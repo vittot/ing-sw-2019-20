@@ -9,5 +9,52 @@ public class Square {
     private List<Player> players;
     private List<CardWeapon> weapons;
     private CardAmmo cardAmmo;
-    //TODO
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public int[] getEdge() {
+        return edge;
+    }
+
+    public void setEdge(int[] edge) {
+        this.edge = edge;
+    }
+
+    public boolean isRespawn() {
+        return respawn;
+    }
+
+    public void setRespawn(boolean respawn) {
+        this.respawn = respawn;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
+
+    public List<CardWeapon> getWeapons() {
+        return weapons;
+    }
+
+    public void setWeapons(List<CardWeapon> weapons) {
+        this.weapons = weapons;
+    }
+
+    public CardAmmo getCardAmmo() {
+        return cardAmmo;
+    }
+
+    public void setCardAmmo(CardAmmo cardAmmo) {
+        this.cardAmmo = cardAmmo;
+    }
 }
