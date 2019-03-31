@@ -1,3 +1,5 @@
+package game.model;
+
 public class Map {
     private int id;
     private Square[][] grid;

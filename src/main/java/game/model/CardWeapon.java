@@ -1,3 +1,5 @@
+package game.model;
+
 import java.util.List;
 
 public class CardWeapon {
