@@ -3,55 +3,55 @@ package game.model;
 import java.util.List;
 
 public class CardWeapon {
-    private int price;
-    private int pricePlus;
-    private int priceAlt;
-    private List<Effect> effectPlus;
-    private Effect effectAlt;
-    private boolean plusBeforeBase;
-    private boolean plusOrder;
+    private List<Color> price;
+    private List<List<Color>> pricePlus;
+    private List<Color> priceAlt;
+    private List<List<Effect>> effectPlus;
+    private List<Effect> effectAlt;
+    private boolean plusBeforeBase;           //True if you can use optional effect before base effect
+    private boolean plusOrder;                //True if you have to respect the order of the list
     private List<Player> lastTarget;
     private Square lastTargetSquare;
     private int lastDirection;
     private boolean loaded;
 
-    public int getPrice() {
+    public List<Color> getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(List<Color> price) {
         this.price = price;
     }
 
-    public int getPricePlus() {
+    public List<List<Color>> getPricePlus() {
         return pricePlus;
     }
 
-    public void setPricePlus(int pricePlus) {
+    public void setPricePlus(List<List<Color>> pricePlus) {
         this.pricePlus = pricePlus;
     }
 
-    public int getPriceAlt() {
+    public List<Color> getPriceAlt() {
         return priceAlt;
     }
 
-    public void setPriceAlt(int priceAlt) {
+    public void setPriceAlt(List<Color> priceAlt) {
         this.priceAlt = priceAlt;
     }
 
-    public List<Effect> getEffectPlus() {
+    public List<List<Effect>> getEffectPlus() {
         return effectPlus;
     }
 
-    public void setEffectPlus(List<Effect> effectPlus) {
+    public void setEffectPlus(List<List<Effect>> effectPlus) {
         this.effectPlus = effectPlus;
     }
 
-    public Effect getEffectAlt() {
+    public List<Effect> getEffectAlt() {
         return effectAlt;
     }
 
-    public void setEffectAlt(Effect effectAlt) {
+    public void setEffectAlt(List<Effect> effectAlt) {
         this.effectAlt = effectAlt;
     }
 
