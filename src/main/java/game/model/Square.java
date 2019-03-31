@@ -10,6 +10,11 @@ public class Square {
     private List<CardWeapon> weapons;
     private CardAmmo cardAmmo;
 
+    public Square(Color c)
+    {
+        this.color = c;
+    }
+
     public Color getColor() {
         return color;
     }
