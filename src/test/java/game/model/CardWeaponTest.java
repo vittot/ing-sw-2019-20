@@ -73,6 +73,28 @@ class CardWeaponTest {
         Effect lcrz12 = new Effect (1,0,1,1,false,false,0,0,1,2,0,0,true,false,false,2,false,false,Target.SQUARE);
         Effect lcrz21 = new Effect (0,0,0,0,false,true,1,2,1,2,0,0,false,false,false,0,false,true,Target.PLAYER);
 
-        //
+        //Laser
+        Effect lsr01 = new Effect (3,0,1,1, false,false,0,0,2,2,0,12,false,false,false,0,false,false,Target.DIRECTION);
+        Effect lsr11 = new Effect (2,0,1,2,false,false,0,0,2,2,0,12,false,false,false,0,true,false,Target.DIRECTION);
+
+        //Photonic blade
+        Effect phot01 = new Effect (2,0,1,1,false,false,0,0,1,2,0,0,false,false,false,0,false,false,Target.PLAYER);
+        Effect phot21 = new Effect (2,0,1,1,false,false,0,0,1,2,0,0,false,false,false,1,false,false,Target.PLAYER);
+        Effect phot32 = new Effect (0,0,0,0,false,true,0,1,1,2,0,0,false,false,false,0,false,false,Target.PLAYER);
+
+        //ZX-2
+        Effect zx01 = new Effect (1,2,1,1,false,false,0,0,1,2,0,12,false,false,false,0,false,false,Target.PLAYER);
+        Effect zx11 = new Effect(0,1,0,3,false,false,0,0,1,2,0,12,false,false,false,0,false,false,Target.PLAYER);
+
+        //Pump
+        Effect pmp01 = new Effect (3,0,1,1,true,false,0,1,1,2,0,0,false,false,false,0,false,false,Target.PLAYER);
+        Effect pmp11 = new Effect (2,0,1,1,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.PLAYER);
+
+        //Cyber
+        //TODO Effect cyb01 = new Effect ()
+
+        //Onda d'urto
+        Effect ond01 = new Effect (1,0,1,3,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.PLAYER);
+
     }
 }
