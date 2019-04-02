@@ -6,14 +6,26 @@ public class CardWeapon {
     private List<Color> price;
     private List<List<Color>> pricePlus;
     private List<Color> priceAlt;
-    private List<List<Effect>> effectPlus;
+    private List<Effect> effectBase;
     private List<Effect> effectAlt;
+    private List<List<Effect>> effectPlus;
     private boolean plusBeforeBase;           //True if you can use optional effect before base effect
     private boolean plusOrder;                //True if you have to respect the order of the list
     private List<Player> lastTarget;
     private Square lastTargetSquare;
     private int lastDirection;
     private boolean loaded;
+
+    public CardWeapon(List<Color> price, List<List<Color>> pricePlus, List<Color> priceAlt, List<List<Effect>> effectPlus, List<Effect> effectAlt, boolean plusBeforeBase, boolean plusOrder) {
+        this.price = price;
+        this.pricePlus = pricePlus;
+        this.priceAlt = priceAlt;
+        this.effectPlus = effectPlus;
+        this.effectAlt = effectAlt;
+        this.plusBeforeBase = plusBeforeBase;
+        this.plusOrder = plusOrder;
+        this.loaded = true;
+    }
 
     public List<Color> getPrice() {
         return price;

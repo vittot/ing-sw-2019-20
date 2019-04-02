@@ -4,7 +4,8 @@ import java.util.List;
 
 public class Player {
     private Color color;
-    private int mark;
+    private List<Color> mark;
+    private int givenMarks;
     private List<Color> damage;
     private int adrenalin;
     private List<CardWeapon> weapons;
@@ -22,11 +23,11 @@ public class Player {
         this.color = color;
     }
 
-    public int getMark() {
+    public List<Color> getMark() {
         return mark;
     }
 
-    public void setMark(int mark) {
+    public void setMark(List<Color> mark) {
         this.mark = mark;
     }
 

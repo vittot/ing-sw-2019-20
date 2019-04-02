@@ -7,20 +7,43 @@ public class Effect {
     private int maxEnemy; //maximum number of enemies to hit
     private boolean moveEnemy; //if the enemy has to be moved
     private boolean moveShooter; //if the player has to be moved
-    private int minMove; //minimum number of movement of the shooter/enemy
-    private int maxMove; //maximum number of movement of the shooter/enemy
-    private int visibility; //0=enemy has to be visible, 1=enemy has to be not visible, 2=enemy can be visible or not
-    private boolean visibilityAfter; //if the enemy must be visible after the movement effect
+    private int minMove; //minimum number of movement of the shooter/enemy (when -1 the enemy has to be moved in the shooter's square)
+    private int maxMove; //maximum number of movement of the shooter/enemy (when -1 the enemy has to be moved in the shooter's square)
+    private int visibility; //0=enemy has to be not visible, 1=enemy has to be visible, 2=enemy can be visible or not
+    private int visibilityAfter; //0=enemy has to be not visible, 1=enemy has to be visible, 2=enemy can be visible or not (after di action)
     private int minDist;
     private int maxDist;
-    private Player shooter;
+    //private Player shooter;
     private int cardDir; //{0,1,2,3} identify a direction for the effect
     private boolean chainTarget; //if the target should be found from the target of the last effect (eg: T.H.O.R.)
     private boolean prevTarget; //if the target has to be the last hit by the weapon
     private boolean chainMove; //if the target has to be moved in the position of the last target (eg. Vortex Cannon)
-    private boolean differentTarget; //if the target has to be different from all the previous target of the weapon
+    private int differentTarget; //0=target can be one of the lasts, 1=target cannot be the last one, 2=target cannot be one of the previews shoot
     private boolean sameDirection; //if the target has to be on same direction of the last target
     private boolean beforeBase; //if the effect is not base effect but can be used before the base effect
+    private Target typeOfTarget; //select the type of target you want to shoot
+
+    public Effect(int damage, int marks, int minEnemy, int maxEnemy, boolean moveEnemy, boolean moveShooter, int minMove, int maxMove, int visibility, int visibilityAfter, int minDist, int maxDist, boolean chainTarget, boolean prevTarget, boolean chainMove, int differentTarget, boolean sameDirection, boolean beforeBase, Target typeOfTarget) {
+        this.damage = damage;
+        this.marks = marks;
+        this.minEnemy = minEnemy;
+        this.maxEnemy = maxEnemy;
+        this.moveEnemy = moveEnemy;
+        this.moveShooter = moveShooter;
+        this.minMove = minMove;
+        this.maxMove = maxMove;
+        this.visibility = visibility;
+        this.visibilityAfter = visibilityAfter;
+        this.minDist = minDist;
+        this.maxDist = maxDist;
+        this.chainTarget = chainTarget;
+        this.prevTarget = prevTarget;
+        this.chainMove = chainMove;
+        this.differentTarget = differentTarget;
+        this.sameDirection = sameDirection;
+        this.beforeBase = beforeBase;
+        this.typeOfTarget = typeOfTarget;
+    }
 
     public int getDamage() {
         return damage;
@@ -94,11 +117,11 @@ public class Effect {
         this.visibility = visibility;
     }
 
-    public boolean isVisibilityAfter() {
+    public int getVisibilityAfter() {
         return visibilityAfter;
     }
 
-    public void setVisibilityAfter(boolean visibilityAfter) {
+    public void setVisibilityAfter(int visibilityAfter) {
         this.visibilityAfter = visibilityAfter;
     }
 
@@ -117,7 +140,7 @@ public class Effect {
     public void setMaxDist(int maxDist) {
         this.maxDist = maxDist;
     }
-
+/*
     public Player getShooter() {
         return shooter;
     }
@@ -125,7 +148,7 @@ public class Effect {
     public void setShooter(Player shooter) {
         this.shooter = shooter;
     }
-
+*/
     public int getCardDir() {
         return cardDir;
     }
@@ -158,11 +181,11 @@ public class Effect {
         this.chainMove = chainMove;
     }
 
-    public boolean isDifferentTarget() {
+    public int getDifferentTarget() {
         return differentTarget;
     }
 
-    public void setDifferentTarget(boolean differentTarget) {
+    public void setDifferentTarget(int differentTarget) {
         this.differentTarget = differentTarget;
     }
 
