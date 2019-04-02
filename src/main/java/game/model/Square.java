@@ -65,17 +65,25 @@ public class Square {
         this.edges = edges;
     }
 
-    //TODO manage map limits
+    //TODO manage map limits controllo 4x3 e null se la mappa bo è rettangolare
     public Square getNextSquare(Direction d)
     {
         switch (d){
             case UP:
+                if (y==0)
+                    return null;
                 return m.getGrid()[x][y-1];
             case DOWN:
+                if (y==m.getDimY())
+                    return null;
                 return m.getGrid()[x][y+1];
             case RIGHT:
+                if (x==m.getDimX())
+                    return null;
                 return m.getGrid()[x+1][y];
             default:
+                if (x==0)
+                    return null;
                 return m.getGrid()[x-1][y];
 
         }
