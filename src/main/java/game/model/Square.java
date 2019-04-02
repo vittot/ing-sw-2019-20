@@ -71,7 +71,11 @@ public class Square {
         this.edges = edges;
     }
 
-
+    /**
+     * Get the next Square in the indicate Direction
+     * @param d
+     * @return the next Square or null if it doesn't exist in the Map
+     */
     public Square getNextSquare(Direction d)
     {
         switch (d){
