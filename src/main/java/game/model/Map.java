@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public class Map {
     private int id;
     private Square[][] grid;
-    private int dim1, dim2;
+    private int dimX, dimY;
 
 
     public int getId() {
@@ -26,36 +26,36 @@ public class Map {
         this.grid = grid;
     }
 
-    public int getDim1() {
-        return dim1;
+    public int getDimX() {
+        return dimX;
     }
 
-    public void setDim1(int dim1) {
-        this.dim1 = dim1;
+    public void setDimX(int dimX) {
+        this.dimX = dimX;
     }
 
-    public int getDim2() {
-        return dim2;
+    public int getDimY() {
+        return dimY;
     }
 
-    public void setDim2(int dim2) {
-        this.dim2 = dim2;
+    public void setDimY(int dimY) {
+        this.dimY = dimY;
     }
 
     public Map(int id, int dim1,int dim2)
     {
         this.id = id;
-        this.dim1 = dim1;
-        this.dim2 = dim2;
+        this.dimX = dim1;
+        this.dimY = dim2;
     }
 
     public List<Square> getRoom(Color c)
     {
         List<Square> room = new ArrayList<>();
         int i,j;
-        for(i=0;i<dim1;i++)
+        for(i=0; i< dimX; i++)
         {
-            for(j=0;j<dim2;j++)
+            for(j=0; j< dimY; j++)
                 if(grid[i][j].getColor() == c)
                     room.add(grid[i][j]);
         }

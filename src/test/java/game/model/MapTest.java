@@ -11,7 +11,7 @@ class MapTest {
 
     @Test
     void getRoom() {
-        Map m = new Map(3,1);
+        Map m = new Map(1,3,1);
         Square[][] grid = new Square[3][1];
         grid[0][0] = new Square(Color.BLUE);
         grid[1][0] = new Square(Color.BLUE);
