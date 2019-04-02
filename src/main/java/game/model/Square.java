@@ -71,7 +71,7 @@ public class Square {
         this.edges = edges;
     }
 
-    //TODO manage map limits controllo 4x3 e null se la mappa bo è rettangolare
+
     public Square getNextSquare(Direction d)
     {
         switch (d){
