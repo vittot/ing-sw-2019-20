@@ -1,5 +1,6 @@
 package game.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Square {
@@ -13,9 +14,14 @@ public class Square {
     private int y;
     private Map m;
 
-    public Square(Color c)
-    {
-        this.color = c;
+    public Square(Color color,  boolean respawn, int x, int y, Map m, Edge[] edges) {
+        this.color = color;
+        this.edges = edges;
+        this.respawn = respawn;
+        this.x = x;
+        this.y = y;
+        this.m = m;
+        players = new ArrayList<>();
     }
 
     public Color getColor() {
@@ -65,26 +71,30 @@ public class Square {
         this.edges = edges;
     }
 
-    //TODO manage map limits controllo 4x3 e null se la mappa bo è rettangolare
+    /**
+     * Get the next Square in the indicate Direction
+     * @param d
+     * @return the next Square or null if it doesn't exist in the Map
+     */
     public Square getNextSquare(Direction d)
     {
         switch (d){
             case UP:
                 if (y==0)
                     return null;
-                return m.getGrid()[x][y-1];
+                return m.getGrid()[x-1][y];
             case DOWN:
                 if (y==m.getDimY())
                     return null;
-                return m.getGrid()[x][y+1];
+                return m.getGrid()[x+1][y];
             case RIGHT:
                 if (x==m.getDimX())
                     return null;
-                return m.getGrid()[x+1][y];
+                return m.getGrid()[x][y+1];
             default:
                 if (x==0)
                     return null;
-                return m.getGrid()[x-1][y];
+                return m.getGrid()[x][y-1];
 
         }
     }
@@ -101,8 +111,9 @@ public class Square {
         return players;
     }
 
-    public void setPlayers(List<Player> players) {
-        this.players = players;
+    public void addPlayer(Player p) {
+        players.add(p);
+        p.setPosition(this);
     }
 
     public List<CardWeapon> getWeapons() {

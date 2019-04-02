@@ -63,11 +63,24 @@ public class Map {
 
     }
 
+    /**
+     * Calculate the distance between two Squares 
+     * @param s1
+     * @param s2
+     * @return
+     */
     static int distanceBtwSquares(Square s1,Square s2)
     {
         return Math.abs(s1.getX() - s2.getX()) + Math.abs(s1.getY() - s2.getY());
     }
 
+    /**
+     * Return the visible target from the indicated position in the indicated distance range
+     * @param s position
+     * @param maxDist maximum allowed distance for targets
+     * @param minDist minimum allowed distance for targets
+     * @return players available as targets
+     */
     public List<Player> getVisibleTargets(Square s, int maxDist, int minDist)
     {
         Square next;
