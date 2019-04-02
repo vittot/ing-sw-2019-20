@@ -20,9 +20,9 @@ class MapTest {
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.WALL,Edge.OPEN,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
         Edge[] edges3 = new Edge[]{Edge.DOOR,Edge.WALL,Edge.WALL,Edge.WALL};
-        grid[0][0] = new Square(Color.BLUE, false, 0, 0, map, edges1);
-        grid[1][0] = new Square(Color.BLUE, false, 1, 0, map, edges2);
-        grid[2][0] = new Square(Color.RED, false, 2, 0, map, edges3);
+        grid[0][0] = new Square(MapColor.BLUE, false, 0, 0, map, edges1);
+        grid[1][0] = new Square(MapColor.BLUE, false, 1, 0, map, edges2);
+        grid[2][0] = new Square(MapColor.RED, false, 2, 0, map, edges3);
         map.setGrid(grid);
     }
 
