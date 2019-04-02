@@ -3,6 +3,7 @@ package game.model;
 import java.util.List;
 
 public class Player {
+    private PlayerColor color;
     private List<Color> mark;
     private int givenMarks;
     private int id;

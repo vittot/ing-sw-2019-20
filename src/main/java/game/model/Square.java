@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Square {
-    private Color color;
+    private MapColor color;
     private Edge[] edges;
     private boolean respawn;
     private List<Player> players;
@@ -14,7 +14,7 @@ public class Square {
     private int y;
     private Map m;
 
-    public Square(Color color,  boolean respawn, int x, int y, Map m, Edge[] edges) {
+    public Square(MapColor color,  boolean respawn, int x, int y, Map m, Edge[] edges) {
         this.color = color;
         this.edges = edges;
         this.respawn = respawn;
@@ -24,11 +24,11 @@ public class Square {
         players = new ArrayList<>();
     }
 
-    public Color getColor() {
+    public MapColor getColor() {
         return color;
     }
 
-    public void setColor(Color color) {
+    public void setColor(MapColor color) {
         this.color = color;
     }
 
