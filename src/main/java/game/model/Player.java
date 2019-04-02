@@ -3,7 +3,7 @@ package game.model;
 import java.util.List;
 
 public class Player {
-    private Color color;
+    private int id;
     private int mark;
     private List<Color> damage;
     private int adrenalin;
@@ -13,13 +13,14 @@ public class Player {
     private int deaths;
     private Square position;
 
-
-    public Color getColor() {
-        return color;
+    public Player(int id)
+    {
+        this.id = id;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+
+    public int id() {
+        return id;
     }
 
     public int getMark() {

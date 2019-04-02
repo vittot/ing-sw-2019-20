@@ -1,5 +1,6 @@
 package game.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Square {
@@ -20,6 +21,7 @@ public class Square {
         this.x = x;
         this.y = y;
         this.m = m;
+        players = new ArrayList<>();
     }
 
     public Color getColor() {
@@ -76,19 +78,19 @@ public class Square {
             case UP:
                 if (y==0)
                     return null;
-                return m.getGrid()[x][y-1];
+                return m.getGrid()[x-1][y];
             case DOWN:
                 if (y==m.getDimY())
                     return null;
-                return m.getGrid()[x][y+1];
+                return m.getGrid()[x+1][y];
             case RIGHT:
                 if (x==m.getDimX())
                     return null;
-                return m.getGrid()[x+1][y];
+                return m.getGrid()[x][y+1];
             default:
                 if (x==0)
                     return null;
-                return m.getGrid()[x-1][y];
+                return m.getGrid()[x][y-1];
 
         }
     }
@@ -105,8 +107,9 @@ public class Square {
         return players;
     }
 
-    public void setPlayers(List<Player> players) {
-        this.players = players;
+    public void addPlayer(Player p) {
+        players.add(p);
+        p.setPosition(this);
     }
 
     public List<CardWeapon> getWeapons() {
