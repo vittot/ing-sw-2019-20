@@ -13,9 +13,13 @@ public class Square {
     private int y;
     private Map m;
 
-    public Square(Color c)
-    {
-        this.color = c;
+    public Square(Color color,  boolean respawn, int x, int y, Map m, Edge[] edges) {
+        this.color = color;
+        this.edges = edges;
+        this.respawn = respawn;
+        this.x = x;
+        this.y = y;
+        this.m = m;
     }
 
     public Color getColor() {
