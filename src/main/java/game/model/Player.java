@@ -3,8 +3,10 @@ package game.model;
 import java.util.List;
 
 public class Player {
-    private Color color;
-    private int mark;
+    private PlayerColor color;
+    private List<Color> mark;
+    private int givenMarks;
+    private int id;
     private List<Color> damage;
     private int adrenalin;
     private List<CardWeapon> weapons;
@@ -13,20 +15,21 @@ public class Player {
     private int deaths;
     private Square position;
 
-
-    public Color getColor() {
-        return color;
+    public Player(int id)
+    {
+        this.id = id;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+
+    public int id() {
+        return id;
     }
 
-    public int getMark() {
+    public List<Color> getMark() {
         return mark;
     }
 
-    public void setMark(int mark) {
+    public void setMark(List<Color> mark) {
         this.mark = mark;
     }
 
