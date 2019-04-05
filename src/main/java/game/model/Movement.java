@@ -9,10 +9,10 @@ public class Movement extends Effect{
     private boolean sameDirection;
     private boolean beforeBase;
 
-    public Movement(int minEnemy, int maxEnemy, int visibility, int visibilityAfter, int minDist, int maxDist, boolean moveShooter, int visibilityAfter1, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase) {
-        super(minEnemy, maxEnemy, visibility, visibilityAfter, minDist, maxDist);
+    public Movement(int minEnemy, int maxEnemy, int minDist, int maxDist, int visibility, boolean moveShooter, int visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase) {
+        super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.moveShooter = moveShooter;
-        this.visibilityAfter = visibilityAfter1;
+        this.visibilityAfter = visibilityAfter;
         this.myPos = myPos;
         this.chainMove = chainMove;
         this.lastTarget = lastTarget;

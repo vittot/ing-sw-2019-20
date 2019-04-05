@@ -8,8 +8,8 @@ public class PlainDamage extends Effect{
     private boolean chainTarget; //if the target should be found from the target of the last effect (eg: T.H.O.R.)
     private boolean sameDirection; //if the next target has to be on the same last direction
 
-    public PlainDamage(int minEnemy, int maxEnemy, int visibility, int visibilityAfter, int minDist, int maxDist, int damage, int marks, boolean lastTarget, int differentTarget, boolean chainTarget, boolean sameDirection) {
-        super(minEnemy, maxEnemy, visibility, visibilityAfter, minDist, maxDist);
+    public PlainDamage(int minEnemy, int maxEnemy, int minDist, int maxDist, int visibility, int damage, int marks, boolean lastTarget, int differentTarget, boolean chainTarget, boolean sameDirection) {
+        super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.damage = damage;
         this.marks = marks;
         this.lastTarget = lastTarget;

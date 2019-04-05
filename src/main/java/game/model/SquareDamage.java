@@ -6,8 +6,8 @@ public class SquareDamage extends Effect{
     private boolean lastTargetSquare;
     private boolean sameDirection;
 
-    public SquareDamage(int minEnemy, int maxEnemy, int visibility, int visibilityAfter, int minDist, int maxDist, int damage, int marks, boolean lastTargetSquare, boolean sameDirection) {
-        super(minEnemy, maxEnemy, visibility, visibilityAfter, minDist, maxDist);
+    public SquareDamage(int minEnemy, int maxEnemy, int minDist, int maxDist, int visibility, int damage, int marks, boolean lastTargetSquare, boolean sameDirection) {
+        super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.damage = damage;
         this.marks = marks;
         this.lastTargetSquare = lastTargetSquare;
