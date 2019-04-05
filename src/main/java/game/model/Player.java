@@ -2,7 +2,7 @@ package game.model;
 
 import java.util.List;
 
-public class Player {
+public class Player implements Target{
     private PlayerColor color;
     private List<Color> mark;
     private int givenMarks;

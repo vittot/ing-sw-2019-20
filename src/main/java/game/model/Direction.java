@@ -1,6 +1,6 @@
 package game.model;
 
-public enum Direction {
+public enum Direction implements Target{
     UP,
     DOWN,
     LEFT,
