@@ -3,7 +3,7 @@ package game.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Square {
+public class Square implements Target{
     private MapColor color;
     private Edge[] edges;
     private boolean respawn;

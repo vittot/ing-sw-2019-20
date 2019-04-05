@@ -1,6 +1,6 @@
 package game.model;
 
-public enum MapColor {
+public enum MapColor implements Target{
     RED,
     BLUE,
     YELLOW,
