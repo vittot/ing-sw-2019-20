@@ -49,7 +49,7 @@ public class Map {
         this.dimY = dim2;
     }
 
-    public List<Square> getRoom(Color c)
+    public List<Square> getRoom(MapColor c)
     {
         List<Square> room = new ArrayList<>();
         int i,j;
@@ -84,7 +84,7 @@ public class Map {
     public List<Player> getVisibleTargets(Square s, int maxDist, int minDist)
     {
         Square next;
-        Color c = s.getColor();
+        MapColor c = s.getColor();
         List<Square> result = this.getRoom(c).stream().filter((s2) -> Map.distanceBtwSquares(s,s2)<=maxDist && Map.distanceBtwSquares(s,s2)>=minDist).collect(Collectors.toList());
         for(Direction d : Direction.values())
         {

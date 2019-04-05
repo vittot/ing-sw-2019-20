@@ -10,6 +10,7 @@ class CardWeaponTest {
     @Test
     void instanceWeapons ()
     {
+        /*
         //Distruttore
         Effect distr01 = new Effect (2,1,1,1,false,false,0,0,1,2,0,12,false, false,false,0,false,false, Target.PLAYER);
         Effect distr21 = new Effect (0,1,1,1,false,false,0,0,1,2,0, 12,false,false,false,2,false,false, Target.PLAYER);
@@ -96,5 +97,7 @@ class CardWeaponTest {
         //Onda d'urto
         Effect ond01 = new Effect (1,0,1,3,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.PLAYER);
 
+        CardWeapon distruttore = new CardWeapon ()
+        */
     }
 }
