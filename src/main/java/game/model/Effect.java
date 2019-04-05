@@ -10,7 +10,7 @@ public class Effect {
     private int minMove; //minimum number of movement of the shooter/enemy
     private int maxMove; //maximum number of movement of the shooter/enemy
     private int visibility; //0=enemy has to be visible, 1=enemy has to be not visible, 2=enemy can be visible or not
-    private boolean visibilityAfter; //if the enemy must be visible after the movement effect
+    private int visibilityAfter; //if the enemy must be visible after the movement effect
     private int minDist;
     private int maxDist;
     private Player shooter;
@@ -18,9 +18,32 @@ public class Effect {
     private boolean chainTarget; //if the target should be found from the target of the last effect (eg: T.H.O.R.)
     private boolean prevTarget; //if the target has to be the last hit by the weapon
     private boolean chainMove; //if the target has to be moved in the position of the last target (eg. Vortex Cannon)
-    private boolean differentTarget; //if the target has to be different from all the previous target of the weapon
+    private int differentTarget; // 0 false 1 different from last one 2 true
     private boolean sameDirection; //if the target has to be on same direction of the last target
     private boolean beforeBase; //if the effect is not base effect but can be used before the base effect
+    private Target tipeOfTardet;
+
+    public Effect(int damage, int marks, int minEnemy, int maxEnemy, boolean moveEnemy, boolean moveShooter, int minMove, int maxMove, int visibility, int visibilityAfter, int minDist, int maxDist, boolean chainTarget, boolean prevTarget, boolean chainMove, boolean differentTarget, boolean sameDirection, boolean beforeBase, Target tipeOfTardet) {
+        this.damage = damage;
+        this.marks = marks;
+        this.minEnemy = minEnemy;
+        this.maxEnemy = maxEnemy;
+        this.moveEnemy = moveEnemy;
+        this.moveShooter = moveShooter;
+        this.minMove = minMove;
+        this.maxMove = maxMove;
+        this.visibility = visibility;
+        this.visibilityAfter = visibilityAfter;
+        this.minDist = minDist;
+        this.maxDist = maxDist;
+        this.chainTarget = chainTarget;
+        this.prevTarget = prevTarget;
+        this.chainMove = chainMove;
+        this.differentTarget = differentTarget;
+        this.sameDirection = sameDirection;
+        this.beforeBase = beforeBase;
+        this.tipeOfTardet = tipeOfTardet;
+    }
 
     public int getDamage() {
         return damage;
