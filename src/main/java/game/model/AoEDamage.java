@@ -1,5 +1,7 @@
 package game.model;
 
+import java.util.List;
+
 public class AoEDamage extends Effect{
     private int damage;
     private int marks;
@@ -25,4 +27,8 @@ public class AoEDamage extends Effect{
     public void setMarks(int marks) {
         this.marks = marks;
     }
+
+    public List<List<Target>> searchTarget(Player shooter){}
+
+    public void applyEffect(Player shooter, List<Target>){}
 }

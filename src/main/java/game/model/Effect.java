@@ -1,5 +1,7 @@
 package game.model;
 
+import java.util.List;
+
 public abstract class Effect {
     private int minEnemy;
     private int maxEnemy;
@@ -54,4 +56,8 @@ public abstract class Effect {
     public void setVisibility(int visibility) {
         this.visibility = visibility;
     }
+
+    public List<List<Target>> searchTarget(Player shooter){}
+
+    public void applyEffect(Player shooter, List<Target>){}
 }

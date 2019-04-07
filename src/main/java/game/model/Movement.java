@@ -1,5 +1,7 @@
 package game.model;
 
+import java.util.List;
+
 public class Movement extends Effect{
     private boolean moveShooter; //true if the shoother has to to be moved, false if the enemy has to be moved
     private int visibilityAfter;
@@ -75,4 +77,8 @@ public class Movement extends Effect{
     public void setBeforeBase(boolean beforeBase) {
         this.beforeBase = beforeBase;
     }
+
+    public List<List<Target>> searchTarget(Player shooter){}
+
+    public void applyEffect(Player shooter, List<Target>){}
 }

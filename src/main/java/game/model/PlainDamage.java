@@ -1,5 +1,7 @@
 package game.model;
 
+import java.util.List;
+
 public class PlainDamage extends Effect{
     private int damage;
     private int marks;
@@ -65,4 +67,8 @@ public class PlainDamage extends Effect{
     public void setSameDirection(boolean sameDirection) {
         this.sameDirection = sameDirection;
     }
+
+    public List<List<Target>> searchTarget(Player shooter){}
+
+    public void applyEffect(Player shooter, List<Target>){}
 }
