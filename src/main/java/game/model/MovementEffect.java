@@ -1,15 +1,15 @@
 package game.model;
 
-public class Movement extends Effect{
+public class MovementEffect extends Effect{
     private boolean moveShooter; //true if the shoother has to to be moved, false if the enemy has to be moved
-    private int visibilityAfter;
+    private TargetVisibility visibilityAfter;
     private boolean myPos;
     private boolean chainMove; //if the target has to be moved in the position of the last target (eg. Vortex Cannon)
     private boolean lastTarget;
     private boolean sameDirection;
     private boolean beforeBase;
 
-    public Movement(int minEnemy, int maxEnemy, int minDist, int maxDist, int visibility, boolean moveShooter, int visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase) {
+    public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.moveShooter = moveShooter;
         this.visibilityAfter = visibilityAfter;
@@ -28,11 +28,11 @@ public class Movement extends Effect{
         this.moveShooter = moveShooter;
     }
 
-    public int getVisibilityAfter() {
+    public TargetVisibility getVisibilityAfter() {
         return visibilityAfter;
     }
 
-    public void setVisibilityAfter(int visibilityAfter) {
+    public void setVisibilityAfter(TargetVisibility visibilityAfter) {
         this.visibilityAfter = visibilityAfter;
     }
 

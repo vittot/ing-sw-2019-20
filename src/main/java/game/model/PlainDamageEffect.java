@@ -1,14 +1,14 @@
 package game.model;
 
-public class PlainDamage extends Effect{
+public class PlainDamageEffect extends Effect{
     private int damage;
     private int marks;
     private boolean lastTarget; //if the target has to be the last hit by the weapon
-    private int differentTarget; //0=target can be one of the lasts, 1=target cannot be the last one, 2=target cannot be one of the previews shoot
+    private DifferentTarget differentTarget; //0=target can be one of the lasts, 1=target cannot be the last one, 2=target cannot be one of the previews shoot
     private boolean chainTarget; //if the target should be found from the target of the last effect (eg: T.H.O.R.)
     private boolean sameDirection; //if the next target has to be on the same last direction
 
-    public PlainDamage(int minEnemy, int maxEnemy, int minDist, int maxDist, int visibility, int damage, int marks, boolean lastTarget, int differentTarget, boolean chainTarget, boolean sameDirection) {
+    public PlainDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, boolean lastTarget, DifferentTarget differentTarget, boolean chainTarget, boolean sameDirection) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.damage = damage;
         this.marks = marks;
@@ -42,11 +42,11 @@ public class PlainDamage extends Effect{
         this.lastTarget = lastTarget;
     }
 
-    public int getDifferentTarget() {
+    public DifferentTarget getDifferentTarget() {
         return differentTarget;
     }
 
-    public void setDifferentTarget(int differentTarget) {
+    public void setDifferentTarget(DifferentTarget differentTarget) {
         this.differentTarget = differentTarget;
     }
 

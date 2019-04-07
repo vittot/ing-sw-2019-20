@@ -5,9 +5,9 @@ public abstract class Effect {
     private int maxEnemy;
     private int minDist;
     private int maxDist;
-    private int visibility;
+    private TargetVisibility visibility;
 
-    public Effect(int minEnemy, int maxEnemy, int minDist, int maxDist, int visibility) {
+    public Effect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility) {
         this.minEnemy = minEnemy;
         this.maxEnemy = maxEnemy;
         this.minDist = minDist;
@@ -47,11 +47,11 @@ public abstract class Effect {
         this.maxDist = maxDist;
     }
 
-    public int getVisibility() {
+    public TargetVisibility getVisibility() {
         return visibility;
     }
 
-    public void setVisibility(int visibility) {
+    public void setVisibility(TargetVisibility visibility) {
         this.visibility = visibility;
     }
 }

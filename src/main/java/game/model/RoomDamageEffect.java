@@ -1,10 +1,10 @@
 package game.model;
 
-public class RoomDamage extends Effect{
+public class RoomDamageEffect extends Effect{
     private int damage;
     private int marks;
 
-    public RoomDamage(int minEnemy, int maxEnemy, int minDist, int maxDist, int visibility, int damage, int marks) {
+    public RoomDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.damage = damage;
         this.marks = marks;
