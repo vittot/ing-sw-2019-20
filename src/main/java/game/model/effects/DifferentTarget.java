@@ -1,4 +1,4 @@
-package game.model;
+package game.model.effects;
 
 public enum DifferentTarget {
     ANYONE,

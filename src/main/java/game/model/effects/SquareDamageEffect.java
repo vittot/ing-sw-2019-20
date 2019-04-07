@@ -1,6 +1,8 @@
-package game.model;
+package game.model.effects;
 
-import java.util.ArrayList;
+import game.model.Player;
+import game.model.Target;
+
 import java.util.List;
 
 public class SquareDamageEffect extends Effect{

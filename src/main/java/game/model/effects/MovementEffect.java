@@ -1,4 +1,9 @@
-package game.model;
+package game.model.effects;
+
+import game.model.CardWeapon;
+import game.model.Player;
+import game.model.Square;
+import game.model.Target;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +106,7 @@ public class MovementEffect extends Effect{
             }
         }
         else{
-            //TODO code to permit the enemy movement effect
+            //TODO code to permit the enemy movement effects
         }
         return result;
     }

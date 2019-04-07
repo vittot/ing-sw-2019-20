@@ -1,5 +1,7 @@
 package game.model;
 
+import game.model.effects.Effect;
+
 import java.util.List;
 
 public class CardWeapon {
@@ -9,7 +11,7 @@ public class CardWeapon {
     private List<Effect> effectBase;
     private List<Effect> effectAlt;
     private List<List<Effect>> effectPlus;
-    private boolean plusBeforeBase;           //True if you can use optional effect before base effect
+    private boolean plusBeforeBase;           //True if you can use optional effects before base effects
     private boolean plusOrder;                //True if you have to respect the order of the list
     private List<Player> lastTarget;
     private Square lastTargetSquare;
