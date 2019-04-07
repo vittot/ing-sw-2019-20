@@ -1,5 +1,6 @@
 package game.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Effect {
@@ -57,7 +58,9 @@ public abstract class Effect {
         this.visibility = visibility;
     }
 
-    public List<List<Target>> searchTarget(Player shooter){}
+    public List<List<Target>> searchTarget(Player shooter){
+        return null;
+    }
 
-    public void applyEffect(Player shooter, List<Target>){}
+    public void applyEffect(Player shooter, List<Target> targets){}
 }

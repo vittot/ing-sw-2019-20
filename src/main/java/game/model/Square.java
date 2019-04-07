@@ -131,4 +131,84 @@ public class Square implements Target{
     public void setCardAmmo(CardAmmo cardAmmo) {
         this.cardAmmo = cardAmmo;
     }
+
+    public List<Square> getSameColorSquares(){
+        List<Square> sameMapColor=new ArrayList<>();
+        for(int x=0;x<m.getDimX();x++){
+            for(int y=0;y<m.getDimY();y++){
+                if(this.color==m.getGrid()[x][y].getColor()){
+                    sameMapColor.add(m.getGrid()[x][y]);
+                }
+            }
+        }
+        return sameMapColor;
+    }
+
+    public List<Square> getAdiacentRoomSquares(Direction d){
+        Square tmp;
+        if(this.getEdge(d)== Edge.DOOR) {
+            tmp = this.getNextSquare(d);
+            return tmp.getSameColorSquares();
+        }
+        else
+            return null;
+    }
+
+    public List<List<Square>> getVisibleSquares(){
+        List<List<Square>> result=new ArrayList<>();
+        List<Square> tmp = new ArrayList<>();
+        tmp=this.getSameColorSquares();
+        result.add(tmp);
+        if(this.getAdiacentRoomSquares(Direction.UP)!=null){
+            result.add((ArrayList)this.getAdiacentRoomSquares(Direction.UP));
+        }
+        if (this.getAdiacentRoomSquares(Direction.RIGHT)!=null){
+            result.add((ArrayList)this.getAdiacentRoomSquares(Direction.RIGHT));
+        }
+        if (this.getAdiacentRoomSquares(Direction.DOWN)!=null){
+            result.add((ArrayList)this.getAdiacentRoomSquares(Direction.DOWN));
+        }
+        if (this.getAdiacentRoomSquares(Direction.LEFT)!=null){
+            result.add((ArrayList)this.getAdiacentRoomSquares(Direction.LEFT));
+        }
+        return result;
+    }
+
+    public List<List<Target>> getSquaresInRange(int minDist, int maxDist){
+        List<List<Target>> result=new ArrayList<>();
+        List<Target> tmp=new ArrayList<>();
+        int sum;
+        for(int x=0;x<m.getDimX();x++){
+            for(int y=0;y<m.getDimY();y++){
+                sum=Math.abs(this.getX()-m.getGrid()[x][y].getX())+Math.abs(this.getY()-m.getGrid()[x][y].getY());
+                if(sum>=minDist && sum<=maxDist){
+                    tmp.add(m.getGrid()[x][y]);
+                    result.add(tmp);
+                    tmp.clear();
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<List<Target>> getSquaresInRange(int minDist, int maxDist, int lastDirection){
+        List<List<Target>> result=new ArrayList<>();
+        List<Target> tmp=new ArrayList<>();
+        Square actual,next;
+        int sum;
+        Direction d=Direction.getDirection(lastDirection);
+        actual=this;
+        for(int i=0;i<maxDist;i++){
+            next=actual.getNextSquare(d);
+            sum=Math.abs(this.getX()-next.getX())+Math.abs(this.getY()-next.getY());
+            if(sum>=minDist && sum<=maxDist){
+                tmp.add(next);
+                result.add(tmp);
+                tmp.clear();
+            }
+            actual=next;
+        }
+        return result;
+    }
+
 }

@@ -4,5 +4,19 @@ public enum Direction implements Target{
     UP,
     DOWN,
     LEFT,
-    RIGHT
+    RIGHT;
+
+    public static Direction getDirection(int var){
+        switch(var){
+            case 0:
+                return Direction.UP;
+            case 1:
+                return Direction.RIGHT;
+            case 2:
+                return Direction.DOWN;
+            default:
+                return Direction.LEFT;
+
+        }
+    }
 }

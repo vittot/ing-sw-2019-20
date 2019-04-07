@@ -1,5 +1,6 @@
 package game.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RoomDamageEffect extends Effect{
@@ -28,7 +29,11 @@ public class RoomDamageEffect extends Effect{
         this.marks = marks;
     }
 
-    public List<List<Target>> searchTarget(Player shooter){}
+    public List<List<Target>> searchTarget(Player shooter){
+        return null;
+    }
 
-    public void applyEffect(Player shooter, List<Target>){}
+    public void applyEffect(Player shooter, List<Target> targets){
+        //TODO
+    }
 }

@@ -1,11 +1,12 @@
 package game.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MovementEffect extends Effect{
-    private boolean moveShooter; //true if the shoother has to to be moved, false if the enemy has to be moved
+    private boolean moveShooter; //true if the shooter has to to be moved, false if the enemy has to be moved
     private TargetVisibility visibilityAfter;
-    private boolean myPos;
+    private boolean myPos;  //true if the target has to be moved into the position of the shooter
     private boolean chainMove; //if the target has to be moved in the position of the last target (eg. Vortex Cannon)
     private boolean lastTarget;
     private boolean sameDirection;
@@ -78,7 +79,34 @@ public class MovementEffect extends Effect{
         this.beforeBase = beforeBase;
     }
 
-    public List<List<Target>> searchTarget(Player shooter){}
+    public List<List<Target>> searchTarget(Player shooter){
+        List<List<Target>> result = new ArrayList<>(); //it will contain the final result of the method
+        if(moveShooter) { //part of the method that control the shooter movement
+            Square startingPosition = shooter.getPosition(); //the starting position of the shooter
+            CardWeapon actualWeapon = shooter.getWeapons().get(shooter.getActualWeapon()); //the weapon the player is using
+            ArrayList<Target> tmp = new ArrayList<>(); //temporary variable that will compose the final result
+            Square actual;
+            Square next;
+            int sIndex;
+            if (chainMove) {
+                tmp.add(actualWeapon.getLastTargetSquare());
+                result.add(tmp);
+            }
+            else {
+                if(sameDirection){
+                    result=startingPosition.getSquaresInRange(this.getMinDist(),this.getMaxDist(),actualWeapon.getLastDirection());
+                }
+                else
+                    result=startingPosition.getSquaresInRange(this.getMinDist(),this.getMaxDist());
+            }
+        }
+        else{
+            //TODO code to permit the enemy movement effect
+        }
+        return result;
+    }
 
-    public void applyEffect(Player shooter, List<Target>){}
+    public void applyEffect(Player shooter, List<Target> targets){
+        //TODO
+    }
 }

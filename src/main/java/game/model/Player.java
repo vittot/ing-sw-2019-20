@@ -10,6 +10,7 @@ public class Player implements Target{
     private List<Color> damage;
     private int adrenalin;
     private List<CardWeapon> weapons;
+    private int actualWeapon; //index of the weapon that the player is using
     private List<Color> ammo;
     private List<CardPower> cardPower;
     private int deaths;
@@ -20,9 +21,36 @@ public class Player implements Target{
         this.id = id;
     }
 
+    public PlayerColor getColor() {
+        return color;
+    }
 
-    public int id() {
+    public void setColor(PlayerColor color) {
+        this.color = color;
+    }
+
+    public int getGivenMarks() {
+        return givenMarks;
+    }
+
+    public void setGivenMarks(int givenMarks) {
+        this.givenMarks = givenMarks;
+    }
+
+    public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getActualWeapon() {
+        return actualWeapon;
+    }
+
+    public void setActualWeapon(int actualWeapon) {
+        this.actualWeapon = actualWeapon;
     }
 
     public List<Color> getMark() {
