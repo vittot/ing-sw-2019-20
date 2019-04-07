@@ -2,7 +2,7 @@ package game.model;
 
 import java.util.List;
 
-public class PlainDamage extends Effect{
+public class PlainDamageEffect extends Effect{
     private int damage;
     private int marks;
     private boolean lastTarget; //if the target has to be the last hit by the weapon
@@ -10,7 +10,7 @@ public class PlainDamage extends Effect{
     private boolean chainTarget; //if the target should be found from the target of the last effect (eg: T.H.O.R.)
     private boolean sameDirection; //if the next target has to be on the same last direction
 
-    public PlainDamage(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, boolean lastTarget, DifferentTarget differentTarget, boolean chainTarget, boolean sameDirection) {
+    public PlainDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, boolean lastTarget, DifferentTarget differentTarget, boolean chainTarget, boolean sameDirection) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.damage = damage;
         this.marks = marks;

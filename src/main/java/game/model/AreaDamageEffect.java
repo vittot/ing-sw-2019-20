@@ -1,6 +1,5 @@
 package game.model;
 
-<<<<<<< HEAD:src/main/java/game/model/AoEDamage.java
 import java.util.List;
 
 public class AreaDamageEffect extends Effect{
