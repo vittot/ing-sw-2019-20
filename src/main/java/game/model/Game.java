@@ -11,6 +11,7 @@ public class Game {
     private List<CardPower> powerWaste;
     private List<Kill> kills;
     private Turn currentTurn;
+    public static final int MAXPLAYERS = 5;
 
     public List<Player> getPlayers() {
         return players;

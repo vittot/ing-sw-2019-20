@@ -1,10 +1,8 @@
 package game.model;
 
-<<<<<<< HEAD
+
 import org.junit.jupiter.api.BeforeAll;
-=======
 import org.junit.jupiter.api.BeforeEach;
->>>>>>> 11e9c3653aa9286085b516ce99695acacd8c4f4d
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -37,7 +35,7 @@ class MapTest {
         blueRoom.add(map.getGrid()[0][0]);
         blueRoom.add(map.getGrid()[1][0]);
 
-        assertEquals(map.getRoom(Color.BLUE), blueRoom);
+        assertEquals(map.getRoom(MapColor.BLUE), blueRoom);
     }
 
     @Test

@@ -8,6 +8,7 @@ public class Map {
     private int id;
     private Square[][] grid;
     private int dimX, dimY;
+    public static final int maxDist = 5;
 
 
     public int getId() {
