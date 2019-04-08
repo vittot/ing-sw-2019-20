@@ -5,6 +5,12 @@ public class Kill {
     private Player victim;
     private boolean isRage;
 
+    public Kill(Player killer, Player victim, boolean isRage) {
+        this.killer = killer;
+        this.victim = victim;
+        this.isRage = isRage;
+    }
+
     public Player getKiller() {
         return killer;
     }
