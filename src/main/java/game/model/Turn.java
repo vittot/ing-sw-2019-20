@@ -53,4 +53,22 @@ public class Turn {
         numOfActions = 2;
         numOfMovs = 0;
     }
+    public void newAction(Action action, int adrenalin){
+        if (numOfActions == 0){}  //TODO throw exe
+        numOfActions = numOfActions - 1;
+        switch (action){
+            case GRAB:
+                if (adrenalin > 0 ){
+                            numOfMovs = 2;
+                }else
+                    numOfMovs = 1;
+
+            case SHOOT:
+                if(adrenalin == 2){
+                    numOfMovs = 1;
+                }else
+                    numOfMovs = 0;
+            case MOVEMENT: numOfMovs = 3;
+        }
+    }
 }
