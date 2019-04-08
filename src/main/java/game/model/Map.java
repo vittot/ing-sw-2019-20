@@ -43,11 +43,11 @@ public class Map {
         this.dimY = dimY;
     }
 
-    public Map(int id, int dim1,int dim2)
+    public Map(int id, int dimX,int dimY)
     {
         this.id = id;
-        this.dimX = dim1;
-        this.dimY = dim2;
+        this.dimX = dimX;
+        this.dimY = dimY;
     }
 
     public List<Square> getRoom(MapColor c)

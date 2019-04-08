@@ -117,5 +117,7 @@ public class CardWeapon {
         this.loaded = loaded;
     }
 
-    public void reloadWeapon(List<CardAmmo> cardAmmo, List<CardPower> powerUp){}
+    public void reloadWeapon(List<CardAmmo> cardAmmo, List<CardPower> powerUp){
+        // TODO
+    }
 }
