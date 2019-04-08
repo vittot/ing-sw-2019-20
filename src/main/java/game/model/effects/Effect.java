@@ -12,12 +12,15 @@ public abstract class Effect {
     private int maxDist;
     private TargetVisibility visibility;
 
+
+
     public Effect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility) {
         this.minEnemy = minEnemy;
         this.maxEnemy = maxEnemy;
         this.minDist = minDist;
         this.maxDist = maxDist;
         this.visibility = visibility;
+
     }
 
     public int getMinEnemy() {

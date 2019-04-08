@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Player implements Target{
     private PlayerColor color;
-    private List<Color> mark;
+    private List<Color> marks;
     private int givenMarks;
     private int id;
     private List<Color> damage;

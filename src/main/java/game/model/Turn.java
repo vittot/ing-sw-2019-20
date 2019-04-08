@@ -37,4 +37,20 @@ public class Turn {
     public void setCurrentAction(Action currentAction) {
         this.currentAction = currentAction;
     }
+
+    /**
+     * Get the next Square in the indicate Direction
+     * @param player , finalFrezy
+     * @return void
+     */
+
+    public void newTurn(Player player, boolean finalFrezy){
+        currentPlayer = player;
+        if (finalFrezy) {
+            numOfMovs = 0;
+            numOfActions = 2;
+        }
+        numOfActions = 2;
+        numOfMovs = 0;
+    }
 }

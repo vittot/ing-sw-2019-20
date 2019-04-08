@@ -115,7 +115,7 @@ public class Game {
         ammoWaste.clear();
     }
 
-    public void replacePower(){
+    public void replacePowerUpDeck(){
         Random rand = new Random();
         CardPower tmp;
         int n;
@@ -127,6 +127,14 @@ public class Game {
         deckPower.addAll(powerWaste);
         powerWaste.clear();
     }
-
+    // set the player for next turn
+    public void changeTurn (){
+        int num = 0;
+        num = players.indexOf(currentTurn.getCurrentPlayer());
+        if(num == players.size()){
+            currentTurn.setCurrentPlayer(players.get(0));
+        }else
+            currentTurn.setCurrentPlayer(players.get(num+1));
+    }
     //TODO
 }

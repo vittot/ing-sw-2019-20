@@ -1,15 +1,17 @@
 package game.model;
 
+import java.util.List;
+
 public class CardAmmo {
-    private Color ammo;
+    private List<Color> ammo;
     private CardPower cardPower;
 
-    public Color getAmmo() {
-        return ammo;
+    public void setAmmo(List<Color> ammo) {
+        this.ammo = ammo;
     }
 
-    public void setAmmo(Color ammo) {
-        this.ammo = ammo;
+    public List<Color> getAmmo() {
+        return ammo;
     }
 
     public CardPower getCardPower() {
