@@ -4,10 +4,10 @@ import java.util.List;
 
 public class Player implements Target{
     private PlayerColor color;
-    private List<Color> marks;
+    private List<PlayerColor> marks;
     private int givenMarks;
     private int id;
-    private List<Color> damage;
+    private List<PlayerColor> damage;
     private int adrenalin;
     private List<CardWeapon> weapons;
     private int actualWeapon; //index of the weapon that the player is using
@@ -15,6 +15,8 @@ public class Player implements Target{
     private List<CardPower> cardPower;
     private int deaths;
     private Square position;
+
+
 
     public Player(int id)
     {
@@ -53,19 +55,19 @@ public class Player implements Target{
         this.actualWeapon = actualWeapon;
     }
 
-    public List<Color> getMark() {
-        return mark;
+    public List<PlayerColor> getMark() {
+        return marks;
     }
 
-    public void setMark(List<Color> mark) {
-        this.mark = mark;
+    public void setMark(List<PlayerColor> mark) {
+        this.marks = mark;
     }
 
-    public List<Color> getDamage() {
+    public List<PlayerColor> getDamage() {
         return damage;
     }
 
-    public void setDamage(List<Color> damage) {
+    public void setDamage(List<PlayerColor> damage) {
         this.damage = damage;
     }
 

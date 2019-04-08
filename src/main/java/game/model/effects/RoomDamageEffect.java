@@ -36,6 +36,7 @@ public class RoomDamageEffect extends Effect{
     }
 
     public void applyEffect(Player shooter, List<Target> targets){
+
         //TODO
     }
 }

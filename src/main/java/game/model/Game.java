@@ -15,6 +15,7 @@ public class Game {
     private List<CardAmmo> ammoWaste;
     private List<Kill> killBoard;
     private Turn currentTurn;
+    private ScoreBoard scoreBoard;
     public static final int MAXPLAYERS = 5;
 
     public Game(List<Player> players, Map map) {
@@ -136,5 +137,13 @@ public class Game {
         }else
             currentTurn.setCurrentPlayer(players.get(num+1));
     }
+    public boolean checkVictory(){
+        return (killBoard.size() == 8);
+    }
+    //TODO
+    public List<Integer> countPoints(){
+        return null;
+    }
+
     //TODO
 }
