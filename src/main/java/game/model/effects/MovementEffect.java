@@ -15,9 +15,12 @@ public class MovementEffect extends Effect{
     private boolean chainMove; //if the target has to be moved in the position of the last target (eg. Vortex Cannon)
     private boolean lastTarget;
     private boolean sameDirection;
+    private DifferentTarget differentTarget;
     private boolean beforeBase;
+    private int minMove;
+    private int maxMove;
 
-    public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase) {
+    public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, int minMove, int maxMove, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase,DifferentTarget differentTarget) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.moveShooter = moveShooter;
         this.visibilityAfter = visibilityAfter;
@@ -26,6 +29,9 @@ public class MovementEffect extends Effect{
         this.lastTarget = lastTarget;
         this.sameDirection = sameDirection;
         this.beforeBase = beforeBase;
+        this.minMove = minMove;
+        this.maxMove = maxMove;
+        this.differentTarget = differentTarget;
     }
 
     public boolean isMoveShooter() {

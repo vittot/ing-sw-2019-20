@@ -1,11 +1,23 @@
 package game.model;
 
+import game.model.effects.Effect;
+
 import java.util.List;
 
 public class CardPower {
     private int type;
-    private Color color;
-    private List<Color> price;
+    private Color color;    //card color (for respwan or to pay ammo)
+    private List<Color> price; //price for the use of the effect
+    private boolean usedWhenDamaged;
+    private List<Effect> effect;
+
+    public CardPower(int type, Color color, List<Color> price, boolean usedWhenDamaged, List<Effect> effect) {
+        this.type = type;
+        this.color = color;
+        this.price = price;
+        this.usedWhenDamaged = usedWhenDamaged;
+        this.effect = effect;
+    }
 
     public int getType() {
         return type;
