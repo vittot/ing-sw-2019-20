@@ -9,7 +9,7 @@ public class Game {
     private List<CardAmmo> deckAmmo;
     private List<CardWeapon> deckWeapon;
     private List<CardPower> powerWaste;
-    private List<Kill> kills;
+    private List<Kill> killBoard;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
 
@@ -61,12 +61,12 @@ public class Game {
         this.powerWaste = powerWaste;
     }
 
-    public List<Kill> getKills() {
-        return kills;
+    public List<Kill> getKillBoard() {
+        return killBoard;
     }
 
-    public void setKills(List<Kill> kills) {
-        this.kills = kills;
+    public void setKillBoard(List<Kill> killBoard) {
+        this.killBoard = killBoard;
     }
 
     public Turn getCurrentTurn() {

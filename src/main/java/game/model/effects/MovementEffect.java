@@ -104,11 +104,11 @@ public class MovementEffect extends Effect{
                 result.add(tmp);
             }
             else {
-                if(sameDirection){
-                    result=startingPosition.getSquaresInRange(this.getMinDist(),this.getMaxDist(),actualWeapon.getLastDirection());
+                if (sameDirection) {
+                    //result=startingPosition.getSquaresInRange(this.getMinDist(),this.getMaxDist(),actualWeapon.getLastDirection());
+                } else {
+                    //result=startingPosition.getSquaresInRange(this.getMinDist(),this.getMaxDist());
                 }
-                else
-                    result=startingPosition.getSquaresInRange(this.getMinDist(),this.getMaxDist());
             }
         }
         else{

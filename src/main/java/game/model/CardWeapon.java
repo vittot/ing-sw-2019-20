@@ -116,4 +116,6 @@ public class CardWeapon {
     public void setLoaded(boolean loaded) {
         this.loaded = loaded;
     }
+
+    public void reloadWeapon(List<CardAmmo> cardAmmo, List<CardPower> powerUp){}
 }

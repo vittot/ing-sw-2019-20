@@ -132,23 +132,12 @@ public class Square implements Target{
         this.cardAmmo = cardAmmo;
     }
 
-    public List<Square> getSameColorSquares(){
-        List<Square> sameMapColor=new ArrayList<>();
-        for(int x=0;x<m.getDimX();x++){
-            for(int y=0;y<m.getDimY();y++){
-                if(this.color==m.getGrid()[x][y].getColor()){
-                    sameMapColor.add(m.getGrid()[x][y]);
-                }
-            }
-        }
-        return sameMapColor;
-    }
 
     public List<Square> getAdiacentRoomSquares(Direction d){
         Square tmp;
         if(this.getEdge(d)== Edge.DOOR) {
             tmp = this.getNextSquare(d);
-            return tmp.getSameColorSquares();
+            return m.getRoom(tmp.getColor());
         }
         else
             return null;
@@ -157,7 +146,7 @@ public class Square implements Target{
     public List<List<Square>> getVisibleSquares(){
         List<List<Square>> result=new ArrayList<>();
         List<Square> tmp = new ArrayList<>();
-        tmp=this.getSameColorSquares();
+        tmp=m.getRoom(this.getColor());
         result.add(tmp);
         if(this.getAdiacentRoomSquares(Direction.UP)!=null){
             result.add((ArrayList)this.getAdiacentRoomSquares(Direction.UP));
@@ -173,7 +162,7 @@ public class Square implements Target{
         }
         return result;
     }
-
+    /*
     public List<List<Target>> getSquaresInRange(int minDist, int maxDist){
         List<List<Target>> result=new ArrayList<>();
         List<Target> tmp=new ArrayList<>();
@@ -209,6 +198,6 @@ public class Square implements Target{
             actual=next;
         }
         return result;
-    }
+    }*/
 
 }
