@@ -14,7 +14,6 @@ public class Game {
     private List<CardAmmo> ammoWaste;
     private List<Kill> killBoard;
     private Turn currentTurn;
-    private ScoreBoard scoreBoard;
     public static final int MAXPLAYERS = 5;
     private final int KILLBOARD_SIZE = 8;
 
@@ -23,6 +22,8 @@ public class Game {
         this.map = map;
         this.killBoard = new ArrayList<Kill>(8);
         generateDecks("loadingGame.txt");
+        currentTurn = new Turn();
+        currentTurn.setCurrentPlayer(players.get(0));
     }
 
     public List<Player> getPlayers() {
@@ -136,9 +137,9 @@ public class Game {
      * Set the player for the next turn
      */
     public void changeTurn (){
-        int num = 0;
+        int num;
         num = players.indexOf(currentTurn.getCurrentPlayer());
-        if(num == players.size()){
+        if(num + 1 == players.size()){
             currentTurn.setCurrentPlayer(players.get(0));
         }else
             currentTurn.setCurrentPlayer(players.get(num+1));
