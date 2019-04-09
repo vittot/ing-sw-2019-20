@@ -1,8 +1,7 @@
 package game.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Game {
     private List <Player> players;
@@ -14,15 +13,90 @@ public class Game {
     private List<CardAmmo> ammoWaste;
     private List<Kill> killBoard;
     private Turn currentTurn;
-    private ScoreBoard scoreBoard;
     public static final int MAXPLAYERS = 5;
+    public static final List<Integer> POINTSCOUNT;
     private final int KILLBOARD_SIZE = 8;
+    private HashMap <PlayerColor, Integer> pointsPlayer;
+
+    static{
+        POINTSCOUNT = new ArrayList<Integer>();
+        POINTSCOUNT.add(8);
+        POINTSCOUNT.add(6);
+        POINTSCOUNT.add(4);
+        POINTSCOUNT.add(2);
+        POINTSCOUNT.add(1);
+        POINTSCOUNT.add(1);
+    }
 
     public Game(List<Player> players, Map map) {
         this.players = players;
         this.map = map;
         this.killBoard = new ArrayList<Kill>(8);
         generateDecks("loadingGame.txt");
+        pointsPlayer = new HashMap<PlayerColor, Integer>();
+        for(int i = 0; i < players.size(); i ++) {
+            pointsPlayer.put(players.get(i).getColor(), 0);
+        }
+    }
+
+    public PlayerColor firstBlood(Player victim){
+        return victim.getDamage().get(0);
+    }
+
+    /**
+     * called when someone get killed and add the points to player based on first blood and damage dealt
+     * @param victim
+     */
+    public void updatePoints(Player victim) {
+        PlayerColor firstBlood;
+        int lastDamage = 0;
+        int countDeaths = 0;
+        int numDamage = 0;
+        HashMap<PlayerColor, Integer> sorted = new HashMap<PlayerColor, Integer>();
+        PlayerColor[] colors;
+        numDamage = victim.getDamage().size();
+        if (victim.getDamage().size() > 12){
+            numDamage = 12;
+        }
+        for(int i = 0; i < numDamage; i++){
+            pointsPlayer.replace(victim.getDamage().get(i),pointsPlayer.get(victim.getDamage().get(i))+1);
+        }
+
+        sorted = pointsPlayer
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparingInt(java.util.Map.Entry::getValue))
+                .collect(Collectors.toMap(java.util.Map.Entry::getKey,java.util.Map.Entry::getValue, (n,m) -> n, HashMap::new));
+        countDeaths = victim.getDeaths();
+        colors = (PlayerColor[]) sorted.keySet().toArray();
+        for(int i = 1; i < colors.length ; i++) {
+            if (sorted.get(colors[i - 1]) == sorted.get(colors[i])) {
+                if(!findFirstDamage(colors[i - 1], colors[i])){
+                    firstBlood = colors[i - 1];
+                    colors[i] = colors [i - 1];
+                    colors[i - 1] = firstBlood;
+                }
+            }
+        }
+        firstBlood = firstBlood(victim);
+        for (int i = 0; i < colors.length; i ++){
+            for(int j = 0; j < players.size();j++){
+                if(colors[i] == players.get(j).getColor()){
+                    if(countDeaths >= 5 ) countDeaths = 5;
+                    if(firstBlood == colors[i]){
+                        players.get(j).addPoints(POINTSCOUNT.get(countDeaths)+1);
+                    }else
+                        players.get(j).addPoints(POINTSCOUNT.get(countDeaths));
+                    if(countDeaths < 5) countDeaths ++;
+
+                }
+
+            }
+
+        }
+    }
+    public Kill getLastKill (Player player){
+        return killBoard.stream().filter(k -> k.getVictim()==player).reduce((f,s)->s).orElse(null);
     }
 
     public List<Player> getPlayers() {
@@ -111,6 +185,7 @@ public class Game {
     public void addKill(Player killer, Player victim, boolean isRage){
         Kill newKill = new Kill(killer,victim,isRage);
         killBoard.add(newKill);
+        updatePoints(victim);
     }
 
     /**
@@ -142,6 +217,7 @@ public class Game {
             currentTurn.setCurrentPlayer(players.get(0));
         }else
             currentTurn.setCurrentPlayer(players.get(num+1));
+        checkRespawn();
     }
 
     /**
@@ -152,10 +228,14 @@ public class Game {
         return (killBoard.size() == KILLBOARD_SIZE);
     }
 
+    public void checkRespawn(){
+        for (int i = 0; i < players.size(); i++){
+            if(players.get(i).isDead()){
+                updatePoints(players.get(i));
+                players.get(i).respawn();
+            }
 
-    //TODO
-    public List<Integer> countPoints(){
-        return null;
+        }
     }
 
 }
