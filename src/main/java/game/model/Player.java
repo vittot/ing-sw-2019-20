@@ -5,6 +5,7 @@ import java.util.List;
 public class Player implements Target{
     private PlayerColor color;
     private List<PlayerColor> marks;
+    private List<PlayerColor> thisTurnMarks;
     private int givenMarks;
     private int id;
     private List<PlayerColor> damage;
@@ -16,8 +17,6 @@ public class Player implements Target{
     private int deaths;
     private Square position;
     private Game game;
-
-
 
     public Player(int id)
     {
@@ -60,17 +59,50 @@ public class Player implements Target{
         return marks;
     }
 
-    public void setMark(List<PlayerColor> mark) {
-        this.marks = mark;
+    /**
+     *
+     * @param thisTurnMarks
+     */
+    public void addThisTurnMarks(List<PlayerColor> thisTurnMarks) {
+        this.thisTurnMarks.addAll(thisTurnMarks);
+    }
+
+    public void updateMarks() {
+        this.marks.addAll(thisTurnMarks);
     }
 
     public List<PlayerColor> getDamage() {
         return damage;
     }
 
-    public void setDamage(List<PlayerColor> damage) {
-
-        this.damage = damage;
+    /**
+     *
+     * @param shooter
+     * @param damage
+     */
+    public void addDamage(Player shooter, List<PlayerColor> damage) {
+        int num;
+        boolean isRage = false;
+        for(int i=0;i<marks.size();i++){
+            if(marks.get(i)==damage.get(0)){
+                damage.add(marks.get(i));
+                marks.remove(i);
+                i--;
+            }
+        }
+        this.damage.addAll(damage);
+        num = this.damage.size();
+        if(num>10){
+            this.deaths++;
+            if(num>11){
+                isRage = true;
+            }
+            game.addKill(shooter, this, isRage);
+        }
+        else if(num>5)
+            this.adrenalin = AdrenalineLevel.SHOOTLEVEL;
+        else if(num>2)
+            this.adrenalin = AdrenalineLevel.GRABLEVEL;
     }
 
     public AdrenalineLevel getAdrenalin() {
@@ -119,5 +151,11 @@ public class Player implements Target{
 
     public void setPosition(Square position) {
         this.position = position;
+    }
+
+    public void respawn(CardPower discard){
+        this.damage.clear();
+        this.adrenalin = AdrenalineLevel.NONE;
+        this.position = game.getMap().respawnColor(discard.getMapColor());
     }
 }

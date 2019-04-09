@@ -52,4 +52,18 @@ public class CardPower {
     public void setPrice(List<Color> price) {
         this.price = price;
     }
+
+    public MapColor getMapColor(){
+        switch(this.color){
+            case BLUE:
+                return MapColor.BLUE;
+            case RED:
+                return MapColor.RED;
+            case YELLOW:
+                return MapColor.YELLOW;
+            default:
+                return null;
+
+        }
+    }
 }
