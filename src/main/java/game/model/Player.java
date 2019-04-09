@@ -75,36 +75,6 @@ public class Player implements Target{
         return damage;
     }
 
-    /**
-     *
-     * @param shooter
-     * @param damage
-     */
-    public void addDamage(Player shooter, List<PlayerColor> damage) {
-        int num;
-        boolean isRage = false;
-        for(int i=0;i<marks.size();i++){
-            if(marks.get(i)==damage.get(0)){
-                damage.add(marks.get(i));
-                marks.remove(i);
-                i--;
-            }
-        }
-        this.damage.addAll(damage);
-        num = this.damage.size();
-        if(num>10){
-            this.deaths++;
-            if(num>11){
-                isRage = true;
-            }
-            game.addKill(shooter, this, isRage);
-        }
-        else if(num>5)
-            this.adrenalin = AdrenalineLevel.SHOOTLEVEL;
-        else if(num>2)
-            this.adrenalin = AdrenalineLevel.GRABLEVEL;
-    }
-
     public AdrenalineLevel getAdrenalin() {
         return adrenalin;
     }
@@ -153,9 +123,48 @@ public class Player implements Target{
         this.position = position;
     }
 
+    /**
+     *
+     * @param discard
+     */
     public void respawn(CardPower discard){
         this.damage.clear();
         this.adrenalin = AdrenalineLevel.NONE;
         this.position = game.getMap().respawnColor(discard.getMapColor());
     }
+
+    /**
+     *
+     * add damage cause of an enemy's weapon effect
+     * also marks from the same enemy are counted to calculate the damage to be applied
+     * the adrenaline attribute is updated according to the total damage suffered
+     * manage deaths
+     * @param shooter
+     * @param damage
+     */
+    public void addDamage(Player shooter, List<PlayerColor> damage) {
+        int num;
+        boolean isRage = false;
+        for(int i=0;i<marks.size();i++){
+            if(marks.get(i)==damage.get(0)){
+                damage.add(marks.get(i));
+                marks.remove(i);
+                i--;
+            }
+        }
+        this.damage.addAll(damage);
+        num = this.damage.size();
+        if(num>10){
+            this.deaths++;
+            if(num>11){
+                isRage = true;
+            }
+            game.addKill(shooter, this, isRage);
+        }
+        else if(num>5)
+            this.adrenalin = AdrenalineLevel.SHOOTLEVEL;
+        else if(num>2)
+            this.adrenalin = AdrenalineLevel.GRABLEVEL;
+    }
+
 }
