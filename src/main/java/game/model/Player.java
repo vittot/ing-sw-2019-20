@@ -9,18 +9,27 @@ public class Player implements Target{
     private int givenMarks;
     private int id;
     private List<PlayerColor> damage;
-    private AdrenalineLevel adrenalin;
+    private AdrenalineLevel adrenaline;
     private List<CardWeapon> weapons;
     private int actualWeapon; //index of the weapon that the player is using
     private List<Color> ammo;
     private List<CardPower> cardPower;
     private int deaths;
+    private int points;
     private Square position;
     private Game game;
+    private boolean isDead;
 
-    public Player(int id)
+    public Player(int id, PlayerColor color, Game game)
     {
         this.id = id;
+        this.color = color;
+        this.givenMarks = 0;
+        this.adrenaline = AdrenalineLevel.NONE;
+        this.deaths = 0;
+        this.points = 0;
+        this.isDead = false;
+        this.game = game;
     }
 
     public PlayerColor getColor() {
@@ -55,32 +64,24 @@ public class Player implements Target{
         this.actualWeapon = actualWeapon;
     }
 
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
     public List<PlayerColor> getMark() {
         return marks;
-    }
-
-    /**
-     *
-     * @param thisTurnMarks
-     */
-    public void addThisTurnMarks(List<PlayerColor> thisTurnMarks) {
-        this.thisTurnMarks.addAll(thisTurnMarks);
-    }
-
-    public void updateMarks() {
-        this.marks.addAll(thisTurnMarks);
     }
 
     public List<PlayerColor> getDamage() {
         return damage;
     }
 
-    public AdrenalineLevel getAdrenalin() {
-        return adrenalin;
+    public AdrenalineLevel getAdrenaline() {
+        return adrenaline;
     }
 
-    public void setAdrenalin(AdrenalineLevel adrenalin) {
-        this.adrenalin = adrenalin;
+    public void setAdrenaline(AdrenalineLevel adrenaline) {
+        this.adrenaline = adrenaline;
     }
 
     public List<CardWeapon> getWeapons() {
@@ -123,14 +124,27 @@ public class Player implements Target{
         this.position = position;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
+    public boolean isDead() {
+        return isDead;
+    }
+
+    public void setDead(boolean dead) {
+        isDead = dead;
+    }
+
     /**
      *
      * @param discard
      */
     public void respawn(CardPower discard){
         this.damage.clear();
-        this.adrenalin = AdrenalineLevel.NONE;
+        this.adrenaline = AdrenalineLevel.NONE;
         this.position = game.getMap().respawnColor(discard.getMapColor());
+        this.isDead = false;
     }
 
     /**
@@ -138,33 +152,78 @@ public class Player implements Target{
      * add damage cause of an enemy's weapon effect
      * also marks from the same enemy are counted to calculate the damage to be applied
      * the adrenaline attribute is updated according to the total damage suffered
-     * manage deaths
+     * manage deaths and rages adding new kills into the kill-board
      * @param shooter
      * @param damage
      */
-    public void addDamage(Player shooter, List<PlayerColor> damage) {
+    public void addDamage(Player shooter, int damage) {
         int num;
         boolean isRage = false;
+        Kill lastKill=null;
         for(int i=0;i<marks.size();i++){
-            if(marks.get(i)==damage.get(0)){
-                damage.add(marks.get(i));
+            if(marks.get(i)==shooter.getColor()){
+                damage++;
                 marks.remove(i);
                 i--;
             }
         }
-        this.damage.addAll(damage);
-        num = this.damage.size();
-        if(num>10){
-            this.deaths++;
-            if(num>11){
-                isRage = true;
+        if(this.damage.size()<11) {
+            for (int i = 0; i < damage; i++)
+                this.damage.add(shooter.getColor());
+            num = this.damage.size();
+            if (num > 10) {
+                this.deaths++;
+                this.isDead = true;
+                if (num > 11) {
+                    isRage = true;
+                }
+                game.addKill(shooter, this, isRage);
             }
-            game.addKill(shooter, this, isRage);
+            else if (num > 5)
+                this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
+            else if (num > 2)
+                this.adrenaline = AdrenalineLevel.GRABLEVEL;
         }
-        else if(num>5)
-            this.adrenalin = AdrenalineLevel.SHOOTLEVEL;
-        else if(num>2)
-            this.adrenalin = AdrenalineLevel.GRABLEVEL;
+        else if (this.damage.size()==11 && damage>0){
+            lastKill = game.getLastKill(this);
+            lastKill.setRage(true);
+        }
     }
 
+    /**
+     *
+     * @param addP
+     */
+    public void addPoints(int addP){
+        this.points+=addP;
+    }
+
+    /**
+     *
+     * @param thisTurnMarks
+     */
+    public void addThisTurnMarks(List<PlayerColor> thisTurnMarks) {
+        this.thisTurnMarks.addAll(thisTurnMarks);
+    }
+
+    public void updateMarks() {
+        this.marks.addAll(thisTurnMarks);
+    }
+
+    /**
+     * return true if p1 make damage before than p2, false otherwise
+     * @param p1
+     * @param p2
+     * @return
+     */
+    public boolean findFirstDamage(PlayerColor p1, PlayerColor p2){
+        for(int i=0;i<damage.size();i++){
+            if(damage.get(i)==p1){
+                return true;
+            }
+            else if(damage.get(i)==p2)
+                return false;
+        }
+        return false;
+    }
 }
