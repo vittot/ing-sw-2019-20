@@ -75,7 +75,7 @@ public class Game {
         colors = (PlayerColor[]) sorted.keySet().toArray();
         for (int i = 1; i < colors.length; i++) {
             if (sorted.get(colors[i - 1]) == sorted.get(colors[i])) {
-                if (!findFirstDamage(colors[i - 1], colors[i])) {
+                if (!victim.findFirstDamage(colors[i - 1], colors[i])) {
                     firstBlood = colors[i - 1];
                     colors[i] = colors[i - 1];
                     colors[i - 1] = firstBlood;
@@ -102,9 +102,6 @@ public class Game {
 
     public Kill getLastKill(Player player) {
         return killBoard.stream().filter(k -> k.getVictim() == player).reduce((f, s) -> s).orElse(null);
-        currentTurn = new Turn();
-        currentTurn.setCurrentPlayer(players.get(0));
-        this.killboardSize = killBoardSize;
     }
 
     public List<Player> getPlayers() {
