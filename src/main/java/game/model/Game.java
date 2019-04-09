@@ -3,7 +3,6 @@ package game.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class Game {
     private List <Player> players;
@@ -17,6 +16,7 @@ public class Game {
     private Turn currentTurn;
     private ScoreBoard scoreBoard;
     public static final int MAXPLAYERS = 5;
+    private final int KILLBOARD_SIZE = 8;
 
     public Game(List<Player> players, Map map) {
         this.players = players;
@@ -89,6 +89,10 @@ public class Game {
         this.currentTurn = currentTurn;
     }
 
+    /**
+     * Add new player to the game
+     * @param p Player to be added
+     */
     public void addNewPlayer(Player p){
         if(this.players.size()<MAXPLAYERS)
             this.players.add(p);
@@ -98,37 +102,39 @@ public class Game {
         //TODO only one method or one for any type of card?
     }
 
+    /**
+     * Add a kill to the killboard
+     * @param killer
+     * @param victim
+     * @param isRage
+     */
     public void addKill(Player killer, Player victim, boolean isRage){
         Kill newKill = new Kill(killer,victim,isRage);
         killBoard.add(newKill);
     }
 
+    /**
+     * Shuffle the power up waste deck to reuse them
+     */
     public void replaceAmmoDeck() {
-        Random rand = new Random();
-        CardAmmo tmp;
-        int n;
-        for (int i = 0; i < ammoWaste.size(); i++) {
-            n = rand.nextInt(ammoWaste.size());
-            Collections.swap(ammoWaste, i, n);
-        }
+        Collections.shuffle(ammoWaste);
         deckAmmo.clear();
         deckAmmo.addAll(ammoWaste);
         ammoWaste.clear();
     }
 
+    /**
+     * Shuffle the power up waste deck to reuse them
+     */
     public void replacePowerUpDeck(){
-        Random rand = new Random();
-        CardPower tmp;
-        int n;
-        for(int i=0;i<powerWaste.size();i++){
-            n=rand.nextInt(powerWaste.size());
-            Collections.swap(powerWaste,i, n);
-        }
-        powerWaste.clear();
+        Collections.shuffle(ammoWaste);
         deckPower.addAll(powerWaste);
         powerWaste.clear();
     }
-    // set the player for next turn
+
+    /**
+     * Set the player for the next turn
+     */
     public void changeTurn (){
         int num = 0;
         num = players.indexOf(currentTurn.getCurrentPlayer());
@@ -137,13 +143,19 @@ public class Game {
         }else
             currentTurn.setCurrentPlayer(players.get(num+1));
     }
+
+    /**
+     * Check if the game is terminated
+     * @return true if the game is terminated
+     */
     public boolean checkVictory(){
-        return (killBoard.size() == 8);
+        return (killBoard.size() == KILLBOARD_SIZE);
     }
+
+
     //TODO
     public List<Integer> countPoints(){
         return null;
     }
 
-    //TODO
 }

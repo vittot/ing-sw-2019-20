@@ -8,6 +8,7 @@ import game.model.Target;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class MovementEffect extends Effect{
     private boolean moveShooter; //true if the shooter has to to be moved, false if the enemy has to be moved
     private TargetVisibility visibilityAfter;
@@ -33,7 +34,6 @@ public class MovementEffect extends Effect{
         this.maxMove = maxMove;
         this.differentTarget = differentTarget;
     }
-
     public boolean isMoveShooter() {
         return moveShooter;
     }

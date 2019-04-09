@@ -23,6 +23,7 @@ public abstract class Effect {
 
     }
 
+
     public int getMinEnemy() {
         return minEnemy;
     }

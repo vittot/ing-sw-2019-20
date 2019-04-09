@@ -41,9 +41,7 @@ public class Turn {
     /**
      * Get the next Square in the indicate Direction
      * @param player , finalFrezy
-     * @return void
      */
-
     public void newTurn(Player player, boolean finalFrezy){
         currentPlayer = player;
         if (finalFrezy) {
@@ -53,6 +51,12 @@ public class Turn {
         numOfActions = 2;
         numOfMovs = 0;
     }
+
+    /**
+     *
+     * @param action
+     * @param adrenalin
+     */
     public void newAction(Action action, int adrenalin){
         if (numOfActions == 0){}  //TODO throw exe
         numOfActions = numOfActions - 1;

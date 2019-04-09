@@ -5,6 +5,7 @@ import game.model.Target;
 
 import java.util.List;
 
+
 public class PlainDamageEffect extends Effect{
     private int damage;
     private int marks;
@@ -12,6 +13,7 @@ public class PlainDamageEffect extends Effect{
     private DifferentTarget differentTarget; //0=target can be one of the lasts, 1=target cannot be the last one, 2=target cannot be one of the previews shoot
     private boolean chainTarget; //if the target should be found from the target of the last effects (eg: T.H.O.R.)
     private boolean sameDirection; //if the next target has to be on the same last direction
+
 
     public PlainDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, boolean lastTarget, DifferentTarget differentTarget, boolean chainTarget, boolean sameDirection) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
@@ -23,9 +25,7 @@ public class PlainDamageEffect extends Effect{
         this.sameDirection = sameDirection;
     }
 
-    public int getDamage() {
-        return damage;
-    }
+    public int getDamage() {return damage; }
 
     public void setDamage(int damage) {
         this.damage = damage;
