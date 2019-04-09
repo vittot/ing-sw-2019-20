@@ -1,7 +1,6 @@
 package game.model;
 
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +34,9 @@ class MapTest {
         map.setGrid(grid);
     }
 
+    /**
+     * Check getRoom return exactly all the Map's Squares of a given MapColor
+     */
     @Test
     void getRoom() {
 
@@ -48,11 +50,14 @@ class MapTest {
         assertTrue(blueRoomMap.containsAll(blueRoom) && blueRoom.containsAll(blueRoomMap));
     }
 
+    /**
+     * Checks getVisibleTargets return exactly the Players in the same room and in the adiacent room through a Door
+     */
     @Test
     void getVisibleTargets() {
-        Player p1 = new Player(1);
-        Player p2 = new Player(2);
-        Player p3 = new Player(3);
+        Player p1 = new Player(1,PlayerColor.PURPLE);
+        Player p2 = new Player(2,PlayerColor.PURPLE);
+        Player p3 = new Player(3,PlayerColor.PURPLE);
 
         map.getGrid()[0][0].addPlayer(p1);
         map.getGrid()[1][1].addPlayer(p2);
@@ -69,6 +74,9 @@ class MapTest {
 
     }
 
+    /**
+     * Check getSpawoints return exactly the Map's spawnpoints
+     */
     @Test
     void getSpawnpoints() {
         List<Square> spawnpoints = new ArrayList<>();

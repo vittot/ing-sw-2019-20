@@ -37,7 +37,7 @@ class GameTest {
 
         List<Player> players = new ArrayList<>();
         for(i=0;i<3;i++) {
-            players.add(mock(Player.class));
+            players.add(new Player(i,PlayerColor.values()[i]));
         }
         g = new Game(players,m,3);
     }
@@ -81,13 +81,16 @@ class GameTest {
     void checkVictory() {
         Player p1 = g.getPlayers().get(0);
         Player p2 = g.getPlayers().get(1);
-        g.addKill(p1,p2,false);
-        g.addKill(p2,p2,false);
-        g.addKill(p1,p2,true);
+        p2.addDamage(p1,11);
+        p1.addDamage(p2,11);
+        p2.addDamage(p1,12);
         assertTrue(g.checkVictory());
     }
 
 
+    /**
+     * Check that refillMap refills all non spawnpoint Squares with an AmmoCard and all spawnpoints with all avaiable CardWeapons
+     */
     @Test
     void refillMap() {
         g.getMap().getGrid()[0][0].setCardAmmo(mock(CardAmmo.class));

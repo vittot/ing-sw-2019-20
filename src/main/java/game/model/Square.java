@@ -53,6 +53,11 @@ public class Square implements Target{
         return edges;
     }
 
+    /**
+     * Return the square's edge in the given Direction
+     * @param d
+     * @return
+     */
     public Edge getEdge(Direction d)
     {
         switch (d){
@@ -111,6 +116,10 @@ public class Square implements Target{
         return players;
     }
 
+    /**
+     * Add a Player to this Square
+     * @param p
+     */
     public void addPlayer(Player p) {
         players.add(p);
         p.setPosition(this);

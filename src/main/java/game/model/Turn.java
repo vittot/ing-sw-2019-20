@@ -11,6 +11,19 @@ public class Turn {
     private Action currentAction;
     private List <Action> actionList;
 
+    public Turn(Player currentPlayer)
+    {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public List<Action> getActionList() {
+        return actionList;
+    }
+
+    public void setActionList(List<Action> actionList) {
+        this.actionList = actionList;
+    }
+
     public Turn() {
         actionList = new ArrayList<>();
     }
@@ -48,12 +61,12 @@ public class Turn {
     }
 
     /**
-     * Get the next Square in the indicate Direction
+     *
      * @param player , finalFrezy
      * @return void
      */
-
     public void newTurn(Player player, boolean finalFrezy){
+        
         currentPlayer = player;
         if (finalFrezy) {
             numOfMovs = 0;
@@ -62,6 +75,12 @@ public class Turn {
         numOfActions = 2;
         numOfMovs = 0;
     }
+
+    /**
+     * set a list of sub-action you can do from a selected Action(GRAB/MOVE/SHOOT)
+     * @param action
+     * @param adrenaline
+     */
     public void newAction(Action action, AdrenalineLevel adrenaline){
         actionList.clear();
         if (numOfActions == 0){}  //TODO throw exe
