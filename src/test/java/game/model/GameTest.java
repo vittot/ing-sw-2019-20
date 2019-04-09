@@ -24,7 +24,7 @@ class GameTest {
         for(i=0;i<3;i++) {
             players.add(mock(Player.class));
         }
-        g = new Game(players,m);
+        g = new Game(players,m,3);
     }
 
     @Test
@@ -59,8 +59,16 @@ class GameTest {
         assertEquals(pTurn,third);
     }
 
+    /**
+     * Test the victory condition
+     */
     @Test
     void checkVictory() {
-
+        Player p1 = g.getPlayers().get(0);
+        Player p2 = g.getPlayers().get(1);
+        g.addKill(p1,p2,false);
+        g.addKill(p2,p2,false);
+        g.addKill(p1,p2,true);
+        assertTrue(g.checkVictory());
     }
 }

@@ -15,15 +15,16 @@ public class Game {
     private List<Kill> killBoard;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
-    private final int KILLBOARD_SIZE = 8;
+    private int killboardSize = 8;
 
-    public Game(List<Player> players, Map map) {
+    public Game(List<Player> players, Map map,int killBoardSize) {
         this.players = players;
         this.map = map;
-        this.killBoard = new ArrayList<Kill>(8);
+        this.killBoard = new ArrayList<>(8);
         generateDecks("loadingGame.txt");
         currentTurn = new Turn();
         currentTurn.setCurrentPlayer(players.get(0));
+        this.killboardSize = killBoardSize;
     }
 
     public List<Player> getPlayers() {
@@ -112,6 +113,7 @@ public class Game {
     public void addKill(Player killer, Player victim, boolean isRage){
         Kill newKill = new Kill(killer,victim,isRage);
         killBoard.add(newKill);
+        //TODO add record of players killed in this turn
     }
 
     /**
@@ -150,13 +152,14 @@ public class Game {
      * @return true if the game is terminated
      */
     public boolean checkVictory(){
-        return (killBoard.size() == KILLBOARD_SIZE);
+        return (killBoard.size() == killboardSize);
     }
 
 
-    //TODO
+
     public List<Integer> countPoints(){
-        return null;
+        //TODO
+        return new ArrayList<>();
     }
 
 }
