@@ -17,14 +17,21 @@ class MapTest {
 
     @BeforeEach
     public void before()  {
-        map = new Map(1,3,1);
-        Square[][] grid = new Square[3][1];
-        Edge[] edges1 = new Edge[]{Edge.WALL,Edge.WALL,Edge.OPEN,Edge.WALL};
+        map = new Map(1,2,3);
+        Square[][] grid = new Square[3][2];
+        Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
         Edge[] edges3 = new Edge[]{Edge.DOOR,Edge.WALL,Edge.WALL,Edge.WALL};
+        Edge[] edges4 = new Edge[]{Edge.OPEN,Edge.OPEN,Edge.DOOR,Edge.OPEN};
+        Edge[] edges5 = new Edge[]{Edge.DOOR,Edge.OPEN,Edge.OPEN,Edge.WALL};
+
         grid[0][0] = new Square(MapColor.BLUE, false, 0, 0, map, edges1);
-        grid[1][0] = new Square(MapColor.BLUE, false, 1, 0, map, edges2);
-        grid[2][0] = new Square(MapColor.RED, false, 2, 0, map, edges3);
+        grid[1][0] = new Square(MapColor.BLUE, false, 0, 1, map, edges2);
+        grid[2][0] = new Square(MapColor.RED, true, 0, 2, map, edges3);
+        grid[0][1] = new Square(MapColor.BLUE, true, 1, 0, map, edges4);
+        grid[1][1] = new Square(MapColor.YELLOW, true, 1, 1, map, edges5);
+
+
         map.setGrid(grid);
     }
 
@@ -34,8 +41,11 @@ class MapTest {
         List<Square> blueRoom = new ArrayList<>();
         blueRoom.add(map.getGrid()[0][0]);
         blueRoom.add(map.getGrid()[1][0]);
+        blueRoom.add(map.getGrid()[0][1]);
 
-        assertEquals(map.getRoom(MapColor.BLUE), blueRoom);
+        List<Square> blueRoomMap = map.getRoom(MapColor.BLUE);
+
+        assertTrue(blueRoomMap.containsAll(blueRoom) && blueRoom.containsAll(blueRoomMap));
     }
 
     @Test
@@ -45,7 +55,7 @@ class MapTest {
         Player p3 = new Player(3);
 
         map.getGrid()[0][0].addPlayer(p1);
-        map.getGrid()[1][0].addPlayer(p2);
+        map.getGrid()[1][1].addPlayer(p2);
         map.getGrid()[2][0].addPlayer(p3);
 
         List<Player> visible = new ArrayList<>();
@@ -54,9 +64,18 @@ class MapTest {
 
         List<Player> visibleRes = map.getVisibleTargets(map.getGrid()[1][0],20,1);
 
-        assertEquals(visible,visibleRes);
+        assertTrue(visibleRes.containsAll(visible) && visible.containsAll(visibleRes));
 
 
     }
 
+    @Test
+    void getSpawnpoints() {
+        List<Square> spawnpoints = new ArrayList<>();
+        spawnpoints.add(map.getGrid()[0][1]);
+        spawnpoints.add(map.getGrid()[1][1]);
+        spawnpoints.add(map.getGrid()[2][0]);
+
+        assertEquals(spawnpoints,map.getSpawnpoints());
+    }
 }

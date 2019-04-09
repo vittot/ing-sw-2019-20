@@ -91,6 +91,10 @@ public class Game {
         this.currentTurn = currentTurn;
     }
 
+    public List<CardAmmo> getAmmoWaste() { return ammoWaste; }
+
+    public void setAmmoWaste(List<CardAmmo> ammoWaste) { this.ammoWaste = ammoWaste; }
+
     /**
      * Add new player to the game
      * @param p Player to be added
@@ -160,6 +164,33 @@ public class Game {
     public List<Integer> countPoints(){
         //TODO
         return new ArrayList<>();
+    }
+
+    /**
+     * Replace ammoCard with new cards from the ammo deck. If the deck is empty the discard ammo deck is shuffled and moved to the ammo deck.
+     * Replace weapons in spawnpoints. If the weapon deck is empty no new weapon appears on the map.
+     */
+    public void refillMap()
+    {
+        List<Square> spawnpoints = map.getSpawnpoints();
+        for(Square s : spawnpoints)
+        {
+            while(s.getWeapons().size() < Map.WEAPON_PER_SQUARE && !deckWeapon.isEmpty())
+                s.addWeapon(Collections.singletonList(deckWeapon.remove(0)));
+        }
+
+        List<Square> otherSquares = map.getNormalSquares();
+        for(Square s : otherSquares)
+        {
+            if(s.getCardAmmo() == null)
+            {
+                //the ammo cards are all in the ammoDeck and in the ammoWaste deck
+                if(deckAmmo.isEmpty())
+                    replaceAmmoDeck();
+                s.setCardAmmo(deckAmmo.remove(0));
+            }
+        }
+
     }
 
 }

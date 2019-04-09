@@ -6,6 +6,8 @@ public class CardAmmo {
     private List<Color> ammo;
     private CardPower cardPower;
 
+
+
     public void setAmmo(List<Color> ammo) {
         this.ammo = ammo;
     }

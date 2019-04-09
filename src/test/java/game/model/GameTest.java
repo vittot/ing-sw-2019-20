@@ -19,7 +19,22 @@ class GameTest {
     @BeforeEach
     void before()  {
         int i;
-        Map m = mock(Map.class);
+        Map m = new Map(1,2,3);
+        Square[][] grid = new Square[3][2];
+        Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
+        Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
+        Edge[] edges3 = new Edge[]{Edge.DOOR,Edge.WALL,Edge.WALL,Edge.WALL};
+        Edge[] edges4 = new Edge[]{Edge.OPEN,Edge.OPEN,Edge.DOOR,Edge.OPEN};
+        Edge[] edges5 = new Edge[]{Edge.DOOR,Edge.OPEN,Edge.OPEN,Edge.WALL};
+
+        grid[0][0] = new Square(MapColor.BLUE, false, 0, 0, m, edges1);
+        grid[1][0] = new Square(MapColor.BLUE, false, 0, 1, m, edges2);
+        grid[2][0] = new Square(MapColor.RED, true, 0, 2, m, edges3);
+        grid[0][1] = new Square(MapColor.BLUE, true, 1, 0, m, edges4);
+        grid[1][1] = new Square(MapColor.YELLOW, true, 1, 1, m, edges5);
+        m.setGrid(grid);
+
+
         List<Player> players = new ArrayList<>();
         for(i=0;i<3;i++) {
             players.add(mock(Player.class));
@@ -70,5 +85,39 @@ class GameTest {
         g.addKill(p2,p2,false);
         g.addKill(p1,p2,true);
         assertTrue(g.checkVictory());
+    }
+
+
+    @Test
+    void refillMap() {
+        g.getMap().getGrid()[0][0].setCardAmmo(mock(CardAmmo.class));
+        g.getMap().getGrid()[2][0].addWeapon(Collections.singletonList(mock(CardWeapon.class)));
+
+        List<CardAmmo> cardAmmoDeck = new ArrayList<>();
+        List<CardAmmo> cardAmmoWaste = new ArrayList<>();
+        cardAmmoWaste.add(mock(CardAmmo.class));
+        cardAmmoWaste.add(mock(CardAmmo.class));
+        cardAmmoWaste.add(mock(CardAmmo.class));
+        g.setDeckAmmo(cardAmmoDeck);
+        g.setAmmoWaste(cardAmmoWaste);
+        List<CardWeapon> weaponDeck = new ArrayList<>();
+        weaponDeck.add(mock(CardWeapon.class));
+        g.setDeckWeapon(weaponDeck);
+
+        g.refillMap();
+
+        boolean hasAmmo=true;
+        for(Square s: g.getMap().getNormalSquares())
+        {
+                if( s.getCardAmmo() == null)
+                    hasAmmo = false;
+        }
+        int weaponOnMap = 0;
+        for(Square s : g.getMap().getSpawnpoints())
+            if(s.getWeapons() != null)
+                weaponOnMap += s.getWeapons().size();
+
+        //All squares which are not respawn must have an ammo card and the weapon card on the map (in respawn squares) have to be 2
+        assertTrue(hasAmmo && weaponOnMap == 2);
     }
 }

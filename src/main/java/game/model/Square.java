@@ -22,6 +22,7 @@ public class Square implements Target{
         this.y = y;
         this.m = m;
         players = new ArrayList<>();
+        weapons = new ArrayList<>();
     }
 
     public MapColor getColor() {
@@ -81,19 +82,19 @@ public class Square implements Target{
             case UP:
                 if (y==0)
                     return null;
-                return m.getGrid()[x-1][y];
+                return m.getGrid()[y-1][x];
             case DOWN:
                 if (y==m.getDimY())
                     return null;
-                return m.getGrid()[x+1][y];
+                return m.getGrid()[y+1][x];
             case RIGHT:
                 if (x==m.getDimX())
                     return null;
-                return m.getGrid()[x][y+1];
+                return m.getGrid()[y][x+1];
             default:
                 if (x==0)
                     return null;
-                return m.getGrid()[x][y-1];
+                return m.getGrid()[y][x-1];
 
         }
     }
@@ -119,8 +120,9 @@ public class Square implements Target{
         return weapons;
     }
 
-    public void setWeapons(List<CardWeapon> weapons) {
-        this.weapons = weapons;
+    public void addWeapon(List<CardWeapon> weapons)
+    {
+        this.weapons.addAll(weapons);
     }
 
     public CardAmmo getCardAmmo() {

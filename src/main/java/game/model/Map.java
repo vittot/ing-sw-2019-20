@@ -1,5 +1,6 @@
 package game.model;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -10,6 +11,8 @@ public class Map {
     private int dimX;
     private int dimY;
     public static final int MAX_DIST = 12;
+    public static final int WEAPON_PER_SQUARE = 3;
+
 
 
     public int getId() {
@@ -52,6 +55,24 @@ public class Map {
     }
 
     /**
+     * Return all spawnpoints of the Map
+     * @return
+     */
+    public List<Square> getSpawnpoints()
+    {
+        return Arrays.stream(grid).flatMap(Arrays::stream).filter(s->s!=null && s.isRespawn()).collect(Collectors.toList());
+    }
+
+    /**
+     * Return all map squares which are not spawnpoints
+     * @return
+     */
+    public List<Square> getNormalSquares()
+    {
+        return Arrays.stream(grid).flatMap(Arrays::stream).filter(s->s!=null && !s.isRespawn()).collect(Collectors.toList());
+    }
+
+    /**
      * Return the room of the indicated MapColor
      * @param c Color of the room
      * @return Squares of the room
@@ -61,10 +82,10 @@ public class Map {
         List<Square> room = new ArrayList<>();
         int i;
         int j;
-        for(i=0; i< dimX; i++)
+        for(i=0; i< dimY; i++)
         {
-            for(j=0; j< dimY; j++)
-                if(grid[i][j].getColor() == c)
+            for(j=0; j< dimX; j++)
+                if(grid[i][j]!=null && grid[i][j].getColor() == c)
                     room.add(grid[i][j]);
         }
         return room;
@@ -106,6 +127,11 @@ public class Map {
         return result.stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
     }
 
+    /**
+     * Get the respawn point of a given color
+     * @param c the color
+     * @return the Square with the respawn color
+     */
     public Square respawnColor(MapColor c){
         List<Square> room = getRoom(c);
         for(int i=0;i<room.size();i++){
