@@ -8,13 +8,14 @@ public class Player implements Target{
     private int givenMarks;
     private int id;
     private List<PlayerColor> damage;
-    private int adrenalin;
+    private AdrenalineLevel adrenalin;
     private List<CardWeapon> weapons;
     private int actualWeapon; //index of the weapon that the player is using
     private List<Color> ammo;
     private List<CardPower> cardPower;
     private int deaths;
     private Square position;
+    private Game game;
 
 
 
@@ -68,14 +69,15 @@ public class Player implements Target{
     }
 
     public void setDamage(List<PlayerColor> damage) {
+
         this.damage = damage;
     }
 
-    public int getAdrenalin() {
+    public AdrenalineLevel getAdrenalin() {
         return adrenalin;
     }
 
-    public void setAdrenalin(int adrenalin) {
+    public void setAdrenalin(AdrenalineLevel adrenalin) {
         this.adrenalin = adrenalin;
     }
 
