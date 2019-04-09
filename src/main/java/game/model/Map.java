@@ -96,7 +96,15 @@ public class Map {
             }
 
         }
-
         return result.stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
+    }
+
+    public Square respawnColor(MapColor c){
+        List<Square> room = getRoom(c);
+        for(int i=0;i<room.size();i++){
+            if(room.get(i).isRespawn())
+                return room.get(i);
+        }
+        return null;
     }
 }

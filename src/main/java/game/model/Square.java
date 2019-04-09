@@ -66,7 +66,6 @@ public class Square implements Target{
         }
     }
 
-
     public void setEdges(Edge[] edges) {
         this.edges = edges;
     }
