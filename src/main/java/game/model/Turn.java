@@ -12,7 +12,7 @@ public class Turn {
     private List <Action> actionList;
 
     public Turn() {
-        actionList = new ArrayList<Action>();
+        actionList = new ArrayList<>();
     }
 
     public Player getCurrentPlayer() {
@@ -73,16 +73,22 @@ public class Turn {
                             actionList.add(Action.MOVEMENT);
                             actionList.add(Action.GRAB);
 
-                }else
+                }
+                else{
                     actionList.add(Action.MOVEMENT);
                     actionList.add(Action.GRAB);
+                }
+                break;
 
             case SHOOT:
                 if(adrenaline == AdrenalineLevel.SHOOTLEVEL){
                     actionList.add(Action.MOVEMENT);
                     actionList.add(Action.GRAB);
-                }else
+                }
+                else{
                     actionList.add(Action.GRAB);
+                }
+                break;
             case MOVEMENT:
                 actionList.add(Action.MOVEMENT);
                 actionList.add(Action.MOVEMENT);
