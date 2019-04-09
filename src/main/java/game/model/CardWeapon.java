@@ -14,6 +14,7 @@ public class CardWeapon {
     private List<Effect> baseEffect;
     private List<Effect> altEffect;
     private List<List<Effect>> plusEffects;
+    private List<String> effectDescriptions;
     private boolean plusBeforeBase;           //True if you can use optional effects before base effects
     private boolean plusOrder;                //True if you have to respect the order of the list
     private List<Player> lastTarget;
@@ -21,7 +22,7 @@ public class CardWeapon {
     private int lastDirection;
     private boolean loaded;
 
-    public CardWeapon(String name, List<Color> price, List<List<Color>> pricePlus, List<Color> priceAlt, List<Effect> baseEffect, List<List<Effect>> effectPlus, List<Effect> altEffect, boolean plusBeforeBase, boolean plusOrder) {
+    public CardWeapon(String name, List<Color> price, List<List<Color>> pricePlus, List<Color> priceAlt, List<Effect> baseEffect, List<List<Effect>> effectPlus, List<Effect> altEffect, List<String> effectDescription, boolean plusBeforeBase, boolean plusOrder) {
         this.name = name;
         this.price = price;
         this.pricePlus = pricePlus;
@@ -29,6 +30,7 @@ public class CardWeapon {
         this.baseEffect = baseEffect;
         this.plusEffects = effectPlus;
         this.altEffect = altEffect;
+        this.effectDescriptions = effectDescription;
         this.plusBeforeBase = plusBeforeBase;
         this.plusOrder = plusOrder;
         this.loaded = true;

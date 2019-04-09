@@ -5,18 +5,18 @@ import java.util.List;
 public class Player implements Target{
     private PlayerColor color;
     private List<PlayerColor> marks;
+    private List<PlayerColor> thisTurnMarks;
     private int givenMarks;
     private int id;
     private List<PlayerColor> damage;
-    private int adrenalin;
+    private AdrenalineLevel adrenalin;
     private List<CardWeapon> weapons;
     private int actualWeapon; //index of the weapon that the player is using
     private List<Color> ammo;
     private List<CardPower> cardPower;
     private int deaths;
     private Square position;
-
-
+    private Game game;
 
     public Player(int id)
     {
@@ -59,23 +59,27 @@ public class Player implements Target{
         return marks;
     }
 
-    public void setMark(List<PlayerColor> mark) {
-        this.marks = mark;
+    /**
+     *
+     * @param thisTurnMarks
+     */
+    public void addThisTurnMarks(List<PlayerColor> thisTurnMarks) {
+        this.thisTurnMarks.addAll(thisTurnMarks);
+    }
+
+    public void updateMarks() {
+        this.marks.addAll(thisTurnMarks);
     }
 
     public List<PlayerColor> getDamage() {
         return damage;
     }
 
-    public void setDamage(List<PlayerColor> damage) {
-        this.damage = damage;
-    }
-
-    public int getAdrenalin() {
+    public AdrenalineLevel getAdrenalin() {
         return adrenalin;
     }
 
-    public void setAdrenalin(int adrenalin) {
+    public void setAdrenalin(AdrenalineLevel adrenalin) {
         this.adrenalin = adrenalin;
     }
 
@@ -118,4 +122,49 @@ public class Player implements Target{
     public void setPosition(Square position) {
         this.position = position;
     }
+
+    /**
+     *
+     * @param discard
+     */
+    public void respawn(CardPower discard){
+        this.damage.clear();
+        this.adrenalin = AdrenalineLevel.NONE;
+        this.position = game.getMap().respawnColor(discard.getMapColor());
+    }
+
+    /**
+     *
+     * add damage cause of an enemy's weapon effect
+     * also marks from the same enemy are counted to calculate the damage to be applied
+     * the adrenaline attribute is updated according to the total damage suffered
+     * manage deaths
+     * @param shooter
+     * @param damage
+     */
+    public void addDamage(Player shooter, List<PlayerColor> damage) {
+        int num;
+        boolean isRage = false;
+        for(int i=0;i<marks.size();i++){
+            if(marks.get(i)==damage.get(0)){
+                damage.add(marks.get(i));
+                marks.remove(i);
+                i--;
+            }
+        }
+        this.damage.addAll(damage);
+        num = this.damage.size();
+        if(num>10){
+            this.deaths++;
+            if(num>11){
+                isRage = true;
+            }
+            game.addKill(shooter, this, isRage);
+        }
+        else if(num>5)
+            this.adrenalin = AdrenalineLevel.SHOOTLEVEL;
+        else if(num>2)
+            this.adrenalin = AdrenalineLevel.GRABLEVEL;
+    }
+
 }

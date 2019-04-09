@@ -3,8 +3,8 @@ package game.model;
 import game.model.effects.*;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
+//import javax.xml.bind.JAXBContext;
+//import javax.xml.bind.Marshaller;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,10 +26,11 @@ class CardWeaponTest {
         priceLRB.add(Color.BLUE);
         List<Color> priceLRA = new ArrayList<>();
         priceLRA.add(Color.RED);
+        List<String> effectDesc = new ArrayList<>();
 
         Effect distr01 = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
         Effect distr21 = new PlainDamageEffect(1,1,0, Map.MAX_DIST, TargetVisibility.VISIBLE, 0,1,false,DifferentTarget.NOTTHELAST,false,false);
-        CardWeapon cwLR = new CardWeapon("Lock rifle",priceLRB,null,priceLRA,Collections.singletonList(distr01), null,Collections.singletonList(distr21),false,false);
+        CardWeapon cwLR = new CardWeapon("Lock rifle",priceLRB,null,priceLRA,Collections.singletonList(distr01), null,Collections.singletonList(distr21),effectDesc,false,false);
 
 //        //Mitra (machine gun)
 //        Effect mitr01 = new Effect (1,0,1,2,false,false,0,0,1,2,0,12,false,false,false,2,false,false, Target.PLAYER);

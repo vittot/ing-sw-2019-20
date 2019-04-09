@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 public class Map {
     private int id;
     private Square[][] grid;
-    private int dimX, dimY;
+    private int dimX;
+    private int dimY;
     public static final int MAX_DIST = 12;
 
 
@@ -50,10 +51,16 @@ public class Map {
         this.dimY = dimY;
     }
 
+    /**
+     * Return the room of the indicated MapColor
+     * @param c Color of the room
+     * @return Squares of the room
+     */
     public List<Square> getRoom(MapColor c)
     {
         List<Square> room = new ArrayList<>();
-        int i,j;
+        int i;
+        int j;
         for(i=0; i< dimX; i++)
         {
             for(j=0; j< dimY; j++)
@@ -86,17 +93,25 @@ public class Map {
     {
         Square next;
         MapColor c = s.getColor();
-        List<Square> result = this.getRoom(c).stream().filter((s2) -> Map.distanceBtwSquares(s,s2)<=maxDist && Map.distanceBtwSquares(s,s2)>=minDist).collect(Collectors.toList());
+        List<Square> result = this.getRoom(c).stream().filter(s2 -> Map.distanceBtwSquares(s,s2)<=maxDist && Map.distanceBtwSquares(s,s2)>=minDist).collect(Collectors.toList());
         for(Direction d : Direction.values())
         {
             if(s.getEdge(d) == Edge.DOOR)
             {
                 next = s.getNextSquare(d);
-                result.addAll(this.getRoom(next.getColor()).stream().filter((s2) -> Map.distanceBtwSquares(s,s2)<=maxDist && Map.distanceBtwSquares(s,s2)>=minDist).collect(Collectors.toList()));
+                result.addAll(this.getRoom(next.getColor()).stream().filter(s2 -> Map.distanceBtwSquares(s,s2)<=maxDist && Map.distanceBtwSquares(s,s2)>=minDist).collect(Collectors.toList()));
             }
 
         }
-
         return result.stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
+    }
+
+    public Square respawnColor(MapColor c){
+        List<Square> room = getRoom(c);
+        for(int i=0;i<room.size();i++){
+            if(room.get(i).isRespawn())
+                return room.get(i);
+        }
+        return null;
     }
 }
