@@ -1,10 +1,19 @@
 package game.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class Turn {
     private Player currentPlayer;
     private int numOfActions;
     private int numOfMovs;
     private Action currentAction;
+    private List <Action> actionList;
+
+    public Turn() {
+        actionList = new ArrayList<Action>();
+    }
 
     public Player getCurrentPlayer() {
         return currentPlayer;
@@ -53,22 +62,31 @@ public class Turn {
         numOfActions = 2;
         numOfMovs = 0;
     }
-    public void newAction(Action action, int adrenalin){
+    public void newAction(Action action, AdrenalineLevel adrenaline){
+        actionList.clear();
         if (numOfActions == 0){}  //TODO throw exe
         numOfActions = numOfActions - 1;
         switch (action){
             case GRAB:
-                if (adrenalin > 0 ){
-                            numOfMovs = 2;
+                if (adrenaline == AdrenalineLevel.GRABLEVEL || adrenaline == AdrenalineLevel.SHOOTLEVEL){
+                            actionList.add(Action.MOVEMENT);
+                            actionList.add(Action.MOVEMENT);
+                            actionList.add(Action.GRAB);
+
                 }else
-                    numOfMovs = 1;
+                    actionList.add(Action.MOVEMENT);
+                    actionList.add(Action.GRAB);
 
             case SHOOT:
-                if(adrenalin == 2){
-                    numOfMovs = 1;
+                if(adrenaline == AdrenalineLevel.SHOOTLEVEL){
+                    actionList.add(Action.MOVEMENT);
+                    actionList.add(Action.GRAB);
                 }else
-                    numOfMovs = 0;
-            case MOVEMENT: numOfMovs = 3;
+                    actionList.add(Action.GRAB);
+            case MOVEMENT:
+                actionList.add(Action.MOVEMENT);
+                actionList.add(Action.MOVEMENT);
+                actionList.add(Action.MOVEMENT);
         }
     }
 }
