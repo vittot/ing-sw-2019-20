@@ -224,6 +224,7 @@ public class Game {
      */
     public void replacePowerUpDeck(){
         Collections.shuffle(ammoWaste);
+        deckPower.clear();
         deckPower.addAll(powerWaste);
         powerWaste.clear();
     }

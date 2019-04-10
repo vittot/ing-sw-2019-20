@@ -142,7 +142,11 @@ public class Square implements Target{
         this.cardAmmo = cardAmmo;
     }
 
-
+    /**
+     *
+     * @param d
+     * @return
+     */
     public List<Square> getAdiacentRoomSquares(Direction d){
         Square tmp;
         if(this.getEdge(d)== Edge.DOOR) {

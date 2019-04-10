@@ -211,10 +211,12 @@ public class Player implements Target{
     /**
      * Add marks to the current turn marks, saved there to avoid to be added as damage in case of composite effects
      * They will be added to the Player's effective marks at the end of the action
-     * @param thisTurnMarks
+     * @param shooter
+     * @param marks
      */
-    public void addThisTurnMarks(List<PlayerColor> thisTurnMarks) {
-        this.thisTurnMarks.addAll(thisTurnMarks);
+    public void addThisTurnMarks(Player shooter, int marks) {
+        for (int i = 0; i < marks; i++)
+            this.thisTurnMarks.add(shooter.getColor());
     }
 
     /**
