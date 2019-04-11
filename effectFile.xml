@@ -1,0 +1,1136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<weaponList>
+
+    <weapon>
+        <name>
+            Lock Rifle
+        </name>
+        <effectDescription>
+            <name>
+                Basic effect
+            </name>
+            Deal 2 damage and 1 marks to 1 target you ca see
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Second lock
+            </name>
+            Deal 1 mark to a different target you ca see
+        </effectDescription>
+        <price>
+            <ammo>
+                blue
+            </ammo>
+            <ammo>
+                blue
+            </ammo>
+        </price>
+        <alternativePrice>
+
+        </alternativePrice>
+        <opzionalPrice>
+            <ammo>
+                red
+            </ammo>
+        </opzionalPrice>
+        <!--Effect distr01 = new Effect (2,1,1,1,false,false,0,0,1,2,0,12,false, false,false,0,false,false, Target.PLAYER);
+        Effect distr21 = new Effect (0,1,1,1,false,false,0,0,1,2,0, 12,false,false,false,2,false,false, Target.PLAYER);-->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <plusBeforeBase>
+
+        </plusBeforeBase>
+        <plusOrder>
+
+        </plusOrder>
+    </weapon>
+
+    <weapon>
+        <name>
+            Machine gun
+        </name>
+        <effectDescription>
+            <name>
+                basic effect
+            </name>
+            Choose 1 or 2 targets you can see and deal 1 damage to each.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Focus shot
+            </name>
+            Deal 1 additional damage to one of those targets.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Turret tripod
+            </name>
+            Deal 1 additional damage to the other of those targets and/or deal 1 damage to a different target you can see.
+        </effectDescription>
+        <!--
+        Effect mitr01 = new PlainDamageEffect(1,2,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        Effect mitr21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        Effect mitr31 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NOTTHELAST,false,false);
+        Effect mitr32 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
+
+        -->
+        <price>
+           <ammo>
+               blue
+           </ammo>
+            <ammo>
+                red
+            </ammo>
+        </price>
+        <opzionalPrice>
+            <ammo>
+                yellow
+            </ammo>
+        </opzionalPrice>
+        <opzionalPrice>
+            blue
+        </opzionalPrice>
+        <baseEffect>
+
+        </baseEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+
+    <weapon>
+        <name>
+            T.H.O.R
+        </name>
+        <effectDescription>
+            <name>
+                basic effect
+            </name>
+            Deal 2 damage to 1 target you can see.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Chain reaction
+            </name>
+            Deal 1 damage to a second target that your first target can see.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                High voltage
+            </name>
+            Deal 2 damage to a third target that your second target can see. You cannot use this effect unless you use chain reaction first.
+        </effectDescription>
+        <price>
+            <ammo>
+                blue
+            </ammo>
+            <ammo>
+                red
+            </ammo>
+        </price>
+        <opzionalPrice>
+            <ammo>
+                blue
+            </ammo>
+        </opzionalPrice>
+        <opzionalPrice>
+            <ammo>
+                blue
+            </ammo>
+        </opzionalPrice>
+        <!--        Effect torp01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.ANYONE,false,false);
+        Effect torp21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,true,false);
+        Effect torp31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.NONEOFTHEPREVIOUS, true,false);
+-->
+        <baseEffect>
+
+        </baseEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            true
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Plasma Gun
+        </name>
+
+        <effectDescription>
+            <name>
+                Base effect
+            </name>
+            Deal 2 damage to 1 target you can see.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Phase glide
+            </name>
+            Move 1 or 2 squares. This effect can be used before the basic affect.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Charged shot
+            </name>
+            deal 1 additional damage to your target.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                blue
+            </ammo>
+            <ammo>
+                yellow
+            </ammo>
+        </price>
+        <opzionalPrice>
+            <ammo>
+
+            </ammo>
+        </opzionalPrice>
+        <opzionalPrice>
+            <ammo>
+                blue
+            </ammo>
+        </opzionalPrice>
+        <!--
+                Effect plas01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+        Effect plas21 = new MovementEffect(0,0,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
+        Effect plas31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+-->
+        <baseEffect>
+
+        </baseEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            true
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Whisper
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic effect
+            </name>
+            Deal 3 dmage and 1 mark to 1 target you can see. Your target must be at least 2 moves away from you.
+        </effectDescription>
+
+
+        <price>
+            <ammo>
+                Blue
+            </ammo>
+            <ammo>
+                Blue
+            </ammo>
+            <ammo>
+                yellow
+            </ammo>
+        </price>
+        <!--        Effect prec01 = new PlainDamageEffect(1,1,2,Map.MAX_DIST,TargetVisibility.VISIBLE,3,1,false,DifferentTarget.ANYONE,false,false);
+-->
+        <baseEffect>
+
+        </baseEffect>
+
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Electroscythe
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Deal 1 damage to every other player on your square.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Reaper mode
+            </name>
+            Deal 2 damage to every other player on your square.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                blue
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+                blue
+            </ammo>
+            <ammo>
+                red
+            </ammo>
+        </alternativePrice>
+        <!--
+                Effect prot01 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,0,TargetVisibility.VISIBLE,1,0,false,false);
+        Effect prot11 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,0,TargetVisibility.VISIBLE,2,0,false,false);
+
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Tarctor Beam
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Move a target 0,1 or 2 sqaures to a square you can see, and give it 2 damage.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Punisher mode
+            </name>
+            Choose a target 0,1 or 2 squares away frm you. Move the target to your sqaure and deal 3 damage to it.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                blue
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+                red
+            </ammo>
+            <ammo>
+                yellow
+            </ammo>
+        </alternativePrice>
+        <!--         Effect ray01 = new MovementEffect(1,1,0,Map.MAX_DIST,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,false,false,false,false,false,DifferentTarget.ANYONE);
+        Effect ray02 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        Effect ray11 = new MovementEffect(1,1,0,2,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,true,false,false,false,false,DifferentTarget.ANYONE);
+        Effect ray12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,true,DifferentTarget.ANYONE,false,false);
+-->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Vortex Cannon
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic effect
+            </name>
+            Choose a square you can see, but not your square. Call it "the vortex". Choose a target on the vortex or 1 move away from it. Move it onto the vortex and give it 2 damage.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Black hole
+            </name>
+            Choose up to 2 target on the vortex or 1 move away from it. Move them onto the vortex and give them each 1 damage.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                red
+            </ammo>
+            <ammo>
+                blue
+            </ammo>
+        </price>
+        <opzionalPrice>
+            <ammo>
+                red
+            </ammo>
+        </opzionalPrice>
+        <!--
+                Effect vort01 = new SquareDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE, 0,0,false,false);
+        Effect vort02 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.ANYONE);
+        Effect vort03 = new PlainDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,2,0,true,DifferentTarget.ANYONE,false,false);
+
+        Effect vort21 = new MovementEffect(1,1,0,1, 0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.NONEOFTHEPREVIOUS);
+        Effect vort22 = new PlainDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
+        Effect vort23 = new MovementEffect(0,1,0,1, 0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.NONEOFTHEPREVIOUS);
+        Effect vort24 = new PlainDamageEffect(0,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+-->
+        <baseEffect>
+
+        </baseEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Furnace
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Choose a room you can see, but not the room you are in. Del 1 damage to everyone in that room.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Cozy fire mode
+            </name>
+            Choose a sqaure exacly one move away. Deal 1 damage and 1 mark to everyone on that square.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                red
+            </ammo>
+            <ammo>
+                blue
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+
+            </ammo>
+        </alternativePrice>
+        <!--
+                Effect vulc01 = new RoomDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0);
+        Effect vulc11 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,1,TargetVisibility.VISIBLE,1,1,false,false);
+
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Heatseeker
+        </name>
+
+        <effectDescription>
+            <name>
+                Effect
+            </name>
+            Choose 1 target you cannnoot see and deal 3 damage to it.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                red
+            </ammo>
+            <ammo>
+                red
+            </ammo>
+            <ammo>
+                yellow
+            </ammo>
+        </price>
+            <!--
+              Effect rock01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.INVISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
+            -->
+        <baseEffect>
+
+        </baseEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Hellion
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Deal 1 damage to 1 target you can see al least 1 move away. then give 1 mark to that target and everyoe else on that sqaure.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Nano-tracer mode
+            </name>
+            Deal 1 damage to 1 target you can see at least 1 move away. then give 2 marks to that target and everyone else on tat square.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                red
+            </ammo>
+            <ammo>
+                yellow
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+                red
+            </ammo>
+        </alternativePrice>
+        <!--
+                Effect flash01 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        Effect flash02 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 1,true,false);
+        Effect flash11 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        Effect flash12 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 2,true,false);
+        -->
+
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Flamethrower
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Choose a sqaure 1 move away and possibly a second square 1 more move away in the same direction. On each sqaure, you may choose 1 target and give it 1 damage.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Barbecue mode
+            </name>
+            Choose a sqaure 1 move away and possibly a second square 1 more move away in the same direction. deal 2 damage to everyone on the first square and 1 damage to everyone on the second square.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                red
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+                yellow
+            </ammo>
+            <ammo>
+                yellow
+            </ammo>
+        </alternativePrice>
+        <!--
+                Effect flam01 = new PlainDamageEffect(1,1,1,1,TargetVisibility.EVERYWHERE,1,0,false,DifferentTarget.ANYONE,false,false);
+        Effect flam02 = new PlainDamageEffect(0,1,2,2,TargetVisibility.EVERYWHERE,1,0,false,DifferentTarget.ANYONE,false,true);
+        Effect flam11 = new SquareDamageEffect(1,1,1,1,TargetVisibility.EVERYWHERE,2,0,false,false);
+        Effect flam12 = new SquareDamageEffect(0,1,2,2,TargetVisibility.EVERYWHERE,1,0,false,true);
+
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Grenade Launcher
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic effect
+            </name>
+            Deal1 damage to 1 target you can see. Then you may move the target 1 square.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Extra grenade
+            </name>
+            deal 1 damage to every player on a square yu can see. you can use this before or after the basic effect's move.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                red
+            </ammo>
+        </price>
+        <opzionalPrice>
+            <ammo>
+                red
+            </ammo>
+        </opzionalPrice>
+        <!--
+        Effect gran01 =  new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        Effect gran02 = new MovementEffect(0,1,0,Map.MAX_DIST,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false, DifferentTarget.ANYONE);
+        Effect gran21 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,false);
+        //TODO Effetto plus su puo fare rima del effetto base
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <plusBeforeBase>
+            true
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+<weapon>
+        <name>
+            Rocket launcher
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic effect
+            </name>
+            Deal 2 damage to 1 target you can see tht is not on your square. Then you may move the target 1 sqaure.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Rocket jump
+            </name>
+            Move 1 or 2 squares. This effect can be used before basic effect.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Fragment warhead
+            </name>
+            During the basic effect, deal 1 damage to every player on your target's original square-including the target, even if yu move it.
+        </effectDescription>
+        <price>
+            <ammo>
+                red
+            </ammo>
+            <ammo>
+                red
+            </ammo>
+        </price>
+        <opzionalPrice>
+            <ammo>
+                blue
+            </ammo>
+        </opzionalPrice>
+        <alternativePrice>
+            <ammo>
+                yellow
+            </ammo>
+        </alternativePrice>
+<!--
+    Effect lcrz01 = new PlainDamageEffect(1,1,1, Map.MAX_DIST, TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+    Effect lcrz02 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
+    Effect lcrz21 = new MovementEffect(1,1,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
+    Effect lcrz11 = new SquareDamageEffect(1,Game.MAXPLAYERS,1,Game.MAXPLAYERS,TargetVisibility.VISIBLE,1,0,false,false);
+    Effect lcrz12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,true,false);
+    Effect lcrz13 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
+-->
+    <baseEffect>
+
+        </baseEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            true
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Railgun
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Choose a cardinal direction and 1 target in that direction. Deal 3 damage to it. You can attack through walls.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Piercing mode
+            </name>
+            Choose a cardinal direction and 1 or 2 target in that direction. Deal 2 damage to each. You can attack through walls.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                yellow
+            </ammo>
+            <ammo>
+                yellow
+            </ammo>
+            <ammo>
+                blue
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+
+            </ammo>
+        </alternativePrice>
+        <!--
+        Effect lsr01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
+        Effect lsr11 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
+        Effect lsr12 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,true);
+
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+
+    <weapon>
+        <name>
+            Cyberblade
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic effect
+            </name>
+            Deal 2 damage to 1 target on your square.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Shadowstep
+            </name>
+            Move 1 square before or after the basic effect.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Slice and dice
+            </name>
+            deal 2 damage to a different target on your square. The shadowstep mau be used before or after this effect.
+        </effectDescription>
+        <price>
+            <ammo>
+                yellow
+            </ammo>
+            <ammo>
+                red
+            </ammo>
+        </price>
+        <opzionalPrice>
+            <ammo>
+
+            </ammo>
+        </opzionalPrice>
+        <opzionalPrice>
+            <ammo>
+                yellow
+            </ammo>
+        </opzionalPrice>
+<!--
+        Effect phot01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+        Effect phot21 = new MovementEffect(1,1,0,0,1,1,TargetVisibility.VISIBLE,true,TargetVisibility.VISIBLE,false,false,false,false,true,DifferentTarget.ANYONE);
+        Effect phot31 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.NONEOFTHEPREVIOUS,false,false);
+
+-->
+        <baseEffect>
+
+        </baseEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <plusBeforeBase>
+            true
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            ZX-2
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Deal 1 damage and 2 marks to 1 target you can see.
+
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Scanner mode
+            </name>
+            Choose up to 3 targets you can see and del 1 marks to each.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                yellow
+            </ammo>
+            <ammo>
+                red
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+
+            </ammo>
+        </alternativePrice>
+        <!--
+                Effect zx01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,1,false,DifferentTarget.ANYONE,false,false);
+        Effect zx11 = new PlainDamageEffect(1,3,0,Map.MAX_DIST,TargetVisibility.VISIBLE,0,1,false, DifferentTarget.ANYONE,false,false);
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Shotgun
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Deal 3 damage to 1 target on your square. If you want, you may then move the target 1 square.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Long barrel mode
+            </name>
+            Deal 2 damage to 1 target on any square exactly one move away.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                yellow
+            </ammo>
+            <ammo>
+                yellow
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+
+            </ammo>
+        </alternativePrice>
+        <!--
+                Effect pmp01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
+        Effect pmp02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
+        Effect pmp11 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Power glove
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Choose 1 target on any square exactly 1 move away. Move onto that square and give the target 1 damage and 2 marks.
+        </effectDescription>
+        <effectDescription>
+            <name>
+                Rocket fist mode
+            </name>
+            Choose 1 target on any square exactly 1 move away. Move onto that square. You may deal 2 damage to 1 target there. If you want, you may move 1 more square in that same direction. You may deal 2 damage to 1 target there, as well.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                yellow
+            </ammo>
+            <ammo>
+                blue
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+                blue
+            </ammo>
+        </alternativePrice>
+        <!--
+                Effect cyb01 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,1,2,false,DifferentTarget.ANYONE,false,false);
+        Effect cyb02 = new MovementEffect(1,1,0,0,1,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,false,DifferentTarget.ANYONE);
+
+        Effect cyb11 = new MovementEffect(1,1,1,1,0,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        Effect cyb12 = new PlainDamageEffect(0,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+        Effect cyb13 = new PlainDamageEffect(0,1,1,1,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,true);
+        Effect cyb14 = new MovementEffect(0,1,1,1,0,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,false,DifferentTarget.ANYONE);
+
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Shockwave
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Chose up to 3 target on different squares, each exactly 1 move away. Deal 1 damage to each other target.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Tsunami mode
+            </name>
+            Deal 1 damage to all target that are exactly 1 move away.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                yellow
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+                yellow
+            </ammo>
+        </alternativePrice>
+        <!--
+        Effect ond01 = new AreaDamageEffect(1,3,1,1,TargetVisibility.VISIBLE,1,0,1);
+        Effect ond11 = new AreaDamageEffect(4,4,1,1,TargetVisibility.VISIBLE,1,0,Game.MAXPLAYERS);
+
+        -->
+        <baseEffect>
+
+        </baseEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+    <weapon>
+        <name>
+            Sledgehammer
+        </name>
+
+        <effectDescription>
+            <name>
+                Basic mode
+            </name>
+            Deal 2 damage to 1 target on your square.
+        </effectDescription>
+
+        <effectDescription>
+            <name>
+                Pulverize mode
+            </name>
+            Deal 3 damage to 1 target  on your square, then move that target 0,1 or 2 squares in one direction.
+        </effectDescription>
+
+        <price>
+            <ammo>
+                yellow
+            </ammo>
+        </price>
+        <alternativePrice>
+            <ammo>
+                red
+            </ammo>
+        </alternativePrice>
+<!--
+        Effect sled01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+        Effect sled11 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
+        Effect sled12 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        Effect sled13 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,true,false,DifferentTarget.ANYONE);
+
+-->
+        <baseEffect>
+
+        </baseEffect>
+        <opzionalEffect>
+
+        </opzionalEffect>
+        <alternativeEffect>
+
+        </alternativeEffect>
+        <plusBeforeBase>
+            false
+        </plusBeforeBase>
+        <plusOrder>
+            false
+        </plusOrder>
+    </weapon>
+
+    <powerUp>
+        <name>
+            Targeting scope
+        </name>
+        <descriprion>
+            You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
+        </descriprion>
+        <effect>
+            <!--
+                    Effect ts01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+            -->
+        </effect>
+    </powerUp>
+    <powerUp>
+        <name>
+            Newton
+        </name>
+        <descriprion>
+            Choose any other player and move 1 or 2 square on teh same direction.
+        </descriprion>
+        <!--
+                Effect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        Effect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
+        -->
+        <effect>
+
+        </effect>
+    </powerUp>
+
+</weaponList>
