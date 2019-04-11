@@ -51,7 +51,7 @@ class MapTest {
     }
 
     /**
-     * Checks getVisibleTargets return exactly the Players in the same room and in the adiacent room through a Door
+     * Checks getVisiblePlayers return exactly the Players in the same room and in the adiacent room through a Door
      */
     @Test
     void getVisibleTargets() {
@@ -67,7 +67,7 @@ class MapTest {
         visible.add(p1);
         visible.add(p3);
 
-        List<Player> visibleRes = map.getVisibleTargets(map.getGrid()[1][0],20,1);
+        List<Player> visibleRes = map.getVisibleTargets(map.getGrid()[1][0],1,20);
 
         assertTrue(visibleRes.containsAll(visible) && visible.containsAll(visibleRes));
 

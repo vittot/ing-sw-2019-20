@@ -258,7 +258,7 @@ public class Game {
             if (players.get(i).isDead()) {
                 updatePoints(players.get(i));
                 //TODO choose discard power up
-                //players.get(i).respawn();
+                //players.get(i)n();.respaw
             }
         }
     }

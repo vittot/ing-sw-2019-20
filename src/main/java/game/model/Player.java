@@ -12,7 +12,7 @@ public class Player implements Target{
     private List<PlayerColor> damage;
     private AdrenalineLevel adrenaline;
     private List<CardWeapon> weapons;
-    private int actualWeapon; //index of the weapon that the player is using
+    private CardWeapon actualWeapon;
     private List<Color> ammo;
     private List<CardPower> cardPower;
     private int deaths;
@@ -59,11 +59,9 @@ public class Player implements Target{
         this.id = id;
     }
 
-    public int getActualWeapon() {
-        return actualWeapon;
-    }
+    public CardWeapon getActualWeapon() { return actualWeapon; }
 
-    public void setActualWeapon(int actualWeapon) {
+    public void setActualWeapon(CardWeapon actualWeapon) {
         this.actualWeapon = actualWeapon;
     }
 
@@ -219,12 +217,19 @@ public class Player implements Target{
             this.thisTurnMarks.add(shooter.getColor());
     }
 
+    @Override
+    public void move(int numSquare, Direction dir) {
+        //TODO
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Add the last marks to the Player's marks
      * This happens at the end of each action
      */
     public void updateMarks() {
         this.marks.addAll(thisTurnMarks);
+        thisTurnMarks.clear();
     }
 
     /**
