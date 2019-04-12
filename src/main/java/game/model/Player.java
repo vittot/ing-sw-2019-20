@@ -173,6 +173,7 @@ public class Player implements Target{
         for(int i=0;i<marks.size();i++){
             if(marks.get(i)==shooter.getColor()){
                 damage++;
+                //TODO management the number of given marks per enemy
                 marks.remove(i);
                 i--;
             }
@@ -184,10 +185,14 @@ public class Player implements Target{
             if (num > 10) {
                 this.deaths++;
                 this.isDead = true;
+                //TODO update given marks if it's possible
+                shooter.addThisTurnMarks(this, 1); //when the victim of a damage die, the shooter receive a marks from the dead player
+                //
                 if (num > 11) {
                     isRage = true;
                 }
                 game.addKill(shooter, this, isRage);
+
             }
             else if (num > 5)
                 this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
