@@ -7,7 +7,6 @@ public class Player implements Target{
     private PlayerColor color;
     private List<PlayerColor> marks;
     private List<PlayerColor> thisTurnMarks;
-    private int givenMarks;
     private int id;
     private List<PlayerColor> damage;
     private AdrenalineLevel adrenaline;
@@ -20,12 +19,12 @@ public class Player implements Target{
     private Square position;
     private Game game;
     private boolean isDead;
+    private final static int MARKS_PER_ENEMY=3;
 
     public Player(int id, PlayerColor color)
     {
         this.id = id;
         this.color = color;
-        this.givenMarks = 0;
         this.adrenaline = AdrenalineLevel.NONE;
         this.deaths = 0;
         this.points = 0;
@@ -41,14 +40,6 @@ public class Player implements Target{
 
     public void setColor(PlayerColor color) {
         this.color = color;
-    }
-
-    public int getGivenMarks() {
-        return givenMarks;
-    }
-
-    public void setGivenMarks(int givenMarks) {
-        this.givenMarks = givenMarks;
     }
 
     public int getId() {
@@ -171,7 +162,6 @@ public class Player implements Target{
         for(int i=0;i<marks.size();i++){
             if(marks.get(i)==shooter.getColor()){
                 damage++;
-                //TODO management the number of given marks per enemy
                 marks.remove(i);
                 i--;
             }
@@ -183,9 +173,7 @@ public class Player implements Target{
             if (num > 10) {
                 this.deaths++;
                 this.isDead = true;
-                //TODO update given marks if it's possible
                 shooter.addThisTurnMarks(this, 1); //when the victim of a damage die, the shooter receive a marks from the dead player
-                //
                 if (num > 11) {
                     isRage = true;
                 }
@@ -218,8 +206,27 @@ public class Player implements Target{
      * @param marks
      */
     public void addThisTurnMarks(Player shooter, int marks) {
+        if(checkMarksNumber(shooter,marks))
         for (int i = 0; i < marks; i++)
             this.thisTurnMarks.add(shooter.getColor());
+    }
+
+    /**
+     * verify if the shooter can apply a finite number of marks to the victim (any player can apply max 3 marks per enemy)
+     * @param shooter
+     * @param marks
+     * @return
+     */
+    public boolean checkMarksNumber(Player shooter, int marks){
+        int count=0;
+        for(int i=0;i<this.marks.size();i++){
+            if(this.marks.get(i)==shooter.getColor())
+                count++;
+        }
+        if(marks+count>MARKS_PER_ENEMY)
+            return false;
+        else
+            return true;
     }
 
     @Override
@@ -252,5 +259,14 @@ public class Player implements Target{
                 return false;
         }
         return false;
+    }
+
+    /**
+     * clear the content of the actual weapon parameters used during the current turn
+     */
+    public void rifleActualWeapon(){
+        this.actualWeapon.getPreviousTargets().clear();
+        this.actualWeapon.setLastTargetSquare(null);
+        this.actualWeapon.setLastDirection(null);
     }
 }

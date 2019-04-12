@@ -33,7 +33,7 @@ public class Game {
         this.killboardSize = killBoardSize;
         this.killBoard = new ArrayList<>(killBoardSize);
         generateDecks("loadingGame.txt");
-        currentTurn = new Turn(this.players.get(0));
+        currentTurn = new Turn(this.players.get(0), this);
         players.stream().forEach(p -> p.setGame(this));
     }
 

@@ -116,6 +116,7 @@ public class Turn {
                 actionList.add(Action.MOVEMENT);
                 actionList.add(Action.MOVEMENT);
         }
+        currentPlayer.rifleActualWeapon();
         game.getPlayers().forEach(p -> p.updateMarks());
     }
 }

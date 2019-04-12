@@ -3,6 +3,7 @@ package game.model;
 import game.model.effects.Effect;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -21,6 +22,7 @@ public class CardWeapon {
     private Square lastTargetSquare;
     private Direction lastDirection;
     private boolean loaded;
+    private Player shooter;
 
     public CardWeapon(String name, List<Color> price, List<List<Color>> pricePlus, List<Color> priceAlt, List<Effect> baseEffect, List<List<Effect>> effectPlus, List<Effect> altEffect, List<String> effectDescription, boolean plusBeforeBase, boolean plusOrder) {
         this.name = name;
@@ -140,7 +142,35 @@ public class CardWeapon {
         return this.previousTargets.get(previousTargets.size() - 1);
     }
 
-    public void reloadWeapon(List<CardAmmo> cardAmmo, List<CardPower> powerUp){
-        // TODO
+    /**
+     *
+     * @param ammo
+     * @param powerUp
+     * @throws InsufficientAmmoException
+     */
+    public void reloadWeapon(List<Color> ammo, List<CardPower> powerUp) throws InsufficientAmmoException{
+        List<Color> tmp = new ArrayList<>();
+        List<Color> colorPwrUp = new ArrayList<>();
+        if(!loaded) {
+            tmp.addAll(price);
+            if (ammo.size() + powerUp.size() == price.size()) {
+                if (tmp.containsAll(ammo))
+                    tmp.removeAll(ammo);
+                if (tmp.size() != 0) {
+                    for (int i = 0; i < powerUp.size(); i++)
+                        colorPwrUp.add(powerUp.get(i).getColor());
+                    if (tmp.containsAll(colorPwrUp))
+                        tmp.removeAll(colorPwrUp);
+                }
+                if (tmp.size() == 0) {
+                    loaded = true;
+                    //TODO removeAmmo in player
+                }
+                else
+                    throw new InsufficientAmmoException();
+            }
+            else
+                throw new InsufficientAmmoException();
+        }
     }
 }
