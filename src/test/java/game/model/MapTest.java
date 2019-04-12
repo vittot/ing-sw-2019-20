@@ -67,7 +67,7 @@ class MapTest {
         visible.add(p1);
         visible.add(p3);
 
-        List<Player> visibleRes = map.getVisibleTargets(map.getGrid()[1][0],1,20);
+        List<Player> visibleRes = map.getGrid()[1][0].getVisiblePlayers(1,20);
 
         assertTrue(visibleRes.containsAll(visible) && visible.containsAll(visibleRes));
 

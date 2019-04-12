@@ -2,6 +2,7 @@ package game.model.effects;
 
 import game.model.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public class PlainDamageEffect extends Effect{
      * @param shooter
      * @return The List is a singleton for this type of Effect
      */
-    public List<List<? extends Target>> searchTarget(Player shooter){
+    public List<List<Target>> searchTarget(Player shooter){
 
         List<Player> targets;
         Square shooterPos = chainTarget ? shooter.getActualWeapon().getLastTarget().getPosition() : shooter.getPosition();
@@ -126,10 +127,12 @@ public class PlainDamageEffect extends Effect{
             }
         }
 
+        targets.remove(shooter);
 
-
-        return Collections.singletonList(targets);
-
+        List<Target> retList = new ArrayList<>();
+        for(Player p: targets)
+            retList.add(p);
+        return Collections.singletonList(retList);
 
     }
 
@@ -138,7 +141,7 @@ public class PlainDamageEffect extends Effect{
      * @param shooter
      * @param targets choosen targets
      */
-    public void applyEffect(Player shooter, List<? extends Target> targets){
+    public void applyEffect(Player shooter, List<Target> targets){
         for(Target t : targets)
         {
             t.addDamage(shooter,damage);

@@ -173,15 +173,17 @@ public class Square implements Target{
     public List<Room> getVisibileRooms()
     {
         List<Room> visRooms = new ArrayList<>();
+        Square next;
         for(Direction d : Direction.values())
         {
             if(this.getEdge(d) == Edge.DOOR)
             {
-                visRoooms.add(this.getNextSquare(d);
-                result.addAll(map.getRoom(next.getColor()).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList()));
+                next = this.getNextSquare(d);
+                visRooms.add(new Room(next.getColor(),map));
             }
 
         }
+        return visRooms;
     }
 
     /**

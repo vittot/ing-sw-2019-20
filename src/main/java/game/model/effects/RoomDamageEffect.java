@@ -31,7 +31,7 @@ public class RoomDamageEffect extends Effect{
         this.marks = marks;
     }
 
-    public List<List<? extends Target>> searchTarget(Player shooter){
+    public List<List<Target>> searchTarget(Player shooter){
         return null;
     }
 
@@ -40,7 +40,7 @@ public class RoomDamageEffect extends Effect{
      * @param shooter
      * @param targets choosen targets
      */
-    public void applyEffect(Player shooter, List<? extends Target> targets){
+    public void applyEffect(Player shooter, List<Target> targets){
         for(Target t : targets)
         {
             t.addDamage(shooter,damage);

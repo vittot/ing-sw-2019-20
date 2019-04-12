@@ -22,8 +22,8 @@ public class Room implements Target {
     }
 
     @Override
-    public void addThisTurnMarks(List<PlayerColor> thisTurnMarks) {
-        getSquares().forEach( s -> s.addThisTurnMarks(thisTurnMarks));
+    public void addThisTurnMarks(Player shooter, int marks) {
+        getSquares().forEach( s -> s.addThisTurnMarks(shooter,marks));
     }
 
     @Override

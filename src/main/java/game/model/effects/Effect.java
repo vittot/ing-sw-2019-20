@@ -64,7 +64,7 @@ public abstract class Effect {
         this.visibility = visibility;
     }
 
-    public abstract List<List<? extends Target>> searchTarget(Player shooter);
+    public abstract List<List<Target>> searchTarget(Player shooter);
 
-    public abstract void applyEffect(Player shooter, List<? extends Target> targets);
+    public abstract void applyEffect(Player shooter, List<Target> targets);
 }

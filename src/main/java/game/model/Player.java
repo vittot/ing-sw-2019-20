@@ -136,6 +136,10 @@ public class Player implements Target{
         isDead = dead;
     }
 
+    public List<PlayerColor> getThisTurnMarks() {
+        return thisTurnMarks;
+    }
+
     /**
      * Respawn the player after his death
      * @param discard Power-up Card choosen by the Player to select the respawn point
