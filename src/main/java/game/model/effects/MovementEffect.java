@@ -1,9 +1,6 @@
 package game.model.effects;
 
-import game.model.CardWeapon;
-import game.model.Player;
-import game.model.Square;
-import game.model.Target;
+import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +17,7 @@ public class MovementEffect extends Effect{
     private boolean beforeBase;
     private int minMove;
     private int maxMove;
+    private List<Direction> choosenMovement;
 
     public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, int minMove, int maxMove, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase,DifferentTarget differentTarget) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
@@ -34,6 +32,11 @@ public class MovementEffect extends Effect{
         this.maxMove = maxMove;
         this.differentTarget = differentTarget;
     }
+
+    public void setChoosenMovement(List<Direction> choosenMovement) {
+        this.choosenMovement = choosenMovement;
+    }
+
     public boolean isMoveShooter() {
         return moveShooter;
     }
@@ -94,7 +97,7 @@ public class MovementEffect extends Effect{
         List<List<Target>> result = new ArrayList<>(); //it will contain the final result of the method
         if(moveShooter) { //part of the method that control the shooter movement
             Square startingPosition = shooter.getPosition(); //the starting position of the shooter
-            CardWeapon actualWeapon = shooter.getWeapons().get(shooter.getActualWeapon()); //the weapon the player is using
+            CardWeapon actualWeapon = shooter.getActualWeapon(); //the weapon the player is using
             ArrayList<Target> tmp = new ArrayList<>(); //temporary variable that will compose the final result
             Square actual;
             Square next;

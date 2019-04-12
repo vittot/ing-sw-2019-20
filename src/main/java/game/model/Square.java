@@ -2,6 +2,7 @@ package game.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Square implements Target{
     private MapColor color;
@@ -10,20 +11,24 @@ public class Square implements Target{
     private List<Player> players;
     private List<CardWeapon> weapons;
     private CardAmmo cardAmmo;
+    //Convention: the map starts with (0,0) the left upper corner and ends with (map.dimY-1,map.dimX-1) at the lower right corner
     private int x;
     private int y;
-    private Map m;
+    private Map map;
 
-    public Square(MapColor color,  boolean respawn, int x, int y, Map m, Edge[] edges) {
+    public Square(MapColor color, boolean respawn, int x, int y, Map map, Edge[] edges) {
         this.color = color;
         this.edges = edges;
         this.respawn = respawn;
         this.x = x;
         this.y = y;
-        this.m = m;
+        this.map = map;
         players = new ArrayList<>();
         weapons = new ArrayList<>();
     }
+
+
+    public Map getMap() { return map; }
 
     public MapColor getColor() {
         return color;
@@ -87,19 +92,19 @@ public class Square implements Target{
             case UP:
                 if (y==0)
                     return null;
-                return m.getGrid()[y-1][x];
+                return map.getGrid()[y-1][x];
             case DOWN:
-                if (y==m.getDimY())
+                if (y== map.getDimY())
                     return null;
-                return m.getGrid()[y+1][x];
+                return map.getGrid()[y+1][x];
             case RIGHT:
-                if (x==m.getDimX())
+                if (x== map.getDimX())
                     return null;
-                return m.getGrid()[y][x+1];
+                return map.getGrid()[y][x+1];
             default:
                 if (x==0)
                     return null;
-                return m.getGrid()[y][x-1];
+                return map.getGrid()[y][x-1];
 
         }
     }
@@ -143,6 +148,56 @@ public class Square implements Target{
     }
 
     /**
+     * Return the visible targets from this Square, in the indicated distance range
+     * @param minDist minimum allowed distance for targets
+     * @param maxDist maximum allowed distance for targets
+     * @return players available as targets
+     */
+    public List<Player> getVisiblePlayers(int minDist, int maxDist)
+    {
+        Square next;
+        MapColor c = this.getColor();
+        List<Square> result = map.getRoom(c).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList());
+        for(Direction d : Direction.values())
+        {
+            if(this.getEdge(d) == Edge.DOOR)
+            {
+                next = this.getNextSquare(d);
+                result.addAll(map.getRoom(next.getColor()).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList()));
+            }
+
+        }
+        return result.stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
+    }
+
+    public List<Room> getVisibileRooms()
+    {
+        List<Room> visRooms = new ArrayList<>();
+        for(Direction d : Direction.values())
+        {
+            if(this.getEdge(d) == Edge.DOOR)
+            {
+                visRoooms.add(this.getNextSquare(d);
+                result.addAll(map.getRoom(next.getColor()).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList()));
+            }
+
+        }
+    }
+
+    /**
+     * Get all targets not visible frome this Square, in the indicated distance range
+     * @param minDist minimum allowed distance for targets
+     * @param maxDist maximum allowed distance for targets
+     * @return
+     */
+    public List<Player> getInvisiblePlayers(int minDist, int maxDist)
+    {
+        List<Player> visibleTargets = getVisiblePlayers(minDist,maxDist);
+        return map.getAllPlayers().stream().filter(p -> !visibleTargets.contains(p) && Map.distanceBtwSquares(this,p.getPosition())<=maxDist && Map.distanceBtwSquares(this,p.getPosition())>=minDist).collect(Collectors.toList());
+    }
+
+
+    /**
      *
      * @param d
      * @return
@@ -151,7 +206,7 @@ public class Square implements Target{
         Square tmp;
         if(this.getEdge(d)== Edge.DOOR) {
             tmp = this.getNextSquare(d);
-            return m.getRoom(tmp.getColor());
+            return map.getRoom(tmp.getColor());
         }
         else
             return null;
@@ -160,7 +215,7 @@ public class Square implements Target{
     public List<List<Square>> getVisibleSquares(){
         List<List<Square>> result=new ArrayList<>();
         List<Square> tmp = new ArrayList<>();
-        tmp=m.getRoom(this.getColor());
+        tmp= map.getRoom(this.getColor());
         result.add(tmp);
         if(this.getAdiacentRoomSquares(Direction.UP)!=null){
             result.add((ArrayList)this.getAdiacentRoomSquares(Direction.UP));
@@ -176,16 +231,32 @@ public class Square implements Target{
         }
         return result;
     }
+
+    @Override
+    public void addDamage(Player shooter, int damage) {
+        players.stream().forEach( p -> p.addDamage(shooter,damage));
+    }
+
+    @Override
+    public void addThisTurnMarks(Player shooter, int marks) {
+        players.stream().forEach(p -> p.addThisTurnMarks(shooter, marks));
+    }
+
+    @Override
+    public void move(int numSquare, Direction dir) {
+        players.stream().forEach(p -> p.move(numSquare, dir));
+    }
+
     /*
     public List<List<Target>> getSquaresInRange(int minDist, int maxDist){
         List<List<Target>> result=new ArrayList<>();
         List<Target> tmp=new ArrayList<>();
         int sum;
-        for(int x=0;x<m.getDimX();x++){
-            for(int y=0;y<m.getDimY();y++){
-                sum=Math.abs(this.getX()-m.getGrid()[x][y].getX())+Math.abs(this.getY()-m.getGrid()[x][y].getY());
+        for(int x=0;x<map.getDimX();x++){
+            for(int y=0;y<map.getDimY();y++){
+                sum=Math.abs(this.getX()-map.getGrid()[x][y].getX())+Math.abs(this.getY()-map.getGrid()[x][y].getY());
                 if(sum>=minDist && sum<=maxDist){
-                    tmp.add(m.getGrid()[x][y]);
+                    tmp.add(map.getGrid()[x][y]);
                     result.add(tmp);
                     tmp.clear();
                 }

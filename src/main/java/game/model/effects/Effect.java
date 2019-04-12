@@ -6,11 +6,11 @@ import game.model.Target;
 import java.util.List;
 
 public abstract class Effect {
-    private int minEnemy;
-    private int maxEnemy;
-    private int minDist;
-    private int maxDist;
-    private TargetVisibility visibility;
+    protected int minEnemy;
+    protected int maxEnemy;
+    protected int minDist;
+    protected int maxDist;
+    protected TargetVisibility visibility;
 
 
 
@@ -64,7 +64,7 @@ public abstract class Effect {
         this.visibility = visibility;
     }
 
-    public abstract List<List<Target>> searchTarget(Player shooter);
+    public abstract List<List<? extends Target>> searchTarget(Player shooter);
 
-    public abstract void applyEffect(Player shooter, List<Target> targets);
+    public abstract void applyEffect(Player shooter, List<? extends Target> targets);
 }

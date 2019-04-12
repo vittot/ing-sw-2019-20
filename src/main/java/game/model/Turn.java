@@ -10,10 +10,12 @@ public class Turn {
     private int numOfMovs;
     private Action currentAction;
     private List <Action> actionList;
+    private Game game;
 
-    public Turn(Player currentPlayer)
+    public Turn(Player currentPlayer, Game game)
     {
         this.currentPlayer = currentPlayer;
+        this.game = game;
     }
 
     public List<Action> getActionList() {
@@ -83,6 +85,7 @@ public class Turn {
      */
     public void newAction(Action action, AdrenalineLevel adrenaline){
         actionList.clear();
+
         if (numOfActions == 0){}  //TODO throw exe
         numOfActions = numOfActions - 1;
         switch (action){
@@ -113,5 +116,6 @@ public class Turn {
                 actionList.add(Action.MOVEMENT);
                 actionList.add(Action.MOVEMENT);
         }
+        game.getPlayers().forEach(p -> p.updateMarks());
     }
 }

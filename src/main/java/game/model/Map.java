@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 public class Map {
     private int id;
     private Square[][] grid;
-    private int dimX;
-    private int dimY;
+    private int dimX; //number of cols
+    private int dimY; //number of rows
     public static final int MAX_DIST = 12;
     public static final int WEAPON_PER_SQUARE = 3;
 
@@ -73,6 +73,15 @@ public class Map {
     }
 
     /**
+     * Get all Map squares as List<Square>
+     * @return
+     */
+    public List<Square> getAllSquares()
+    {
+        return Arrays.stream(grid).flatMap(Arrays::stream).filter(s->s!=null).collect(Collectors.toList());
+    }
+
+    /**
      * Return the room of the indicated MapColor
      * @param c Color of the room
      * @return Squares of the room
@@ -98,33 +107,18 @@ public class Map {
      * @param s2
      * @return
      */
-    static int distanceBtwSquares(Square s1,Square s2)
+    public static int distanceBtwSquares(Square s1,Square s2)
     {
         return Math.abs(s1.getX() - s2.getX()) + Math.abs(s1.getY() - s2.getY());
     }
 
     /**
-     * Return the visible target from the indicated position in the indicated distance range
-     * @param s position
-     * @param maxDist maximum allowed distance for targets
-     * @param minDist minimum allowed distance for targets
-     * @return players available as targets
+     * Get a List of all Players on the Map
+     * @return
      */
-    public List<Player> getVisibleTargets(Square s, int maxDist, int minDist)
+    public List<Player> getAllPlayers()
     {
-        Square next;
-        MapColor c = s.getColor();
-        List<Square> result = this.getRoom(c).stream().filter(s2 -> Map.distanceBtwSquares(s,s2)<=maxDist && Map.distanceBtwSquares(s,s2)>=minDist).collect(Collectors.toList());
-        for(Direction d : Direction.values())
-        {
-            if(s.getEdge(d) == Edge.DOOR)
-            {
-                next = s.getNextSquare(d);
-                result.addAll(this.getRoom(next.getColor()).stream().filter(s2 -> Map.distanceBtwSquares(s,s2)<=maxDist && Map.distanceBtwSquares(s,s2)>=minDist).collect(Collectors.toList()));
-            }
-
-        }
-        return result.stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
+        return this.getAllSquares().stream().flatMap(s -> s.getPlayers().stream()).collect(Collectors.toList());
     }
 
     /**

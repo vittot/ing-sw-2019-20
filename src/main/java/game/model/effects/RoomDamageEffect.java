@@ -31,12 +31,20 @@ public class RoomDamageEffect extends Effect{
         this.marks = marks;
     }
 
-    public List<List<Target>> searchTarget(Player shooter){
+    public List<List<? extends Target>> searchTarget(Player shooter){
         return null;
     }
 
-    public void applyEffect(Player shooter, List<Target> targets){
-
-        //TODO
+    /**
+     * Apply damage and marks to the targets
+     * @param shooter
+     * @param targets choosen targets
+     */
+    public void applyEffect(Player shooter, List<? extends Target> targets){
+        for(Target t : targets)
+        {
+            t.addDamage(shooter,damage);
+            t.addThisTurnMarks(shooter,marks);
+        }
     }
 }

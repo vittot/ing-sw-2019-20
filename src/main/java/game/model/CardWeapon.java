@@ -17,9 +17,9 @@ public class CardWeapon {
     private List<String> effectDescriptions;
     private boolean plusBeforeBase;           //True if you can use optional effects before base effects
     private boolean plusOrder;                //True if you have to respect the order of the list
-    private List<Player> lastTarget;
+    private List<Player> previousTargets;
     private Square lastTargetSquare;
-    private int lastDirection;
+    private Direction lastDirection;
     private boolean loaded;
 
     public CardWeapon(String name, List<Color> price, List<List<Color>> pricePlus, List<Color> priceAlt, List<Effect> baseEffect, List<List<Effect>> effectPlus, List<Effect> altEffect, List<String> effectDescription, boolean plusBeforeBase, boolean plusOrder) {
@@ -100,12 +100,10 @@ public class CardWeapon {
         this.plusOrder = plusOrder;
     }
 
-    public List<Player> getLastTarget() {
-        return lastTarget;
-    }
+    public List<Player> getPreviousTargets() { return previousTargets; }
 
-    public void setLastTarget(List<Player> lastTarget) {
-        this.lastTarget = lastTarget;
+    public void setPreviousTargets(List<Player> previousTargets) {
+        this.previousTargets = previousTargets;
     }
 
     public Square getLastTargetSquare() {
@@ -116,11 +114,11 @@ public class CardWeapon {
         this.lastTargetSquare = lastTargetSquare;
     }
 
-    public int getLastDirection() {
+    public Direction getLastDirection() {
         return lastDirection;
     }
 
-    public void setLastDirection(int lastDirection) {
+    public void setLastDirection(Direction lastDirection) {
         this.lastDirection = lastDirection;
     }
 
@@ -130,6 +128,16 @@ public class CardWeapon {
 
     public void setLoaded(boolean loaded) {
         this.loaded = loaded;
+    }
+
+
+    /**
+     * Get the last Player hit by this Weapon
+     * @return
+     */
+    public Player getLastTarget()
+    {
+        return this.previousTargets.get(previousTargets.size() - 1);
     }
 
     public void reloadWeapon(List<CardAmmo> cardAmmo, List<CardPower> powerUp){
