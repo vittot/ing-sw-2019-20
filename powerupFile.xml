@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<powerUpList>
+    <powerUp>
+        <name>
+            Targeting scope
+        </name>
+        <descriprion>
+            You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
+        </descriprion>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+    <powerUp>
+    <name>
+        Newton
+    </name>
+    <descriprion>
+        Choose any other player and move 1 or 2 square on teh same direction.
+    </descriprion>
+    <!--
+            Effect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+    Effect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
+    -->
+    <effect>
+
+    </effect>
+    </powerUp>
+</powerUpList>

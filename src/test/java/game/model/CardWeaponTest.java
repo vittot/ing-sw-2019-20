@@ -175,9 +175,9 @@ class CardWeaponTest {
 //        //Pump (shotgun)
 //        Effect pmp01 = new Effect (3,0,1,1,true,false,0,1,1,2,0,0,false,false,false,0,false,false,Target.PLAYER);
 //        Effect pmp11 = new Effect (2,0,1,1,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.PLAYER);
-        Effect pmp01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
-        Effect pmp02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
-        Effect pmp11 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+            Effect pmp01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
+            Effect pmp02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
+            Effect pmp11 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
 //
 //        //Cyber (powerglove)
 //        //effetto cyb14 solo se fatto cyb13 (CORRETTO)
