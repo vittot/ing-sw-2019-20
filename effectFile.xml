@@ -25,32 +25,53 @@
                 blue
             </ammo>
         </price>
-        <alternativePrice>
-
-        </alternativePrice>
         <opzionalPrice>
             <ammo>
                 red
             </ammo>
         </opzionalPrice>
-        <!--Effect distr01 = new Effect (2,1,1,1,false,false,0,0,1,2,0,12,false, false,false,0,false,false, Target.PLAYER);
-        Effect distr21 = new Effect (0,1,1,1,false,false,0,0,1,2,0, 12,false,false,false,2,false,false, Target.PLAYER);-->
+        <!--
+        Effect distr01 = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
+        Effect distr21 = new PlainDamageEffect(1,1,0, Map.MAX_DIST, TargetVisibility.VISIBLE, 0,1,false,DifferentTarget.NOTTHELAST,false,false);
+        -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>1</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
-        <alternativeEffect>
-
-        </alternativeEffect>
         <opzionalEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>NotTheLast</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </opzionalEffect>
         <plusBeforeBase>
-
+            false
         </plusBeforeBase>
         <plusOrder>
-
+            false
         </plusOrder>
     </weapon>
+
 
     <weapon>
         <name>
@@ -74,17 +95,10 @@
             </name>
             Deal 1 additional damage to the other of those targets and/or deal 1 damage to a different target you can see.
         </effectDescription>
-        <!--
-        Effect mitr01 = new PlainDamageEffect(1,2,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect mitr21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
-        Effect mitr31 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NOTTHELAST,false,false);
-        Effect mitr32 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
-
-        -->
         <price>
-           <ammo>
-               blue
-           </ammo>
+            <ammo>
+                blue
+            </ammo>
             <ammo>
                 red
             </ammo>
@@ -95,16 +109,75 @@
             </ammo>
         </opzionalPrice>
         <opzionalPrice>
-            blue
+            <ammo>
+                blue
+            </ammo>
         </opzionalPrice>
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>2</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <opzionalEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </opzionalEffect>
-        <opzionalEffect>
+        <!--
+        Effect mitr01 = new PlainDamageEffect(1,2,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        Effect mitr21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        Effect mitr31 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NOTTHELAST,false,false);
+        Effect mitr32 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
 
+
+        -->
+        <opzionalEffect>
+            <plainDamage>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>NotTheLast</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+            <plainDamage>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>NoneofThePrevius</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </opzionalEffect>
         <plusBeforeBase>
             false
@@ -159,13 +232,49 @@
         Effect torp31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.NONEOFTHEPREVIOUS, true,false);
 -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <opzionalEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>NoneOfThePrevius</differentTarget>
+                <chainTarget>true</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </opzionalEffect>
         <opzionalEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>NoneOfThePrevius</differentTarget>
+                <chainTarget>true</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </opzionalEffect>
         <plusBeforeBase>
             false
@@ -174,6 +283,7 @@
             true
         </plusOrder>
     </weapon>
+
     <weapon>
         <name>
             Plasma Gun
@@ -223,14 +333,38 @@
         Effect plas31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <opzionalEffect>
 
         </opzionalEffect>
-        <alternativeEffect>
-
-        </alternativeEffect>
+        <opzionalEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </opzionalEffect>
         <plusBeforeBase>
             true
         </plusBeforeBase>
@@ -265,7 +399,19 @@
         <!--        Effect prec01 = new PlainDamageEffect(1,1,2,Map.MAX_DIST,TargetVisibility.VISIBLE,3,1,false,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>3</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
 
         <plusBeforeBase>
@@ -363,10 +509,34 @@
         Effect ray12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <alternativeEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>3</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </alternativeEffect>
         <plusBeforeBase>
             false
@@ -417,10 +587,47 @@
         Effect vort24 = new PlainDamageEffect(0,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <opzionalEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>NoneOfThePrevious</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+            <plainDamage>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </opzionalEffect>
         <plusBeforeBase>
             false
@@ -488,7 +695,7 @@
             <name>
                 Effect
             </name>
-            Choose 1 target you cannnoot see and deal 3 damage to it.
+            Choose 1 target you cannot see and deal 3 damage to it.
         </effectDescription>
 
         <price>
@@ -506,7 +713,19 @@
               Effect rock01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.INVISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
             -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Invisible</targetVisib>
+                <damage>3</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <plusBeforeBase>
             false
@@ -515,6 +734,7 @@
             false
         </plusOrder>
     </weapon>
+
     <weapon>
         <name>
             Hellion
@@ -547,6 +767,22 @@
                 red
             </ammo>
         </alternativePrice>
+        <baseEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+
+        </baseEffect>
         <!--
                 Effect flash01 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
         Effect flash02 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 1,true,false);
@@ -554,10 +790,20 @@
         Effect flash12 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 2,true,false);
         -->
 
-        <baseEffect>
-
-        </baseEffect>
         <alternativeEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
 
         </alternativeEffect>
         <plusBeforeBase>
@@ -607,7 +853,33 @@
 
         -->
         <baseEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
 
+            <plainDamage>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>true</chainTarget>
+                <sameDirection>true</sameDirection>
+            </plainDamage>
         </baseEffect>
         <alternativeEffect>
 
@@ -655,6 +927,19 @@
         //TODO Effetto plus su puo fare rima del effetto base
         -->
         <baseEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
 
         </baseEffect>
         <opzionalEffect>
@@ -717,13 +1002,39 @@
     Effect lcrz12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,true,false);
     Effect lcrz13 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
 -->
-    <baseEffect>
+        <baseEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
 
         </baseEffect>
         <opzionalEffect>
 
         </opzionalEffect>
         <alternativeEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>true</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
 
         </alternativeEffect>
         <plusBeforeBase>
@@ -775,9 +1086,48 @@
 
         -->
         <baseEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Everywhere</targetVisib>
+                <damage>3</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
 
         </baseEffect>
         <alternativeEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Everywhere</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+            <plainDamage>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Everywhere</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>true</sameDirection>
+            </plainDamage>
 
         </alternativeEffect>
         <plusBeforeBase>
@@ -792,7 +1142,6 @@
         <name>
             Cyberblade
         </name>
-
         <effectDescription>
             <name>
                 Basic effect
@@ -837,10 +1186,37 @@
 
 -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <opzionalEffect>
 
+        </opzionalEffect>
+        <opzionalEffect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>NoneOfThePrevious</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </opzionalEffect>
         <plusBeforeBase>
             true
@@ -887,10 +1263,34 @@
         Effect zx11 = new PlainDamageEffect(1,3,0,Map.MAX_DIST,TargetVisibility.VISIBLE,0,1,false, DifferentTarget.ANYONE,false,false);
         -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>1</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <alternativeEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>3</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </alternativeEffect>
         <plusBeforeBase>
             false
@@ -938,10 +1338,34 @@
 
         -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>3</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <alternativeEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </alternativeEffect>
         <plusBeforeBase>
             false
@@ -992,9 +1416,47 @@
 
         -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>2</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
         <alternativeEffect>
+            <plainDamage>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+            <plainDamage>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>true</sameDirection>
+            </plainDamage>
 
         </alternativeEffect>
         <plusBeforeBase>
@@ -1088,13 +1550,34 @@
 
 -->
         <baseEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </baseEffect>
-        <opzionalEffect>
-
-        </opzionalEffect>
         <alternativeEffect>
-
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>3</damage>
+                <marks>0</marks>
+                <lastTarget>false</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
         </alternativeEffect>
         <plusBeforeBase>
             false
@@ -1103,34 +1586,4 @@
             false
         </plusOrder>
     </weapon>
-
-    <powerUp>
-        <name>
-            Targeting scope
-        </name>
-        <descriprion>
-            You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
-        </descriprion>
-        <effect>
-            <!--
-                    Effect ts01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
-            -->
-        </effect>
-    </powerUp>
-    <powerUp>
-        <name>
-            Newton
-        </name>
-        <descriprion>
-            Choose any other player and move 1 or 2 square on teh same direction.
-        </descriprion>
-        <!--
-                Effect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
-        Effect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
-        -->
-        <effect>
-
-        </effect>
-    </powerUp>
-
 </weaponList>
