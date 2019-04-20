@@ -1,5 +1,7 @@
 package game.model;
 
+import game.model.exceptions.MapOutOfLimitException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -148,7 +150,7 @@ public class Square implements Target{
     }
 
     /**
-     * Return the visible targets from this Square, in the indicated distance range
+     * Return the visible players from this Square, in the indicated distance range
      * @param minDist minimum allowed distance for targets
      * @param maxDist maximum allowed distance for targets
      * @return players available as targets
@@ -187,10 +189,10 @@ public class Square implements Target{
     }
 
     /**
-     * Get all targets not visible frome this Square, in the indicated distance range
+     * Get all players not visible frome this Square, in the indicated distance range
      * @param minDist minimum allowed distance for targets
      * @param maxDist maximum allowed distance for targets
-     * @return
+     * @return players available as targets
      */
     public List<Player> getInvisiblePlayers(int minDist, int maxDist)
     {
@@ -198,11 +200,21 @@ public class Square implements Target{
         return map.getAllPlayers().stream().filter(p -> !visibleTargets.contains(p) && Map.distanceBtwSquares(this,p.getPosition())<=maxDist && Map.distanceBtwSquares(this,p.getPosition())>=minDist).collect(Collectors.toList());
     }
 
+    /**
+     * Get all players on a cardinal direction from this Square, in the indicated distance range
+     * @param minDist
+     * @param maxDist
+     * @return players available as targets
+     */
+    public List<Player> getPlayersInDirections(int minDist, int maxDist)
+    {
+        return map.getAllPlayers().stream().filter(p -> p.getPosition().getX() == this.x || p.getPosition().getY() == this.y).filter(p -> Map.distanceBtwSquares(this,p.getPosition())<=maxDist && Map.distanceBtwSquares(this,p.getPosition())>=minDist).collect(Collectors.toList());
+    }
+
 
     /**
-     *
      * @param d
-     * @return
+     * @return List of Square of the adicent Room in the indicated Direction, possibly empty
      */
     public List<Square> getAdiacentRoomSquares(Direction d){
         Square tmp;
@@ -211,10 +223,10 @@ public class Square implements Target{
             return map.getRoom(tmp.getColor());
         }
         else
-            return null;
+            return new ArrayList<>();
     }
 
-    public List<List<Square>> getVisibleSquares(){
+    /**public List<List<Square>> getVisibleSquares(){
         List<List<Square>> result=new ArrayList<>();
         List<Square> tmp = new ArrayList<>();
         tmp= map.getRoom(this.getColor());
@@ -232,21 +244,46 @@ public class Square implements Target{
             result.add((ArrayList)this.getAdiacentRoomSquares(Direction.LEFT));
         }
         return result;
-    }
+    }*/
 
+
+    /**
+     * For every Player in the Square add damage cause of an enemy's weapon effect
+     * Marks from the same enemy are counted to calculate the damage to be applied
+     * The adrenaline attribute is updated according to the total damage suffered
+     * Manage deaths and rages adding new kills into the kill-board
+     * @param shooter
+     * @param damage
+     */
     @Override
     public void addDamage(Player shooter, int damage) {
         players.stream().forEach( p -> p.addDamage(shooter,damage));
     }
 
+    /**
+     * For every Player in the Square add marks to the current turn marks, saved there to avoid to be added as damage in case of composite effects
+     * They will be added to the Player's effective marks at the end of the action
+     * @param shooter
+     * @param marks
+     */
     @Override
     public void addThisTurnMarks(Player shooter, int marks) {
         players.stream().forEach(p -> p.addThisTurnMarks(shooter, marks));
     }
 
     @Override
-    public void move(int numSquare, Direction dir) {
-        players.stream().forEach(p -> p.move(numSquare, dir));
+    public void move(int numSquare, Direction dir) throws MapOutOfLimitException {
+        for (Player p : players) {
+            p.move(numSquare, dir);
+        }
+    }
+
+    /**
+     * Remove a Player from the list of players in this Square
+     * @param player
+     */
+    public void removePlayer(Player player) {
+        players.remove(player);
     }
 
     /*

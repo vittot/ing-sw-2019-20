@@ -1,4 +1,4 @@
-package game.model;
+package game.model.exceptions;
 
 public class InsufficientAmmoException extends Exception {
 }

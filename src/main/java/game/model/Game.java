@@ -14,7 +14,7 @@ public class Game {
     private List<Kill> killBoard;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
-    public static final List<Integer> POINTSCOUNT;
+    private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
 
     static {
@@ -59,10 +59,9 @@ public class Game {
         }
 
         PlayerColor firstBlood;
-        int lastDamage = 0;
         int countDeaths = 0;
         int numDamage = 0;
-        HashMap<PlayerColor, Integer> sorted = new HashMap<>();
+        HashMap<PlayerColor, Integer> sorted;
         PlayerColor[] colors;
         numDamage = victim.getDamage().size();
         if (victim.getDamage().size() > 12) {
@@ -80,7 +79,7 @@ public class Game {
         countDeaths = victim.getDeaths();
         colors =  sorted.keySet().stream().toArray(PlayerColor[]::new);
         for (int i = 1; i < colors.length; i++) {
-            if (sorted.get(colors[i - 1]) == sorted.get(colors[i])) {
+            if (sorted.get(colors[i - 1]).equals(sorted.get(colors[i]))) {
                 if (!victim.findFirstDamage(colors[i - 1], colors[i])) {
                     firstBlood = colors[i - 1];
                     colors[i] = colors[i - 1];
@@ -230,16 +229,16 @@ public class Game {
     }
 
     /**
-     * Set the player for the next turn and respawn dead Players
+     * Set the player for the next turn and return the player to be respawned
      */
-    public void changeTurn (){
+    public List<Player> changeTurn (){
         int num;
         num = players.indexOf(currentTurn.getCurrentPlayer());
         if(num + 1 == players.size()){
             currentTurn.setCurrentPlayer(players.get(0));
         }else
             currentTurn.setCurrentPlayer(players.get(num+1));
-        checkRespawn();
+        return checkRespawn();
     }
 
     /**
@@ -251,16 +250,17 @@ public class Game {
     }
 
     /**
-     * Check Players dead in the turn, count points and respawn them
+     * Check Players dead in the turn, count points ask to respawn them
      */
-    public void checkRespawn() {
+    public List<Player> checkRespawn() {
+        List<Player> toRespawn = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
             if (players.get(i).isDead()) {
                 updatePoints(players.get(i));
-                //TODO choose discard power up
-                //players.get(i)n();.respaw
+                toRespawn.add(players.get(i));
             }
         }
+        return toRespawn;
     }
 
     /**

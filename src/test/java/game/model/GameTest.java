@@ -8,9 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class GameTest {
 
@@ -75,15 +73,30 @@ class GameTest {
     }
 
     /**
-     * Test the victory condition
+     * Test the victory condition (Game's killboard becomes full)
      */
     @Test
     void checkVictory() {
         Player p1 = g.getPlayers().get(0);
         Player p2 = g.getPlayers().get(1);
+        CardPower cp = mock(CardPower.class);
+        when(cp.getColor()).thenReturn(Color.BLUE);
+        List<Player> toRespawn;
+        //Player p1 kills Player p2
         p2.addDamage(p1,11);
+        toRespawn = g.changeTurn();
+        for(Player p: toRespawn)
+            p.respawn(cp);
+        //Player p2 kills Player p1
         p1.addDamage(p2,11);
+        toRespawn = g.changeTurn();
+        for(Player p: toRespawn)
+            p.respawn(cp);
+        //Player p1 kills Player p2 with rage
         p2.addDamage(p1,12);
+        toRespawn = g.changeTurn();
+        for(Player p: toRespawn)
+            p.respawn(cp);
         assertTrue(g.checkVictory());
     }
 

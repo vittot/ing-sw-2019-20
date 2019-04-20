@@ -247,7 +247,7 @@
             <name>
                 Basic effect
             </name>
-            Deal 3 dmage and 1 mark to 1 target you can see. Your target must be at least 2 moves away from you.
+            Deal 3 damage and 1 mark to 1 target you can see. Your target must be at least 2 moves away from you.
         </effectDescription>
 
 
@@ -576,14 +576,14 @@
             <name>
                 Basic mode
             </name>
-            Choose a sqaure 1 move away and possibly a second square 1 more move away in the same direction. On each sqaure, you may choose 1 target and give it 1 damage.
+            Choose a square 1 move away and possibly a second square 1 more move away in the same direction. On each sqaure, you may choose 1 target and give it 1 damage.
         </effectDescription>
 
         <effectDescription>
             <name>
                 Barbecue mode
             </name>
-            Choose a sqaure 1 move away and possibly a second square 1 more move away in the same direction. deal 2 damage to everyone on the first square and 1 damage to everyone on the second square.
+            Choose a square 1 move away and possibly a second square 1 more move away in the same direction. deal 2 damage to everyone on the first square and 1 damage to everyone on the second square.
         </effectDescription>
 
         <price>

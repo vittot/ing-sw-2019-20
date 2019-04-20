@@ -1,6 +1,7 @@
 package game.model;
 
 
+import game.model.exceptions.NoResidualActionAvaiableException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 
 class TurnTest {
@@ -20,8 +22,13 @@ class TurnTest {
 
     @BeforeEach
     public void before(){
-        turn = new Turn();
-        actionList = new ArrayList<Action>();
+        Game g = mock(Game.class);
+        Player p = mock(Player.class);
+        CardWeapon cw = mock(CardWeapon.class);
+        when(g.getPlayers()).thenReturn(new ArrayList<>());
+        doNothing().when(p).rifleActualWeapon(); //not really necessary, just to be clear
+        turn = new Turn(p,g);
+        actionList = new ArrayList<>();
         actionList.add(Action.MOVEMENT);
         actionList.add(Action.MOVEMENT);
         actionList.add(Action.GRAB);
@@ -33,29 +40,12 @@ class TurnTest {
      * Check the Movement list return
      */
     @Test
-    void newAction(){
+    void newAction() throws NoResidualActionAvaiableException {
         turn.setNumOfActions(2);
         turn.newAction(action,al);
-        newAction1(actionList.get(0));
-        newAction2(actionList.get(1));
-        newAction3(actionList.get(2));
+        assertEquals(actionList,turn.getActionList());
 
     }
 
-    @Test
-    void newAction1(Action actionList) {
-        assertEquals(turn.getActionList().get(0),actionList);
 
-    }
-
-    @Test
-    void newAction2(Action actionList) {
-        assertEquals(turn.getActionList().get(1),actionList);
-
-    }
-
-    @Test
-    void newAction3(Action actionList) {
-        assertEquals(turn.getActionList().get(2),actionList);
-    }
 }

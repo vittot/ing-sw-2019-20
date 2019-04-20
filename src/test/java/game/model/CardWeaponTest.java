@@ -112,20 +112,20 @@ class CardWeaponTest {
 //        // stesso di flas01 -- Effect flas11 = new Effect (1,0,1,1,false,false,0,0,1,2,1,12,false,false,false,0,false,false, Target.PLAYER);
 //        Effect flas12 = new Effect (0,2,1,1,false,false,0,0,1,2,0,0,true,false,false,0,false,false,Target.SQUARE);
         Effect flash01 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect flash02 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 1,true,false);
+        Effect flash02 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,0,TargetVisibility.VISIBLE,0, 1,true,false);
         Effect flash11 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect flash12 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 2,true,false);
+        Effect flash12 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,0,TargetVisibility.VISIBLE,0, 2,true,false);
 
 //
-//        //Flame
+//        //Flamethrower
 //        Effect flam01 = new Effect (1,0,1,1,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.PLAYER);
 //        Effect flam02 = new Effect (1,0,1,1,false,false,0,0,1,2,1,1,true,false,false,0,true,false,Target.PLAYER);
 //        Effect flam11 = new Effect (2,0,1,1,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.PLAYER);
 //        Effect flam12 = new Effect (1,0,1,1,false,false,0,0,1,2,1,1,true,false,false,0,true,false,Target.PLAYER);
-        Effect flam01 = new PlainDamageEffect(1,1,1,1,TargetVisibility.EVERYWHERE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect flam02 = new PlainDamageEffect(0,1,2,2,TargetVisibility.EVERYWHERE,1,0,false,DifferentTarget.ANYONE,false,true);
-        Effect flam11 = new SquareDamageEffect(1,1,1,1,TargetVisibility.EVERYWHERE,2,0,false,false);
-        Effect flam12 = new SquareDamageEffect(0,1,2,2,TargetVisibility.EVERYWHERE,1,0,false,true);
+        Effect flam01 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        Effect flam02 = new PlainDamageEffect(0,1,1,1,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,true,true);
+        Effect flam11 = new SquareDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,2,0,false,false);
+        Effect flam12 = new SquareDamageEffect(0,1,1,1,TargetVisibility.VISIBLE,1,0,true,true);
 
 //
 //        //Lanciagranate (granade launcher)
@@ -151,8 +151,8 @@ class CardWeaponTest {
 //        //Laser (railgun)
 //        Effect lsr01 = new Effect (3,0,1,1, false,false,0,0,2,2,0,12,false,false,false,0,false,false,Target.DIRECTION);
 //        Effect lsr11 = new Effect (2,0,1,2,false,false,0,0,2,2,0,12,false,false,false,0,true,false,Target.DIRECTION);
-        Effect lsr01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
-        Effect lsr11 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
+        Effect lsr01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.DIRECTION,3,0,false,DifferentTarget.ANYONE,false,false);
+        Effect lsr11 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.DIRECTION,3,0,false,DifferentTarget.ANYONE,false,false);
         Effect lsr12 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,true);
 
 

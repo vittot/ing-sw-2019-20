@@ -8,7 +8,7 @@ import java.util.List;
 public class SquareDamageEffect extends Effect{
     private int damage;
     private int marks;
-    private boolean lastTargetSquare;
+    private boolean lastTargetSquare; //if true indicate to search target from the last target position
     private boolean sameDirection;
 
     public SquareDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, boolean lastTargetSquare, boolean sameDirection) {

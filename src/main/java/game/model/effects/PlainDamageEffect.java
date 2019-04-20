@@ -94,6 +94,9 @@ public class PlainDamageEffect extends Effect{
                 case INVISIBLE:
                     targets = shooterPos.getInvisiblePlayers(minDist,maxDist);
                     break;
+                case DIRECTION:
+                    targets = shooterPos.getPlayersInDirections(minDist,maxDist);
+                    break;
                 default:
                     targets = shooterPos.getMap().getAllPlayers();
             }

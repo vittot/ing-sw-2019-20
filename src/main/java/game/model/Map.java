@@ -1,5 +1,7 @@
 package game.model;
 
+import game.model.exceptions.MapOutOfLimitException;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -79,6 +81,20 @@ public class Map {
     public List<Square> getAllSquares()
     {
         return Arrays.stream(grid).flatMap(Arrays::stream).filter(s->s!=null).collect(Collectors.toList());
+    }
+
+    /**
+     * Get the Square in the given position
+     * @param x number of col (from zero)
+     * @param y number of row (from zero)
+     * @return the Square
+     * @throws MapOutOfLimitException if the given coordinates go outside of the Map
+     */
+    public Square getSquare(int x, int y) throws MapOutOfLimitException
+    {
+        if(x<0 || y<0 || x>=dimX || y>=dimY || grid[y][x] == null)
+            throw new MapOutOfLimitException();
+        return grid[y][x];
     }
 
     /**

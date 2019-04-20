@@ -1,7 +1,10 @@
 package game.model;
 
+import game.model.exceptions.MapOutOfLimitException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Player implements Target{
     private PlayerColor color;
@@ -19,7 +22,7 @@ public class Player implements Target{
     private Square position;
     private Game game;
     private boolean isDead;
-    private final static int MARKS_PER_ENEMY=3;
+    private static final int MARKS_PER_ENEMY=3;
 
     public Player(int id, PlayerColor color)
     {
@@ -163,13 +166,18 @@ public class Player implements Target{
         int num;
         boolean isRage = false;
         Kill lastKill=null;
-        for(int i=0;i<marks.size();i++){
+        List<PlayerColor> marksToBeRemoved = marks.stream().filter(m-> m == shooter.getColor()).collect(Collectors.toList());
+        damage += marksToBeRemoved.size();
+        marks.removeAll(marksToBeRemoved);
+
+        /*for(int i=0;i<marks.size();i++){
             if(marks.get(i)==shooter.getColor()){
                 damage++;
                 marks.remove(i);
                 i--;
             }
-        }
+        }*/
+
         if(this.damage.size()<11) {
             for (int i = 0; i < damage; i++)
                 this.damage.add(shooter.getColor());
@@ -211,12 +219,12 @@ public class Player implements Target{
      */
     public void addThisTurnMarks(Player shooter, int marks) {
         if(checkMarksNumber(shooter,marks))
-        for (int i = 0; i < marks; i++)
-            this.thisTurnMarks.add(shooter.getColor());
+            for (int i = 0; i < marks; i++)
+                this.thisTurnMarks.add(shooter.getColor());
     }
 
     /**
-     * verify if the shooter can apply a finite number of marks to the victim (any player can apply max 3 marks per enemy)
+     * Verify if the shooter can apply a finite number of marks to the victim (any player can apply max 3 marks per enemy)
      * @param shooter
      * @param marks
      * @return
@@ -227,16 +235,34 @@ public class Player implements Target{
             if(this.marks.get(i)==shooter.getColor())
                 count++;
         }
-        if(marks+count>MARKS_PER_ENEMY)
-            return false;
-        else
-            return true;
+
+        return marks+count<MARKS_PER_ENEMY;
     }
 
+    /**
+     * Move the Player
+     * @param numSquare movement amount
+     * @param dir movement direction
+     * @throws MapOutOfLimitException if this movement would put the Player outside the Map
+     */
     @Override
-    public void move(int numSquare, Direction dir) {
-        //TODO
-        throw new UnsupportedOperationException();
+    public void move(int numSquare, Direction dir) throws MapOutOfLimitException {
+        Square newPos;
+        switch (dir){
+            case UP:
+                newPos = game.getMap().getSquare(this.position.getX(),this.position.getY() - numSquare);
+                break;
+            case DOWN:
+                newPos = game.getMap().getSquare(this.position.getX(),this.position.getY() + numSquare);
+                break;
+            case RIGHT:
+                newPos = game.getMap().getSquare(this.position.getX() + numSquare,this.position.getY());
+                break;
+            default:
+                newPos = game.getMap().getSquare(this.position.getX() - numSquare,this.position.getY());
+        }
+        this.position.removePlayer(this);
+        this.position = newPos;
     }
 
     /**
@@ -266,7 +292,7 @@ public class Player implements Target{
     }
 
     /**
-     * clear the content of the actual weapon parameters used during the current turn
+     * Clear the content of the actual weapon parameters used during the current turn
      */
     public void rifleActualWeapon(){
         this.actualWeapon.getPreviousTargets().clear();

@@ -1,6 +1,7 @@
 package game.model;
 
 import game.model.effects.Effect;
+import game.model.exceptions.InsufficientAmmoException;
 
 
 import java.util.ArrayList;
@@ -151,26 +152,28 @@ public class CardWeapon {
     public void reloadWeapon(List<Color> ammo, List<CardPower> powerUp) throws InsufficientAmmoException{
         List<Color> tmp = new ArrayList<>();
         List<Color> colorPwrUp = new ArrayList<>();
-        if(!loaded) {
-            tmp.addAll(price);
-            if (ammo.size() + powerUp.size() == price.size()) {
-                if (tmp.containsAll(ammo))
-                    tmp.removeAll(ammo);
-                if (tmp.size() != 0) {
-                    for (int i = 0; i < powerUp.size(); i++)
-                        colorPwrUp.add(powerUp.get(i).getColor());
-                    if (tmp.containsAll(colorPwrUp))
-                        tmp.removeAll(colorPwrUp);
-                }
-                if (tmp.size() == 0) {
-                    loaded = true;
-                    //TODO removeAmmo in player
-                }
-                else
-                    throw new InsufficientAmmoException();
+        if(loaded)
+            return;
+
+        tmp.addAll(price);
+        if (ammo.size() + powerUp.size() == price.size()) {
+            if (tmp.containsAll(ammo))
+                tmp.removeAll(ammo);
+
+            if (!tmp.isEmpty()) {
+                for (int i = 0; i < powerUp.size(); i++)
+                    colorPwrUp.add(powerUp.get(i).getColor());
+                if (tmp.containsAll(colorPwrUp))
+                    tmp.removeAll(colorPwrUp);
             }
-            else
-                throw new InsufficientAmmoException();
+
+            if (tmp.isEmpty()) {
+                loaded = true;
+                //TODO removeAmmo in player
+            }
+
         }
+        if(!tmp.isEmpty())
+            throw new InsufficientAmmoException();
     }
 }

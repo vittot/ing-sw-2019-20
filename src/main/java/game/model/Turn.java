@@ -1,5 +1,7 @@
 package game.model;
 
+import game.model.exceptions.NoResidualActionAvaiableException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,7 @@ public class Turn {
     {
         this.currentPlayer = currentPlayer;
         this.game = game;
+        actionList = new ArrayList<>();
     }
 
     public List<Action> getActionList() {
@@ -24,10 +27,6 @@ public class Turn {
 
     public void setActionList(List<Action> actionList) {
         this.actionList = actionList;
-    }
-
-    public Turn() {
-        actionList = new ArrayList<>();
     }
 
     public Player getCurrentPlayer() {
@@ -83,10 +82,12 @@ public class Turn {
      * @param action
      * @param adrenaline
      */
-    public void newAction(Action action, AdrenalineLevel adrenaline){
+    public void newAction(Action action, AdrenalineLevel adrenaline) throws NoResidualActionAvaiableException {
         actionList.clear();
 
-        if (numOfActions == 0){}  //TODO throw exe
+        if (numOfActions == 0){
+            throw new NoResidualActionAvaiableException();
+        }
         numOfActions = numOfActions - 1;
         switch (action){
             case GRAB:
@@ -117,6 +118,6 @@ public class Turn {
                 actionList.add(Action.MOVEMENT);
         }
         currentPlayer.rifleActualWeapon();
-        game.getPlayers().forEach(p -> p.updateMarks());
+        game.getPlayers().forEach(Player::updateMarks);
     }
 }
