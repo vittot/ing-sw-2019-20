@@ -94,19 +94,19 @@ class CardWeaponTest {
         Effect vort24 = new PlainDamageEffect(0,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
         //L'ultimo dev'essere fatto se e solo se è stato fatto il penultimo (ma forse se lastTarget è vuoto si evita il problema)
 
-//        //Vulcanic (furnace)
+//        //Furnace
 //        Effect vulc01 = new Effect (1,0,1,1,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.ROOM);
 //        Effect vulc11 = new Effect (1,1,1,1,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.SQUARE);
         Effect vulc01 = new RoomDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0);
         Effect vulc11 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,1,TargetVisibility.VISIBLE,1,1,false,false);
 
 //
-//        //Rocket (heatseeker)
+//        //Heatseeker
 //        Effect rock01 = new Effect (3,0,1,1,false,false,0,0,0,0,1,12,false,false,false,0,false,false,Target.PLAYER);
         Effect rock01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.INVISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
 
 //
-//        //Solar Flash (hellion)
+//        //Hellion
 //        Effect flas01 = new Effect (1,0,1,1,false,false,0,0,1,2,1,12,false,false,false,0,false,false, Target.PLAYER);
 //        Effect flas02 = new Effect (0,1,1,1,false,false,0,0,1,2,0,0,true,false,false,0,false,false,Target.SQUARE);
 //        // stesso di flas01 -- Effect flas11 = new Effect (1,0,1,1,false,false,0,0,1,2,1,12,false,false,false,0,false,false, Target.PLAYER);
@@ -128,7 +128,7 @@ class CardWeaponTest {
         Effect flam12 = new SquareDamageEffect(0,1,1,1,TargetVisibility.VISIBLE,1,0,true,true);
 
 //
-//        //Lanciagranate (granade launcher)
+//        //Granade launcher
 //        Effect gran01 = new Effect (1,0,1,1,true,false,0,1,1,2,0,12,false,false,false,0,false,false,Target.PLAYER);
 //        Effect gran21 = new Effect (1,0,1,1,false,false,0,0,1,2,0,12,false,false,false,0,false,true,Target.SQUARE);
         Effect gran01 =  new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
@@ -136,7 +136,7 @@ class CardWeaponTest {
         Effect gran21 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,false);
         //TODO gran21 deve poter essere fatto prima dell'effetto base
 //
-//        //Lanciarazzi (rocket launcher)
+//        //Rocket launcher
 //        Effect lcrz01 = new Effect (2,0,1,1,true,false,0,1,1,2,1,12,false,false,false,0,false,false,Target.PLAYER);
 //        Effect lcrz11 = new Effect (3, 0,1,1,true,false,0,1,1,2,1,12,false,false,false,0,false,false,Target.PLAYER);
 //        Effect lcrz12 = new Effect (1,0,1,1,false,false,0,0,1,2,0,0,true,false,false,2,false,false,Target.SQUARE);
@@ -194,9 +194,10 @@ class CardWeaponTest {
 
 
 //
-//          Onda d'urto (shockwave)
+//          Onda d'urto (shockwave) //TODO: verificare
 //        Effect ond01 = new Effect (1,0,1,3,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.PLAYER);
         Effect ond01 = new AreaDamageEffect(1,3,1,1,TargetVisibility.VISIBLE,1,0,1);
+
         Effect ond11 = new AreaDamageEffect(4,4,1,1,TargetVisibility.VISIBLE,1,0,Game.MAXPLAYERS);
 
         //SLEDGEHAMMER (martello ionico)

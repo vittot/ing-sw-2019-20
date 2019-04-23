@@ -118,6 +118,11 @@ public class Game {
         return players;
     }
 
+    public Player getPlayer(int id)
+    {
+        return players.get(id - 1);
+    }
+
     public void setPlayers(List<Player> players) {
         this.players = players;
     }

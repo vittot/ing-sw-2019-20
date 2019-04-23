@@ -93,8 +93,8 @@ public class MovementEffect extends Effect{
         this.beforeBase = beforeBase;
     }
 
-    public List<List<Target>> searchTarget(Player shooter){
-        List<List<Target>> result = new ArrayList<>(); //it will contain the final result of the method
+    public List<Target> searchTarget(Player shooter){
+        List<Target> result = new ArrayList<>(); //it will contain the final result of the method
         if(moveShooter) { //part of the method that control the shooter movement
             Square startingPosition = shooter.getPosition(); //the starting position of the shooter
             CardWeapon actualWeapon = shooter.getActualWeapon(); //the weapon the player is using
@@ -104,7 +104,7 @@ public class MovementEffect extends Effect{
             int sIndex;
             if (chainMove) {
                 tmp.add(actualWeapon.getLastTargetSquare());
-                result.add(tmp);
+                result = tmp;
             }
             else {
                 if (sameDirection) {

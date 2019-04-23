@@ -19,7 +19,7 @@ public class Room implements Target {
      * @return
      */
     public List<Square> getSquares(){
-        return map.getRoom(color);
+        return map.getRoomSquares(color);
     }
 
     /**
