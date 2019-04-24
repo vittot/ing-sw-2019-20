@@ -1,9 +1,13 @@
 package game.model.effects;
 
+import game.model.Direction;
 import game.model.Player;
+import game.model.Square;
 import game.model.Target;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SquareDamageEffect extends Effect{
     private int damage;
@@ -51,11 +55,69 @@ public class SquareDamageEffect extends Effect{
         this.sameDirection = sameDirection;
     }
 
-    public List<List<Target>> searchTarget(Player shooter){
-        return null;
+    /**
+     * Return the possible targets. It will have to be verified that they respect the minEnemy - maxEnemy constraint
+     * @param shooter
+     * @return The List is a singleton for this type of Effect
+     */
+    public List<Target> searchTarget(Player shooter){
+
+        List<Square> targets;
+        Square shooterPos = lastTargetSquare ? shooter.getActualWeapon().getLastTargetSquare() : shooter.getPosition();
+        switch(visibility){
+            case VISIBLE:
+                targets = shooterPos.getVisibleSquares(minDist,maxDist);
+                break;
+            case INVISIBLE:
+                targets = shooterPos.getInvisibleSquares(minDist,maxDist);
+                break;
+            case DIRECTION:
+                targets = shooterPos.getSquaresInDirections(minDist,maxDist);
+                break;
+            default:
+                targets = shooterPos.getMap().getAllSquares();
+        }
+
+        if(sameDirection)
+        {
+            Direction lastDir = shooter.getActualWeapon().getLastDirection();
+            Square lastTargPos = shooter.getActualWeapon().getLastTargetSquare();
+            switch(lastDir)
+            {
+
+                case UP:
+                    targets = targets.stream().filter(t -> t.getY() < lastTargPos.getY()).collect(Collectors.toList());
+                    break;
+                case DOWN:
+                    targets = targets.stream().filter(t -> t.getY() > lastTargPos.getY()).collect(Collectors.toList());
+                    break;
+                case LEFT:
+                    targets = targets.stream().filter(t -> t.getX() < lastTargPos.getX()).collect(Collectors.toList());
+                    break;
+                case RIGHT:
+                    targets = targets.stream().filter(t -> t.getX() > lastTargPos.getX()).collect(Collectors.toList());
+                    break;
+            }
+        }
+
+        List<Target> retList = new ArrayList<>();
+        for(Square s: targets)
+            retList.add(s);
+        //return Collections.singletonList(retList);
+        return retList;
+
     }
 
+    /**
+     * Apply damage and marks to the targets
+     * @param shooter
+     * @param targets choosen targets
+     */
     public void applyEffect(Player shooter, List<Target> targets){
-        //TODO
+        for(Target t : targets)
+        {
+            t.addDamage(shooter,damage);
+            t.addThisTurnMarks(shooter,marks);
+        }
     }
 }

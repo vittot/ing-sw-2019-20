@@ -96,11 +96,11 @@ public class Square implements Target{
                     return null;
                 return map.getGrid()[y-1][x];
             case DOWN:
-                if (y== map.getDimY())
+                if (y== map.getDimY()-1)
                     return null;
                 return map.getGrid()[y+1][x];
             case RIGHT:
-                if (x== map.getDimX())
+                if (x== map.getDimX()-1)
                     return null;
                 return map.getGrid()[y][x+1];
             default:
@@ -157,21 +157,24 @@ public class Square implements Target{
      */
     public List<Player> getVisiblePlayers(int minDist, int maxDist)
     {
-        Square next;
-        MapColor c = this.getColor();
-        List<Square> result = map.getRoom(c).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList());
-        for(Direction d : Direction.values())
-        {
-            if(this.getEdge(d) == Edge.DOOR)
-            {
-                next = this.getNextSquare(d);
-                result.addAll(map.getRoom(next.getColor()).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList()));
-            }
-
-        }
-        return result.stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
+       return getVisibleSquares(minDist,maxDist).stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
     }
 
+    /**
+     * Get all players not visible from this Square, in the indicated distance range
+     * @param minDist minimum allowed distance for targets
+     * @param maxDist maximum allowed distance for targets
+     * @return players available as targets
+     */
+    public List<Player> getInvisiblePlayers(int minDist, int maxDist)
+    {
+        return getInvisibleSquares(minDist,maxDist).stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
+    }
+
+    /**
+     * Get the Rooms visible from the current position. The current Room is excluded
+     * @return
+     */
     public List<Room> getVisibileRooms()
     {
         List<Room> visRooms = new ArrayList<>();
@@ -188,17 +191,7 @@ public class Square implements Target{
         return visRooms;
     }
 
-    /**
-     * Get all players not visible frome this Square, in the indicated distance range
-     * @param minDist minimum allowed distance for targets
-     * @param maxDist maximum allowed distance for targets
-     * @return players available as targets
-     */
-    public List<Player> getInvisiblePlayers(int minDist, int maxDist)
-    {
-        List<Player> visibleTargets = getVisiblePlayers(minDist,maxDist);
-        return map.getAllPlayers().stream().filter(p -> !visibleTargets.contains(p) && Map.distanceBtwSquares(this,p.getPosition())<=maxDist && Map.distanceBtwSquares(this,p.getPosition())>=minDist).collect(Collectors.toList());
-    }
+
 
     /**
      * Get all players on a cardinal direction from this Square, in the indicated distance range
@@ -208,28 +201,74 @@ public class Square implements Target{
      */
     public List<Player> getPlayersInDirections(int minDist, int maxDist)
     {
-        return map.getAllPlayers().stream().filter(p -> p.getPosition().getX() == this.x || p.getPosition().getY() == this.y).filter(p -> Map.distanceBtwSquares(this,p.getPosition())<=maxDist && Map.distanceBtwSquares(this,p.getPosition())>=minDist).collect(Collectors.toList());
+        return getSquaresInDirections(minDist,maxDist).stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
+    }
+
+    /**
+     * Get all squares on a cardinal direction from this Square, in the indicated distance range
+     * @param minDist
+     * @param maxDist
+     * @return players available as targets
+     */
+    public List<Square> getSquaresInDirections(int minDist, int maxDist)
+    {
+        return map.getAllSquares().stream().filter(s -> s.getX() == this.x || s.getY() == this.y).filter(s -> Map.distanceBtwSquares(this,s)<=maxDist && Map.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
     }
 
 
     /**
      * @param d
-     * @return List of Square of the adicent Room in the indicated Direction, possibly empty
+     * @return List of Square of the adiacent Room in the indicated Direction, possibly empty
      */
     public List<Square> getAdiacentRoomSquares(Direction d){
         Square tmp;
         if(this.getEdge(d)== Edge.DOOR) {
             tmp = this.getNextSquare(d);
-            return map.getRoom(tmp.getColor());
+            return map.getRoomSquares(tmp.getColor());
         }
         else
             return new ArrayList<>();
     }
 
+    /**
+     * Return the visible squares from this Square, in the indicated distance range
+     * @param minDist minimum allowed distance for targets
+     * @param maxDist maximum allowed distance for targets
+     * @return players available as targets
+     */
+    public List<Square> getVisibleSquares(int minDist, int maxDist)
+    {
+        Square next;
+        MapColor c = this.getColor();
+        List<Square> result = map.getRoomSquares(c).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList());
+        for(Direction d : Direction.values())
+        {
+            if(this.getEdge(d) == Edge.DOOR)
+            {
+                next = this.getNextSquare(d);
+                result.addAll(map.getRoomSquares(next.getColor()).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList()));
+            }
+
+        }
+        return result;
+    }
+
+    /**
+     * Get all squares not visible from this Square, in the indicated distance range
+     * @param minDist minimum allowed distance for targets
+     * @param maxDist maximum allowed distance for targets
+     * @return players available as targets
+     */
+    public List<Square> getInvisibleSquares(int minDist, int maxDist)
+    {
+        List<Square> visibleSquares = getVisibleSquares(minDist,maxDist);
+        return map.getAllSquares().stream().filter(s -> !visibleSquares.contains(s) && Map.distanceBtwSquares(this,s)<=maxDist && Map.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
+    }
+
     /**public List<List<Square>> getVisibleSquares(){
         List<List<Square>> result=new ArrayList<>();
         List<Square> tmp = new ArrayList<>();
-        tmp= map.getRoom(this.getColor());
+        tmp= map.getRoomSquares(this.getColor());
         result.add(tmp);
         if(this.getAdiacentRoomSquares(Direction.UP)!=null){
             result.add((ArrayList)this.getAdiacentRoomSquares(Direction.UP));
@@ -271,6 +310,12 @@ public class Square implements Target{
         players.stream().forEach(p -> p.addThisTurnMarks(shooter, marks));
     }
 
+    /**
+     * Move all players in the Square
+     * @param numSquare movement amount
+     * @param dir movement Direction
+     * @throws MapOutOfLimitException if the movement put any Player outside of the Map
+     */
     @Override
     public void move(int numSquare, Direction dir) throws MapOutOfLimitException {
         for (Player p : players) {

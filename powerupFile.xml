@@ -24,18 +24,102 @@
         </effect>
     </powerUp>
     <powerUp>
-    <name>
-        Newton
-    </name>
-    <descriprion>
-        Choose any other player and move 1 or 2 square on teh same direction.
-    </descriprion>
-    <!--
-            Effect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
-    Effect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
-    -->
-    <effect>
-
-    </effect>
+        <name>
+            Newton
+        </name>
+        <descriprion>
+            Choose any other player and move 1 or 2 square on teh same direction.
+        </descriprion>
+        <!--
+                Effect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        Effect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
+        -->
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>1</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everwehre</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>true</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+    <powerUp>
+        <name>
+            Tagback Grenade
+        </name>
+        <descriprion>
+            Give 1 mark to a enemy that deal you damage and you can see.
+            <!--TODO gestire quando ti fanno danno-->
+        </descriprion>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+    <powerUp>
+        <name>
+            Teleporter
+        </name>
+        <descriprion>
+            Play this card in any moment of your turn, move your figure and set it down on any square.
+        </descriprion>
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>12</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
     </powerUp>
 </powerUpList>

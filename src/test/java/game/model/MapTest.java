@@ -35,7 +35,7 @@ class MapTest {
     }
 
     /**
-     * Check getRoom return exactly all the Map's Squares of a given MapColor
+     * Check getRoomSquares return exactly all the Map's Squares of a given MapColor
      */
     @Test
     void getRoom() {
@@ -45,7 +45,7 @@ class MapTest {
         blueRoom.add(map.getGrid()[1][0]);
         blueRoom.add(map.getGrid()[0][1]);
 
-        List<Square> blueRoomMap = map.getRoom(MapColor.BLUE);
+        List<Square> blueRoomMap = map.getRoomSquares(MapColor.BLUE);
 
         assertTrue(blueRoomMap.containsAll(blueRoom) && blueRoom.containsAll(blueRoomMap));
     }

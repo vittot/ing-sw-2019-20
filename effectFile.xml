@@ -348,7 +348,23 @@
             </plainDamage>
         </baseEffect>
         <opzionalEffect>
-
+            <movementEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>0</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <minMove>1</minMove>
+                <maxMove>2</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>true</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
         </opzionalEffect>
         <opzionalEffect>
             <plainDamage>
@@ -459,10 +475,30 @@
 
         -->
         <baseEffect>
-
+            <squareDamageEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTargetSquare>false</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
         </baseEffect>
         <alternativeEffect>
-
+            <squareDamageEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTargetSquare>false</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
         </alternativeEffect>
         <plusBeforeBase>
             false
@@ -509,6 +545,23 @@
         Effect ray12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>2</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Visible</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -524,6 +577,23 @@
             </plainDamage>
         </baseEffect>
         <alternativeEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>2</maxDist>
+                <minMove>0</minMove>
+                <maxMove>2</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Visible</targetVisibAfter>
+                <myPos>true</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -587,6 +657,34 @@
         Effect vort24 = new PlainDamageEffect(0,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
+            <squareDamageEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>5</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>0</marks>
+                <lastTargetSquare>false</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Visible</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>true</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -602,6 +700,23 @@
             </plainDamage>
         </baseEffect>
         <opzionalEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Visible</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>true</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>NoneOfThePrevious</differentTarget>
+            </movementEffect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -615,6 +730,23 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
+            <movementEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Visible</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>true</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>NoneOfThePrevious</differentTarget>
+            </movementEffect>
             <plainDamage>
                 <minEnemy>0</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -674,10 +806,28 @@
 
         -->
         <baseEffect>
-
+            <RoomDamageEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+            </RoomDamageEffect>
         </baseEffect>
         <alternativeEffect>
-
+            <squareDamageEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>1</marks>
+                <lastTargetSquare>false</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
         </alternativeEffect>
         <plusBeforeBase>
             false
@@ -781,7 +931,28 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
-
+            <squareDamageEffect>
+                <minEnemy></minEnemy>
+                <maxEnemy></maxEnemy>
+                <minDist></minDist>
+                <maxDist></maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage></damage>
+                <marks></marks>
+                <lastTargetSquare>false</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
+            <squareDamageEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTargetSquare>true</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
         </baseEffect>
         <!--
                 Effect flash01 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
@@ -804,6 +975,17 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
+            <squareDamageEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>2</marks>
+                <lastTargetSquare>true</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
 
         </alternativeEffect>
         <plusBeforeBase>
@@ -882,6 +1064,28 @@
             </plainDamage>
         </baseEffect>
         <alternativeEffect>
+            <squareDamageEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>2</damage>
+                <marks>0</marks>
+                <lastTargetSquare>false</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
+            <squareDamageEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTargetSquare>true</lastTargetSquare>
+                <sameDirection>true</sameDirection>
+            </squareDamageEffect>
 
         </alternativeEffect>
         <plusBeforeBase>
@@ -940,6 +1144,34 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
+            <movementEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+            <squareDamageEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTargetSquare>false</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
 
         </baseEffect>
         <opzionalEffect>
@@ -952,7 +1184,7 @@
             false
         </plusOrder>
     </weapon>
-<weapon>
+    <weapon>
         <name>
             Rocket launcher
         </name>
@@ -1016,12 +1248,55 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
-
+            <movementEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
         </baseEffect>
         <opzionalEffect>
-
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <minMove>1</minMove>
+                <maxMove>2</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>true</beforeBase>
+                <differentTarget>anyone</differentTarget>
+            </movementEffect>
         </opzionalEffect>
         <alternativeEffect>
+            <squareDamageEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTargetSquare>false</lastTargetSquare>
+                <sameDirection>false</sameDirection>
+            </squareDamageEffect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1035,6 +1310,23 @@
                 <chainTarget>true</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
+            <movementEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
 
         </alternativeEffect>
         <plusBeforeBase>
@@ -1201,6 +1493,23 @@
             </plainDamage>
         </baseEffect>
         <opzionalEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <minMove>1</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Visible</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>true</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
 
         </opzionalEffect>
         <opzionalEffect>
@@ -1351,6 +1660,23 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
+            <movementEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>true</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
         </baseEffect>
         <alternativeEffect>
             <plainDamage>
@@ -1429,8 +1755,42 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>0</maxDist>
+                <minMove>1</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>true</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
         </baseEffect>
         <alternativeEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
             <plainDamage>
                 <minEnemy>0</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1457,7 +1817,23 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>true</sameDirection>
             </plainDamage>
-
+            <movementEffect>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>true</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
         </alternativeEffect>
         <plusBeforeBase>
             false
@@ -1501,9 +1877,28 @@
 
         -->
         <baseEffect>
-
+            <areaDamagEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>3</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <maxEnemyPerSquare>1</maxEnemyPerSquare>
+            </areaDamagEffect>
         </baseEffect>
         <alternativeEffect>
+            <areaDamagEffect>
+                <minEnemy>4</minEnemy>
+                <maxEnemy>4</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>1</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <maxEnemyPerSquare>5</maxEnemyPerSquare>
+            </areaDamagEffect>
 
         </alternativeEffect>
         <plusBeforeBase>
@@ -1578,6 +1973,40 @@
                 <chainTarget>false</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>1</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Visible</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>true</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
         </alternativeEffect>
         <plusBeforeBase>
             false

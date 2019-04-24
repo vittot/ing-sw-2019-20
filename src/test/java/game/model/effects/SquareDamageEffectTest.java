@@ -1,22 +1,19 @@
 package game.model.effects;
 
 import game.model.*;
-import org.junit.jupiter.api.BeforeAll;
+import game.model.exceptions.MapOutOfLimitException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class PlainDamageEffectTest {
-
-
-    private PlainDamageEffect effect;
+class SquareDamageEffectTest {
+    private SquareDamageEffect effect;
     private Game game;
 
     @BeforeEach
@@ -42,20 +39,23 @@ class PlainDamageEffectTest {
         Player p2 = new Player(2,PlayerColor.BLUE);
         Player p3 = new Player(3,PlayerColor.GREEN);
         Player p4 = new Player(4,PlayerColor.YELLOW);
+        Player p5 = new Player(5,PlayerColor.GREY);
         List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
         players.add(p3);
         players.add(p4);
+        players.add(p5);
 
         CardWeapon w = mock(CardWeapon.class);
         p1.setActualWeapon(w);
         p4.setActualWeapon(w);
+        p5.setActualWeapon(w);
         when(w.getPreviousTargets()).thenReturn(new ArrayList<>());
 
         map.getGrid()[0][0].addPlayer(p1);
         map.getGrid()[1][1].addPlayer(p2);
-        map.getGrid()[2][0].addPlayer(p3);
+        map.getGrid()[0][0].addPlayer(p3);
         map.getGrid()[1][0].addPlayer(p4);
 
         game = new Game(players,map,8);
@@ -68,55 +68,47 @@ class PlainDamageEffectTest {
      * Search for visible targets (used by most weapons)
      */
     @Test
-    void searchVisibleTargets() {
-        effect = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
+    void searchVisibleTargets() throws MapOutOfLimitException {
+        effect = new SquareDamageEffect(1,1,1,2,TargetVisibility.VISIBLE,1,1,false,false);
+        List<Target> targets = effect.searchTarget(game.getPlayer(4));
+        List<Target> expTargets = new ArrayList<>();
+        expTargets.add( game.getMap().getSquare(0,0) );
+        expTargets.add( game.getMap().getSquare(0,2) );
+        expTargets.add( game.getMap().getSquare(1,0) );
+
+        assertTrue(expTargets.containsAll(targets) && targets.containsAll(expTargets));
+    }
+
+    /**
+     * Search from the last target (used by Hellion)
+     */
+    @Test
+    void searchFromTheLastTarget() throws MapOutOfLimitException {
+        when(game.getPlayer(1).getActualWeapon().getLastTargetSquare()).thenReturn(game.getPlayer(2).getPosition());
+        effect = new SquareDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,1,1,true,false);
         List<Target> targets = effect.searchTarget(game.getPlayer(1));
         List<Target> expTargets = new ArrayList<>();
-        expTargets.add( game.getPlayer(4) );
-        assertEquals(expTargets,targets);
+        expTargets.add( game.getMap().getSquare(1,0) );
+        expTargets.add( game.getMap().getSquare(1,1) );
+
+        assertTrue(expTargets.containsAll(targets) && targets.containsAll(expTargets));
     }
 
     /**
-     * Search for invisible targets (used by Heatseeker)
+     * Search mantaining the last direction (used by Flamethrower)
      */
     @Test
-    void searchInvisibleTargets(){
-        effect = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.INVISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
-        List<Target> targets = effect.searchTarget(game.getPlayer(4));
+    void searchWithLastDirection() throws MapOutOfLimitException {
+        when(game.getPlayer(5).getActualWeapon().getLastTargetSquare()).thenReturn(game.getPlayer(4).getPosition());
+        when(game.getPlayer(5).getActualWeapon().getLastDirection()).thenReturn(Direction.UP);
+        effect = new SquareDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,1,1,true,true);
+        List<Target> targets = effect.searchTarget(game.getPlayer(5));
         List<Target> expTargets = new ArrayList<>();
-        expTargets.add( game.getPlayer(2) );
-        assertEquals(expTargets,targets);
+        expTargets.add( game.getMap().getSquare(0,0) );
+
+        assertTrue(expTargets.containsAll(targets) && targets.containsAll(expTargets));
     }
 
-    /**
-     * Search for targets on a cardinal direction (used by railgun)
-     */
-    @Test
-    void searchDirectionalTargets(){
-        effect = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.DIRECTION,3,0,false,DifferentTarget.ANYONE,false,false);
-        List<Target> targets = effect.searchTarget(game.getPlayer(4));
-        List<Target> expTargets = new ArrayList<>();
-        expTargets.add( game.getPlayer(1) );
-        expTargets.add( game.getPlayer(2) );
-        expTargets.add( game.getPlayer(3) );
-        assertEquals(expTargets,targets);
-    }
 
-    @Test
-    void applyEffect() {
-        effect = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
-        List<Target> targets = new ArrayList<>();
-        Player p1 = game.getPlayer(1);
-        Player p3 = game.getPlayer(3);
-        Player p4 = game.getPlayer(4);
-        targets.add(p3);
-        targets.add(p4);
-        effect.applyEffect(game.getPlayer(1),targets);
-        List<PlayerColor> damage = new ArrayList<>();
-        damage.add(p1.getColor());
-        damage.add(p1.getColor());
-        List<PlayerColor> marks = Collections.singletonList(p1.getColor());
 
-        assertTrue(p3.getDamage().equals(damage) && p3.getThisTurnMarks().equals(marks) && p4.getDamage().equals(damage) && p4.getThisTurnMarks().equals(marks));
-    }
 }

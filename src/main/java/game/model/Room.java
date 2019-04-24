@@ -19,7 +19,7 @@ public class Room implements Target {
      * @return
      */
     public List<Square> getSquares(){
-        return map.getRoom(color);
+        return map.getRoomSquares(color);
     }
 
     /**
@@ -31,8 +31,7 @@ public class Room implements Target {
      * @param damage
      */
     @Override
-    public void addDamage(Player shooter, int damage) {
-        getSquares().forEach( s -> s.addDamage(shooter,damage));
+    public void addDamage(Player shooter, int damage) { getSquares().forEach( s -> s.addDamage(shooter,damage));
     }
 
     /**
