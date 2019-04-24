@@ -3,7 +3,9 @@ package game.model.effects;
 import game.model.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class MovementEffect extends Effect{
@@ -17,7 +19,7 @@ public class MovementEffect extends Effect{
     private boolean beforeBase;
     private int minMove;
     private int maxMove;
-    private List<Direction> choosenMovement;
+    private List<Direction> choosenMovement; //what?
 
     public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, int minMove, int maxMove, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase,DifferentTarget differentTarget) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
@@ -93,34 +95,101 @@ public class MovementEffect extends Effect{
         this.beforeBase = beforeBase;
     }
 
-    public List<List<Target>> searchTarget(Player shooter){
-        List<List<Target>> result = new ArrayList<>(); //it will contain the final result of the method
-        if(moveShooter) { //part of the method that control the shooter movement
-            Square startingPosition = shooter.getPosition(); //the starting position of the shooter
-            CardWeapon actualWeapon = shooter.getActualWeapon(); //the weapon the player is using
-            ArrayList<Target> tmp = new ArrayList<>(); //temporary variable that will compose the final result
-            Square actual;
-            Square next;
-            int sIndex;
-            if (chainMove) {
-                tmp.add(actualWeapon.getLastTargetSquare());
-                result.add(tmp);
-            }
-            else {
-                if (sameDirection) {
-                    //result=startingPosition.getSquaresInRange(this.getMinDist(),this.getMaxDist(),actualWeapon.getLastDirection());
-                } else {
-                    //result=startingPosition.getSquaresInRange(this.getMinDist(),this.getMaxDist());
+    /**
+     * locate the player who can be moved
+     * @param shooter
+     * @return
+     */
+    public List<Target> selectMoved (Player shooter) {
+        List<Player> targets = new ArrayList<>();
+        List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
+        Square shooterPos = shooter.getPosition();
+        if(moveShooter) {
+            targets.add(shooter);
+        }
+        else {
+            if (lastTarget) {
+                targets = prevTargets.stream().filter(p -> Map.distanceBtwSquares(shooterPos, p.getPosition()) <= maxDist && Map.distanceBtwSquares(shooterPos, p.getPosition()) >= minDist).collect(Collectors.toList());
+            } else {
+                switch (visibility) {
+                    case VISIBLE:
+                        targets = shooterPos.getVisiblePlayers(minDist, maxDist);
+                        break;
+                    case INVISIBLE:
+                        targets = shooterPos.getInvisiblePlayers(minDist, maxDist);
+                        break;
+                    case DIRECTION:
+                        targets = shooterPos.getPlayersInDirections(minDist, maxDist);
+                        break;
+                    default:
+                        targets = shooterPos.getMap().getAllPlayers();
                 }
             }
+            if (differentTarget == DifferentTarget.NOTTHELAST)
+                targets.remove(shooter.getActualWeapon().getLastTarget());
+
+            else if (differentTarget == DifferentTarget.NONEOFTHEPREVIOUS)
+                targets.removeAll(shooter.getActualWeapon().getPreviousTargets());
+
+            targets.remove(shooter);
+        }
+        List<Target> retList = new ArrayList<>();
+        for(Player p: targets)
+            retList.add(p);
+        return retList;
+    }
+
+    /**
+     * locate the possible destination for the player that has to be moved
+     * @param shooter
+     * @return
+     */
+    public List<Target> searchTarget(Player shooter){
+        List<Target> result = new ArrayList<>(); //it will contain the final result of the method
+        if(myPos) {
+            result.add(shooter.getGame().getCurrentTurn().getCurrentPlayer().getPosition());
+            return result;
+        }
+        else if (chainMove) {
+            result.add(shooter.getActualWeapon().getLastTargetSquare());
+            return result;
         }
         else{
             //TODO code to permit the enemy movement effects
+            Square currentPosition = shooter.getPosition();
+            Square tmp;
+            if(sameDirection) {
+                Direction currDirection = shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().getLastDirection();
+                tmp = currentPosition;
+                for (int i = 1; i <= maxMove; i++) {
+                    tmp = tmp.getNextSquare(currDirection);
+                    if (minMove <= i && maxMove >= i)
+                        result.add(tmp);
+                }
+            }
+            else {
+                Square
+                List<Square> squares = shooter.getGame().getMap().getAllSquares();
+                for(Square s : squares){
+                    if(s.getX()!=currentPosition.getX() || s.getY()!=currentPosition.getY())
+                        if(Map.distanceBtwSquares(s,currentPosition)>=minMove && Map.distanceBtwSquares(s,currentPosition)<=maxMove)
+                            result.add(s);
+                }
+
+            }
         }
         return result;
     }
 
+    /**
+     * apply the movement of the shooter into the unique square selected from the list of possible squares generated by the searchTarget() method
+     * @param shooter
+     * @param targets
+     */
+    @Override
     public void applyEffect(Player shooter, List<Target> targets){
-        //TODO
+        shooter.getPosition().removePlayer(shooter);
+        shooter.setPosition((Square)targets.get(0));
+        //shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().setLastTargetSquare((Square));
     }
 }

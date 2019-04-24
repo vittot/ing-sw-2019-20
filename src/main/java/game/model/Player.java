@@ -162,6 +162,7 @@ public class Player implements Target{
      * @param shooter
      * @param damage
      */
+    @Override
     public void addDamage(Player shooter, int damage) {
         int num;
         boolean isRage = false;
@@ -217,6 +218,7 @@ public class Player implements Target{
      * @param shooter
      * @param marks
      */
+    @Override
     public void addThisTurnMarks(Player shooter, int marks) {
         if(checkMarksNumber(shooter,marks))
             for (int i = 0; i < marks; i++)
