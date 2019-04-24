@@ -4,6 +4,7 @@ import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class MovementEffect extends Effect{
@@ -166,7 +167,7 @@ public class MovementEffect extends Effect{
                 }
             }
             else {
-                Square
+                //Square
                 List<Square> squares = shooter.getGame().getMap().getAllSquares();
                 for(Square s : squares){
                     if(s.getX()!=currentPosition.getX() || s.getY()!=currentPosition.getY())
@@ -191,6 +192,4 @@ public class MovementEffect extends Effect{
         shooter.setPosition((Square)targets.get(0));
         //shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().setLastTargetSquare((Square));
     }
-}
-
 }

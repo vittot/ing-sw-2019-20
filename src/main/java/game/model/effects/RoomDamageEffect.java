@@ -1,8 +1,8 @@
 package game.model.effects;
 
-import com.sun.org.apache.bcel.internal.generic.TABLESWITCH;
 import game.model.Player;
 import game.model.Room;
+import game.model.Square;
 import game.model.Target;
 
 import java.util.ArrayList;

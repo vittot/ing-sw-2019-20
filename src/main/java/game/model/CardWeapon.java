@@ -133,7 +133,6 @@ public class CardWeapon {
         this.loaded = loaded;
     }
 
-
     /**
      * Get the last Player hit by this Weapon
      * @return
@@ -169,7 +168,8 @@ public class CardWeapon {
 
             if (tmp.isEmpty()) {
                 loaded = true;
-                //TODO removeAmmo in player
+                shooter.removeAmmo(ammo);
+                shooter.removePowerUp(powerUp);
             }
 
         }

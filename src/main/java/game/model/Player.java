@@ -267,6 +267,8 @@ public class Player implements Target{
         this.position = newPos;
     }
 
+
+
     /**
      * Add the last marks to the Player's marks
      * This happens at the end of each action
@@ -300,5 +302,23 @@ public class Player implements Target{
         this.actualWeapon.getPreviousTargets().clear();
         this.actualWeapon.setLastTargetSquare(null);
         this.actualWeapon.setLastDirection(null);
+    }
+
+    /**
+     * Remove the indicated ammos from the Player
+     * @param cost
+     */
+    public void removeAmmo(List<Color> cost)
+    {
+        ammo.removeAll(cost);
+    }
+
+    /**
+     * Remove the indicated power-up cards from the Player
+     * @param cost
+     */
+    public void removePowerUp(List<CardPower> cost)
+    {
+        cardPower.removeAll(cost);
     }
 }
