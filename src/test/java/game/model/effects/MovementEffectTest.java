@@ -13,9 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class RoomDamageEffectTest {
-
-    private RoomDamageEffect effect;
+class MovementEffectTest {
+    private MovementEffect effect;
     private Game game;
 
     @BeforeEach
@@ -46,12 +45,12 @@ class RoomDamageEffectTest {
         players.add(p2);
         players.add(p3);
         players.add(p4);
-        /*
+
         CardWeapon w = mock(CardWeapon.class);
         p1.setActualWeapon(w);
         p4.setActualWeapon(w);
         when(w.getPreviousTargets()).thenReturn(new ArrayList<>());
-        */
+
         map.getGrid()[0][0].addPlayer(p1);
         map.getGrid()[1][1].addPlayer(p2);
         map.getGrid()[2][0].addPlayer(p3);
@@ -61,18 +60,29 @@ class RoomDamageEffectTest {
 
     }
 
+    @Test
+    void selectMoved() {
+        effect = new MovementEffect(1,1,1,3,1,3,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        List<Target> targets = effect.selectMoved(game.getPlayers().get(3));
+        //I expect p3, p4
+        List<Target> expected = new ArrayList<>();
+        expected.add(game.getPlayers().get(0));
+        expected.add(game.getPlayers().get(1));
+        assertTrue(expected.containsAll(targets) && targets.containsAll(expected));
+    }
+
     /**
      * Test for searchTarget that return visible room
      */
     @Test
     void searchTarget() {
-        effect = new RoomDamageEffect(1,5,1,1,TargetVisibility.VISIBLE,2,1);
-        List<Target> target = effect.searchTarget(game.getPlayers().get(0));
-        List<List<Target>> roomCheck = new ArrayList<>();
-        //I expect only p3
-        roomCheck.add(new ArrayList<>());
-        roomCheck.get(0).add(new Room(MapColor.RED,game.getMap()));
-        assertEquals(roomCheck,target);
+        effect = new MovementEffect(1,1,1,3,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        List<Target> targets = effect.searchTarget(game.getPlayers().get(1));
+        List<Target> squareCheck = new ArrayList<>();
+        //squareCheck.add(game.getMap().getGrid()[1][0]);
+        squareCheck.add(game.getMap().getGrid()[0][0]);
+        squareCheck.add(game.getMap().getGrid()[0][1]);
+        assertTrue(squareCheck.containsAll(targets) && targets.containsAll(squareCheck));
     }
 
     /**
@@ -80,20 +90,12 @@ class RoomDamageEffectTest {
      */
     @Test
     void applyEffect() {
-        effect = new RoomDamageEffect(1,5,1,1,TargetVisibility.VISIBLE,2,1);
-        List<Target> targets = new ArrayList<>();
-        Player p1 = game.getPlayers().get(0);
-        Player p3 = game.getPlayers().get(2);
-        p3.addThisTurnMarks(p1,1);
-        p3.updateMarks();
-        targets.add(p3);
-        effect.applyEffect(game.getPlayers().get(0),targets);
-        List<PlayerColor> damage = new ArrayList<>();
-        damage.add(p1.getColor());
-        damage.add(p1.getColor());
-        damage.add(p1.getColor());
-        List<PlayerColor> marks = Collections.singletonList(p1.getColor());
-
-        assertTrue(p3.getDamage().equals(damage) && p3.getThisTurnMarks().equals(marks));
+        effect = new MovementEffect(1,1,1,3,1,3,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        List<Target> target = new ArrayList<>();
+        target.add(game.getMap().getGrid()[0][0]);
+        effect.applyEffect(game.getPlayers().get(1), target);
+        assertTrue(game.getPlayers().get(1).getPosition().getX()==0 && game.getPlayers().get(1).getPosition().getY()==0);
     }
+
+
 }

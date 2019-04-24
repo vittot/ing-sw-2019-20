@@ -4,6 +4,7 @@ import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class MovementEffect extends Effect{
@@ -142,6 +143,7 @@ public class MovementEffect extends Effect{
      * @param shooter
      * @return
      */
+    @Override
     public List<Target> searchTarget(Player shooter){
         List<Target> result = new ArrayList<>(); //it will contain the final result of the method
         if(myPos) {
@@ -153,7 +155,6 @@ public class MovementEffect extends Effect{
             return result;
         }
         else{
-            //TODO code to permit the enemy movement effects
             Square currentPosition = shooter.getPosition();
             Square tmp;
             if(sameDirection) {
@@ -166,14 +167,19 @@ public class MovementEffect extends Effect{
                 }
             }
             else {
-                Square
                 List<Square> squares = shooter.getGame().getMap().getAllSquares();
                 for(Square s : squares){
                     if(s.getX()!=currentPosition.getX() || s.getY()!=currentPosition.getY())
                         if(Map.distanceBtwSquares(s,currentPosition)>=minMove && Map.distanceBtwSquares(s,currentPosition)<=maxMove)
                             result.add(s);
                 }
-
+            }
+            if(visibilityAfter==TargetVisibility.VISIBLE) {
+                List<Square> visibles = currentPosition.getVisibleSquares(0, Map.MAX_DIST);
+                for (Target t : result)
+                    if(!visibles.contains(t)){
+                        result.remove(t);
+                    }
             }
         }
         return result;
@@ -186,11 +192,7 @@ public class MovementEffect extends Effect{
      */
     @Override
     public void applyEffect(Player shooter, List<Target> targets){
-        //TODO
         shooter.getPosition().removePlayer(shooter);
         shooter.setPosition((Square)targets.get(0));
-        //shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().setLastTargetSquare((Square));
     }
-}
-
 }
