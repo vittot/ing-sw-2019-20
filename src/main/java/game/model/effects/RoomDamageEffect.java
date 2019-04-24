@@ -1,8 +1,12 @@
 package game.model.effects;
 
+import com.sun.org.apache.bcel.internal.generic.TABLESWITCH;
 import game.model.Player;
+import game.model.Room;
 import game.model.Target;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RoomDamageEffect extends Effect{
@@ -31,8 +35,20 @@ public class RoomDamageEffect extends Effect{
         this.marks = marks;
     }
 
+    /**
+     * Search available room from the shooter
+     * @param shooter
+     * @return
+     */
     public List<List<Target>> searchTarget(Player shooter){
-        return null;
+        List<Room> rooms = shooter.getPosition().getVisibleRooms();
+        if(minDist == 0){
+            rooms.add(new Room(shooter.getPosition().getColor(),shooter.getPosition().getMap()));
+        }
+        List<Target> retList = new ArrayList<>();
+        for(Room r: rooms)
+            retList.add(r);
+        return Collections.singletonList(retList);
     }
 
     /**

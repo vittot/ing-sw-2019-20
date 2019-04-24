@@ -172,7 +172,7 @@ public class Square implements Target{
         return result.stream().flatMap(square -> square.getPlayers().stream()).collect(Collectors.toList());
     }
 
-    public List<Room> getVisibileRooms()
+    public List<Room> getVisibleRooms()
     {
         List<Room> visRooms = new ArrayList<>();
         Square next;
