@@ -3,9 +3,7 @@ package game.model.effects;
 import game.model.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class MovementEffect extends Effect{
@@ -19,7 +17,7 @@ public class MovementEffect extends Effect{
     private boolean beforeBase;
     private int minMove;
     private int maxMove;
-    private List<Direction> choosenMovement; //what?
+    private List<Direction> choosenMovement;
 
     public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, int minMove, int maxMove, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase,DifferentTarget differentTarget) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
@@ -188,8 +186,11 @@ public class MovementEffect extends Effect{
      */
     @Override
     public void applyEffect(Player shooter, List<Target> targets){
+        //TODO
         shooter.getPosition().removePlayer(shooter);
         shooter.setPosition((Square)targets.get(0));
         //shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().setLastTargetSquare((Square));
     }
+}
+
 }
