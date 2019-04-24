@@ -14,6 +14,10 @@ public class Room implements Target {
         this.map = map;
     }
 
+    public MapColor getColor() {
+        return color;
+    }
+
     /**
      * Get a List of the Square which compose the Room
      * @return

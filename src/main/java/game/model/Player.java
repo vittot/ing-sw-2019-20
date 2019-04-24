@@ -1,6 +1,8 @@
 package game.model;
 
+import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
+import game.model.exceptions.NoCardWeaponSpace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -300,5 +302,51 @@ public class Player implements Target{
         this.actualWeapon.getPreviousTargets().clear();
         this.actualWeapon.setLastTargetSquare(null);
         this.actualWeapon.setLastDirection(null);
+    }
+
+    /**
+     * Remove the indicated ammos from the Player
+     * @param cost
+     */
+    public void removeAmmo(List<Color> cost)
+    {
+        ammo.removeAll(cost);
+    }
+
+    /**
+     * Remove the indicated power-up cards from the Player
+     * @param cost
+     */
+    public void removePowerUp(List<CardPower> cost)
+    {
+        cardPower.removeAll(cost);
+    }
+
+    /**
+     *
+     * @param weapon
+     * @param powerUp
+     * @throws InsufficientAmmoException
+     * @throws NoCardWeaponSpace
+     */
+    public void pickUpWeapon(CardWeapon weapon, List<CardPower> powerUp) throws InsufficientAmmoException, NoCardWeaponSpace {
+        List <Color> tmp = new ArrayList<>();
+        tmp = weapon.getPrice();
+        removePowerUp(powerUp);
+        if (weapons.size() == 3) throw new NoCardWeaponSpace();
+        for(int i = 0; i < powerUp.size(); i++){
+            tmp.remove(powerUp.get(i).getColor());
+            powerUp.remove(i);
+        }
+        if(!ammo.contains(tmp)) throw new InsufficientAmmoException();
+        else{
+            for (Color ammor : tmp){
+                ammo.remove(ammor);
+            }
+        }
+        for(CardPower cp : powerUp){
+            cardPower.add(cp);
+        }
+
     }
 }

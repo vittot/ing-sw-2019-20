@@ -68,10 +68,9 @@ class RoomDamageEffectTest {
     void searchTarget() {
         effect = new RoomDamageEffect(1,5,1,1,TargetVisibility.VISIBLE,2,1);
         List<Target> target = effect.searchTarget(game.getPlayers().get(0));
-        List<List<Target>> roomCheck = new ArrayList<>();
+        List<Target> roomCheck = new ArrayList<>();
         //I expect only p3
-        roomCheck.add(new ArrayList<>());
-        roomCheck.get(0).add(new Room(MapColor.RED,game.getMap()));
+        roomCheck.add(getRoomByColor(MapColor.RED));
         assertEquals(roomCheck,target);
     }
 
