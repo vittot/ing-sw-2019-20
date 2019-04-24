@@ -305,6 +305,24 @@ public class Player implements Target{
     }
 
     /**
+     * Remove the indicated ammos from the Player
+     * @param cost
+     */
+    public void removeAmmo(List<Color> cost)
+    {
+        ammo.removeAll(cost);
+    }
+
+    /**
+     * Remove the indicated power-up cards from the Player
+     * @param cost
+     */
+    public void removePowerUp(List<CardPower> cost)
+    {
+        cardPower.removeAll(cost);
+    }
+
+    /**
      *
      * @param weapon
      * @param powerUp

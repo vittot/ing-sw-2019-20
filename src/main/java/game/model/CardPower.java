@@ -7,7 +7,7 @@ import java.util.List;
 public class CardPower {
     String name;
     String description;
-    private Color color;    //card color (for respwan or to pay ammo)
+    private Color color;    //card color (for respawn or to pay ammo)
     private List<Color> price; //price for the use of the effect
     private boolean usedWhenDamaged;
     private List<Effect> effect;
@@ -53,6 +53,10 @@ public class CardPower {
         this.price = price;
     }
 
+    /**
+     * Get Power-up respawn color
+     * @return
+     */
     public MapColor getMapColor(){
         switch(this.color){
             case BLUE:
