@@ -36,19 +36,23 @@ public class RoomDamageEffect extends Effect{
     }
 
     /**
-     * Search available room from the shooter
+     * Return the possible targets. It will have to be verified that they respect the minEnemy - maxEnemy constraint
      * @param shooter
-     * @return
+     * @return The List is a singleton for this type of Effect
      */
-    public List<List<Target>> searchTarget(Player shooter){
-        List<Room> rooms = shooter.getPosition().getVisibleRooms();
-        if(minDist == 0){
-            rooms.add(new Room(shooter.getPosition().getColor(),shooter.getPosition().getMap()));
-        }
+    public List<Target> searchTarget(Player shooter){
+        List<Room> targets;
+        Square shooterPos = shooter.getPosition();
+
+        if(visibility == TargetVisibility.VISIBLE)
+            targets = shooterPos.getVisibileRooms();
+        else
+            targets = shooterPos.getMap().getAllRooms();
+
         List<Target> retList = new ArrayList<>();
-        for(Room r: rooms)
+        for(Room r: targets)
             retList.add(r);
-        return Collections.singletonList(retList);
+        return retList;
     }
 
     /**

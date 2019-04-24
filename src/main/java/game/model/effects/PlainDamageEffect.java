@@ -74,11 +74,11 @@ public class PlainDamageEffect extends Effect{
     }
 
     /**
-     * Return the possible target. It will have to be verified that they respect the minEnemy - maxEnemy constraint
+     * Return the possible targets. It will have to be verified that they respect the minEnemy - maxEnemy constraint
      * @param shooter
      * @return The List is a singleton for this type of Effect
      */
-    public List<List<Target>> searchTarget(Player shooter){
+    public List<Target> searchTarget(Player shooter){
 
         List<Player> targets;
         Square shooterPos = chainTarget ? shooter.getActualWeapon().getLastTarget().getPosition() : shooter.getPosition();
@@ -135,7 +135,8 @@ public class PlainDamageEffect extends Effect{
         List<Target> retList = new ArrayList<>();
         for(Player p: targets)
             retList.add(p);
-        return Collections.singletonList(retList);
+        //return Collections.singletonList(retList);
+        return retList;
 
     }
 
