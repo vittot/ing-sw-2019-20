@@ -42,7 +42,7 @@ public class AreaDamageEffect extends Effect{
      */
     public List<Target> searchTarget(Player shooter){
         List<Player> targets;
-        Square shooterPos =shooter.getPosition();
+        Square shooterPos = shooter.getPosition();
         switch(visibility){
             case VISIBLE:
                 targets = shooterPos.getVisiblePlayers(minDist,maxDist);

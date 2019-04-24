@@ -184,7 +184,7 @@ public class Square implements Target{
             if(this.getEdge(d) == Edge.DOOR)
             {
                 next = this.getNextSquare(d);
-                visRooms.add(new Room(next.getColor(),map));
+                visRooms.add(map.getRoomByColor(next.getColor()));
             }
 
         }

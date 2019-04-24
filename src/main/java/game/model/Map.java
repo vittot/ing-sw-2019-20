@@ -14,6 +14,7 @@ public class Map {
     private int dimY; //number of rows
     public static final int MAX_DIST = 12;
     public static final int WEAPON_PER_SQUARE = 3;
+    private List<Room> rooms;
 
 
 
@@ -54,6 +55,9 @@ public class Map {
         this.id = id;
         this.dimX = dimX;
         this.dimY = dimY;
+        rooms = new ArrayList<>();
+        for(MapColor c : MapColor.values())
+            rooms.add(new Room(c,this));
     }
 
     /**
@@ -89,10 +93,20 @@ public class Map {
      */
     public List<Room> getAllRooms()
     {
-        List<Room> rooms = new ArrayList<>();
-        for(MapColor c : MapColor.values())
-            rooms.add(new Room(c,this));
         return rooms;
+    }
+
+    /**
+     * Return the Room of the given color
+     * @param c
+     * @return
+     */
+    public Room getRoomByColor(MapColor c)
+    {
+        for(Room r : rooms)
+            if(r.getColor() == c)
+                return r;
+        return null;
     }
 
     /**
