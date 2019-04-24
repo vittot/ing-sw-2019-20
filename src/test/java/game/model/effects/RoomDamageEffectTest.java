@@ -67,7 +67,7 @@ class RoomDamageEffectTest {
     @Test
     void searchTarget() {
         effect = new RoomDamageEffect(1,5,1,1,TargetVisibility.VISIBLE,2,1);
-        List<List<Target>> target = effect.searchTarget(game.getPlayers().get(0));
+        List<Target> target = effect.searchTarget(game.getPlayers().get(0));
         List<List<Target>> roomCheck = new ArrayList<>();
         //I expect only p3
         roomCheck.add(new ArrayList<>());
