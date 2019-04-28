@@ -18,7 +18,7 @@ public class MovementEffect extends Effect{
     private boolean beforeBase;
     private int minMove;
     private int maxMove;
-    private List<Direction> choosenMovement;
+    //private List<Direction> choosenMovement;
 
     public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, int minMove, int maxMove, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase,DifferentTarget differentTarget) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
@@ -32,10 +32,6 @@ public class MovementEffect extends Effect{
         this.minMove = minMove;
         this.maxMove = maxMove;
         this.differentTarget = differentTarget;
-    }
-
-    public void setChoosenMovement(List<Direction> choosenMovement) {
-        this.choosenMovement = choosenMovement;
     }
 
     public boolean isMoveShooter() {

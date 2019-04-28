@@ -5,6 +5,7 @@ import game.model.exceptions.MapOutOfLimitException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Map {
@@ -84,7 +85,8 @@ public class Map {
      */
     public List<Square> getAllSquares()
     {
-        return Arrays.stream(grid).flatMap(Arrays::stream).filter(s->s!=null).collect(Collectors.toList());
+        //Objects::nonNull is equal to s->s!=null
+        return Arrays.stream(grid).flatMap(Arrays::stream).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     /**
@@ -144,7 +146,7 @@ public class Map {
     }
 
     /**
-     * Calculate the distance between two Squares 
+     * Calculate the distance between two Squares, considering walls
      * @param s1
      * @param s2
      * @return

@@ -6,7 +6,6 @@ import game.model.Square;
 import game.model.Target;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class RoomDamageEffect extends Effect{

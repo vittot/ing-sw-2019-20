@@ -2,8 +2,6 @@ package game.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 public class Game {
@@ -213,7 +211,6 @@ public class Game {
         Kill newKill = new Kill(killer, victim, isRage);
         killBoard.add(newKill);
         updatePoints(victim);
-        //TODO add record of players killed in this turn
     }
 
     /**

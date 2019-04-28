@@ -330,7 +330,7 @@ public class Player implements Target{
      * @throws NoCardWeaponSpace
      */
     public void pickUpWeapon(CardWeapon weapon, List<CardPower> powerUp) throws InsufficientAmmoException, NoCardWeaponSpace {
-        List <Color> tmp = new ArrayList<>();
+        List <Color> tmp;
         tmp = weapon.getPrice();
         removePowerUp(powerUp);
         if (weapons.size() == 3) throw new NoCardWeaponSpace();
@@ -338,7 +338,7 @@ public class Player implements Target{
             tmp.remove(powerUp.get(i).getColor());
             powerUp.remove(i);
         }
-        if(!ammo.contains(tmp)) throw new InsufficientAmmoException();
+        if(!ammo.containsAll(tmp)) throw new InsufficientAmmoException();
         else{
             for (Color ammor : tmp){
                 ammo.remove(ammor);

@@ -135,7 +135,7 @@ public class PlainDamageEffect extends Effect{
         List<Target> retList = new ArrayList<>();
         for(Player p: targets)
             retList.add(p);
-        //return Collections.singletonList(retList);
+
         return retList;
 
     }

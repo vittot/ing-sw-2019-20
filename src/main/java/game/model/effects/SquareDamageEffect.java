@@ -103,7 +103,7 @@ public class SquareDamageEffect extends Effect{
         List<Target> retList = new ArrayList<>();
         for(Square s: targets)
             retList.add(s);
-        //return Collections.singletonList(retList);
+
         return retList;
 
     }

@@ -40,11 +40,6 @@ class GameTest {
         g = new Game(players,m,3);
     }
 
-    @Test
-    void generateDecks() {
-        //TODO
-    }
-
     /**
      * Test for normal turn change
      */

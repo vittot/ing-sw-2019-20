@@ -3,14 +3,13 @@ package game.model.effects;
 import game.model.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
 public class AreaDamageEffect extends Effect{
     private int damage;
     private int marks;
-    private int maxEnemyPerSquare; //TODO:quando andrà controllato vedere Collectors.groupingBy
+    private int maxEnemyPerSquare; //quando andrà controllato vedere Collectors.groupingBy
 
     public AreaDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, int maxEnemyPerSquare) {
         super( minEnemy, maxEnemy, minDist, maxDist, visibility);
@@ -63,7 +62,7 @@ public class AreaDamageEffect extends Effect{
         List<Target> retList = new ArrayList<>();
         for(Player p: targets)
             retList.add(p);
-        //return Collections.singletonList(retList);
+
         return retList;
     }
 
