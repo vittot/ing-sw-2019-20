@@ -5,8 +5,8 @@ import game.model.effects.Effect;
 import java.util.List;
 
 public class CardPower {
-    String name;
-    String description;
+    private String name;
+    private String description;
     private Color color;    //card color (for respawn or to pay ammo)
     private List<Color> price; //price for the use of the effect
     private boolean usedWhenDamaged;
