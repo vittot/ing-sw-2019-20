@@ -143,35 +143,31 @@ public class CardWeapon {
     }
 
     /**
-     *
-     * @param ammo
+     * reload weapon with available ammo and chosen power up
      * @param powerUp
      * @throws InsufficientAmmoException
      */
-    public void reloadWeapon(List<Color> ammo, List<CardPower> powerUp) throws InsufficientAmmoException{
-        List<Color> tmp = new ArrayList<>();
-        List<Color> colorPwrUp = new ArrayList<>();
+    public void reloadWeapon(List<CardPower> powerUp) throws InsufficientAmmoException{
+        List<CardPower> tmpPUPaid = new ArrayList<>();
+        List<Color> tmp = new ArrayList<>(price);
+        List<Color> tmpAmmoPaid = new ArrayList<>();
         if(loaded)
             return;
 
-        tmp.addAll(price);
-        if (ammo.size() + powerUp.size() == price.size()) {
-            if (tmp.containsAll(ammo))
-                tmp.removeAll(ammo);
-
-            if (!tmp.isEmpty()) {
-                for (int i = 0; i < powerUp.size(); i++)
-                    colorPwrUp.add(powerUp.get(i).getColor());
-                if (tmp.containsAll(colorPwrUp))
-                    tmp.removeAll(colorPwrUp);
-            }
-
-            if (tmp.isEmpty()) {
-                loaded = true;
-                shooter.removeAmmo(ammo);
-                shooter.removePowerUp(powerUp);
-            }
-
+        for(int i=0 ; i < powerUp.size() ; i++){
+            if(tmp.remove(powerUp.get(i).getColor()))
+                tmpPUPaid.add(powerUp.get(i));
+        }
+        for(int i=0 ; i < shooter.getAmmo().size() ; i++){
+            if(tmp.remove(shooter.getAmmo().get(i)))
+                tmpAmmoPaid.add(shooter.getAmmo().get(i));
+        }
+        if(tmp.isEmpty()){
+            loaded = true;
+            for (int i = 0 ; i < tmpAmmoPaid.size(); i++)
+                shooter.getAmmo().remove(tmpAmmoPaid.get(i));
+            for (int i = 0 ; i < tmpPUPaid.size(); i++)
+                shooter.getCardPower().remove(tmpAmmoPaid.get(i));
         }
         if(!tmp.isEmpty())
             throw new InsufficientAmmoException();
