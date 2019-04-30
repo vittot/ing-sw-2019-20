@@ -9,15 +9,15 @@ public class ClientController {
 
     //TODO: add the view
 
-    public ClientController(Client socketClient) {
-        this.client = socketClient;
+    public ClientController(Client client) {
+        this.client = client;
     }
 
 
     public void start() {
 
         receiver = new Thread(
-               //receive response from the Server
+                //receive response from the Server
         );
         receiver.start();
     }
