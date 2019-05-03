@@ -1,5 +1,16 @@
 package game.model;
 
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -199,6 +210,7 @@ public class Game {
 
     public void generateDecks(String fileLoading){
         //TODO only one method or one for any type of card?
+
     }
 
     /**

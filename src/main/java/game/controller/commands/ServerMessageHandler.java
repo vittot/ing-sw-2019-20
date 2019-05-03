@@ -26,5 +26,7 @@ public interface ServerMessageHandler {
     void handle (RespawnRequest serverMsg);
     void handle (InsufficientAmmoResponse serverMsg);
     void handle (OperationCompletedResponse serverMsg);
+    void handle (InvalidPowerUpResponse serverMsg);
+    void handle (InvalidGrabPositionRsponse serverMsg);
 
 }

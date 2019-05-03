@@ -3,6 +3,8 @@ package game.model;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardWeaponSpace;
+import game.model.exceptions.NoCardAmmoAvailable;
+import org.mockito.internal.matchers.Null;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -329,13 +331,17 @@ public class Player implements Target{
      * @throws InsufficientAmmoException
      * @throws NoCardWeaponSpace
      */
-    public void pickUpWeapon(CardWeapon weapon, List<CardPower> powerUp) throws InsufficientAmmoException, NoCardWeaponSpace {
+    public void pickUpWeapon(CardWeapon weapon,CardWeapon weaponToWaste, List<CardPower> powerUp) throws InsufficientAmmoException{
         List <Color> tmp = new ArrayList<>(weapon.getPrice());
         List <CardPower> tmpPU = new ArrayList<>();
         if(tmp.size() == 1)
             return;
         tmp = tmp.subList(1,tmp.size());
-        if (weapons.size() == 3) throw new NoCardWeaponSpace();
+        if (weapons.size() == 3){
+            this.position.getWeapons().add(weaponToWaste);
+            this.position.getWeapons().remove(weapon);
+            this.weapons.add(weapon);
+        }
         for(int i = 0; i < powerUp.size(); i++){
             tmp.remove(powerUp.get(i).getColor());
             tmpPU.add(powerUp.get(i));
@@ -352,7 +358,10 @@ public class Player implements Target{
 
     }
 
-    public void pickUpAmmo(){
+    public void pickUpAmmo()throws NoCardAmmoAvailable{
+        if (position.getCardAmmo() == null){
+            throw new NoCardAmmoAvailable();
+        }
         if(position.getCardAmmo()!=null){
             ammo.addAll(position.getCardAmmo().getAmmo());
             position.setCardAmmo(null);

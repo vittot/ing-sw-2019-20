@@ -10,7 +10,7 @@ public class Turn {
     private Player currentPlayer;
     private int numOfActions;
     private int numOfMovs;
-    private Action currentAction;
+    private Action currentAction;   //TODO a cosa serve?
     private List <Action> actionList;
     private Game game;
 
@@ -75,6 +75,21 @@ public class Turn {
         }
         numOfActions = 2;
         numOfMovs = 0;
+    }
+
+    /**
+     * Set the current step to the given action
+     * @param ac
+     * @return
+     */
+    public boolean applyStep(Action ac){
+        int i = 0;
+        if(this.actionList.contains(ac)){
+            i = actionList.indexOf(ac);
+            setActionList(actionList.subList(i,actionList.size()));
+            return true;
+        }
+        return false;
     }
 
     /**
