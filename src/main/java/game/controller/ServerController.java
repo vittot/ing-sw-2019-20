@@ -4,10 +4,12 @@ import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.clientcommands.*;
 import game.controller.commands.servercommands.*;
-import game.model.CardWeapon;
-import game.model.Game;
-import game.model.Player;
+import game.model.*;
 import game.model.exceptions.InsufficientAmmoException;
+import game.model.exceptions.NoResidualActionAvaiableException;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ServerController implements ClientMessageHandler {
     // reference to the Networking layer
@@ -51,7 +53,17 @@ public class ServerController implements ClientMessageHandler {
 
     @Override
     public ServerMessage handle(ChooseTurnActionResponse clientMsg) {
-        return null;
+        try {
+            if (Action.checkAction(clientMsg.typeOfAction)) {
+                currPlayer.getGame().getCurrentTurn().newAction(clientMsg.typeOfAction, currPlayer.getAdrenaline());
+                return new OperationCompletedResponse(clientMsg);
+            } else {
+                return new InvalidActionResponse();
+            }
+        }
+        catch(NoResidualActionAvaiableException e){
+            return new InvalidNumberOfActionResponse();
+        }
     }
 
     @Override
@@ -61,7 +73,12 @@ public class ServerController implements ClientMessageHandler {
 
     @Override
     public ServerMessage handle(MovementActionRequest clientMsg) {
-        return null;
+        if(currPlayer.getGame().getCurrentTurn().getActionList().contains(Action.MOVEMENT)){
+            return new ChooseSquareRequest(); // has to be generated a list of possible square?
+        }
+        else{
+            return new InvalidStepResponse();
+        }
     }
 
     @Override
@@ -99,7 +116,17 @@ public class ServerController implements ClientMessageHandler {
 
     @Override
     public ServerMessage handle(RespawnResponse clientMsg) {
-        return null;
+        if(currPlayer.isDead()) {
+            if (currPlayer.getCardPower().contains(clientMsg.powerUp)) {
+                currPlayer.respawn(clientMsg.powerUp);
+                currPlayer.removePowerUp(Collections.singletonList(clientMsg.powerUp));
+                return new OperationCompletedResponse(clientMsg);
+            }
+            else
+                return new InvalidPowerUpResponse();
+        }
+        else
+            return new InvalidDeathResponse();
     }
 
     @Override

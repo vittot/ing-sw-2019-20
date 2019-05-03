@@ -120,4 +120,6 @@ public class Turn {
         currentPlayer.rifleActualWeapon();
         game.getPlayers().forEach(Player::updateMarks);
     }
+
+    
 }

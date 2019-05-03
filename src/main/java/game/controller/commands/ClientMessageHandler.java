@@ -3,7 +3,6 @@ package game.controller.commands;
 import game.controller.commands.clientcommands.*;
 
 public interface ClientMessageHandler {
-
     ServerMessage handle (ChooseSquareResponse clientMsg);
     ServerMessage handle (ChooseTargetResponse clientMsg);
     ServerMessage handle (ChooseTurnActionResponse clientMsg);

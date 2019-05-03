@@ -11,6 +11,10 @@ public interface ServerMessageHandler {
     void handle (ChooseTurnActionRequest serverMsg);
     void handle (InvalidTargetResponse serverMsg);
     void handle (InvalidWeaponResponse serverMsg);
+    void handle (InvalidActionResponse serverMsg);
+    void handle (InvalidNumberOfActionResponse serverMsg);
+    void handle (InvalidStepResponse serverMsg);
+    void handle (InvalidDeathResponse serverMsg);
     void handle (NotifyDamageResponse serverMsg);
     void handle (NotifyDeathResponse serverMsg);
     void handle (NotifyEndGameResponse serverMsg);
