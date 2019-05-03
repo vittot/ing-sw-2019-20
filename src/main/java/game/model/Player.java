@@ -351,4 +351,12 @@ public class Player implements Target{
         }
 
     }
+
+    public void pickUpAmmo(){
+        if(position.getCardAmmo()!=null){
+            ammo.addAll(position.getCardAmmo().getAmmo());
+            position.setCardAmmo(null);
+        }
+
+    }
 }
