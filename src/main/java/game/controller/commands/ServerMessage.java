@@ -2,8 +2,8 @@ package game.controller.commands;
 
 import java.io.Serializable;
 
-public interface Response extends Serializable {
-    void handle(ResponseHandler handler);
+public interface ServerMessage extends Serializable {
+    void handle(ServerMessageHandler handler);
     /*
         Scegli major azione(M/S/R)
         Scegli minor action.list
