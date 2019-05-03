@@ -3,7 +3,7 @@ package game.controller.commands.servercommands;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
 
-public class InvalidWeaponResponse implements ServerMessage {
+public class InsufficientAmmoResponse implements ServerMessage {
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

@@ -1,4 +1,11 @@
 package game.controller.commands.clientcommands;
 
-public class ChooseTargetResponse {
+import game.controller.commands.ClientMessage;
+import game.controller.commands.ClientMessageHandler;
+
+public class ChooseTargetResponse implements ClientMessage {
+    @Override
+    public void handle(ClientMessageHandler handler) {
+        handler.handle(this);
+    }
 }

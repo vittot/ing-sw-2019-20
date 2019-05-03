@@ -9,6 +9,7 @@ import java.util.List;
 
 
 public class CardWeapon {
+    private int id;
     private String name;
     private List<Color> price;
     private List<List<Color>> pricePlus;
@@ -37,6 +38,14 @@ public class CardWeapon {
         this.plusBeforeBase = plusBeforeBase;
         this.plusOrder = plusOrder;
         this.loaded = true;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
