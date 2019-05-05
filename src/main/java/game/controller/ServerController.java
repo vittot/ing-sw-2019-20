@@ -6,11 +6,11 @@ import game.controller.commands.clientcommands.*;
 import game.controller.commands.servercommands.*;
 import game.model.*;
 import game.model.exceptions.InsufficientAmmoException;
+import game.model.exceptions.NoCardWeaponSpaceException;
 import game.model.exceptions.NoResidualActionAvaiableException;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import game.model.exceptions.NoCardAmmoAvailable;
+import game.model.exceptions.NoCardAmmoAvailableException;
 
 public class ServerController implements ClientMessageHandler {
     // reference to the Networking layer
@@ -89,7 +89,7 @@ public class ServerController implements ClientMessageHandler {
         try{
             currPlayer.pickUpAmmo();
             return new OperationCompletedResponse(clientMsg);
-        }catch (NoCardAmmoAvailable e){
+        }catch (NoCardAmmoAvailableException e){
             return new InvalidGrabPositionRsponse();
         }
     }
@@ -112,6 +112,9 @@ public class ServerController implements ClientMessageHandler {
             return  new OperationCompletedResponse(clientMsg);
         }catch (InsufficientAmmoException e){
             return new InsufficientAmmoResponse();
+        }
+        catch (NoCardWeaponSpaceException x){
+            return new MaxNumberOfWeaponsResponse();
         }
     }
 

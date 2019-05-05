@@ -2,9 +2,8 @@ package game.model;
 
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
-import game.model.exceptions.NoCardWeaponSpace;
-import game.model.exceptions.NoCardAmmoAvailable;
-import org.mockito.internal.matchers.Null;
+import game.model.exceptions.NoCardWeaponSpaceException;
+import game.model.exceptions.NoCardAmmoAvailableException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +38,7 @@ public class Player implements Target{
         this.marks = new ArrayList<>();
         this.thisTurnMarks = new ArrayList<>();
         this.damage = new ArrayList<>();
+        this.weapons = new ArrayList<>();
     }
 
     public PlayerColor getColor() {
@@ -329,19 +329,17 @@ public class Player implements Target{
      * @param weapon
      * @param powerUp
      * @throws InsufficientAmmoException
-     * @throws NoCardWeaponSpace
+     * @throws NoCardWeaponSpaceException
      */
-    public void pickUpWeapon(CardWeapon weapon,CardWeapon weaponToWaste, List<CardPower> powerUp) throws InsufficientAmmoException{
+    public void pickUpWeapon(CardWeapon weapon,CardWeapon weaponToWaste, List<CardPower> powerUp) throws InsufficientAmmoException, NoCardWeaponSpaceException {
         List <Color> tmp = new ArrayList<>(weapon.getPrice());
         List <CardPower> tmpPU = new ArrayList<>();
+        if(this.weapons.size()== 3)
+            if(weaponToWaste==null)
+                throw new NoCardWeaponSpaceException();
         if(tmp.size() == 1)
             return;
         tmp = tmp.subList(1,tmp.size());
-        if (weapons.size() == 3){
-            this.position.getWeapons().add(weaponToWaste);
-            this.position.getWeapons().remove(weapon);
-            this.weapons.add(weapon);
-        }
         for(int i = 0; i < powerUp.size(); i++){
             tmp.remove(powerUp.get(i).getColor());
             tmpPU.add(powerUp.get(i));
@@ -351,16 +349,20 @@ public class Player implements Target{
             for (Color ammor : tmp){
                 ammo.remove(ammor);
             }
+            for(CardPower cp : tmpPU){
+                cardPower.remove(cp);
+            }
+            this.position.getWeapons().remove(weapon);
+            this.weapons.add(weapon);
+            if (weapons.size() == 3){
+                this.position.getWeapons().add(weaponToWaste);
+            }
         }
-        for(CardPower cp : tmpPU){
-            cardPower.remove(cp);
-        }
-
     }
 
-    public void pickUpAmmo()throws NoCardAmmoAvailable{
+    public void pickUpAmmo()throws NoCardAmmoAvailableException {
         if (position.getCardAmmo() == null){
-            throw new NoCardAmmoAvailable();
+            throw new NoCardAmmoAvailableException();
         }
         if(position.getCardAmmo()!=null){
             ammo.addAll(position.getCardAmmo().getAmmo());

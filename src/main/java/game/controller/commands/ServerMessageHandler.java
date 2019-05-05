@@ -14,6 +14,7 @@ public interface ServerMessageHandler {
     void handle (InvalidActionResponse serverMsg);
     void handle (InvalidNumberOfActionResponse serverMsg);
     void handle (InvalidStepResponse serverMsg);
+    void handle (MaxNumberOfWeaponsResponse serverMsg);
     void handle (InvalidDeathResponse serverMsg);
     void handle (NotifyDamageResponse serverMsg);
     void handle (NotifyDeathResponse serverMsg);

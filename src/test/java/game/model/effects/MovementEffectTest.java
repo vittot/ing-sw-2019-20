@@ -46,10 +46,11 @@ class MovementEffectTest {
         players.add(p3);
         players.add(p4);
 
-        CardWeapon w = mock(CardWeapon.class);
+        CardWeapon w = new CardWeapon(Direction.DOWN, map.getGrid()[0][0]);
         p1.setActualWeapon(w);
+        p3.setActualWeapon(w);
         p4.setActualWeapon(w);
-        when(w.getPreviousTargets()).thenReturn(new ArrayList<>());
+        //when(w.getPreviousTargets()).thenReturn(new ArrayList<>());
 
         map.getGrid()[0][0].addPlayer(p1);
         map.getGrid()[1][1].addPlayer(p2);
@@ -57,14 +58,18 @@ class MovementEffectTest {
         map.getGrid()[0][1].addPlayer(p4);
 
         game = new Game(players,map,8);
-
+        Turn turn = new Turn(p3,game);
+        game.setCurrentTurn(turn);
+        game.getPlayers().get(3).setGame(game);
+        game.getPlayers().get(1).setGame(game);
+        game.getPlayers().get(2).setGame(game);
     }
 
     @Test
     void selectMoved() {
         effect = new MovementEffect(1,1,1,3,1,3,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         List<Target> targets = effect.selectMoved(game.getPlayers().get(3));
-        //I expect p3, p4
+        //I expect p1, p2
         List<Target> expected = new ArrayList<>();
         expected.add(game.getPlayers().get(0));
         expected.add(game.getPlayers().get(1));
@@ -72,7 +77,7 @@ class MovementEffectTest {
     }
 
     /**
-     * Test for searchTarget that return visible room
+     * Test for searchTarget that return possible destination for the player movement
      */
     @Test
     void searchTarget() {
@@ -82,6 +87,47 @@ class MovementEffectTest {
         //squareCheck.add(game.getMap().getGrid()[1][0]);
         squareCheck.add(game.getMap().getGrid()[0][0]);
         squareCheck.add(game.getMap().getGrid()[0][1]);
+        assertTrue(squareCheck.containsAll(targets) && targets.containsAll(squareCheck));
+    }
+
+    /**
+     * Test for searchTarget (with sameDirection = true) that return possible destination for the player movement
+     */
+    @Test
+    void searchTargetSameDirection() {
+        //game.getCurrentTurn().setCurrentPlayer(game.getPlayers().get(0));
+        effect = new MovementEffect(1,1,1,2,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,true,false,DifferentTarget.ANYONE);
+        List<Target> targets = effect.searchTarget(game.getPlayers().get(0));
+        List<Target> squareCheck = new ArrayList<>();
+        squareCheck.add(game.getMap().getGrid()[1][0]);
+        squareCheck.add(game.getMap().getGrid()[2][0]);
+        assertTrue(squareCheck.containsAll(targets) && targets.containsAll(squareCheck));
+    }
+
+    /**
+     * Test for searchTarget (with chainMove = true) that return possible destination for the player movement
+     */
+    @Test
+    void searchTargetChainMove() {
+        //game.getCurrentTurn().setCurrentPlayer(game.getPlayers().get(0));
+        effect = new MovementEffect(1,1,1,2,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,false,DifferentTarget.ANYONE);
+        List<Target> targets = effect.searchTarget(game.getPlayers().get(2));
+        List<Target> squareCheck = new ArrayList<>();
+        squareCheck.add(game.getMap().getGrid()[0][0]);
+        assertTrue(squareCheck.containsAll(targets) && targets.containsAll(squareCheck));
+    }
+
+    /**
+     * Test for searchTarget (with VisibilityAfter = Visible) that return possible destination for the player movement
+     */
+    @Test
+    void searchTargetVisibilityAfter() {
+        //game.getCurrentTurn().setCurrentPlayer(game.getPlayers().get(0));
+        effect = new MovementEffect(1,1,1,4,1,4,TargetVisibility.VISIBLE,true,TargetVisibility.VISIBLE,false,false,false,false,false,DifferentTarget.ANYONE);
+        List<Target> targets = effect.searchTarget(game.getPlayers().get(1));
+        List<Target> squareCheck = new ArrayList<>();
+        squareCheck.add(game.getMap().getGrid()[1][0]);
+        squareCheck.add(game.getMap().getGrid()[2][0]);
         assertTrue(squareCheck.containsAll(targets) && targets.containsAll(squareCheck));
     }
 

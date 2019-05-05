@@ -147,7 +147,7 @@ public class MovementEffect extends Effect{
             return result;
         }
         else if (chainMove) {
-            result.add(shooter.getActualWeapon().getLastTargetSquare());
+            result.add(shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().getLastTargetSquare());
             return result;
         }
         else{
@@ -156,7 +156,9 @@ public class MovementEffect extends Effect{
             if(sameDirection) {
                 Direction currDirection = shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().getLastDirection();
                 tmp = currentPosition;
-                for (int i = 1; i <= maxMove; i++) {
+                if(minMove==0)
+                    result.add(currentPosition);
+                for (int i = 1; i <= maxMove && tmp!=null; i++) {
                     tmp = tmp.getNextSquare(currDirection);
                     if (minMove <= i && maxMove >= i)
                         result.add(tmp);
@@ -171,11 +173,13 @@ public class MovementEffect extends Effect{
                 }
             }
             if(visibilityAfter==TargetVisibility.VISIBLE) {
-                List<Square> visibles = currentPosition.getVisibleSquares(0, Map.MAX_DIST);
+                List <Target> notVisibleNext = new ArrayList<>();
+                List<Square> visibles = shooter.getGame().getCurrentTurn().getCurrentPlayer().getPosition().getVisibleSquares(0, Map.MAX_DIST);
                 for (Target t : result)
                     if(!visibles.contains(t)){
-                        result.remove(t);
+                        notVisibleNext.add(t);
                     }
+                result.removeAll(notVisibleNext);
             }
         }
         return result;

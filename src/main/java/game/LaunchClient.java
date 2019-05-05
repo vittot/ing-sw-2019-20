@@ -10,7 +10,7 @@ public class LaunchClient {
         Client client = null;
         //client.init();
         ClientController controller = new ClientController(client);
-        controller.run();
+        //controller.run();
 
         //client.close();
     }

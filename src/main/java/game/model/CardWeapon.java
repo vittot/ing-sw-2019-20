@@ -40,6 +40,15 @@ public class CardWeapon {
         this.loaded = true;
     }
 
+    public CardWeapon(Direction lastDirection, Square lastTargetSquare){
+        this.lastDirection = lastDirection;
+        this.lastTargetSquare = lastTargetSquare;
+    }
+
+    public CardWeapon(List<Color> price){
+        this.price = price;
+    }
+
     public int getId() {
         return id;
     }
