@@ -32,15 +32,27 @@ class SquareTest {
     }
 
     /**
-     *
+     * Return all the squares in the map attainable following the four cardinal directions (with a specific distance range)
      */
     @Test
     void getSquaresInDirections(){
-        List<Square> result = map.getGrid()[1][1].getSquaresInDirections(1,2);
+        List<Square> result = map.getGrid()[0][0].getSquaresInDirections(1,2);
+        List<Square> checkResult = new ArrayList<>();
+        checkResult.add(map.getGrid()[0][1]);
+        checkResult.add(map.getGrid()[1][0]);
+        checkResult.add(map.getGrid()[2][0]);
+        assertTrue(checkResult.containsAll(result) && result.containsAll(checkResult));
+    }
+
+    /**
+     * Return all the squares placed in the adiacent room of the current position following a specified direction
+     */
+    @Test
+    void getAdiacentRoomsSquares(){
+        List<Square> result = map.getGrid()[1][0].getAdiacentRoomSquares(Direction.UP);
         List<Square> checkResult = new ArrayList<>();
         checkResult.add(map.getGrid()[0][0]);
         checkResult.add(map.getGrid()[0][1]);
-        checkResult.add(map.getGrid()[1][0]);
         assertTrue(checkResult.containsAll(result) && result.containsAll(checkResult));
     }
 }

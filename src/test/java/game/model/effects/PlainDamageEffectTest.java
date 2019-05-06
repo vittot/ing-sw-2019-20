@@ -48,11 +48,6 @@ class PlainDamageEffectTest {
         players.add(p3);
         players.add(p4);
 
-        CardWeapon w = mock(CardWeapon.class);
-        p1.setActualWeapon(w);
-        p4.setActualWeapon(w);
-        when(w.getPreviousTargets()).thenReturn(new ArrayList<>());
-
         map.getGrid()[0][0].addPlayer(p1);
         map.getGrid()[1][1].addPlayer(p2);
         map.getGrid()[2][0].addPlayer(p3);
@@ -60,8 +55,16 @@ class PlainDamageEffectTest {
 
         game = new Game(players,map,8);
 
-
-
+        List<Player> prevT = new ArrayList<>();
+        prevT.add(p4);
+        prevT.add(p1);
+        CardWeapon w = new CardWeapon(Direction.UP,map.getGrid()[0][0]);
+        w.setLastTargetSquare(p3.getPosition());
+        w.setPreviousTargets(prevT);
+        p1.setActualWeapon(w);
+        p4.setActualWeapon(w);
+        p3.setActualWeapon(w);
+        p2.setActualWeapon(w);
     }
 
     /**
@@ -99,6 +102,31 @@ class PlainDamageEffectTest {
         expTargets.add( game.getPlayer(1) );
         expTargets.add( game.getPlayer(2) );
         expTargets.add( game.getPlayer(3) );
+        assertEquals(expTargets,targets);
+    }
+
+    /**
+     * Search for targets on a cardinal direction (used by railgun)
+     */
+    @Test
+    void searchSameDirectionTargets(){
+        effect = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,true);
+        List<Target> targets = effect.searchTarget(game.getPlayer(3));
+        List<Target> expTargets = new ArrayList<>();
+        expTargets.add( game.getPlayer(1) );
+        expTargets.add( game.getPlayer(4) );
+        assertEquals(expTargets,targets);
+    }
+
+    /**
+     * Search for targets on a cardinal direction (used by railgun)
+     */
+    @Test
+    void searchDifferentTargets(){
+        effect = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.NOTTHELAST,false,false);
+        List<Target> targets = effect.searchTarget(game.getPlayer(2));
+        List<Target> expTargets = new ArrayList<>();
+        expTargets.add( game.getPlayer(4) );
         assertEquals(expTargets,targets);
     }
 

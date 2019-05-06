@@ -1,6 +1,7 @@
 package game.model;
 
 
+import game.model.exceptions.MapOutOfLimitException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,7 @@ class MapTest {
         Edge[] edges4 = new Edge[]{Edge.OPEN,Edge.OPEN,Edge.DOOR,Edge.OPEN};
         Edge[] edges5 = new Edge[]{Edge.DOOR,Edge.OPEN,Edge.OPEN,Edge.WALL};
 
-        grid[0][0] = new Square(MapColor.BLUE, false, 0, 0, map, edges1);
+        grid[0][0] = new Square(MapColor.BLUE, true, 0, 0, map, edges1);
         grid[1][0] = new Square(MapColor.BLUE, false, 0, 1, map, edges2);
         grid[2][0] = new Square(MapColor.RED, true, 0, 2, map, edges3);
         grid[0][1] = new Square(MapColor.BLUE, true, 1, 0, map, edges4);
@@ -83,7 +84,32 @@ class MapTest {
         spawnpoints.add(map.getGrid()[0][1]);
         spawnpoints.add(map.getGrid()[1][1]);
         spawnpoints.add(map.getGrid()[2][0]);
-
         assertEquals(spawnpoints,map.getSpawnpoints());
+    }
+
+    /**
+     * Return the square identified by the specified x and y coordinates
+     */
+    @Test
+    void getSquare() {
+        boolean i = true;
+        Square result = null;
+        try {
+            result = map.getSquare(0, 3);
+        }
+        catch(MapOutOfLimitException e){
+            i = false;
+        }
+        assertEquals(i, false);
+    }
+
+    /**
+     * Return the respawn square for a specific room color in the map
+     */
+    @Test
+    void respawnColor() {
+        Square result = null;
+        result = map.respawnColor(MapColor.BLUE);
+        assertEquals(result,map.getGrid()[0][0]);
     }
 }
