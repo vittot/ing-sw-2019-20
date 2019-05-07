@@ -12,6 +12,8 @@ public class OperationCompletedResponse implements ServerMessage {
         this.operation = operation;
     }
 
+    public OperationCompletedResponse() { }
+
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class MovementEffect extends Effect{
+public class MovementEffect extends SimpleEffect {
     private boolean moveShooter; //true if the shooter has to to be moved, false if the enemy has to be moved
     private TargetVisibility visibilityAfter;
     private boolean myPos;  //true if the target has to be moved into the position of the shooter
@@ -15,12 +15,11 @@ public class MovementEffect extends Effect{
     private boolean lastTarget;
     private boolean sameDirection;
     private DifferentTarget differentTarget;
-    private boolean beforeBase;
     private int minMove;
     private int maxMove;
     //private List<Direction> choosenMovement;
 
-    public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, int minMove, int maxMove, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection, boolean beforeBase,DifferentTarget differentTarget) {
+    public MovementEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, int minMove, int maxMove, TargetVisibility visibility, boolean moveShooter, TargetVisibility visibilityAfter, boolean myPos, boolean chainMove, boolean lastTarget, boolean sameDirection,DifferentTarget differentTarget) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.moveShooter = moveShooter;
         this.visibilityAfter = visibilityAfter;
@@ -28,7 +27,6 @@ public class MovementEffect extends Effect{
         this.chainMove = chainMove;
         this.lastTarget = lastTarget;
         this.sameDirection = sameDirection;
-        this.beforeBase = beforeBase;
         this.minMove = minMove;
         this.maxMove = maxMove;
         this.differentTarget = differentTarget;
@@ -82,20 +80,13 @@ public class MovementEffect extends Effect{
         this.sameDirection = sameDirection;
     }
 
-    public boolean isBeforeBase() {
-        return beforeBase;
-    }
-
-    public void setBeforeBase(boolean beforeBase) {
-        this.beforeBase = beforeBase;
-    }
 
     /**
      * locate the player who can be moved
      * @param shooter
      * @return
      */
-    public List<Target> selectMoved (Player shooter) {
+    public List<Target> searchTarget (Player shooter) {
         List<Player> targets = new ArrayList<>();
         List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
         Square shooterPos = shooter.getPosition();
@@ -139,9 +130,8 @@ public class MovementEffect extends Effect{
      * @param shooter
      * @return
      */
-    @Override
-    public List<Target> searchTarget(Player shooter){
-        List<Target> result = new ArrayList<>(); //it will contain the final result of the method
+    public List<Square> selectPosition(Player shooter){
+        List<Square> result = new ArrayList<>(); //it will contain the final result of the method
         if(myPos) {
             result.add(shooter.getGame().getCurrentTurn().getCurrentPlayer().getPosition());
             return result;

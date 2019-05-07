@@ -1,24 +1,35 @@
 package game.model;
 
-import game.model.effects.Effect;
+import game.model.effects.FullEffect;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CardPower {
+public class CardPower implements Serializable {
+    int id;
     private String name;
     private String description;
     private Color color;    //card color (for respawn or to pay ammo)
     private List<Color> price; //price for the use of the effect
     private boolean usedWhenDamaged;
-    private List<Effect> effect;
+    private FullEffect effect;
 
-    public CardPower(String name, String description, Color color, List<Color> price, boolean usedWhenDamaged, List<Effect> effect) {
+    public CardPower(int id, String name, String description, Color color, List<Color> price, boolean usedWhenDamaged, FullEffect effect) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.color = color;
         this.price = price;
         this.usedWhenDamaged = usedWhenDamaged;
         this.effect = effect;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

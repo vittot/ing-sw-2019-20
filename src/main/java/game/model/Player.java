@@ -5,27 +5,32 @@ import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardWeaponSpaceException;
 import game.model.exceptions.NoCardAmmoAvailableException;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Player implements Target{
+public class Player implements Target, Serializable {
     private PlayerColor color;
     private List<PlayerColor> marks;
     private List<PlayerColor> thisTurnMarks;
     private int id;
     private List<PlayerColor> damage;
     private AdrenalineLevel adrenaline;
-    private List<CardWeapon> weapons;
+    private transient List<CardWeapon> weapons;
     private CardWeapon actualWeapon;
     private List<Color> ammo;
-    private List<CardPower> cardPower;
+    private transient List<CardPower> cardPower;
     private int deaths;
     private int points;
     private Square position;
-    private Game game;
+    private transient Game game;
     private boolean isDead;
     private static final int MARKS_PER_ENEMY=3;
+    private boolean serializeEverything;
 
     public Player(int id, PlayerColor color)
     {
@@ -38,6 +43,17 @@ public class Player implements Target{
         this.marks = new ArrayList<>();
         this.thisTurnMarks = new ArrayList<>();
         this.damage = new ArrayList<>();
+        this.serializeEverything = false;
+        this.weapons = new ArrayList<>();
+        this.cardPower = new ArrayList<>();
+    }
+
+    public boolean isSerializeEverything() {
+        return serializeEverything;
+    }
+
+    public void setSerializeEverything(boolean serializeEverything) {
+        this.serializeEverything = serializeEverything;
         this.weapons = new ArrayList<>();
     }
 
@@ -145,6 +161,24 @@ public class Player implements Target{
 
     public List<PlayerColor> getThisTurnMarks() {
         return thisTurnMarks;
+    }
+
+    /**
+     * Add a weapon to the player's hand
+     * @param cw
+     */
+    public void addWeapon(CardWeapon cw)
+    {
+        this.weapons.add(cw);
+    }
+
+    /**
+     * Add a power-up card to the player's hand
+     * @param cp
+     */
+    public void addCardPower(CardPower cp)
+    {
+        this.cardPower.add(cp);
     }
 
     /**
@@ -338,28 +372,56 @@ public class Player implements Target{
             if(weaponToWaste==null)
                 throw new NoCardWeaponSpaceException();
         if(tmp.size() == 1)
+        {
+            this.position.getWeapons().remove(weapon);
+            this.weapons.add(weapon);
+            if (weapons.size() == 3){
+                this.position.getWeapons().add(weaponToWaste);
+                this.weapons.remove(weaponToWaste);
+            }
             return;
+        }
+
         tmp = tmp.subList(1,tmp.size());
+
+        pay(tmp,powerUp);
+
+        this.position.getWeapons().remove(weapon);
+        this.weapons.add(weapon);
+        if (weapons.size() == 3){
+            this.position.getWeapons().add(weaponToWaste);
+            this.weapons.remove(weaponToWaste);
+        }
+
+    }
+
+    /**
+     * Pay a cost with ammo and eventually powerups
+     * @param ammoToPay
+     * @param powerUp
+     * @throws InsufficientAmmoException
+     */
+    public void pay(List<Color> ammoToPay, List<CardPower> powerUp) throws InsufficientAmmoException {
+        List <Color> tmp = new ArrayList<>(ammoToPay);
+        List <CardPower> tmpPU = new ArrayList<>();
         for(int i = 0; i < powerUp.size(); i++){
             tmp.remove(powerUp.get(i).getColor());
             tmpPU.add(powerUp.get(i));
         }
         if(!ammo.containsAll(tmp)) throw new InsufficientAmmoException();
-        else{
-            for (Color ammor : tmp){
+        else {
+            for (Color ammor : tmp) {
                 ammo.remove(ammor);
             }
-            for(CardPower cp : tmpPU){
+            for (CardPower cp : tmpPU) {
                 cardPower.remove(cp);
-            }
-            this.position.getWeapons().remove(weapon);
-            this.weapons.add(weapon);
-            if (weapons.size() == 3){
-                this.position.getWeapons().add(weaponToWaste);
             }
         }
     }
 
+    /**
+     * Pick an ammo from the current Player position
+     */
     public void pickUpAmmo()throws NoCardAmmoAvailableException {
         if (position.getCardAmmo() == null){
             throw new NoCardAmmoAvailableException();
@@ -370,4 +432,32 @@ public class Player implements Target{
         }
 
     }
+
+    /**
+     * Serialize the object, excluding the sensible Player data (powerups and weapons) if the serializeEverything flag is not high
+     * @param oos
+     * @throws IOException
+     */
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        if(serializeEverything) {
+            oos.writeObject(cardPower);
+            oos.writeObject(weapons);
+        }
+    }
+
+    /**
+     * De-serialize the object. If the serializeEverything flag is high it deserialize also  powerups and weapons
+     * @param ois
+     * @throws IOException
+     */
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+        if(serializeEverything)
+        {
+            cardPower = (List<CardPower>)ois.readObject();
+            weapons = (List<CardWeapon>)ois.readObject();
+        }
+    }
+
 }

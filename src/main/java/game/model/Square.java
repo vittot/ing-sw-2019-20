@@ -2,11 +2,12 @@ package game.model;
 
 import game.model.exceptions.MapOutOfLimitException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Square implements Target{
+public class Square implements Target, Serializable {
     private MapColor color;
     private Edge[] edges;
     private boolean respawn;

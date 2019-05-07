@@ -2,13 +2,14 @@ package game.model;
 
 import game.model.exceptions.MapOutOfLimitException;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Map {
+public class Map implements Serializable {
     private int id;
     private Square[][] grid;
     private int dimX; //number of cols

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AreaDamageEffect extends Effect{
+public class AreaDamageEffect extends SimpleEffect {
     private int damage;
     private int marks;
     private int maxEnemyPerSquare; //quando andrà controllato vedere Collectors.groupingBy
@@ -37,7 +37,7 @@ public class AreaDamageEffect extends Effect{
     /**
      * Return the possible targets. It will have to be verified that they respect the minEnemy - maxEnemy constraint and the maxEnemyPerSquare constraint
      * @param shooter
-     * @return The List is a singleton for this type of Effect
+     * @return The List is a singleton for this type of SimpleEffect
      */
     public List<Target> searchTarget(Player shooter){
         List<Player> targets;

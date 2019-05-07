@@ -1,24 +1,26 @@
 package game.model;
 
-import game.model.effects.Effect;
+import game.model.effects.FullEffect;
 import game.model.exceptions.InsufficientAmmoException;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class CardWeapon {
+public class CardWeapon implements Serializable {
     private int id;
     private String name;
     private List<Color> price;
-    private List<List<Color>> pricePlus;
-    private List<Color> priceAlt;
-    private List<Effect> baseEffect;
-    private List<Effect> altEffect;
-    private List<List<Effect>> plusEffects;
-    private List<String> effectDescriptions;
-    private boolean plusBeforeBase;           //True if you can use optional effects before base effects
+    //private List<List<Color>> pricePlus; //moved in FullEffect
+    //private List<Color> priceAlt;
+    private FullEffect baseEffect;
+    private FullEffect altEffect;
+    private List<FullEffect> plusEffects;
+    //private List<String> effectDescriptions; //moved in FullEffect
+
+    private boolean plusBeforeBase;           //True if you can use a plus effect before the base effect
     private boolean plusOrder;                //True if you have to respect the order of the list
     private List<Player> previousTargets;
     private Square lastTargetSquare;
@@ -26,15 +28,12 @@ public class CardWeapon {
     private boolean loaded;
     private Player shooter;
 
-    public CardWeapon(String name, List<Color> price, List<List<Color>> pricePlus, List<Color> priceAlt, List<Effect> baseEffect, List<List<Effect>> effectPlus, List<Effect> altEffect, List<String> effectDescription, boolean plusBeforeBase, boolean plusOrder) {
+    public CardWeapon(String name, List<Color> price, FullEffect baseEffect, List<FullEffect> effectPlus, FullEffect altEffect, boolean plusBeforeBase, boolean plusOrder) {
         this.name = name;
         this.price = price;
-        this.pricePlus = pricePlus;
-        this.priceAlt = priceAlt;
         this.baseEffect = baseEffect;
         this.plusEffects = effectPlus;
         this.altEffect = altEffect;
-        this.effectDescriptions = effectDescription;
         this.plusBeforeBase = plusBeforeBase;
         this.plusOrder = plusOrder;
         this.loaded = true;
@@ -73,36 +72,24 @@ public class CardWeapon {
         this.price = price;
     }
 
-    public List<List<Color>> getPricePlus() {
-        return pricePlus;
-    }
-
-    public void setPricePlus(List<List<Color>> pricePlus) {
-        this.pricePlus = pricePlus;
-    }
-
-    public List<Color> getPriceAlt() {
-        return priceAlt;
-    }
-
-    public void setPriceAlt(List<Color> priceAlt) {
-        this.priceAlt = priceAlt;
-    }
-
-    public List<List<Effect>> getPlusEffects() {
+    public List<FullEffect> getPlusEffects() {
         return plusEffects;
     }
 
-    public void setPlusEffects(List<List<Effect>> plusEffects) {
+    public void setPlusEffects(List<FullEffect> plusEffects) {
         this.plusEffects = plusEffects;
     }
 
-    public List<Effect> getAltEffect() {
+    public FullEffect getAltEffect() {
         return altEffect;
     }
 
-    public void setAltEffect(List<Effect> altEffect) {
+    public void setAltEffect(FullEffect altEffect) {
         this.altEffect = altEffect;
+    }
+
+    public FullEffect getBaseEffect() {
+        return baseEffect;
     }
 
     public boolean isPlusBeforeBase() {

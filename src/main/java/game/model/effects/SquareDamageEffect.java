@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SquareDamageEffect extends Effect{
+public class SquareDamageEffect extends SimpleEffect {
     private int damage;
     private int marks;
     private boolean lastTargetSquare; //if true indicate to search target from the last target position
@@ -58,7 +58,7 @@ public class SquareDamageEffect extends Effect{
     /**
      * Return the possible targets. It will have to be verified that they respect the minEnemy - maxEnemy constraint
      * @param shooter
-     * @return The List is a singleton for this type of Effect
+     * @return The List is a singleton for this type of SimpleEffect
      */
     public List<Target> searchTarget(Player shooter){
 

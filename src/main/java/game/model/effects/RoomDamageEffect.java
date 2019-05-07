@@ -8,7 +8,7 @@ import game.model.Target;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoomDamageEffect extends Effect{
+public class RoomDamageEffect extends SimpleEffect {
     private int damage;
     private int marks;
 
@@ -37,7 +37,7 @@ public class RoomDamageEffect extends Effect{
     /**
      * Return the possible targets. It will have to be verified that they respect the minEnemy - maxEnemy constraint
      * @param shooter
-     * @return The List is a singleton for this type of Effect
+     * @return The List is a singleton for this type of SimpleEffect
      */
     public List<Target> searchTarget(Player shooter){
         List<Room> targets;

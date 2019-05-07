@@ -3,9 +3,10 @@ package game.model.effects;
 import game.model.Player;
 import game.model.Target;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class Effect {
+public abstract class SimpleEffect implements Serializable {
     protected int minEnemy;
     protected int maxEnemy;
     protected int minDist;
@@ -14,7 +15,7 @@ public abstract class Effect {
 
 
 
-    public Effect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility) {
+    public SimpleEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility) {
         this.minEnemy = minEnemy;
         this.maxEnemy = maxEnemy;
         this.minDist = minDist;

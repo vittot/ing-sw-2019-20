@@ -3,12 +3,11 @@ package game.model.effects;
 import game.model.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class PlainDamageEffect extends Effect{
+public class PlainDamageEffect extends SimpleEffect {
     private int damage;
     private int marks;
     private boolean lastTarget; //if the target has to be among the previous targets hit by the weapon
@@ -76,7 +75,7 @@ public class PlainDamageEffect extends Effect{
     /**
      * Return the possible targets. It will have to be verified that they respect the minEnemy - maxEnemy constraint
      * @param shooter
-     * @return The List is a singleton for this type of Effect
+     * @return The List is a singleton for this type of SimpleEffect
      */
     public List<Target> searchTarget(Player shooter){
 

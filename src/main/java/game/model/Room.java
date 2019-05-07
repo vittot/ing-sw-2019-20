@@ -2,9 +2,10 @@ package game.model;
 
 import game.model.exceptions.MapOutOfLimitException;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Room implements Target {
+public class Room implements Target, Serializable {
 
     private MapColor color;
     private Map map;

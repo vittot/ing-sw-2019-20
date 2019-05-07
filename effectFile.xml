@@ -31,8 +31,8 @@
             </ammo>
         </opzionalPrice>
         <!--
-        Effect distr01 = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
-        Effect distr21 = new PlainDamageEffect(1,1,0, Map.MAX_DIST, TargetVisibility.VISIBLE, 0,1,false,DifferentTarget.NOTTHELAST,false,false);
+        SimpleEffect distr01 = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
+        SimpleEffect distr21 = new PlainDamageEffect(1,1,0, Map.MAX_DIST, TargetVisibility.VISIBLE, 0,1,false,DifferentTarget.NOTTHELAST,false,false);
         -->
         <baseEffect>
             <plainDamage>
@@ -144,10 +144,10 @@
             </plainDamage>
         </opzionalEffect>
         <!--
-        Effect mitr01 = new PlainDamageEffect(1,2,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect mitr21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
-        Effect mitr31 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NOTTHELAST,false,false);
-        Effect mitr32 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
+        SimpleEffect mitr01 = new PlainDamageEffect(1,2,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect mitr21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        SimpleEffect mitr31 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NOTTHELAST,false,false);
+        SimpleEffect mitr32 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
 
 
         -->
@@ -227,9 +227,9 @@
                 blue
             </ammo>
         </opzionalPrice>
-        <!--        Effect torp01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.ANYONE,false,false);
-        Effect torp21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,true,false);
-        Effect torp31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.NONEOFTHEPREVIOUS, true,false);
+        <!--        SimpleEffect torp01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.ANYONE,false,false);
+        SimpleEffect torp21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,true,false);
+        SimpleEffect torp31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.NONEOFTHEPREVIOUS, true,false);
 -->
         <baseEffect>
             <plainDamage>
@@ -328,9 +328,9 @@
             </ammo>
         </opzionalPrice>
         <!--
-                Effect plas01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
-        Effect plas21 = new MovementEffect(0,0,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
-        Effect plas31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+                SimpleEffect plas01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect plas21 = new MovementEffect(0,0,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
+        SimpleEffect plas31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
             <plainDamage>
@@ -412,7 +412,7 @@
                 yellow
             </ammo>
         </price>
-        <!--        Effect prec01 = new PlainDamageEffect(1,1,2,Map.MAX_DIST,TargetVisibility.VISIBLE,3,1,false,DifferentTarget.ANYONE,false,false);
+        <!--        SimpleEffect prec01 = new PlainDamageEffect(1,1,2,Map.MAX_DIST,TargetVisibility.VISIBLE,3,1,false,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
             <plainDamage>
@@ -470,8 +470,8 @@
             </ammo>
         </alternativePrice>
         <!--
-                Effect prot01 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,0,TargetVisibility.VISIBLE,1,0,false,false);
-        Effect prot11 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,0,TargetVisibility.VISIBLE,2,0,false,false);
+                SimpleEffect prot01 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,0,TargetVisibility.VISIBLE,1,0,false,false);
+        SimpleEffect prot11 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,0,TargetVisibility.VISIBLE,2,0,false,false);
 
         -->
         <baseEffect>
@@ -539,10 +539,10 @@
                 yellow
             </ammo>
         </alternativePrice>
-        <!--         Effect ray01 = new MovementEffect(1,1,0,Map.MAX_DIST,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,false,false,false,false,false,DifferentTarget.ANYONE);
-        Effect ray02 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
-        Effect ray11 = new MovementEffect(1,1,0,2,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,true,false,false,false,false,DifferentTarget.ANYONE);
-        Effect ray12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,true,DifferentTarget.ANYONE,false,false);
+        <!--         SimpleEffect ray01 = new MovementEffect(1,1,0,Map.MAX_DIST,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,false,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect ray02 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        SimpleEffect ray11 = new MovementEffect(1,1,0,2,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,true,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect ray12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
             <movementEffect>
@@ -647,14 +647,14 @@
             </ammo>
         </opzionalPrice>
         <!--
-                Effect vort01 = new SquareDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE, 0,0,false,false);
-        Effect vort02 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.ANYONE);
-        Effect vort03 = new PlainDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,2,0,true,DifferentTarget.ANYONE,false,false);
+                SimpleEffect vort01 = new SquareDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE, 0,0,false,false);
+        SimpleEffect vort02 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect vort03 = new PlainDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,2,0,true,DifferentTarget.ANYONE,false,false);
 
-        Effect vort21 = new MovementEffect(1,1,0,1, 0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.NONEOFTHEPREVIOUS);
-        Effect vort22 = new PlainDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
-        Effect vort23 = new MovementEffect(0,1,0,1, 0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.NONEOFTHEPREVIOUS);
-        Effect vort24 = new PlainDamageEffect(0,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        SimpleEffect vort21 = new MovementEffect(1,1,0,1, 0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.NONEOFTHEPREVIOUS);
+        SimpleEffect vort22 = new PlainDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
+        SimpleEffect vort23 = new MovementEffect(0,1,0,1, 0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.NONEOFTHEPREVIOUS);
+        SimpleEffect vort24 = new PlainDamageEffect(0,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
             <squareDamageEffect>
@@ -801,8 +801,8 @@
             </ammo>
         </alternativePrice>
         <!--
-                Effect vulc01 = new RoomDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0);
-        Effect vulc11 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,1,TargetVisibility.VISIBLE,1,1,false,false);
+                SimpleEffect vulc01 = new RoomDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0);
+        SimpleEffect vulc11 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,1,TargetVisibility.VISIBLE,1,1,false,false);
 
         -->
         <baseEffect>
@@ -860,7 +860,7 @@
             </ammo>
         </price>
             <!--
-              Effect rock01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.INVISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
+              SimpleEffect rock01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.INVISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
             -->
         <baseEffect>
             <plainDamage>
@@ -955,10 +955,10 @@
             </squareDamageEffect>
         </baseEffect>
         <!--
-                Effect flash01 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect flash02 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 1,true,false);
-        Effect flash11 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect flash12 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 2,true,false);
+                SimpleEffect flash01 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect flash02 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 1,true,false);
+        SimpleEffect flash11 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect flash12 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 2,true,false);
         -->
 
         <alternativeEffect>
@@ -1028,10 +1028,10 @@
             </ammo>
         </alternativePrice>
         <!--
-                Effect flam01 = new PlainDamageEffect(1,1,1,1,TargetVisibility.EVERYWHERE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect flam02 = new PlainDamageEffect(0,1,2,2,TargetVisibility.EVERYWHERE,1,0,false,DifferentTarget.ANYONE,false,true);
-        Effect flam11 = new SquareDamageEffect(1,1,1,1,TargetVisibility.EVERYWHERE,2,0,false,false);
-        Effect flam12 = new SquareDamageEffect(0,1,2,2,TargetVisibility.EVERYWHERE,1,0,false,true);
+                SimpleEffect flam01 = new PlainDamageEffect(1,1,1,1,TargetVisibility.EVERYWHERE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect flam02 = new PlainDamageEffect(0,1,2,2,TargetVisibility.EVERYWHERE,1,0,false,DifferentTarget.ANYONE,false,true);
+        SimpleEffect flam11 = new SquareDamageEffect(1,1,1,1,TargetVisibility.EVERYWHERE,2,0,false,false);
+        SimpleEffect flam12 = new SquareDamageEffect(0,1,2,2,TargetVisibility.EVERYWHERE,1,0,false,true);
 
         -->
         <baseEffect>
@@ -1125,9 +1125,9 @@
             </ammo>
         </opzionalPrice>
         <!--
-        Effect gran01 =  new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        Effect gran02 = new MovementEffect(0,1,0,Map.MAX_DIST,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false, DifferentTarget.ANYONE);
-        Effect gran21 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,false);
+        SimpleEffect gran01 =  new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect gran02 = new MovementEffect(0,1,0,Map.MAX_DIST,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false, DifferentTarget.ANYONE);
+        SimpleEffect gran21 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,false);
         //TODO Effetto plus su puo fare rima del effetto base
         -->
         <baseEffect>
@@ -1227,12 +1227,12 @@
             </ammo>
         </alternativePrice>
 <!--
-    Effect lcrz01 = new PlainDamageEffect(1,1,1, Map.MAX_DIST, TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
-    Effect lcrz02 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
-    Effect lcrz21 = new MovementEffect(1,1,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
-    Effect lcrz11 = new SquareDamageEffect(1,Game.MAXPLAYERS,1,Game.MAXPLAYERS,TargetVisibility.VISIBLE,1,0,false,false);
-    Effect lcrz12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,true,false);
-    Effect lcrz13 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
+    SimpleEffect lcrz01 = new PlainDamageEffect(1,1,1, Map.MAX_DIST, TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+    SimpleEffect lcrz02 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
+    SimpleEffect lcrz21 = new MovementEffect(1,1,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
+    SimpleEffect lcrz11 = new SquareDamageEffect(1,Game.MAXPLAYERS,1,Game.MAXPLAYERS,TargetVisibility.VISIBLE,1,0,false,false);
+    SimpleEffect lcrz12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,true,false);
+    SimpleEffect lcrz13 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
 -->
         <baseEffect>
             <plainDamage>
@@ -1372,9 +1372,9 @@
             </ammo>
         </alternativePrice>
         <!--
-        Effect lsr01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
-        Effect lsr11 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
-        Effect lsr12 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,true);
+        SimpleEffect lsr01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect lsr11 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect lsr12 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,true);
 
         -->
         <baseEffect>
@@ -1472,9 +1472,9 @@
             </ammo>
         </opzionalPrice>
 <!--
-        Effect phot01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
-        Effect phot21 = new MovementEffect(1,1,0,0,1,1,TargetVisibility.VISIBLE,true,TargetVisibility.VISIBLE,false,false,false,false,true,DifferentTarget.ANYONE);
-        Effect phot31 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.NONEOFTHEPREVIOUS,false,false);
+        SimpleEffect phot01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect phot21 = new MovementEffect(1,1,0,0,1,1,TargetVisibility.VISIBLE,true,TargetVisibility.VISIBLE,false,false,false,false,true,DifferentTarget.ANYONE);
+        SimpleEffect phot31 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false, DifferentTarget.NONEOFTHEPREVIOUS,false,false);
 
 -->
         <baseEffect>
@@ -1568,8 +1568,8 @@
             </ammo>
         </alternativePrice>
         <!--
-                Effect zx01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,1,false,DifferentTarget.ANYONE,false,false);
-        Effect zx11 = new PlainDamageEffect(1,3,0,Map.MAX_DIST,TargetVisibility.VISIBLE,0,1,false, DifferentTarget.ANYONE,false,false);
+                SimpleEffect zx01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,1,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect zx11 = new PlainDamageEffect(1,3,0,Map.MAX_DIST,TargetVisibility.VISIBLE,0,1,false, DifferentTarget.ANYONE,false,false);
         -->
         <baseEffect>
             <plainDamage>
@@ -1641,9 +1641,9 @@
             </ammo>
         </alternativePrice>
         <!--
-                Effect pmp01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
-        Effect pmp02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
-        Effect pmp11 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+                SimpleEffect pmp01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect pmp02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
+        SimpleEffect pmp11 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
 
         -->
         <baseEffect>
@@ -1732,13 +1732,13 @@
             </ammo>
         </alternativePrice>
         <!--
-                Effect cyb01 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,1,2,false,DifferentTarget.ANYONE,false,false);
-        Effect cyb02 = new MovementEffect(1,1,0,0,1,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,false,DifferentTarget.ANYONE);
+                SimpleEffect cyb01 = new PlainDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,1,2,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect cyb02 = new MovementEffect(1,1,0,0,1,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,false,DifferentTarget.ANYONE);
 
-        Effect cyb11 = new MovementEffect(1,1,1,1,0,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
-        Effect cyb12 = new PlainDamageEffect(0,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
-        Effect cyb13 = new PlainDamageEffect(0,1,1,1,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,true);
-        Effect cyb14 = new MovementEffect(0,1,1,1,0,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect cyb11 = new MovementEffect(1,1,1,1,0,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect cyb12 = new PlainDamageEffect(0,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect cyb13 = new PlainDamageEffect(0,1,1,1,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,true);
+        SimpleEffect cyb14 = new MovementEffect(0,1,1,1,0,1,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,false,DifferentTarget.ANYONE);
 
         -->
         <baseEffect>
@@ -1872,8 +1872,8 @@
             </ammo>
         </alternativePrice>
         <!--
-        Effect ond01 = new AreaDamageEffect(1,3,1,1,TargetVisibility.VISIBLE,1,0,1);
-        Effect ond11 = new AreaDamageEffect(4,4,1,1,TargetVisibility.VISIBLE,1,0,Game.MAXPLAYERS);
+        SimpleEffect ond01 = new AreaDamageEffect(1,3,1,1,TargetVisibility.VISIBLE,1,0,1);
+        SimpleEffect ond11 = new AreaDamageEffect(4,4,1,1,TargetVisibility.VISIBLE,1,0,Game.MAXPLAYERS);
 
         -->
         <baseEffect>
@@ -1938,10 +1938,10 @@
             </ammo>
         </alternativePrice>
 <!--
-        Effect sled01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
-        Effect sled11 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
-        Effect sled12 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
-        Effect sled13 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,true,false,DifferentTarget.ANYONE);
+        SimpleEffect sled01 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect sled11 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect sled12 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect sled13 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,true,false,DifferentTarget.ANYONE);
 
 -->
         <baseEffect>

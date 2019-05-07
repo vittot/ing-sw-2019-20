@@ -48,9 +48,11 @@ class MovementEffectTest {
 
         CardWeapon w = new CardWeapon(Direction.DOWN, map.getGrid()[0][0]);
         p1.setActualWeapon(w);
+        //p2.setActualWeapon(w);
         p3.setActualWeapon(w);
         p4.setActualWeapon(w);
         //when(w.getPreviousTargets()).thenReturn(new ArrayList<>());
+        //w.setPreviousTargets(new ArrayList<>());
 
         map.getGrid()[0][0].addPlayer(p1);
         map.getGrid()[1][1].addPlayer(p2);
@@ -67,8 +69,8 @@ class MovementEffectTest {
 
     @Test
     void selectMoved() {
-        effect = new MovementEffect(1,1,1,3,1,3,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
-        List<Target> targets = effect.selectMoved(game.getPlayers().get(3));
+        effect = new MovementEffect(1,1,1,3,1,3,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,DifferentTarget.ANYONE);
+        List<Target> targets = effect.searchTarget(game.getPlayers().get(3));
         //I expect p1, p2
         List<Target> expected = new ArrayList<>();
         expected.add(game.getPlayers().get(0));
@@ -81,9 +83,9 @@ class MovementEffectTest {
      */
     @Test
     void searchTarget() {
-        effect = new MovementEffect(1,1,1,3,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
-        List<Target> targets = effect.searchTarget(game.getPlayers().get(1));
-        List<Target> squareCheck = new ArrayList<>();
+        effect = new MovementEffect(1,1,1,3,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,DifferentTarget.ANYONE);
+        List<Square> targets = effect.selectPosition(game.getPlayers().get(1));
+        List<Square> squareCheck = new ArrayList<>();
         //squareCheck.add(game.getMap().getGrid()[1][0]);
         squareCheck.add(game.getMap().getGrid()[0][0]);
         squareCheck.add(game.getMap().getGrid()[0][1]);
@@ -96,9 +98,9 @@ class MovementEffectTest {
     @Test
     void searchTargetSameDirection() {
         //game.getCurrentTurn().setCurrentPlayer(game.getPlayers().get(0));
-        effect = new MovementEffect(1,1,1,2,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,true,false,DifferentTarget.ANYONE);
-        List<Target> targets = effect.searchTarget(game.getPlayers().get(0));
-        List<Target> squareCheck = new ArrayList<>();
+        effect = new MovementEffect(1,1,1,2,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,true,DifferentTarget.ANYONE);
+        List<Square> targets = effect.selectPosition(game.getPlayers().get(0));
+        List<Square> squareCheck = new ArrayList<>();
         squareCheck.add(game.getMap().getGrid()[1][0]);
         squareCheck.add(game.getMap().getGrid()[2][0]);
         assertTrue(squareCheck.containsAll(targets) && targets.containsAll(squareCheck));
@@ -110,9 +112,9 @@ class MovementEffectTest {
     @Test
     void searchTargetChainMove() {
         //game.getCurrentTurn().setCurrentPlayer(game.getPlayers().get(0));
-        effect = new MovementEffect(1,1,1,2,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,false,DifferentTarget.ANYONE);
-        List<Target> targets = effect.searchTarget(game.getPlayers().get(2));
-        List<Target> squareCheck = new ArrayList<>();
+        effect = new MovementEffect(1,1,1,2,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,true,false,false,DifferentTarget.ANYONE);
+        List<Square> targets = effect.selectPosition(game.getPlayers().get(2));
+        List<Square> squareCheck = new ArrayList<>();
         squareCheck.add(game.getMap().getGrid()[0][0]);
         assertTrue(squareCheck.containsAll(targets) && targets.containsAll(squareCheck));
     }
@@ -123,9 +125,9 @@ class MovementEffectTest {
     @Test
     void searchTargetVisibilityAfter() {
         //game.getCurrentTurn().setCurrentPlayer(game.getPlayers().get(0));
-        effect = new MovementEffect(1,1,1,4,1,4,TargetVisibility.VISIBLE,true,TargetVisibility.VISIBLE,false,false,false,false,false,DifferentTarget.ANYONE);
-        List<Target> targets = effect.searchTarget(game.getPlayers().get(1));
-        List<Target> squareCheck = new ArrayList<>();
+        effect = new MovementEffect(1,1,1,4,1,4,TargetVisibility.VISIBLE,true,TargetVisibility.VISIBLE,false,false,false,false,DifferentTarget.ANYONE);
+        List<Square> targets = effect.selectPosition(game.getPlayers().get(1));
+        List<Square> squareCheck = new ArrayList<>();
         squareCheck.add(game.getMap().getGrid()[1][0]);
         squareCheck.add(game.getMap().getGrid()[2][0]);
         assertTrue(squareCheck.containsAll(targets) && targets.containsAll(squareCheck));
@@ -136,7 +138,7 @@ class MovementEffectTest {
      */
     @Test
     void applyEffect() {
-        effect = new MovementEffect(1,1,1,3,1,3,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        effect = new MovementEffect(1,1,1,3,1,3,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,DifferentTarget.ANYONE);
         List<Target> target = new ArrayList<>();
         target.add(game.getMap().getGrid()[0][0]);
         effect.applyEffect(game.getPlayers().get(1), target);
