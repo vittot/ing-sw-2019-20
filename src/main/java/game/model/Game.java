@@ -152,13 +152,13 @@ public class Game {
         Boolean plusBefore;
         Boolean plusOrder;
         List price = takePrice(weapon);
-        List priceal = takePriceAl(weapon);
-        List priceop = takePriceOpz(weapon);
+        List<Color> priceal = takePriceAl(weapon);
+        List<List<Color>> priceop = takePriceOpz(weapon);
         FullEffect effect = takeEffect(weapon);
         FullEffect effectal = takeEffectal(weapon);
         List effectop = takeEffectopz(weapon);
-        plusBefore = (weapon.getChild("plusBeforeBase").getText() == "true");
-        plusOrder = (weapon.getChild("plusOrdere").getText() == "true");
+        plusBefore = (weapon.getChild("plusBeforeBase").getText().equals("true"));
+        plusOrder = (weapon.getChild("plusOrdere").getText().equals("true"));
         insertDescription(effect, effectal, effectop, desc, names);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
         this.deckWeapon.add(wp);
@@ -285,9 +285,9 @@ public class Game {
      * @return
      */
     public DifferentTarget createDifferent (String vis){
-        if(vis == "Anyone") return DifferentTarget.ANYONE;
-        if(vis == "NoneOfThePrevious") return DifferentTarget.NONEOFTHEPREVIOUS;
-        if(vis == "NotTheLast") return DifferentTarget.NOTTHELAST;
+        if(vis.equals("Anyone")) return DifferentTarget.ANYONE;
+        if(vis.equals("NoneOfThePrevious")) return DifferentTarget.NONEOFTHEPREVIOUS;
+        if(vis.equals("NotTheLast")) return DifferentTarget.NOTTHELAST;
         return null;
     }
     /**
@@ -296,10 +296,10 @@ public class Game {
      * @return
      */
     public TargetVisibility createVisibility (String vis){
-        if(vis == "Visible") return TargetVisibility.VISIBLE;
-        if(vis == "Invisible") return TargetVisibility.INVISIBLE;
-        if(vis == "Direction") return TargetVisibility.DIRECTION;
-        if(vis == "Everywhere") return TargetVisibility.EVERYWHERE;
+        if(vis.equals("Visible")) return TargetVisibility.VISIBLE;
+        if(vis.equals("Invisible")) return TargetVisibility.INVISIBLE;
+        if(vis.equals("Direction")) return TargetVisibility.DIRECTION;
+        if(vis.equals("Everywhere")) return TargetVisibility.EVERYWHERE;
         return null;
     }
 
@@ -309,11 +309,11 @@ public class Game {
      * @return
      */
     public Color createEquivalentAmmo(String name){
-        if(name == "blue")
+        if(name.equals("blue"))
             return Color.BLUE;
-        if(name == "red")
+        if(name.equals("red"))
             return Color.RED;
-        if(name == "Yellow")
+        if(name.equals("Yellow"))
             return Color.YELLOW;
         return Color.ANY;
     }
@@ -329,11 +329,11 @@ public class Game {
         for(Element ef : weapon.getChildren("optionalEffect")) {
             for(Element efo : ef.getChildren()) {
                 try {
-                    if (efo.getName() == "areaDamageEffect") temp.addSimpleEffect(createEquivalentAreaEffect(ef));
-                    if (efo.getName() == "roomDamageEffect") temp.addSimpleEffect(createEquivalentRoomEffect(ef));
-                    if (efo.getName() == "plainDamage") temp.addSimpleEffect(createEquivalentPlainEffect(ef));
-                    if (efo.getName() == "movementEffect") temp.addSimpleEffect(createEquivalentMovementEffect(ef));
-                    if (efo.getName() == "squareDamageEffect") temp.addSimpleEffect(createEquivalentSquareEffect(ef));
+                    if (efo.getName().equals("areaDamageEffect")) temp.addSimpleEffect(createEquivalentAreaEffect(ef));
+                    if (efo.getName().equals("roomDamageEffect")) temp.addSimpleEffect(createEquivalentRoomEffect(ef));
+                    if (efo.getName().equals("plainDamage")) temp.addSimpleEffect(createEquivalentPlainEffect(ef));
+                    if (efo.getName().equals("movementEffect")) temp.addSimpleEffect(createEquivalentMovementEffect(ef));
+                    if (efo.getName().equals("squareDamageEffect")) temp.addSimpleEffect(createEquivalentSquareEffect(ef));
                 } catch (DataConversionException e) {
                     //TODO eccezione
                 }
@@ -353,11 +353,11 @@ public class Game {
         FullEffect effect = new FullEffect();
         for(Element ef : weapon.getChild("alternativeEffect").getChildren()) {
             try{
-                if (ef.getName() == "roomDamageEffect") effect.addSimpleEffect(createEquivalentRoomEffect(ef));
-                if (ef.getName() == "squareDamageEffect") effect.addSimpleEffect(createEquivalentSquareEffect(ef));
-                if (ef.getName() == "movementEffect") effect.addSimpleEffect(createEquivalentMovementEffect(ef));
-                if (ef.getName() == "plainDamage") effect.addSimpleEffect(createEquivalentPlainEffect(ef));
-                if (ef.getName() == "areaDamageEffect") effect.addSimpleEffect(createEquivalentAreaEffect(ef));
+                if (ef.getName().equals("roomDamageEffect")) effect.addSimpleEffect(createEquivalentRoomEffect(ef));
+                if (ef.getName().equals("squareDamageEffect")) effect.addSimpleEffect(createEquivalentSquareEffect(ef));
+                if (ef.getName().equals("movementEffect")) effect.addSimpleEffect(createEquivalentMovementEffect(ef));
+                if (ef.getName().equals("plainDamage")) effect.addSimpleEffect(createEquivalentPlainEffect(ef));
+                if (ef.getName().equals("areaDamageEffect")) effect.addSimpleEffect(createEquivalentAreaEffect(ef));
             }catch (DataConversionException e){
                 //TODO eccezione
             }
@@ -374,11 +374,11 @@ public class Game {
         FullEffect effect = new FullEffect();
         for(Element ef : weapon.getChild("baseEffect").getChildren()) {
             try{
-                if (ef.getName() == "plainDamage") effect.addSimpleEffect(createEquivalentPlainEffect(ef));
-                if (ef.getName() == "squareDamageEffect") effect.addSimpleEffect(createEquivalentSquareEffect(ef));
-                if (ef.getName() == "movementEffect") effect.addSimpleEffect(createEquivalentMovementEffect(ef));
-                if (ef.getName() == "areaDamageEffect") effect.addSimpleEffect(createEquivalentAreaEffect(ef));
-                if (ef.getName() == "roomDamageEffect") effect.addSimpleEffect(createEquivalentRoomEffect(ef));
+                if (ef.getName().equals("plainDamage")) effect.addSimpleEffect(createEquivalentPlainEffect(ef));
+                if (ef.getName().equals("squareDamageEffect")) effect.addSimpleEffect(createEquivalentSquareEffect(ef));
+                if (ef.getName().equals("movementEffect")) effect.addSimpleEffect(createEquivalentMovementEffect(ef));
+                if (ef.getName().equals("areaDamageEffect")) effect.addSimpleEffect(createEquivalentAreaEffect(ef));
+                if (ef.getName().equals("roomDamageEffect")) effect.addSimpleEffect(createEquivalentRoomEffect(ef));
             }catch (DataConversionException e){
                 //TODO eccezione
             }

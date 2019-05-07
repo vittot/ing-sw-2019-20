@@ -254,7 +254,7 @@ public class ServerController implements ClientMessageHandler {
             return new InvalidWeaponResponse();
         try{
             w.reloadWeapon(clientMsg.powerups);
-            return new OperationCompletedResponse(clientMsg);
+            return new CheckReloadResponse(clientMsg.weapon, clientMsg.powerups);
         }catch(InsufficientAmmoException e)
         {
             return new InsufficientAmmoResponse();

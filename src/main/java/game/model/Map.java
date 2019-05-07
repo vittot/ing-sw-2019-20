@@ -23,6 +23,10 @@ public class Map implements Serializable {
         return description;
     }
 
+    public Player getPlayerById(int id){
+        return this.getAllSquares().stream().flatMap(s -> s.getPlayers().stream()).filter(p -> p.getId()==id).findFirst().orElse(null);
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }

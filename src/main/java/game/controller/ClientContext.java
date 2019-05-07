@@ -1,9 +1,8 @@
 package game.controller;
 
 import game.model.Kill;
-import game.model.Map;
-
 import java.util.List;
+import game.model.Map;
 
 /**
  * Model portion for the Client

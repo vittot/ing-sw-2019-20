@@ -4,12 +4,16 @@ import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.servercommands.*;
 import game.model.CardWeapon;
 import game.model.Player;
+import game.model.Kill;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardAmmoAvailableException;
+import game.model.Action;
+import game.model.exceptions.NoCardWeaponSpaceException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 public class ClientController implements ServerMessageHandler {
     // reference to networking layer
@@ -57,12 +61,19 @@ public class ClientController implements ServerMessageHandler {
                 }
             }
         }
-
+        return;
     }
 
     @Override
     public void handle(ChooseSingleActionRequest serverMsg) {
-
+        List<Action> possibleAction = new ArrayList<>();
+        for(Action ac : serverMsg.actions ){
+            if(!possibleAction.contains(ac))
+                possibleAction.add(ac);
+        }
+        //TODO view methods choose step action
+        //chooseStepAction(possibleAction)
+        return;
     }
 
     @Override
@@ -73,21 +84,20 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(ChooseTargetRequest serverMsg) {
+        //TODO call view mwthods
         return;
-
     }
 
     @Override
     public void handle(ChooseTurnActionRequest serverMsg) {
         // TODO view method to permit the player to choose the TurnAction he wants to perform
         return;
-
     }
 
     @Override
     public void handle(InvalidTargetResponse serverMsg) {
+        //TODO call view methods
         return;
-
     }
 
     @Override
@@ -109,6 +119,9 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(NotifyDeathResponse serverMsg) {
+        ClientContext instance = ClientContext.get();
+        instance.getKillboard().add(serverMsg.kill);
+        //TODO Update death view methods(kill)
         return;
 
     }
@@ -121,8 +134,15 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(NotifyGrabResponse serverMsg) {
+        ClientContext instance = ClientContext.get();
+        try {
+            instance.getMap().getSquare(serverMsg.x,serverMsg.y).setCardAmmo(null);
+            instance.getMap().getSquare(serverMsg.x,serverMsg.y).getWeapons().remove(serverMsg.cw);
+        } catch (MapOutOfLimitException e) {
+            //TODO exc
+        }
+        //TODO view methods notify grab ammo/weapon
         return;
-
     }
 
     @Override
@@ -138,7 +158,12 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(NotifyPowerUpUsageResponse serverMsg) {
-
+        ClientContext instance = ClientContext.get();
+        if(instance.getMyId() == serverMsg.id){
+            instance.getMap().getPlayerById(serverMsg.id).getCardPower().remove(serverMsg.cp);
+            //TODO (Myplayer, cardpower)
+        }
+        //TODO (Player, cardPower)
         return;
     }
 
@@ -155,8 +180,15 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(PickUpWeaponResponse serverMsg) {
+        try {
+            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyId()).pickUpWeapon(serverMsg.cw,serverMsg.cwToWaste,serverMsg.cp);
+        } catch (InsufficientAmmoException e) {
+            //TODO call view
+        } catch (NoCardWeaponSpaceException e) {
+            //tOdO call view
+        }
+        //TODO call view methods
         return;
-
     }
 
     @Override
@@ -168,6 +200,7 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(InsufficientAmmoResponse serverMsg) {
+        //TODO view methods
         return;
 
     }
@@ -176,5 +209,11 @@ public class ClientController implements ServerMessageHandler {
     public void handle(OperationCompletedResponse serverMsg) {
         return;
 
+    }
+
+    @Override
+    public void handle (AfterDamagePowerUpRequest serverMsg){
+        //TODO richiesta powerUp
+        return;
     }
 }

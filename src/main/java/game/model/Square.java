@@ -332,6 +332,7 @@ public class Square implements Target, Serializable {
         players.remove(player);
     }
 
+
     /*
     public List<List<Target>> getSquaresInRange(int minDist, int maxDist){
         List<List<Target>> result=new ArrayList<>();
