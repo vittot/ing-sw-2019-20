@@ -108,10 +108,35 @@ public class ClientController implements ServerMessageHandler {
     }
 
     @Override
+    public void handle(InvalidActionResponse serverMsg) {
+
+    }
+
+    @Override
+    public void handle(InvalidNumberOfActionResponse serverMsg) {
+
+    }
+
+    @Override
+    public void handle(InvalidStepResponse serverMsg) {
+
+    }
+
+    @Override
+    public void handle(MaxNumberOfWeaponsResponse serverMsg) {
+
+    }
+
+    @Override
+    public void handle(InvalidDeathResponse serverMsg) {
+
+    }
+
+    @Override
     public void handle(NotifyDamageResponse serverMsg) {
         for(Player p : serverMsg.hit) {
-            ClientContext.get().getMap().getPlayersById(serverMsg.hit.getId()).addDamage(serverMsg.shooter, serverMsg.damage);
-            ClientContext.get().getMap().getPlayersById(serverMsg.hit.getId()).adThisTurnMarks(serverMsg.shooter, serverMsg.marks);
+            ClientContext.get().getMap().getPlayerById(p.getId()).addDamage(serverMsg.shooter, serverMsg.damage);
+            ClientContext.get().getMap().getPlayerById(p.getId()).addThisTurnMarks(serverMsg.shooter, serverMsg.marks);
         }
         return;
 
@@ -159,7 +184,7 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyPowerUpUsageResponse serverMsg) {
         ClientContext instance = ClientContext.get();
-        if(instance.getMyId() == serverMsg.id){
+        if(instance.getMyID() == serverMsg.id){
             instance.getMap().getPlayerById(serverMsg.id).getCardPower().remove(serverMsg.cp);
             //TODO (Myplayer, cardpower)
         }
@@ -170,7 +195,7 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(PickUpAmmoResponse serverMsg) {
         try {
-            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID().pickUpAmmo());
+            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).pickUpAmmo();
         }
         catch(NoCardAmmoAvailableException e){
 
@@ -181,7 +206,7 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(PickUpWeaponResponse serverMsg) {
         try {
-            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyId()).pickUpWeapon(serverMsg.cw,serverMsg.cwToWaste,serverMsg.cp);
+            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).pickUpWeapon(serverMsg.cw,serverMsg.cwToWaste,serverMsg.cp);
         } catch (InsufficientAmmoException e) {
             //TODO call view
         } catch (NoCardWeaponSpaceException e) {
@@ -208,6 +233,16 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(OperationCompletedResponse serverMsg) {
         return;
+
+    }
+
+    @Override
+    public void handle(InvalidPowerUpResponse serverMsg) {
+
+    }
+
+    @Override
+    public void handle(InvalidGrabPositionRsponse serverMsg) {
 
     }
 
