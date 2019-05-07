@@ -156,6 +156,7 @@ public class CardWeapon implements Serializable {
         List<CardPower> tmpPUPaid = new ArrayList<>();
         List<Color> tmp = new ArrayList<>(price);
         List<Color> tmpAmmoPaid = new ArrayList<>();
+        CardPower toRemove;
         if(loaded)
             return;
 
@@ -172,7 +173,7 @@ public class CardWeapon implements Serializable {
             for (int i = 0 ; i < tmpAmmoPaid.size(); i++)
                 shooter.getAmmo().remove(tmpAmmoPaid.get(i));
             for (int i = 0 ; i < tmpPUPaid.size(); i++)
-                shooter.getCardPower().remove(tmpAmmoPaid.get(i));
+                shooter.getCardPower().remove(tmpPUPaid.get(i));
         }
         if(!tmp.isEmpty())
             throw new InsufficientAmmoException();
