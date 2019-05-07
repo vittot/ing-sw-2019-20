@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -109,6 +110,14 @@ class SquareDamageEffectTest {
         assertTrue(expTargets.containsAll(targets) && targets.containsAll(expTargets));
     }
 
-
+    /**
+     * Apply damage to a square and so to a specific range of players in it
+     */
+    @Test
+    void applyDamage() throws MapOutOfLimitException {
+        effect = new SquareDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,3,1,true,true);
+        effect.applyEffect(game.getPlayer(4), Collections.singletonList(game.getMap().getSquare(0,0)));
+        assertTrue(game.getMap().getSquare(0,0).getPlayers().stream().filter(p -> p.getDamage().size()==3 && p.getThisTurnMarks().size() == 1).count()==2);
+    }
 
 }

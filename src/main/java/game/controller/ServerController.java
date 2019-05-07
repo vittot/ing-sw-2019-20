@@ -144,7 +144,7 @@ public class ServerController implements ClientMessageHandler {
             return new InvalidStepResponse();
         if(!currPlayer.getPosition().getWeapons().contains(clientMsg.weapon))
             return new InvalidWeaponResponse();
-        if(!currPlayer.getCardPower().contains(clientMsg.powerup))
+        if(!currPlayer.getCardPower().containsAll(clientMsg.powerup))
             return new InvalidPowerUpResponse();
         try {
             currPlayer.pickUpWeapon(clientMsg.weapon, clientMsg.weaponToWaste, clientMsg.powerup);
@@ -168,7 +168,7 @@ public class ServerController implements ClientMessageHandler {
     @Override
     public ServerMessage handle(ReloadWeaponRequest clientMsg) {
         CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.weapon.getId()).findFirst().orElse(null);
-        if(!currPlayer.getCardPower().contains(clientMsg.powerups))
+        if(!currPlayer.getCardPower().containsAll(clientMsg.powerups))
             return new InvalidPowerUpResponse();
         if( w == null)
             return new InvalidWeaponResponse();
