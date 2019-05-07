@@ -25,7 +25,7 @@ public class Player implements Target, Serializable {
     private List<Color> ammo;
     private transient List<CardPower> cardPower;
     private int deaths;
-    private int points;
+    private transient int points;
     private Square position;
     private transient Game game;
     private boolean isDead;
@@ -444,6 +444,7 @@ public class Player implements Target, Serializable {
             //The cast to Serializable is necessary to avoid Sonar bug issues because List does not implement Serializable but all implementations of List (such as ArrayList) in effect implements Serializable
             oos.writeObject((Serializable)cardPower);
             oos.writeObject((Serializable)weapons);
+            oos.writeInt(points);
         }
     }
 
@@ -458,6 +459,7 @@ public class Player implements Target, Serializable {
         {
             cardPower = (List<CardPower>)ois.readObject();
             weapons = (List<CardWeapon>)ois.readObject();
+            points = ois.readInt();
         }
     }
 

@@ -14,6 +14,8 @@ import java.util.Collections;
 import game.model.exceptions.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ServerController implements ClientMessageHandler {
     // reference to the Networking layer
@@ -27,12 +29,15 @@ public class ServerController implements ClientMessageHandler {
     private FullEffect baseAltEffect;
     private FullEffect currFullEffect;
     private SimpleEffect currSimpleEffect;
+    private Player toBeMoved;
     private boolean baseDone;
     private int nSimpleEffect; //the number of the current simpleEffect of the current FullEffect
     private List<Target> selectableTarget;
+    private List<Square> selectableSquares;
 
 
     public ServerController(SocketClientHandler clientHandler) {
+
         this.clientHandler = clientHandler;
     }
 
@@ -56,38 +61,111 @@ public class ServerController implements ClientMessageHandler {
 
     @Override
     public ServerMessage handle(ChooseSquareResponse clientMsg) {
-        return null;
+        Square selectedSquare = clientMsg.selectedSquare;
+        if(!selectableSquares.contains(selectedSquare))
+            return new InvalidTargetResponse();
+
+        currSimpleEffect.applyEffect(toBeMoved,Collections.singletonList(selectedSquare));
+        if(currFullEffect != null)
+            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+
+        return new OperationCompletedResponse();
+
     }
 
+    /**
+     * Validate the selected target for an effect and apply it, or ask for the movement position if it's a MovementEffect
+     * @param clientMsg
+     * @return
+     */
     @Override
     public ServerMessage handle(ChooseTargetResponse clientMsg)
     {
         List<Target> selectedTarget = clientMsg.selectedTargets;
-        if(selectedTarget.size() > currFullEffect.getSimpleEffect(nSimpleEffect).getMaxEnemy())
-            return new InvalidTargetResponse();
         if(!selectableTarget.containsAll(selectedTarget))
             return new InvalidTargetResponse();
 
-        currSimpleEffect.applyEffect(currPlayer,selectedTarget);
-        if(currFullEffect != null)
-            return handleEffect();
+        if(!validateSelectedTargets(selectedTarget,currSimpleEffect))
+            return new InvalidTargetResponse();
 
-        return new OperationCompletedResponse();
+        //in case no target has been selected (and it's allowed) it stops
+        if(selectedTarget.isEmpty())
+            return new OperationCompletedResponse();
 
+        return handleTargetSelection(selectedTarget,currSimpleEffect);
     }
 
+    /**
+     * Validate the client target selection for a generic simpleEffect, checking the maxEnemy - minEnemy constraint
+     * @param selectedTarget
+     * @param e
+     * @return
+     */
+    private boolean validateSelectedTargets(List<Target> selectedTarget, SimpleEffect e)
+    {
+        if(selectedTarget.size() > e.getMaxEnemy() || (selectedTarget.size() < e.getMinEnemy() && selectableTarget.size() >= e.getMinEnemy()))
+            return false;
+        return true;
+    }
+
+    /**
+     * Validate the client target selection for an AreaDamageEffect
+     * @param selectedTarget
+     * @param e
+     * @return true if the selection is correct, false otherwise
+     */
+    private boolean validateSelectedTargets(List<Target> selectedTarget, AreaDamageEffect e)
+    {
+        if(selectedTarget.size() > e.getMaxEnemy() || (selectedTarget.size() < e.getMinEnemy() && selectableTarget.size() >= e.getMinEnemy()))
+            return false;
+
+        //Check maxEnemyPerSquare constraint
+        List<Player> selectedPlayer = selectedTarget.stream().map( t-> (Player)t).collect(Collectors.toList());
+        Map<Square, List<Player>> targetPerSquare = selectedPlayer.stream().collect(Collectors.groupingBy(Player::getPosition));
+        for(List<Player> l : targetPerSquare.values())
+            if(l.size() > e.getMaxEnemyPerSquare())
+                return false;
+
+        return true;
+    }
+
+    /**
+     * Apply a simpleEffect and manage the next simple effect, if there is any
+     * @param selectedTarget
+     * @param s
+     * @return
+     */
     private ServerMessage handleTargetSelection(List<Target> selectedTarget, SimpleEffect s)
     {
         s.applyEffect(currPlayer,selectedTarget);
+        if(currFullEffect != null)
+            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
         return new OperationCompletedResponse();
     }
 
-
+    /**
+     * Ask for the position selection for a MovementEffect, if necessary, otherwise it applies the effect and proceed to the next simple effect, if there is any
+     * @param selectedTarget
+     * @param s
+     * @return
+     */
     private ServerMessage handleTargetSelection(List<Target> selectedTarget, MovementEffect s)
     {
-        s.applyEffect(currPlayer,selectedTarget);
-        List<Square> possiblePosition = s.selectPosition(currPlayer);
-        return new ChooseSquareRequest(possiblePosition);
+        toBeMoved = (Player)selectedTarget.get(0);
+        List<Square> selectableSquares = s.selectPosition(currPlayer);
+
+        if(selectableSquares.isEmpty())
+            return new InvalidWeaponResponse();
+        if(selectableSquares.size() > 1)
+            return new ChooseSquareRequest(selectableSquares);
+
+        //apply without asking nothing if it is not necessary
+        s.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
+        if(currFullEffect != null)
+            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+
+        return new OperationCompletedResponse();
+
     }
 
     @Override
@@ -242,7 +320,7 @@ public class ServerController implements ClientMessageHandler {
         if(clientMsg.plusBeforeBase)
         {
             baseDone = false;
-            currFullEffect = selectedPlusEffects.stream().filter(e -> e.isBeforeBase()).findFirst().orElse(null);
+            currFullEffect = selectedPlusEffects.stream().filter(FullEffect::isBeforeBase).findFirst().orElse(null);
             selectedPlusEffects.remove(currFullEffect);
         }
         else
@@ -251,21 +329,22 @@ public class ServerController implements ClientMessageHandler {
             currFullEffect = baseAltEffect;
 
         }
-        return handleEffect();
+        return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
 
 
     }
 
     /**
-     * Ask the user for the targets of the next simpleEffect in the currentEffect, if there is the need of a choice
+     * Ask the user for the targets of the next simpleEffect, if there is the need of a choice
      * If the choice is not needed, it passes to the next simpleEffect
      * When simpleEffects are terminated it passes to the next FullEffect
      * When fullEffects are terminated it return a confirm message
+     * It's overloaded for MovementEffect
      * @return
      */
-    private ServerMessage handleEffect()
+    private ServerMessage handleEffect(SimpleEffect e)
     {
-        currSimpleEffect = currFullEffect.getSimpleEffects().get(nSimpleEffect);
+        currSimpleEffect = e;
         if(nSimpleEffect == currFullEffect.getSimpleEffects().size() - 1)
         {
             nSimpleEffect=0;
@@ -273,18 +352,68 @@ public class ServerController implements ClientMessageHandler {
         }
         else
             nSimpleEffect++;
-        selectableTarget = currSimpleEffect.searchTarget(currPlayer);
-        if(selectableTarget.size() > currSimpleEffect.getMaxEnemy() || (currSimpleEffect.getMinEnemy() < currSimpleEffect.getMaxEnemy() && selectableTarget.size() > currSimpleEffect.getMinEnemy()))
+        selectableTarget = e.searchTarget(currPlayer);
+        if(selectableTarget.isEmpty())
+            return new InvalidWeaponResponse();
+
+        if(selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
             return new ChooseTargetRequest(selectableTarget);
 
-        //apply without ask
-        currSimpleEffect.applyEffect(currPlayer,selectableTarget);
+        //apply without asking nothing if it is not necessary
+        e.applyEffect(currPlayer,selectableTarget);
         if(currFullEffect != null)
-            return handleEffect();
+            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
 
         return new OperationCompletedResponse();
 
     }
+
+    /**
+     * Ask the user for the targets of the next MovementEffect, if there is the need of a choice
+     * If the choice is not needed, it asks for the square where the target has to be moved, if it is needed
+     * If no choice is needed it passes to the next SingleEffect
+     * When simpleEffects are terminated it passes to the next FullEffect
+     * When fullEffects are terminated it return a confirm message
+     * @return
+     */
+    private ServerMessage handleEffect(MovementEffect e)
+    {
+        currSimpleEffect = e;
+        if(nSimpleEffect == currFullEffect.getSimpleEffects().size() - 1)
+        {
+            nSimpleEffect=0;
+            setNextFullEffect();
+        }
+        else
+            nSimpleEffect++;
+
+        if(!e.isMoveShooter())
+        {
+            selectableTarget = e.searchTarget(currPlayer);
+            if(selectableTarget.isEmpty())
+                return new InvalidWeaponResponse();
+            if(selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
+                return new ChooseTargetRequest(selectableTarget);
+        }
+        else{
+            selectableTarget = Collections.singletonList(currPlayer);
+        }
+
+        selectableSquares = e.selectPosition(currPlayer);
+        if(selectableSquares.isEmpty())
+            return new InvalidWeaponResponse();
+        if(selectableSquares.size() > 1)
+            return new ChooseSquareRequest(selectableSquares);
+
+        //apply without asking nothing if it is not necessary
+        e.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
+        if(currFullEffect != null)
+            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+
+        return new OperationCompletedResponse();
+
+    }
+
 
     /**
      * Sets the next FullEffect in the list of requested effects, when they are finished it becomes null

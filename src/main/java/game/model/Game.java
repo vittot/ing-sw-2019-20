@@ -1,14 +1,14 @@
 package game.model;
 
 
+import java.beans.Visibility;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import game.model.effects.*;
+import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 
 import java.util.*;
@@ -47,6 +47,388 @@ public class Game {
         generateDecks("loadingGame.txt");
         currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
+    }
+    public Game(List<Player> players, int id,int killBoardSize) {
+        this.players = players;
+        this.map = map;
+        this.killboardSize = killBoardSize;
+        this.killBoard = new ArrayList<>(killBoardSize);
+        generateDecks("loadingGame.txt");
+        currentTurn = new Turn(this.players.get(0),this);
+        players.stream().forEach(p -> p.setGame(this));
+        readDeck("effectFile.xml");
+        readMap(id, "mapFile.xml");
+    }
+
+
+    public Map readMap(int id,String fileName){
+        Map map = new Map(id,4,3);
+        Square [][] grid = new Square[4][3];
+        int x = 0;
+        int y = 0;
+        Edge [] edges = new Edge[4];
+        int k = 0;
+        SAXBuilder builder = new SAXBuilder();
+        Document document = null;
+        try
+        {
+            document = builder.build(fileName);
+            Element root = document.getRootElement();
+            for (Element tmpMap : root.getChildren("map")){
+                if(tmpMap.getAttribute("id").getIntValue() == id){
+                    map.setDescription(tmpMap.getChildText("desc"));
+                    for(Element sq : tmpMap.getChildren("square")){
+                        grid[x][y].setColor(createEquivalentMapColor(sq.getChildText("color")));
+                        for(Element edg : sq.getChildren("edge")){
+                            edges[k] = createEquivalentEdge(edg.getText());
+                        }
+                        k = 0;
+                        grid[x][y].setEdges(edges);
+                        grid[x][y].setRespawn(sq.getChildText("respown").equals("true"));
+                        if(x == 3){
+                            x = 0;
+                            y++;
+                        }else{
+                            x++;
+                        }
+                    }
+
+                }
+            }
+
+
+        } catch (JDOMException e1) {
+            //TODO ecce
+        } catch (IOException e1) {
+            //TODO ecc
+        }
+        return map;
+    }
+
+    public Edge createEquivalentEdge (String name){
+        if(name.equals("door")) return Edge.DOOR;
+        if(name.equals("open")) return Edge.OPEN;
+        if(name.equals("wall")) return Edge.WALL;
+        return null;
+    }
+
+    public MapColor createEquivalentMapColor (String name){
+        if(name.equals("blue")) return MapColor.BLUE;
+        if(name.equals("grey")) return MapColor.GREY;
+        if(name.equals("purple")) return MapColor.PURPLE;
+        if(name.equals("red")) return MapColor.RED;
+        if(name.equals("yellow")) return MapColor.YELLOW;
+        return null;
+    }
+    /**
+     * read from xml and call the methods to build a weapon deck
+     * @param fileName
+     * @return
+     */
+    public boolean readDeck(String fileName){
+        SAXBuilder builder = new SAXBuilder();
+        Document document = null;
+        try
+        {
+            document = builder.build(fileName);
+            Element root = document.getRootElement();
+            for (Element weapon : root.getChildren("weapon")) addWeapon(weapon);
+        } catch (JDOMException e1) {
+            //TODO ecce
+        } catch (IOException e1) {
+            //TODO ecc
+        }
+        return true;
+    }
+
+    /**
+     * Get a Element weapon and build it
+     * @param weapon
+     */
+    public void addWeapon(Element weapon){
+        String name = weapon.getChild("name").getText();
+        List desc = takeDescription(weapon);
+        List names = takeNameEffect(weapon);
+        Boolean plusBefore;
+        Boolean plusOrder;
+        List price = takePrice(weapon);
+        List priceal = takePriceAl(weapon);
+        List priceop = takePriceOpz(weapon);
+        FullEffect effect = takeEffect(weapon);
+        FullEffect effectal = takeEffectal(weapon);
+        List effectop = takeEffectopz(weapon);
+        plusBefore = (weapon.getChild("plusBeforeBase").getText() == "true");
+        plusOrder = (weapon.getChild("plusOrdere").getText() == "true");
+        insertDescription(effect, effectal, effectop, desc, names);
+        CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
+        this.deckWeapon.add(wp);
+    }
+    public void insertDescription (FullEffect ef,FullEffect aef,List<FullEffect> oef, List<String> desc, List<String> name){
+        ef.setName(name.get(0));
+        ef.setDescription(desc.get(0));
+        int i = 1;
+        if(aef != null){
+            aef.setName(name.get(i));
+            aef.setDescription(desc.get(i));
+            i++;
+        }
+        for(FullEffect fe : oef){
+            fe.setDescription(desc.get(i));
+            fe.setName(name.get(i));
+            i++;
+        }
+    }
+
+    /**
+     * create movement effect from xml element
+     * @param effect
+     * @return
+     * @throws DataConversionException
+     */
+    public SimpleEffect createEquivalentMovementEffect (Element effect) throws DataConversionException {
+        int mine = effect.getAttribute("minEnemy").getIntValue();
+        int maxd = effect.getAttribute("maxDist").getIntValue();
+        int maxe = effect.getAttribute("maxEnemy").getIntValue();
+        int mind = effect.getAttribute("minDist").getIntValue();
+        int minm = effect.getAttribute("minMove").getIntValue();
+        int maxm = effect.getAttribute("maxMove").getIntValue();
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        boolean moves = (effect.getChildText("moveShooter").equals("true"));
+        TargetVisibility after = createVisibility(effect.getChild("targetVisibAfter").getText());
+        boolean mypos= (effect.getChildText("myPos").equals("true"));
+        boolean chain = (effect.getChildText("chainTarget").equals("true"));
+        boolean last = (effect.getChildText("lastTargetSquare").equals("true"));
+        boolean same = (effect.getChildText("sameDirection").equals("true"));
+        DifferentTarget diff = createDifferent(effect.getChild("differentTarget").getText());
+        SimpleEffect move = new MovementEffect(mine,maxe,mind,maxd,minm,maxm,visib,moves,after,mypos,chain,last,same,diff);
+        return move;
+    }
+    /**
+     * create plainDamageEffect from xml element
+     * @param effect
+     * @return
+     * @throws DataConversionException
+     */
+    public SimpleEffect createEquivalentPlainEffect (Element effect) throws DataConversionException {
+        int mine = effect.getAttribute("minEnemy").getIntValue();
+        int mind = effect.getAttribute("minDist").getIntValue();
+        int dam = effect.getAttribute("damage").getIntValue();
+        int maxd = effect.getAttribute("maxDist").getIntValue();
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        int maxe = effect.getAttribute("maxEnemy").getIntValue();
+        boolean last = (effect.getChildText("lastTargetSquare").equals("true"));
+        int marks = effect.getAttribute("marks").getIntValue();
+        DifferentTarget diff = createDifferent(effect.getChild("differentTarget").getText());
+        boolean chain = (effect.getChildText("chainTarget").equals("true"));
+        boolean same = (effect.getChildText("sameDirection").equals("true"));
+        SimpleEffect plain = new PlainDamageEffect(mine,maxe,mind,maxd,visib,dam,marks,last,diff,chain,same);
+        return plain;
+    }
+    /**
+     * create squareDamageEffect from xml element
+     * @param effect
+     * @return
+     * @throws DataConversionException
+     */
+    public SimpleEffect createEquivalentSquareEffect (Element effect) throws DataConversionException {
+        int mine = effect.getAttribute("minEnemy").getIntValue();
+        int marks = effect.getAttribute("marks").getIntValue();
+        int maxe = effect.getAttribute("maxEnemy").getIntValue();
+        int maxd = effect.getAttribute("maxDist").getIntValue();
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        int mind = effect.getAttribute("minDist").getIntValue();
+        int dam = effect.getAttribute("damage").getIntValue();
+        boolean last = (effect.getChildText("lastTargetSquare").equals("true"));
+        boolean same = (effect.getChildText("sameDirection").equals("true"));
+        SimpleEffect square = new SquareDamageEffect(mine,maxe,mind,maxd,visib,dam,marks,last,same);
+        return square;
+    }
+    /**
+     * create roomDamageEffect from xml element
+     * @param effect
+     * @return
+     * @throws DataConversionException
+     */
+    public SimpleEffect createEquivalentRoomEffect (Element effect) throws DataConversionException {
+        int maxd = effect.getAttribute("maxDist").getIntValue();
+        int maxe = effect.getAttribute("maxEnemy").getIntValue();
+        int mind = effect.getAttribute("minDist").getIntValue();
+        int mine = effect.getAttribute("minEnemy").getIntValue();
+        int marks = effect.getAttribute("marks").getIntValue();
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        int dam = effect.getAttribute("damage").getIntValue();
+        SimpleEffect room = new RoomDamageEffect(mine,maxe,mind,maxd,visib,dam,marks);
+        return room;
+    }
+    /**
+     * create areaDamageEffect from xml element
+     * @param effect
+     * @return
+     * @throws DataConversionException
+     */
+    public SimpleEffect createEquivalentAreaEffect (Element effect) throws DataConversionException {
+        int mine = effect.getAttribute("minEnemy").getIntValue();
+        int maxe = effect.getAttribute("maxEnemy").getIntValue();
+        int mind = effect.getAttribute("minDist").getIntValue();
+        int maxd = effect.getAttribute("maxDist").getIntValue();
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        int dam = effect.getAttribute("damage").getIntValue();
+        int marks = effect.getAttribute("marks").getIntValue();
+        int perSquare = effect.getAttribute("maxEnemyPerSquare").getIntValue();
+        SimpleEffect area = new AreaDamageEffect(mine,maxe,mind,maxd,visib,dam,marks,perSquare);
+        return area;
+    }
+
+    /**
+     * create a DifferentTarget enum from a string
+     * @param vis
+     * @return
+     */
+    public DifferentTarget createDifferent (String vis){
+        if(vis == "Anyone") return DifferentTarget.ANYONE;
+        if(vis == "NoneOfThePrevious") return DifferentTarget.NONEOFTHEPREVIOUS;
+        if(vis == "NotTheLast") return DifferentTarget.NOTTHELAST;
+        return null;
+    }
+    /**
+     * create a TargetVisibility enum from a string
+     * @param vis
+     * @return
+     */
+    public TargetVisibility createVisibility (String vis){
+        if(vis == "Visible") return TargetVisibility.VISIBLE;
+        if(vis == "Invisible") return TargetVisibility.INVISIBLE;
+        if(vis == "Direction") return TargetVisibility.DIRECTION;
+        if(vis == "Everywhere") return TargetVisibility.EVERYWHERE;
+        return null;
+    }
+
+    /**
+     * create a AmmoColor from a string
+     * @param name
+     * @return
+     */
+    public Color createEquivalentAmmo(String name){
+        if(name == "blue")
+            return Color.BLUE;
+        if(name == "red")
+            return Color.RED;
+        if(name == "Yellow")
+            return Color.YELLOW;
+        return Color.ANY;
+    }
+
+    /**
+     * Create all the optional effect of a weapon
+     * @param weapon
+     * @return
+     */
+    public List<FullEffect> takeEffectopz(Element weapon){
+        List<FullEffect> effect = new ArrayList<FullEffect>();
+        FullEffect temp = new FullEffect();
+        for(Element ef : weapon.getChildren("optionalEffect")) {
+            for(Element efo : ef.getChildren()) {
+                try {
+                    if (efo.getName() == "areaDamageEffect") temp.addSimpleEffect(createEquivalentAreaEffect(ef));
+                    if (efo.getName() == "roomDamageEffect") temp.addSimpleEffect(createEquivalentRoomEffect(ef));
+                    if (efo.getName() == "plainDamage") temp.addSimpleEffect(createEquivalentPlainEffect(ef));
+                    if (efo.getName() == "movementEffect") temp.addSimpleEffect(createEquivalentMovementEffect(ef));
+                    if (efo.getName() == "squareDamageEffect") temp.addSimpleEffect(createEquivalentSquareEffect(ef));
+                } catch (DataConversionException e) {
+                    //TODO eccezione
+                }
+            }
+            int i = 0;
+            effect.add(temp);
+        }
+        return effect;
+    }
+
+    /**
+     * Create all the alternative effect of a weapon
+     * @param weapon
+     * @return
+     */
+    public FullEffect takeEffectal(Element weapon){
+        FullEffect effect = new FullEffect();
+        for(Element ef : weapon.getChild("alternativeEffect").getChildren()) {
+            try{
+                if (ef.getName() == "roomDamageEffect") effect.addSimpleEffect(createEquivalentRoomEffect(ef));
+                if (ef.getName() == "squareDamageEffect") effect.addSimpleEffect(createEquivalentSquareEffect(ef));
+                if (ef.getName() == "movementEffect") effect.addSimpleEffect(createEquivalentMovementEffect(ef));
+                if (ef.getName() == "plainDamage") effect.addSimpleEffect(createEquivalentPlainEffect(ef));
+                if (ef.getName() == "areaDamageEffect") effect.addSimpleEffect(createEquivalentAreaEffect(ef));
+            }catch (DataConversionException e){
+                //TODO eccezione
+            }
+        }
+        return effect;
+    }
+
+    /**
+     * Create all the base effect of a weapon
+     * @param weapon
+     * @return
+     */
+    public FullEffect takeEffect(Element weapon){
+        FullEffect effect = new FullEffect();
+        for(Element ef : weapon.getChild("baseEffect").getChildren()) {
+            try{
+                if (ef.getName() == "plainDamage") effect.addSimpleEffect(createEquivalentPlainEffect(ef));
+                if (ef.getName() == "squareDamageEffect") effect.addSimpleEffect(createEquivalentSquareEffect(ef));
+                if (ef.getName() == "movementEffect") effect.addSimpleEffect(createEquivalentMovementEffect(ef));
+                if (ef.getName() == "areaDamageEffect") effect.addSimpleEffect(createEquivalentAreaEffect(ef));
+                if (ef.getName() == "roomDamageEffect") effect.addSimpleEffect(createEquivalentRoomEffect(ef));
+            }catch (DataConversionException e){
+                //TODO eccezione
+            }
+        }
+        return effect;
+    }
+    public List<List<Color>> takePriceOpz(Element weapon){
+        List<List<Color>> pricetot = new ArrayList<List<Color>>();
+        List<Color> price = new ArrayList<Color>();
+        for(int i = 0; i < weapon.getChildren("optionalPrice").size() ; i ++){
+            for (Element pr : weapon.getChildren("optionalPrice").get(i).getChildren("ammo")){
+                price.add(createEquivalentAmmo(pr.getText()));
+            }
+            pricetot.add(price);
+        }
+        return pricetot;
+    }
+    public List<Color> takePrice(Element weapon){
+        List price = new ArrayList<Color>();
+        for (Element pr : weapon.getChild("price").getChildren("ammo")){
+            price.add(createEquivalentAmmo(pr.getText()));
+        }
+        return price;
+    }
+    public List<Color> takePriceAl(Element weapon){
+        List price = new ArrayList<Color>();
+        for (Element pr : weapon.getChild("alternativePrice").getChildren("ammo")){
+            price.add(createEquivalentAmmo(pr.getText()));
+        }
+        return price;
+    }
+
+    /**
+     * read a weapon description
+     * @param weapon
+     * @return
+     */
+    public List<String> takeDescription(Element weapon){
+        List desc = new ArrayList<String>();
+        for (Element ds : weapon.getChildren("effectDescription")){
+            desc.add(ds.getText());
+        }
+        return desc;
+    }
+    public List<String> takeNameEffect(Element weapon){
+        List eff = new ArrayList<String>();
+        for (Element ds : weapon.getChildren("effectDescription")){
+            eff.add(ds.getChildText("name"));
+        }
+        return eff;
     }
 
     /**
