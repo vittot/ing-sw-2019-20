@@ -441,8 +441,9 @@ public class Player implements Target, Serializable {
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
         if(serializeEverything) {
-            oos.writeObject(cardPower);
-            oos.writeObject(weapons);
+            //The cast to Serializable is necessary to avoid Sonar bug issues because List does not implement Serializable but all implementations of List (such as ArrayList) in effect implements Serializable
+            oos.writeObject((Serializable)cardPower);
+            oos.writeObject((Serializable)weapons);
         }
     }
 
