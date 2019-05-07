@@ -17,8 +17,15 @@ public class Map implements Serializable {
     public static final int MAX_DIST = 12;
     public static final int WEAPON_PER_SQUARE = 3;
     private List<Room> rooms;
+    private String description;
 
+    public String getDescription() {
+        return description;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public int getId() {
         return id;

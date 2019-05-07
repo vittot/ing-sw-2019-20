@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mapList>
-    <map>
+    <map id="1">
         <id>
             1
         </id>
@@ -92,7 +92,7 @@
             <respown>true</respown>
         </square>
     </map>
-    <map>
+    <map id="2">
         <id>
             2
         </id>
@@ -191,7 +191,7 @@
             <respown>true</respown>
         </square>
     </map>
-    <map>
+    <map id="3">
         <id>
             3
         </id>

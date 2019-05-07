@@ -19,6 +19,17 @@ public class FullEffect {
         this.price = price;
         this.beforeBase = beforeBase;
     }
+    public FullEffect(){
+        this.simpleEffects = new ArrayList<>();
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public boolean isBeforeBase() {
         return beforeBase;
