@@ -18,6 +18,10 @@ public class AreaDamageEffect extends SimpleEffect {
         this.maxEnemyPerSquare = maxEnemyPerSquare;
     }
 
+    public int getMaxEnemyPerSquare() {
+        return maxEnemyPerSquare;
+    }
+
     public int getDamage() {
         return damage;
     }
