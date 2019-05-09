@@ -110,6 +110,7 @@ public class Game {
         } catch (IOException e1) {
             //TODO ecc
         }
+        map.setGrid(grid);
         return map;
     }
 
@@ -157,21 +158,35 @@ public class Game {
         String name = weapon.getChild("name").getText();
         List desc = takeDescription(weapon);
         List names = takeNameEffect(weapon);
-        Boolean plusBefore;
-        Boolean plusOrder;
-        List price = takePrice(weapon);
+        boolean plusBefore;
+        boolean plusOrder;
+        List<Color> price = takePrice(weapon);
         List<Color> priceal = takePriceAl(weapon);
         List<List<Color>> priceop = takePriceOpz(weapon);
         FullEffect effect = takeEffect(weapon);
         FullEffect effectal = takeEffectal(weapon);
-        List effectop = takeEffectopz(weapon);
+        List<FullEffect> effectop = takeEffectopz(weapon);
         plusBefore = (weapon.getChild("plusBeforeBase").getText().equals("true"));
         plusOrder = (weapon.getChild("plusOrdere").getText().equals("true"));
         insertDescription(effect, effectal, effectop, desc, names);
+        insertPrice(effect,effectal,effectop,price,priceal,priceop);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
         this.deckWeapon.add(wp);
     }
-    public void insertDescription (FullEffect ef,FullEffect aef,List<FullEffect> oef, List<String> desc, List<String> name){
+
+    private void insertPrice(FullEffect effect, FullEffect effectal, List<FullEffect> effectop, List price, List<Color> priceal, List<List<Color>> priceop) {
+        effect.setPrice(price);
+        if(effectal!=null)
+            effectal.setPrice(priceal);
+        if(effectop==null)
+            return;
+        int i = 0;
+        for(FullEffect fe : effectop){
+            fe.setPrice(priceop.get(i));
+        }
+    }
+
+    private void insertDescription (FullEffect ef,FullEffect aef,List<FullEffect> oef, List<String> desc, List<String> name){
         ef.setName(name.get(0));
         ef.setDescription(desc.get(0));
         int i = 1;

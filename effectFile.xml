@@ -50,6 +50,7 @@
             </plainDamage>
         </baseEffect>
         <optionalEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -129,6 +130,7 @@
             </plainDamage>
         </baseEffect>
         <optionalEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -152,6 +154,7 @@
 
         -->
         <optionalEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>0</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -246,6 +249,7 @@
             </plainDamage>
         </baseEffect>
         <optionalEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -261,6 +265,7 @@
             </plainDamage>
         </optionalEffect>
         <optionalEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -331,6 +336,7 @@
         SimpleEffect plas21 = new MovementEffect(0,0,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
         SimpleEffect plas31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
 -->
+
         <baseEffect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -347,6 +353,7 @@
             </plainDamage>
         </baseEffect>
         <optionalEffect>
+            <beforeBase>true</beforeBase>
             <movementEffect>
                 <minEnemy>0</minEnemy>
                 <maxEnemy>0</maxEnemy>
@@ -361,11 +368,11 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>true</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </optionalEffect>
         <optionalEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -544,6 +551,7 @@
         SimpleEffect ray12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
+            <beforeBase>false</beforeBase>
             <movementEffect>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -558,7 +566,6 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <plainDamage>
@@ -656,6 +663,7 @@
         SimpleEffect vort24 = new PlainDamageEffect(0,1,0,1,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
+            <beforeBase>false</beforeBase>
             <squareDamageEffect>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -681,7 +689,6 @@
                 <chainMove>true</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <plainDamage>
@@ -699,6 +706,7 @@
             </plainDamage>
         </baseEffect>
         <optionalEffect>
+            <beforeBase>false</beforeBase>
             <movementEffect>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -713,7 +721,6 @@
                 <chainMove>true</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>NoneOfThePrevious</differentTarget>
             </movementEffect>
             <plainDamage>
@@ -743,7 +750,6 @@
                 <chainMove>true</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>NoneOfThePrevious</differentTarget>
             </movementEffect>
             <plainDamage>
@@ -1130,6 +1136,7 @@
         //TODO Effetto plus su puo fare rima del effetto base
         -->
         <baseEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1157,7 +1164,6 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <squareDamageEffect>
@@ -1173,9 +1179,6 @@
             </squareDamageEffect>
 
         </baseEffect>
-        <optionalEffect>
-
-        </optionalEffect>
         <plusBeforeBase>
             true
         </plusBeforeBase>
@@ -1234,6 +1237,7 @@
     SimpleEffect lcrz13 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
 -->
         <baseEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1261,11 +1265,11 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </baseEffect>
         <optionalEffect>
+            <beforeBase>true</beforeBase>
             <movementEffect>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1280,11 +1284,11 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>true</beforeBase>
                 <differentTarget>anyone</differentTarget>
             </movementEffect>
         </optionalEffect>
         <alternativeEffect>
+            <beforeBase>false</beforeBase>
             <squareDamageEffect>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>5</maxEnemy>
@@ -1323,10 +1327,8 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
-
         </alternativeEffect>
         <plusBeforeBase>
             true
@@ -1492,6 +1494,7 @@
             </plainDamage>
         </baseEffect>
         <optionalEffect>
+            <beforeBase>true</beforeBase>
             <movementEffect>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1506,11 +1509,11 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>true</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </optionalEffect>
         <optionalEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1645,6 +1648,7 @@
 
         -->
         <baseEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1672,7 +1676,6 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>true</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </baseEffect>
@@ -1740,6 +1743,7 @@
 
         -->
         <baseEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1767,11 +1771,11 @@
                 <chainMove>true</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </baseEffect>
         <alternativeEffect>
+            <beforeBase>false</beforeBase>
             <movementEffect>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1786,7 +1790,6 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <plainDamage>
@@ -1829,7 +1832,6 @@
                 <chainMove>true</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </alternativeEffect>
@@ -1958,6 +1960,7 @@
             </plainDamage>
         </baseEffect>
         <alternativeEffect>
+            <beforeBase>false</beforeBase>
             <plainDamage>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>
@@ -1985,7 +1988,6 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <movementEffect>
@@ -2002,7 +2004,6 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>true</sameDirection>
-                <beforeBase>false</beforeBase>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </alternativeEffect>

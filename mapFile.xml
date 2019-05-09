@@ -295,4 +295,32 @@
             <respown>true</respown>
         </square>
     </map>
+    <map id="99">
+        <id>99</id>
+        <desc>test map</desc>
+        <square>
+            <color>yellow</color>
+            <edge>wall</edge>
+            <edge>wall</edge>
+            <edge>wall</edge>
+            <edge>wall</edge>
+            <respown>false</respown>
+        </square>
+        <square>
+            <color>red</color>
+            <edge>open</edge>
+            <edge>open</edge>
+            <edge>open</edge>
+            <edge>open</edge>
+            <respown>false</respown>
+        </square>
+        <square>
+            <color>blue</color>
+            <edge>door</edge>
+            <edge>door</edge>
+            <edge>door</edge>
+            <edge>door</edge>
+            <respown>true</respown>
+        </square>
+    </map>
 </mapList>

@@ -18,6 +18,7 @@ public class Player implements Target, Serializable {
     private List<PlayerColor> marks;
     private List<PlayerColor> thisTurnMarks;
     private int id;
+    private String nickName;
     private List<PlayerColor> damage;
     private AdrenalineLevel adrenaline;
     private transient List<CardWeapon> weapons;
@@ -55,6 +56,19 @@ public class Player implements Target, Serializable {
     public void setSerializeEverything(boolean serializeEverything) {
         this.serializeEverything = serializeEverything;
         this.weapons = new ArrayList<>();
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    @Override
+    public String returnName(){
+        return this.nickName;
     }
 
     public PlayerColor getColor() {

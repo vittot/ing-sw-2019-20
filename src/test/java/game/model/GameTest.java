@@ -1,5 +1,7 @@
 package game.model;
 
+import game.model.exceptions.MapOutOfLimitException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -130,5 +132,19 @@ class GameTest {
 
         //All squares which are not respawn must have an ammo card and the weapon card on the map (in respawn squares) have to be 2
         assertTrue(hasAmmo && weaponOnMap == 2);
+    }
+
+    @Test
+    void checkMap() throws MapOutOfLimitException {
+        g.readMap(99, "effectFile.xml");
+        Map map = new Map(99,4,3);
+        Edge [] ed = new Edge[4];
+        ed[0] = Edge.WALL;
+        ed[1] = Edge.WALL;
+        ed[2] = Edge.WALL;
+        ed[3] = Edge.WALL;
+        Square sq0 = new Square(MapColor.YELLOW,false,0,0,g.getMap(),ed);
+        assertTrue(g.getMap().getSquare(0,0).getColor().equals(MapColor.YELLOW));
+
     }
 }

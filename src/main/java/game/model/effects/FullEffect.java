@@ -23,6 +23,10 @@ public class FullEffect {
         this.simpleEffects = new ArrayList<>();
     }
 
+    public void setPrice(List<Color> price) {
+        this.price = price;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
