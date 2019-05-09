@@ -13,11 +13,8 @@ public interface ClientMessageHandler {
     ServerMessage handle (ReloadWeaponRequest clientMsg);
     ServerMessage handle (RespawnResponse clientMsg);
     ServerMessage handle (ShootActionRequest clientMsg);
-
-
-
-
-
-
-
+    ServerMessage handle(GetWaitingRoomsRequest getWaitingRoomsRequest);
+    ServerMessage handle(JoinWaitingRoomRequest joinWaitingRoomRequest);
+    ServerMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest);
+    ServerMessage handle(EndTurnRequest endTurnRequest);
 }

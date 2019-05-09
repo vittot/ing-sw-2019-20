@@ -30,5 +30,7 @@ public interface ServerMessageHandler {
     void handle (InvalidPowerUpResponse serverMsg);
     void handle (InvalidGrabPositionRsponse serverMsg);
     void handle (AfterDamagePowerUpRequest serverMsg);
-
+    void handle (NotifyGameStarted serverMsg);
+    void handle(WaitingRoomsListResponse waitingRoomsListResponse);
+    void handle(InvalidMessageResponse invalidMessageResponse);
 }

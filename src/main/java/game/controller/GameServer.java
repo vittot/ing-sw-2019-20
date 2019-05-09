@@ -23,7 +23,7 @@ public class GameServer {
         serverSocket = new ServerSocket(port);
         pool = Executors.newCachedThreadPool();
         close = false;
-        //TODO bind on registyr for RMI
+        //TODO bind on registy for RMI
     }
 
     /**

@@ -2,14 +2,17 @@ package game.controller;
 
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
+import game.controller.commands.servercommands.NotifyEndGameResponse;
+import game.model.GameListener;
+import game.model.Player;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.security.SecureRandom;
+import java.util.Map;
 
-public class SocketClientHandler implements Runnable {
+public class SocketClientHandler implements Runnable, GameListener {
 
     private Socket socket;
     private final ObjectInputStream inStream;
@@ -29,6 +32,20 @@ public class SocketClientHandler implements Runnable {
 
 
     /**
+     * Send a message to the client
+     * @param msg
+     */
+    public void sendMessage(ServerMessage msg) {
+        try{
+            outStream.writeObject(msg);
+        }catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
      * Receive clientMessage, send them to the controller to be handled and resend the answer to the Client
      */
     @Override
@@ -38,7 +55,7 @@ public class SocketClientHandler implements Runnable {
             do {
                 ClientMessage inMsg = (ClientMessage)inStream.readObject();
                 ServerMessage outMsg = inMsg.handle(controller);
-                outStream.writeObject(outMsg);
+                sendMessage(outMsg);
             } while (!stop);
             close();
 
@@ -70,4 +87,16 @@ public class SocketClientHandler implements Runnable {
         socket.close();
     }
 
+    ///Listener methods
+
+
+    @Override
+    public void onChangeTurn(Player p) {
+        sendMessage();
+    }
+
+    @Override
+    public void onGameEnd(Map<Player,Integer> gameRanking) {
+        sendMessage(new NotifyEndGameResponse(gameRanking));
+    }
 }

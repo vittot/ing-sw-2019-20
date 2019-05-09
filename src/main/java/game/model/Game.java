@@ -1,21 +1,18 @@
 package game.model;
 
 
-import java.beans.Visibility;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import game.model.effects.*;
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.List;
 
 public class Game {
+    private int id;
     private List <Player> players;
     private Map map;
     private List<CardPower> deckPower;
@@ -39,6 +36,18 @@ public class Game {
         POINTSCOUNT.add(1);
     }
 
+    public Game(int id, int mapId, int killBoardSize)
+    {
+        this.id = id;
+        this.killboardSize = killBoardSize;
+        this.killBoard = new ArrayList<>(killBoardSize);
+        generateDecks("loadingGame.txt");
+        currentTurn = new Turn(this.players.get(0),this);
+        players.stream().forEach(p -> p.setGame(this));
+        readDeck("effectFile.xml");
+        readMap(mapId, "mapFile.xml");
+    }
+
     public Game(List<Player> players, Map map,int killBoardSize) {
         this.players = players;
         this.map = map;
@@ -48,16 +57,15 @@ public class Game {
         currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
     }
-    public Game(List<Player> players, int id,int killBoardSize) {
+    public Game(List<Player> players, int mapId,int killBoardSize) {
         this.players = players;
-        this.map = map;
         this.killboardSize = killBoardSize;
         this.killBoard = new ArrayList<>(killBoardSize);
         generateDecks("loadingGame.txt");
         currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
-        readMap(id, "mapFile.xml");
+        readMap(mapId, "mapFile.xml");
     }
 
 
@@ -649,7 +657,7 @@ public class Game {
     }
 
     /**
-     * Check Players dead in the turn, count points ask to respawn them
+     * Check Players dead in the turn, count points and return the player who need to be respawned
      */
     public List<Player> checkRespawn() {
         List<Player> toRespawn = new ArrayList<>();

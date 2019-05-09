@@ -42,19 +42,17 @@ public class ServerController implements ClientMessageHandler {
     }
 
     /**
-     * Create a new Game for this client
+     * Called by the WaitingRoom when it's ready to start the game, it notify the client associated to this server controller that the game is started, sending the Game serialized object
+     *
+     * @param g
      */
-    public void setNewGame()
+    void startGame(Game g, Player p)
     {
-
-    }
-
-    /**
-     * Join the client to an existing Game
-     * @param gameId
-     */
-    public void joinGame(int gameId){
-
+        this.model = g;
+        this.currPlayer = p;
+        this.clientHandler.sendMessage(new NotifyGameStarted(g));
+        if(g.getCurrentTurn().getCurrentPlayer().equals(p))
+            clientHandler.sendMessage(new ChooseTurnActionRequest());
     }
 
     // TODO: ------ ClientMessage handling
@@ -173,7 +171,7 @@ public class ServerController implements ClientMessageHandler {
         try {
             if (Action.checkAction(clientMsg.typeOfAction)) {
                 currPlayer.getGame().getCurrentTurn().newAction(clientMsg.typeOfAction, currPlayer.getAdrenaline());
-                return new OperationCompletedResponse(clientMsg);
+                return new OperationCompletedResponse("Action completed"); //TODO check this
             } else {
                 return new InvalidActionResponse();
             }
@@ -205,7 +203,7 @@ public class ServerController implements ClientMessageHandler {
             return new InvalidStepResponse();
         try{
             currPlayer.pickUpAmmo();
-            return new OperationCompletedResponse(clientMsg);
+            return new OperationCompletedResponse("Ammo picked up"); //TODO check this
         }catch (NoCardAmmoAvailableException e){
             return new InvalidGrabPositionRsponse();
         }
@@ -226,7 +224,7 @@ public class ServerController implements ClientMessageHandler {
             return new InvalidPowerUpResponse();
         try {
             currPlayer.pickUpWeapon(clientMsg.weapon, clientMsg.weaponToWaste, clientMsg.powerup);
-            return  new OperationCompletedResponse(clientMsg);
+            return  new OperationCompletedResponse("Weapon picked up"); //TODO check this
         }catch (InsufficientAmmoException e){
             return new InsufficientAmmoResponse();
         }
@@ -267,7 +265,7 @@ public class ServerController implements ClientMessageHandler {
             if (currPlayer.getCardPower().contains(clientMsg.powerUp)) {
                 currPlayer.respawn(clientMsg.powerUp);
                 currPlayer.removePowerUp(Collections.singletonList(clientMsg.powerUp));
-                return new OperationCompletedResponse(clientMsg);
+                return new OperationCompletedResponse("You are respawned!"); //TODO check this
             }
             else
                 return new InvalidPowerUpResponse();
@@ -320,7 +318,7 @@ public class ServerController implements ClientMessageHandler {
         if(clientMsg.plusBeforeBase)
         {
             baseDone = false;
-            currFullEffect = selectedPlusEffects.stream().filter(FullEffect::isBeforeBase).findFirst().orElse(null);
+            currFullEffect = selectedPlusEffects.stream().filter(FullEffect::isBeforeBase).findFirst().orElse(selectedPlusEffects.get(0));
             selectedPlusEffects.remove(currFullEffect);
         }
         else
@@ -332,6 +330,41 @@ public class ServerController implements ClientMessageHandler {
         return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
 
 
+    }
+
+    /**
+     * Return existing waiting rooms to the client
+     * @param getWaitingRoomsRequest
+     * @return
+     */
+    @Override
+    public ServerMessage handle(GetWaitingRoomsRequest getWaitingRoomsRequest) {
+        return new WaitingRoomsListResponse(GameManager.get().getWaitingRooms());
+    }
+
+    /**
+     * Join the client in a WaitingRoom
+     * @param joinWaitingRoomRequest
+     * @return
+     */
+    @Override
+    public ServerMessage handle(JoinWaitingRoomRequest joinWaitingRoomRequest) {
+        WaitingRoom w = GameManager.get().getWaitingRoom(joinWaitingRoomRequest.getRoomId());
+        if(w != null)
+            return new OperationCompletedResponse();
+        return new InvalidMessageResponse("The indicated room id does not exist on the Server");
+    }
+
+    @Override
+    public ServerMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest) {
+        GameManager.get().addWaitingRoom(createWaitingRoomRequest.getMapId(),createWaitingRoomRequest.getNumWaitingPlayers());
+        return new OperationCompletedResponse("Waiting room correctly created");
+    }
+
+    @Override
+    public ServerMessage handle(EndTurnRequest endTurnRequest) {
+        model.changeTurn();
+        return new OperationCompletedResponse("Your turn is terminated");
     }
 
     /**
