@@ -19,11 +19,13 @@ public class ClientController implements ServerMessageHandler {
     // reference to networking layer
     private final Client client;
     private Thread receiver;
-
+    //private View clientView;
+    private ClientTextView clientView;
     //TODO: add the view
 
     public ClientController(Client client) {
         this.client = client;
+        clientView = new ClientTextView(this);
     }
 
 
@@ -37,6 +39,7 @@ public class ClientController implements ServerMessageHandler {
 
 
     public void run() throws IOException {
+        clientView.setUserNamePhase();
         //TODO: launch various phases on the view
         return;
     }
@@ -71,19 +74,19 @@ public class ClientController implements ServerMessageHandler {
             if(!possibleAction.contains(ac))
                 possibleAction.add(ac);
         }
-        //TODO view methods choose step action
-        //chooseStepAction(possibleAction)
+        clientView.chooseStepActionPhase(possibleAction);
         return;
     }
 
     @Override
     public void handle(ChooseSquareRequest serverMsg) {
-        // TODO view method to permit the player to choose one or some targets from the possibles (parameter)
+        clientView.chooseSquarePhase(serverMsg.possiblePositions);
         return;
     }
 
     @Override
     public void handle(ChooseTargetRequest serverMsg) {
+        clientView.chooseTargetPhase(serverMsg.possibleTargets);
         //TODO call view mwthods
         return;
     }
