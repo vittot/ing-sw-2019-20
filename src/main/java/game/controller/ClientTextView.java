@@ -32,7 +32,11 @@ public class ClientTextView implements View {
             this.user = readText();
         } while ( this.user == null);
 
-        writeText("Wealcome, " + this.user + ", good luck!");
+        writeText("Welcome, " + this.user + ", good luck!");
+        //TODO:
+        //get list of waiting rooms and available maps
+        //choose if join a room or create a new room
+
     }
 
     public void chooseStepActionPhase(List<Action> possibleAction){
@@ -110,6 +114,8 @@ public class ClientTextView implements View {
         }
         //TODO call clientController chooseTarget
     }
+
+    //
 
 
 }

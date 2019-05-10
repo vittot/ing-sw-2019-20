@@ -3,6 +3,7 @@ package game.controller;
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.servercommands.NotifyEndGameResponse;
+import game.controller.commands.servercommands.NotifyTurnChanged;
 import game.model.GameListener;
 import game.model.Player;
 
@@ -89,4 +90,23 @@ public class SocketClientHandler implements Runnable, GameListener {
 
     ///Listener methods
 
+
+    /**
+     * Notify that it's the turn of another player
+     * @param p
+     */
+    @Override
+    public void onChangeTurn(Player p) {
+        sendMessage(new NotifyTurnChanged(p.getId()));
+    }
+
+    /**
+     * Notify that the game is finished and send the final game ranking
+     * @param gameRanking
+     */
+    @Override
+    public void onGameEnd(Map<Player,Integer> gameRanking) {
+
+        sendMessage(new NotifyEndGameResponse(gameRanking));
+    }
 }

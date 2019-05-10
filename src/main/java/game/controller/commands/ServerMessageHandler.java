@@ -33,4 +33,5 @@ public interface ServerMessageHandler {
     void handle (NotifyGameStarted serverMsg);
     void handle(WaitingRoomsListResponse waitingRoomsListResponse);
     void handle(InvalidMessageResponse invalidMessageResponse);
+    void handle(NotifyTurnChanged notifyTurnChanged);
 }

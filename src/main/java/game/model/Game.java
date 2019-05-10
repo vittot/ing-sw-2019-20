@@ -25,6 +25,7 @@ public class Game {
     public static final int MAXPLAYERS = 5;
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
+    private List<GameListener> gameObservers;
 
     static {
         POINTSCOUNT = new ArrayList<>();
@@ -46,6 +47,7 @@ public class Game {
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
         readMap(mapId, "mapFile.xml");
+        gameObservers = new ArrayList<>();
     }
 
     public Game(List<Player> players, Map map,int killBoardSize) {
@@ -710,5 +712,14 @@ public class Game {
             }
         }
 
+    }
+
+    /**
+     *  Add a new listener for game changes
+     * @param gl
+     */
+    public void addGameListener(GameListener gl)
+    {
+        this.gameObservers.add(gl);
     }
 }
