@@ -177,7 +177,7 @@ public class ServerController implements ClientMessageHandler {
             }
         }
         catch(NoResidualActionAvaiableException e){
-            return new InvalidNumberOfActionResponse();
+            return new InsufficientNumberOfActionResponse();
         }
     }
 
@@ -271,7 +271,7 @@ public class ServerController implements ClientMessageHandler {
                 return new InvalidPowerUpResponse();
         }
         else
-            return new InvalidDeathResponse();
+            return new InvalidMessageResponse();
     }
 
     @Override

@@ -4,7 +4,6 @@ import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.servercommands.*;
 import game.model.CardWeapon;
 import game.model.Player;
-import game.model.Kill;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardAmmoAvailableException;
@@ -28,6 +27,9 @@ public class ClientController implements ServerMessageHandler {
         clientView = new ClientTextView(this);
     }
 
+    public Client getClient() {
+        return client;
+    }
 
     public void start() {
 
@@ -44,10 +46,8 @@ public class ClientController implements ServerMessageHandler {
         return;
     }
 
-    // TODO: ------ ServerMessage handling
-
     /**
-     * Update the ClientContext reloading the weapon and removing the power-up cards and ammo cars used by the player
+     * Update the ClientContext reloading the weapon and removing the power-up cards and ammo cards used by the player
      * @param serverMsg
      */
     @Override
@@ -57,16 +57,18 @@ public class ClientController implements ServerMessageHandler {
             if(cW.equals(serverMsg.weapon)) {
                 try {
                     cW.reloadWeapon(serverMsg.powerUps);
-                    //have we to simplify it?????
                 }
                 catch(InsufficientAmmoException e){
                     //TODO exception case
                 }
             }
         }
-        return;
     }
 
+    /**
+     * Ask the player which possible step, contained in the list of the possible move he can make, want to select
+     * @param serverMsg
+     */
     @Override
     public void handle(ChooseSingleActionRequest serverMsg) {
         List<Action> possibleAction = new ArrayList<>();
@@ -75,64 +77,88 @@ public class ClientController implements ServerMessageHandler {
                 possibleAction.add(ac);
         }
         clientView.chooseStepActionPhase(possibleAction);
-        return;
     }
 
+    /**
+     * Ask the player what square want to select
+     * @param serverMsg
+     */
     @Override
     public void handle(ChooseSquareRequest serverMsg) {
         clientView.chooseSquarePhase(serverMsg.possiblePositions);
-        return;
     }
 
+    /**
+     * Ask the player what target want to select to apply his action
+     * @param serverMsg
+     */
     @Override
     public void handle(ChooseTargetRequest serverMsg) {
         clientView.chooseTargetPhase(serverMsg.possibleTargets);
-        //TODO call view mwthods
-        return;
     }
 
+    /**
+     * Ask the player what action want to choose for this turn phase
+     * @param serverMsg
+     */
     @Override
     public void handle(ChooseTurnActionRequest serverMsg) {
-        // TODO view method to permit the player to choose the TurnAction he wants to perform
-        return;
+        clientView.chooseTurnActionPhase();
     }
 
+    /**
+     * Notify the player that the targets chosen are invalid
+     * @param serverMsg
+     */
     @Override
     public void handle(InvalidTargetResponse serverMsg) {
-        //TODO call view methods
-        return;
+        clientView.invalidTargetNotification();
     }
 
+    /**
+     * Notify the player the invalid weapon selection
+     * @param serverMsg
+     */
     @Override
     public void handle(InvalidWeaponResponse serverMsg) {
-        // TODO view method
-        return;
+        clientView.invalidWeaponNotification();
 
     }
 
+    /**
+     * Notify the player the invalid action selection
+     * @param serverMsg
+     */
     @Override
     public void handle(InvalidActionResponse serverMsg) {
-
+        clientView.invalidActionNotification();
     }
 
+    /**
+     * Notify the player that he doesn't have other new actions available
+     * @param serverMsg
+     */
     @Override
-    public void handle(InvalidNumberOfActionResponse serverMsg) {
-
+    public void handle(InsufficientNumberOfActionResponse serverMsg) {
+        clientView.insufficientNumberOfActionNotification();
     }
 
+    /**
+     * Notify the player the invalid step selection
+     * @param serverMsg
+     */
     @Override
     public void handle(InvalidStepResponse serverMsg) {
-
+        clientView.invalidStepNotification();
     }
 
+    /**
+     * Notify the player that he doesn't have enough space to grab new weapons
+     * @param serverMsg
+     */
     @Override
     public void handle(MaxNumberOfWeaponsResponse serverMsg) {
-
-    }
-
-    @Override
-    public void handle(InvalidDeathResponse serverMsg) {
-
+        clientView.maxNumberOfWeaponNotification();
     }
 
     @Override
