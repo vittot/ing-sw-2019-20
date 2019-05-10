@@ -5,6 +5,7 @@ import game.controller.commands.clientcommands.ChooseTargetResponse;
 import game.controller.commands.clientcommands.ChooseTurnActionResponse;
 import game.controller.commands.clientcommands.GrabActionRequest;
 import game.model.Action;
+import game.model.Player;
 import game.model.Square;
 import game.model.Target;
 
@@ -60,9 +61,9 @@ public class ClientTextView implements View {
             action = readText();
             try {
                 choosenAction = Action.valueOf(action);
-            }catch (IllegalArgumentException e){
-                choosenAction = null;
             }catch ( NullPointerException f){
+                choosenAction = null;
+            }catch (IllegalArgumentException e){
                 choosenAction = null;
             }
         }while(!possibleAction.contains(choosenAction));
@@ -119,24 +120,30 @@ public class ClientTextView implements View {
 
         List <Target> choosenTarget = new ArrayList<>();
         writeText("Scegli tra "+minE+"e "+maxE+" dei seguenti target: (write the number)");
+        writeText(i +" to exit" );
+        i++;
         for (Target tg : possibleTarget){
             writeText(i +" player: "+tg.returnName());
             i++;
         }
-        for(i = 0; i < maxE-minE && k>0 ; ){
+        for(i = 0; i <= maxE && k>0 ; ){
             k = readInt();
-            if(k < possibleTarget.size() && k >= 0){
-                choosenTarget.add(possibleTarget.get(k));
-                i++;
+            if(k < possibleTarget.size() && k > 0){
+                if(choosenTarget.contains(k)){
+                    writeText("Player already selected");
+                }else {
+                    choosenTarget.add(possibleTarget.get(k));
+                    i++;
+                }
             }
-            else if(k<0){
+            else if(k == 0){
                 if(choosenTarget.size()>=minE)
                     writeText("Selection Completed!");
                 else
                     k = 12;
             }
             else{
-                writeText("Invalid Target");
+                writeText("Not enough target");
             }
         }
         controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
@@ -186,6 +193,13 @@ public class ClientTextView implements View {
     }
 
     /**
+     * Notify impossibility that the player doesn't have enough ammo
+     */
+    public void insufficientAmmoNotification() {
+        writeText("Not enough ammo");
+
+    }
+    /**
      * Notify invalid targets selection
      */
     public void invalidTargetNotification(){
@@ -205,4 +219,48 @@ public class ClientTextView implements View {
     public void maxNumberOfWeaponNotification(){
         writeText("You can't grab others weapons from the ground, before discard one of your weapon!");
     }
+
+    /**
+     * notify a player that someone took damage
+     * @param idShooter
+     * @param dmg
+     * @param idHitted
+     */
+    public void damageNotification(int idShooter, int dmg, int idHitted){
+        if(idHitted == ClientContext.get().getMyID())
+            writeText("Player "+idShooter+" dealt "+dmg+" damage to you");
+        else
+            writeText("Player "+idShooter+" dealt "+dmg+" to player "+idHitted);
+    }
+
+    /**
+     * notify the player that someone grab a weapon in a specific position
+     * @param p
+     * @param x
+     * @param y
+     */
+    public void grabWeaponNotification(int p, int x, int y){
+        writeText("Player "+p+" grabbed a weapon in position X:"+x+" Y:"+y);
+    }
+
+    /**
+     * Notify the player from a power up usage
+     * @param id
+     * @param name
+     * @param desc
+     */
+    public void powerUpUsageNotification(int id, String name, String desc){
+        int num = 0;
+        if(ClientContext.get().getMyID() == id)
+            writeText(name +" used correctly");
+        else {
+            writeText("Player " + id + " used power up: " + name + " press 1 for more info, anything else to exit");
+            num = readInt();
+        }
+        if(num == 1){
+            writeText("Power up: "+name+", "+desc);
+        }
+    }
+
+
 }

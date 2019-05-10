@@ -59,7 +59,7 @@ public class ClientController implements ServerMessageHandler {
                     cW.reloadWeapon(serverMsg.powerUps);
                 }
                 catch(InsufficientAmmoException e){
-                    //TODO exception case
+                    clientView.insufficientAmmoNotification();
                 }
             }
         }
@@ -164,7 +164,8 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyDamageResponse serverMsg) {
         Player shooter = ClientContext.get().getMap().getPlayerById(serverMsg.getShooterId());
-            ClientContext.get().getMap().getPlayerById(serverMsg.getHit()).addDamage(shooter, serverMsg.getDamage());
+        ClientContext.get().getMap().getPlayerById(serverMsg.getHit()).addDamage(shooter, serverMsg.getDamage());
+        clientView.damageNotification(serverMsg.getShooterId(),serverMsg.getDamage(),serverMsg.getHit());
 
     }
 
@@ -172,14 +173,14 @@ public class ClientController implements ServerMessageHandler {
     public void handle(NotifyDeathResponse serverMsg) {
         ClientContext instance = ClientContext.get();
         instance.getKillboard().add(serverMsg.getKill());
-        //TODO Update death view methods(kill)
+        //TODO Update death view methods(kill), pass a kill is a problem
         return;
 
     }
 
     @Override
     public void handle(NotifyEndGameResponse serverMsg) {
-        // TODO view method to show the player the final ranking of the game, the game is over
+        // TODO view method to show the player the final ranking of the game, the game is over, how you take first blood points
         return;
     }
 
@@ -187,13 +188,14 @@ public class ClientController implements ServerMessageHandler {
     public void handle(NotifyGrabWeapon serverMsg) {
         ClientContext instance = ClientContext.get();
         try {
-            instance.getMap().getSquare(serverMsg.getX(),serverMsg.getY()).setCardAmmo(null);
             instance.getMap().getSquare(serverMsg.getX(),serverMsg.getY()).getWeapons().remove(serverMsg.getCw());
+            if(serverMsg.getwWaste() == null)
+                instance.getMap().getSquare(serverMsg.getX(),serverMsg.getY()).getWeapons().add(serverMsg.getwWaste());
         } catch (MapOutOfLimitException e) {
-            //TODO exc
+            //TODO shouldnt append
         }
-        //TODO view methods notify grab ammo/weapon
-        return;
+        clientView.grabWeaponNotification(serverMsg.getP(),serverMsg.getX(),serverMsg.getY());
+
     }
 
     @Override
@@ -202,9 +204,8 @@ public class ClientController implements ServerMessageHandler {
             ClientContext.get().getMap().getPlayerById(serverMsg.getId()).setPosition(ClientContext.get().getMap().getSquare(serverMsg.getX(), serverMsg.getY()));
         }
         catch(MapOutOfLimitException e){
-            // TODO
+            // TODO shouldnt append
         }
-        return;
     }
 
     @Override
@@ -212,10 +213,8 @@ public class ClientController implements ServerMessageHandler {
         ClientContext instance = ClientContext.get();
         if(instance.getMyID() == serverMsg.getId()){
             instance.getMap().getPlayerById(serverMsg.getId()).getCardPower().remove(serverMsg.getCp());
-            //TODO (Myplayer, cardpower)
         }
-        //TODO (Player, cardPower)
-        return;
+        clientView.powerUpUsageNotification(serverMsg.getId(),serverMsg.getCp().getName(),serverMsg.getCp().getDescription());
     }
 
     @Override
@@ -224,9 +223,8 @@ public class ClientController implements ServerMessageHandler {
             ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).pickUpAmmo();
         }
         catch(NoCardAmmoAvailableException e){
-
+            clientView.insufficientAmmoNotification();
         }
-        return;
     }
 
     @Override
@@ -234,11 +232,11 @@ public class ClientController implements ServerMessageHandler {
         try {
             ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).pickUpWeapon(serverMsg.cw,serverMsg.cwToWaste,serverMsg.cp);
         } catch (InsufficientAmmoException e) {
-            //TODO call view
+            clientView.insufficientAmmoNotification();
         } catch (NoCardWeaponSpaceException e) {
-            //tOdO call view
+            clientView.invalidWeaponNotification();
         }
-        //TODO call view methods
+        //TODO call view methods already grabweaponnotification?
         return;
     }
 
