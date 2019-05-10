@@ -5,7 +5,16 @@ import game.controller.commands.ServerMessageHandler;
 import game.model.Kill;
 
 public class NotifyDeathResponse implements ServerMessage {
-    public Kill kill;
+    private Kill kill;
+
+    public NotifyDeathResponse(Kill kill) {
+        this.kill = kill;
+    }
+
+    public Kill getKill() {
+        return kill;
+    }
+
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

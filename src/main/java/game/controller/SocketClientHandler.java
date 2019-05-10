@@ -2,15 +2,14 @@ package game.controller;
 
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
-import game.controller.commands.servercommands.NotifyEndGameResponse;
-import game.controller.commands.servercommands.NotifyTurnChanged;
-import game.model.GameListener;
-import game.model.Player;
+import game.controller.commands.servercommands.*;
+import game.model.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
 
 public class SocketClientHandler implements Runnable, GameListener {
@@ -108,5 +107,50 @@ public class SocketClientHandler implements Runnable, GameListener {
     public void onGameEnd(Map<Player,Integer> gameRanking) {
 
         sendMessage(new NotifyEndGameResponse(gameRanking));
+    }
+
+    @Override
+    public void onDamage(Player damaged, Player attacker, int damage) {
+        sendMessage(new NotifyDamageResponse(attacker.getId(), damaged.getId(), damage));
+    }
+
+    @Override
+    public void onMarks(Player marked, Player marker, int marks) {
+        sendMessage(new NotifyDamageResponse(marker.getId(), marked.getId(), marks));
+    }
+
+    @Override
+    public void onDeath(Player dead) {
+        //TODO remove this or the next one
+    }
+
+    @Override
+    public void onDeath(Kill kill) {
+        sendMessage(new NotifyDeathResponse(kill));
+    }
+
+    @Override
+    public void onGrabWeapon(Player p, CardWeapon cw) {
+        sendMessage(new NotifyGrabWeapon(p,cw,p.getPosition().getX(),p.getPosition().getY()));
+    }
+
+    @Override
+    public void onGrabAmmo(Player p, List<Color> ammo) {
+        sendMessage(new NotifyGrabAmmo(p.getId(),p.getPosition().getX(),p.getPosition().getY(),ammo));
+    }
+
+    @Override
+    public void onMove(Player p) {
+        sendMessage(new NotifyMovement(p.getId(),p.getPosition().getX(),p.getPosition().getY()));
+    }
+
+    @Override
+    public void onRespawn(Player p) {
+        sendMessage(new NotifyRespawn(p.getId(),p.getPosition().getX(),p.getPosition().getY()));
+    }
+
+    @Override
+    public void onPowerUpUse(Player p, CardPower c) {
+        sendMessage(new NotifyPowerUpUsage(p.getId(),c));
     }
 }

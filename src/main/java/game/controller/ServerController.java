@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ServerController implements ClientMessageHandler {
+public class ServerController implements ClientMessageHandler, RespawnObserver {
     // reference to the Networking layer
     private final SocketClientHandler clientHandler;
 
@@ -39,6 +39,10 @@ public class ServerController implements ClientMessageHandler {
     public ServerController(SocketClientHandler clientHandler) {
 
         this.clientHandler = clientHandler;
+    }
+
+    public SocketClientHandler getClientHandler() {
+        return clientHandler;
     }
 
     /**
@@ -363,7 +367,11 @@ public class ServerController implements ClientMessageHandler {
 
     @Override
     public ServerMessage handle(EndTurnRequest endTurnRequest) {
-        model.changeTurn();
+        List<Player> toBeRespawned = model.changeTurn();
+        for(Player p: toBeRespawned)
+        {
+            p.notifyRespawnListener();
+        }
         return new OperationCompletedResponse("Your turn is terminated");
     }
 
@@ -468,5 +476,12 @@ public class ServerController implements ClientMessageHandler {
     }
 
 
-
+    /**
+     * Ask a player to respawn, sending him the drawn powerup card
+     */
+    @Override
+    public void onRespawn() {
+        //TODO state in waiting for client response
+        clientHandler.sendMessage(new RespawnRequest(model.drawPowerUp()));
+    }
 }

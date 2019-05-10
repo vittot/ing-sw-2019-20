@@ -39,6 +39,7 @@ public class WaitingRoom {
     {
         int n = players.size();
         Player p = new Player(n+1, PlayerColor.values()[n]);
+        p.setRespawnListener(s);
         players.put(s,p);
         if(players.size() == numWaitingPlayers){
             Game g = GameManager.get().addGame(mapId);
@@ -47,6 +48,7 @@ public class WaitingRoom {
             for(Map.Entry<ServerController, Player> e: players.entrySet())
             {
                 e.getKey().startGame(g, e.getValue());
+                g.addGameListener(e.getKey().getClientHandler());
             }
         }
 

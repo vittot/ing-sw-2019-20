@@ -3,31 +3,29 @@ package game.controller.commands.servercommands;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
 import game.model.Player;
-import game.model.Target;
 
-import java.util.List;
+public class NotifyMarks implements ServerMessage {
 
-public class NotifyDamageResponse implements ServerMessage {
     private int shooterId;
     private int hitId;
-    private int damage;
+    private int marks;
 
-    public NotifyDamageResponse(int shooterId, int hitId, int damage) {
+    public NotifyMarks(int shooterId, int hitId, int marks) {
         this.shooterId = shooterId;
         this.hitId = hitId;
-        this.damage = damage;
+        this.marks = marks;
     }
 
     public int getShooterId() {
         return shooterId;
     }
 
-    public int getHit() {
+    public int getHitId() {
         return hitId;
     }
 
-    public int getDamage() {
-        return damage;
+    public int getMarks() {
+        return marks;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package game.model;
 
+import game.controller.RespawnObserver;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardWeaponSpaceException;
@@ -32,6 +33,7 @@ public class Player implements Target, Serializable {
     private boolean isDead;
     private static final int MARKS_PER_ENEMY=3;
     private boolean serializeEverything;
+    private transient RespawnObserver respawnListener;
 
     public Player(int id, PlayerColor color)
     {
@@ -47,6 +49,10 @@ public class Player implements Target, Serializable {
         this.serializeEverything = false;
         this.weapons = new ArrayList<>();
         this.cardPower = new ArrayList<>();
+    }
+
+    public void setRespawnListener(RespawnObserver respawnListener) {
+        this.respawnListener = respawnListener;
     }
 
     public boolean isSerializeEverything() {
@@ -406,6 +412,7 @@ public class Player implements Target, Serializable {
             this.position.getWeapons().add(weaponToWaste);
             this.weapons.remove(weaponToWaste);
         }
+        game.notifyGrabWeapon(this,weapon);
 
     }
 
@@ -441,10 +448,20 @@ public class Player implements Target, Serializable {
             throw new NoCardAmmoAvailableException();
         }
         if(position.getCardAmmo()!=null){
-            ammo.addAll(position.getCardAmmo().getAmmo());
+            List<Color> ammos = position.getCardAmmo().getAmmo();
+            ammo.addAll(ammos);
+            game.notifyGrabAmmo(this,ammos);
             position.setCardAmmo(null);
         }
 
+    }
+
+    /**
+     * Notify its serverController to respawn the player
+     */
+    public void notifyRespawnListener()
+    {
+        respawnListener.onRespawn();
     }
 
     /**

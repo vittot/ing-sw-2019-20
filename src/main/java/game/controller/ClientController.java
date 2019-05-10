@@ -4,7 +4,6 @@ import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.servercommands.*;
 import game.model.CardWeapon;
 import game.model.Player;
-import game.model.Kill;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardAmmoAvailableException;
@@ -137,18 +136,15 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(NotifyDamageResponse serverMsg) {
-        for(Player p : serverMsg.hit) {
-            ClientContext.get().getMap().getPlayerById(p.getId()).addDamage(serverMsg.shooter, serverMsg.damage);
-            ClientContext.get().getMap().getPlayerById(p.getId()).addThisTurnMarks(serverMsg.shooter, serverMsg.marks);
-        }
-        return;
+        Player shooter = ClientContext.get().getMap().getPlayerById(serverMsg.getShooterId());
+            ClientContext.get().getMap().getPlayerById(serverMsg.getHit()).addDamage(shooter, serverMsg.getDamage());
 
     }
 
     @Override
     public void handle(NotifyDeathResponse serverMsg) {
         ClientContext instance = ClientContext.get();
-        instance.getKillboard().add(serverMsg.kill);
+        instance.getKillboard().add(serverMsg.getKill());
         //TODO Update death view methods(kill)
         return;
 
@@ -161,11 +157,11 @@ public class ClientController implements ServerMessageHandler {
     }
 
     @Override
-    public void handle(NotifyGrabResponse serverMsg) {
+    public void handle(NotifyGrabWeapon serverMsg) {
         ClientContext instance = ClientContext.get();
         try {
-            instance.getMap().getSquare(serverMsg.x,serverMsg.y).setCardAmmo(null);
-            instance.getMap().getSquare(serverMsg.x,serverMsg.y).getWeapons().remove(serverMsg.cw);
+            instance.getMap().getSquare(serverMsg.getX(),serverMsg.getY()).setCardAmmo(null);
+            instance.getMap().getSquare(serverMsg.getX(),serverMsg.getY()).getWeapons().remove(serverMsg.getCw());
         } catch (MapOutOfLimitException e) {
             //TODO exc
         }
@@ -174,9 +170,9 @@ public class ClientController implements ServerMessageHandler {
     }
 
     @Override
-    public void handle(NotifyMovementResponse serverMsg) {
+    public void handle(NotifyMovement serverMsg) {
         try {
-            ClientContext.get().getMap().getPlayerById(serverMsg.id).setPosition(ClientContext.get().getMap().getSquare(serverMsg.x, serverMsg.y));
+            ClientContext.get().getMap().getPlayerById(serverMsg.getId()).setPosition(ClientContext.get().getMap().getSquare(serverMsg.getX(), serverMsg.getY()));
         }
         catch(MapOutOfLimitException e){
             // TODO
@@ -185,10 +181,10 @@ public class ClientController implements ServerMessageHandler {
     }
 
     @Override
-    public void handle(NotifyPowerUpUsageResponse serverMsg) {
+    public void handle(NotifyPowerUpUsage serverMsg) {
         ClientContext instance = ClientContext.get();
-        if(instance.getMyID() == serverMsg.id){
-            instance.getMap().getPlayerById(serverMsg.id).getCardPower().remove(serverMsg.cp);
+        if(instance.getMyID() == serverMsg.getId()){
+            instance.getMap().getPlayerById(serverMsg.getId()).getCardPower().remove(serverMsg.getCp());
             //TODO (Myplayer, cardpower)
         }
         //TODO (Player, cardPower)
@@ -221,7 +217,7 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(RespawnRequest serverMsg) {
-        ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower().add(serverMsg.cPU);
+        ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower().add(serverMsg.getcPU());
         // TODO view method that allows the player to choose a power-up card to discard to select the map color where respawn
         return;
     }
@@ -257,16 +253,37 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(NotifyGameStarted serverMsg) {
-
+        //TODO
     }
+
 
     @Override
     public void handle(WaitingRoomsListResponse waitingRoomsListResponse) {
-
+        ///TODO
     }
 
     @Override
     public void handle(InvalidMessageResponse invalidMessageResponse) {
+
+    }
+
+    @Override
+    public void handle(NotifyTurnChanged notifyTurnChanged) {
+        //TODO
+    }
+
+    @Override
+    public void handle(NotifyMarks notifyMarks) {
+
+    }
+
+    @Override
+    public void handle(NotifyGrabAmmo notifyGrabAmmo) {
+
+    }
+
+    @Override
+    public void handle(NotifyRespawn notifyRespawn) {
 
     }
 }

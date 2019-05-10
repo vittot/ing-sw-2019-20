@@ -630,6 +630,7 @@ public class Game {
         Kill newKill = new Kill(killer, victim, isRage);
         killBoard.add(newKill);
         updatePoints(victim);
+        notifyDeath(newKill);
     }
 
     /**
@@ -650,6 +651,15 @@ public class Game {
         deckPower.clear();
         deckPower.addAll(powerWaste);
         powerWaste.clear();
+    }
+
+    /**
+     * Draw a powerup card from the deck
+     * @return
+     */
+    public CardPower drawPowerUp()
+    {
+        return deckPower.remove(0);
     }
 
     /**
@@ -721,5 +731,45 @@ public class Game {
     public void addGameListener(GameListener gl)
     {
         this.gameObservers.add(gl);
+    }
+
+    void notifyDamage(Player hit, Player attacker, int damage){
+        gameObservers.forEach(o -> o.onDamage(hit,attacker,damage));
+    }
+
+    void notifyMarks(Player marked, Player marker, int marks)
+    {
+        gameObservers.forEach(o -> o.onMarks(marked,marker,marks));
+    }
+
+    void notifyDeath(Kill kill)
+    {
+        gameObservers.forEach(o -> o.onDeath(kill));
+    }
+
+    void notifyGrabWeapon(Player p, CardWeapon cw)
+    {
+        gameObservers.forEach(o -> o.onGrabWeapon(p,cw));
+    }
+
+
+    void notifyGrabAmmo(Player p, List<Color> ammo)
+    {
+        gameObservers.forEach(o -> o.onGrabAmmo(p,ammo));
+    }
+
+    void notifyMove(Player p)
+    {
+        gameObservers.forEach(o -> o.onMove(p));
+    }
+
+
+    void onRespawn(Player p){
+        gameObservers.forEach(o -> o.onRespawn(p));
+    }
+
+    void onPowerUpUse(Player p, CardPower c)
+    {
+        gameObservers.forEach(o -> o.onPowerUpUse(p,c));
     }
 }

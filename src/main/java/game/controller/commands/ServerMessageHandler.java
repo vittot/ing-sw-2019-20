@@ -19,9 +19,9 @@ public interface ServerMessageHandler {
     void handle (NotifyDamageResponse serverMsg);
     void handle (NotifyDeathResponse serverMsg);
     void handle (NotifyEndGameResponse serverMsg);
-    void handle (NotifyGrabResponse serverMsg);
-    void handle (NotifyMovementResponse serverMsg);
-    void handle (NotifyPowerUpUsageResponse serverMsg);
+    void handle (NotifyGrabWeapon serverMsg);
+    void handle (NotifyMovement serverMsg);
+    void handle (NotifyPowerUpUsage serverMsg);
     void handle (PickUpAmmoResponse serverMsg);
     void handle (PickUpWeaponResponse serverMsg);
     void handle (RespawnRequest serverMsg);
@@ -34,4 +34,7 @@ public interface ServerMessageHandler {
     void handle(WaitingRoomsListResponse waitingRoomsListResponse);
     void handle(InvalidMessageResponse invalidMessageResponse);
     void handle(NotifyTurnChanged notifyTurnChanged);
+    void handle(NotifyMarks notifyMarks);
+    void handle(NotifyGrabAmmo notifyGrabAmmo);
+    void handle(NotifyRespawn notifyRespawn);
 }
