@@ -63,4 +63,13 @@ public class Room implements Target, Serializable {
             s.move(numSquare, dir);
         }
     }
+
+    /**
+     * Return the rooms string reference
+     * @return
+     */
+    @Override
+    public String returnName() {
+        return null;
+    }
 }

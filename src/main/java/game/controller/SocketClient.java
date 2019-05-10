@@ -1,5 +1,7 @@
 package game.controller;
 
+import game.controller.commands.ClientMessage;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,6 +23,19 @@ public class SocketClient implements Client {
         socket = new Socket(host, port);
         outStream = new ObjectOutputStream(socket.getOutputStream());
         inputStream = new ObjectInputStream(socket.getInputStream());
+    }
+
+    /**
+     * Send a message to the server
+     * @param msg
+     */
+    public void sendMessage(ClientMessage msg) {
+        try{
+            outStream.writeObject(msg);
+        }catch(IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void close() throws IOException {

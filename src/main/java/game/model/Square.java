@@ -288,6 +288,16 @@ public class Square implements Target, Serializable {
 
 
     /**
+     * Return the reference to the square
+     * @return
+     */
+    @Override
+    public String returnName() {
+        //TODO string that identify suares
+        return null;
+    }
+
+    /**
      * For every Player in the Square add damage cause of an enemy's weapon effect
      * Marks from the same enemy are counted to calculate the damage to be applied
      * The adrenaline attribute is updated according to the total damage suffered

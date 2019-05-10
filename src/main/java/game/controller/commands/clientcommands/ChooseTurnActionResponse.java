@@ -8,6 +8,10 @@ import game.model.Action;
 public class ChooseTurnActionResponse implements ClientMessage {
     public Action typeOfAction;
 
+    public ChooseTurnActionResponse(Action typeOfAction) {
+        this.typeOfAction = typeOfAction;
+    }
+
     @Override
     public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);
