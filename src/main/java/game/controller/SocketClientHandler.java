@@ -89,14 +89,4 @@ public class SocketClientHandler implements Runnable, GameListener {
 
     ///Listener methods
 
-
-    @Override
-    public void onChangeTurn(Player p) {
-        sendMessage();
-    }
-
-    @Override
-    public void onGameEnd(Map<Player,Integer> gameRanking) {
-        sendMessage(new NotifyEndGameResponse(gameRanking));
-    }
 }

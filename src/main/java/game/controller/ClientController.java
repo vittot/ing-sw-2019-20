@@ -254,4 +254,19 @@ public class ClientController implements ServerMessageHandler {
         //TODO richiesta powerUp
         return;
     }
+
+    @Override
+    public void handle(NotifyGameStarted serverMsg) {
+
+    }
+
+    @Override
+    public void handle(WaitingRoomsListResponse waitingRoomsListResponse) {
+
+    }
+
+    @Override
+    public void handle(InvalidMessageResponse invalidMessageResponse) {
+
+    }
 }
