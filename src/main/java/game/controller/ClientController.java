@@ -173,14 +173,15 @@ public class ClientController implements ServerMessageHandler {
     public void handle(NotifyDeathResponse serverMsg) {
         ClientContext instance = ClientContext.get();
         instance.getKillboard().add(serverMsg.getKill());
-        //TODO Update death view methods(kill), pass a kill is a problem
+        clientView.notifyDeath(serverMsg.getKill());
+        //TODO Update death view methods(kill), pass a kill is a problem (????????)
         return;
 
     }
 
     @Override
     public void handle(NotifyEndGameResponse serverMsg) {
-        // TODO view method to show the player the final ranking of the game, the game is over, how you take first blood points
+        // TODO view method to show the player the final ranking of the game, the game is over, how you take first blood points (?)
         return;
     }
 
@@ -243,13 +244,13 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(RespawnRequest serverMsg) {
         ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower().add(serverMsg.getcPU());
+        clientView.choosePowerUpToRespawn(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower());
         // TODO view method that allows the player to choose a power-up card to discard to select the map color where respawn
-        return;
     }
 
     @Override
     public void handle(InsufficientAmmoResponse serverMsg) {
-        //TODO view methods
+        clientView.insufficientAmmoNotification();
         return;
 
     }

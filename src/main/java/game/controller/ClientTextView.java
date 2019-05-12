@@ -1,13 +1,7 @@
 package game.controller;
 
-import game.controller.commands.clientcommands.ChooseSquareResponse;
-import game.controller.commands.clientcommands.ChooseTargetResponse;
-import game.controller.commands.clientcommands.ChooseTurnActionResponse;
-import game.controller.commands.clientcommands.GrabActionRequest;
-import game.model.Action;
-import game.model.Player;
-import game.model.Square;
-import game.model.Target;
+import game.controller.commands.clientcommands.*;
+import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -262,5 +256,23 @@ public class ClientTextView implements View {
         }
     }
 
+    public void notifyDeath(Kill kill) {
+        System.out.print("Player "+kill.getVictim().getId()+" was killed by the player "+kill.getKiller().getId());
+        if(kill.isRage())
+            System.out.println(" that also has raged him!");
+        else
+            System.out.println("!");
+    }
 
+    public void choosePowerUpToRespawn(List <CardPower> list){
+        int k=0;
+        System.out.println("Choose which power-up card you want to discard to respawn (you will respawn in the room with the same color of the discard card):");
+        for(int i=1;i<=list.size();i++)
+            System.out.println(i+">>>"+list.get(i-1).toString());
+        do{
+            k=readInt();
+        }while(k<1 && k>list.size());
+        //TODO have we to remove the card power from the list or we waiting for the notify of the operation?
+        controller.getClient().sendMessage(new RespawnResponse(list.get(k-1)));
+    }
 }
