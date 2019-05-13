@@ -275,7 +275,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                 return new InvalidPowerUpResponse();
         }
         else
-            return new InvalidMessageResponse();
+            return new InvalidMessageResponse("You are not dead, you can't respawn!");
     }
 
     @Override

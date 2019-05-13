@@ -63,6 +63,8 @@ class PlayerTest {
         map.getGrid()[0][0].addPlayer(p);
         game=new Game(Collections.singletonList(p),map,8);
         p.setGame(game);
+        enemy.setGame(game);
+        enemy2.setGame(game);
     }
 
 

@@ -1,5 +1,6 @@
 package game.controller;
 
+import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.servercommands.*;
 import game.model.CardWeapon;
@@ -15,12 +16,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class ClientController implements ServerMessageHandler {
-    // reference to networking layer
     private final Client client;
     private Thread receiver;
-    //private View clientView;
-    private ClientTextView clientView;
-    //TODO: add the view
+    private View clientView;
 
     public ClientController(Client client) {
         this.client = client;
@@ -31,10 +29,20 @@ public class ClientController implements ServerMessageHandler {
         return client;
     }
 
+    /**
+     * Start the listener thread for ServerMessages
+     */
     public void start() {
 
         receiver = new Thread(
-                //receive messages from the Server
+
+                () -> {
+                    ServerMessage sm;
+                    do{
+                        sm = client.receiveMessage();
+                        sm.handle(this);
+                    }while(sm != null);
+                }
         );
         receiver.start();
     }
@@ -42,8 +50,9 @@ public class ClientController implements ServerMessageHandler {
 
     public void run() throws IOException {
         clientView.setUserNamePhase();
+        this.start();
         //TODO: launch various phases on the view
-        return;
+
     }
 
     /**

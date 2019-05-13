@@ -37,25 +37,28 @@ public class Game {
         POINTSCOUNT.add(1);
     }
 
-    public Game(int id, int mapId, int killBoardSize)
-    {
-        this.id = id;
+    public Game(int killBoardSize){
         this.killboardSize = killBoardSize;
+        gameObservers = new ArrayList<>();
         this.killBoard = new ArrayList<>(killBoardSize);
         generateDecks("loadingGame.txt");
+    }
+
+    public Game(int id, int mapId, int killBoardSize)
+    {
+        this(killBoardSize);
+        this.id = id;
         currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
         readMap(mapId, "mapFile.xml");
-        gameObservers = new ArrayList<>();
+
     }
 
     public Game(List<Player> players, Map map,int killBoardSize) {
+        this(killBoardSize);
         this.players = players;
         this.map = map;
-        this.killboardSize = killBoardSize;
-        this.killBoard = new ArrayList<>(killBoardSize);
-        generateDecks("loadingGame.txt");
         currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
     }
@@ -88,6 +91,7 @@ public class Game {
                 if(tmpMap.getAttribute("id").getIntValue() == id){
                     map.setDescription(tmpMap.getChildText("desc"));
                     for(Element sq : tmpMap.getChildren("square")){
+                        grid[x][y] = new Square();
                         grid[x][y].setColor(createEquivalentMapColor(sq.getChildText("color")));
                         for(Element edg : sq.getChildren("edge")){
                             edges[k] = createEquivalentEdge(edg.getText());
@@ -758,17 +762,30 @@ public class Game {
         gameObservers.forEach(o -> o.onGrabAmmo(p,ammo));
     }
 
+    /**
+     * Notify to all players the movement of a player
+     * @param p
+     */
     void notifyMove(Player p)
     {
         gameObservers.forEach(o -> o.onMove(p));
     }
 
 
-    void onRespawn(Player p){
+    /**
+     * Notify to all players the respawn of a player
+     * @param p
+     */
+    void notifyRespawn(Player p){
         gameObservers.forEach(o -> o.onRespawn(p));
     }
 
-    void onPowerUpUse(Player p, CardPower c)
+    /**
+     * Notify to all players the use of a powerup
+     * @param p
+     * @param c
+     */
+    void notifyPowerUpUse(Player p, CardPower c)
     {
         gameObservers.forEach(o -> o.onPowerUpUse(p,c));
     }

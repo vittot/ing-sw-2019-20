@@ -210,6 +210,7 @@ public class Player implements Target, Serializable {
         this.adrenaline = AdrenalineLevel.NONE;
         this.position = game.getMap().respawnColor(discard.getMapColor());
         this.isDead = false;
+        game.notifyRespawn(this);
     }
 
     /**
@@ -260,6 +261,8 @@ public class Player implements Target, Serializable {
             lastKill = game.getLastKill(this);
             lastKill.setRage(true);
         }
+        game.notifyDamage(this,shooter,damage);
+
     }
 
     /**
@@ -278,9 +281,12 @@ public class Player implements Target, Serializable {
      */
     @Override
     public void addThisTurnMarks(Player shooter, int marks) {
-        if(checkMarksNumber(shooter,marks))
+        if(checkMarksNumber(shooter,marks)) {
             for (int i = 0; i < marks; i++)
                 this.thisTurnMarks.add(shooter.getColor());
+            game.notifyMarks(this,shooter,marks);
+        }
+
     }
 
     /**
@@ -323,6 +329,7 @@ public class Player implements Target, Serializable {
         }
         this.position.removePlayer(this);
         this.position = newPos;
+        game.notifyMove(this);
     }
 
     /**

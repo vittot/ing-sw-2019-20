@@ -136,7 +136,7 @@ class GameTest {
 
     @Test
     void checkMap() throws MapOutOfLimitException {
-        g.readMap(99, "effectFile.xml");
+        g.setMap(g.readMap(99, "mapFile.xml"));
         Map map = new Map(99,4,3);
         Edge [] ed = new Edge[4];
         ed[0] = Edge.WALL;

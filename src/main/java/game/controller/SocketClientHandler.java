@@ -131,7 +131,7 @@ public class SocketClientHandler implements Runnable, GameListener {
 
     @Override
     public void onGrabWeapon(Player p, CardWeapon cw) {
-        sendMessage(new NotifyGrabWeapon(p,cw,p.getPosition().getX(),p.getPosition().getY()));
+        sendMessage(new NotifyGrabWeapon(p.getId(),cw,p.getPosition().getX(),p.getPosition().getY()));
     }
 
     @Override

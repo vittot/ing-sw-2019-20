@@ -30,6 +30,10 @@ public class Square implements Target, Serializable {
         weapons = new ArrayList<>();
     }
 
+    public Square() {
+
+    }
+
 
     public Map getMap() { return map; }
 
