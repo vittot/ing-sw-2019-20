@@ -6,6 +6,7 @@ import game.model.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Map;
 
 public class ClientTextView implements View {
     private ClientController controller;
@@ -175,6 +176,7 @@ public class ClientTextView implements View {
     /**
      * Notify invalid action selection
      */
+    @Override
     public void invalidActionNotification(){
         writeText("The action selected is not valid!");
     }
@@ -182,6 +184,7 @@ public class ClientTextView implements View {
     /**
      * Notify impossibility to do others actions fort this current turn
      */
+    @Override
     public void insufficientNumberOfActionNotification(){
         writeText("You cannot do others actions for this turn!");
     }
@@ -189,6 +192,7 @@ public class ClientTextView implements View {
     /**
      * Notify impossibility that the player doesn't have enough ammo
      */
+    @Override
     public void insufficientAmmoNotification() {
         writeText("Not enough ammo");
 
@@ -196,6 +200,7 @@ public class ClientTextView implements View {
     /**
      * Notify invalid targets selection
      */
+    @Override
     public void invalidTargetNotification(){
         writeText("The targets selected are not valid!");
     }
@@ -203,6 +208,7 @@ public class ClientTextView implements View {
     /**
      * Notify invalid step selection
      */
+    @Override
     public void invalidStepNotification(){
         writeText("The step selected is not valid!");
     }
@@ -210,6 +216,7 @@ public class ClientTextView implements View {
     /**
      * Notify invalid targets election
      */
+    @Override
     public void maxNumberOfWeaponNotification(){
         writeText("You can't grab others weapons from the ground, before discard one of your weapon!");
     }
@@ -220,6 +227,7 @@ public class ClientTextView implements View {
      * @param dmg
      * @param idHitted
      */
+    @Override
     public void damageNotification(int idShooter, int dmg, int idHitted){
         if(idHitted == ClientContext.get().getMyID())
             writeText("Player "+idShooter+" dealt "+dmg+" damage to you");
@@ -233,6 +241,7 @@ public class ClientTextView implements View {
      * @param x
      * @param y
      */
+    @Override
     public void grabWeaponNotification(int p, int x, int y){
         writeText("Player "+p+" grabbed a weapon in position X:"+x+" Y:"+y);
     }
@@ -243,6 +252,7 @@ public class ClientTextView implements View {
      * @param name
      * @param desc
      */
+    @Override
     public void powerUpUsageNotification(int id, String name, String desc){
         int num = 0;
         if(ClientContext.get().getMyID() == id)
@@ -256,6 +266,11 @@ public class ClientTextView implements View {
         }
     }
 
+    /**
+     *
+     * @param kill
+     */
+    @Override
     public void notifyDeath(Kill kill) {
         System.out.print("Player "+kill.getVictim().getId()+" was killed by the player "+kill.getKiller().getId());
         if(kill.isRage())
@@ -264,9 +279,123 @@ public class ClientTextView implements View {
             System.out.println("!");
     }
 
+    /**
+     *
+     * @param list
+     */
+    @Override
     public void choosePowerUpToRespawn(List <CardPower> list){
-        int k=0;
         System.out.println("Choose which power-up card you want to discard to respawn (you will respawn in the room with the same color of the discard card):");
+        choosePowerUp(list);
+
+    }
+
+    /**
+     *
+     * @param ranking
+     */
+    @Override
+    public void showRanking(Map<Player, Integer> ranking){
+        int i=1;
+        System.out.println("The game is over! \nLet's see the final results:");
+        for(Player p : ranking.keySet()) {
+            switch (i) {
+                case 1:
+                    System.out.print(">>> First place : ");
+                    break;
+                case 2:
+                    System.out.print(">>> Second place : ");
+                    break;
+                case 3:
+                    System.out.print(">>> Third place : ");
+                    break;
+                case 4:
+                    System.out.print(">>> Fourth place : ");
+                    break;
+                case 5:
+                    System.out.print(">>> Fifth place : ");
+                    break;
+            }
+            System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+ranking.get(p)+".");
+        }
+    }
+
+    /**
+     *
+     * @param name
+     */
+    @Override
+    public void notifyWeaponGrab(String name){
+        System.out.println("You grab "+name);
+    }
+
+    @Override
+    public void notifyCompletedOpeartion(String message) {
+
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void notifyInvalidPowerUP(){
+        System.out.println("You have selected an invalid power-up card!");
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void notifyInvalidGrabPosition(){
+        System.out.println("Your grab is failed! There are not card to grab in this square!");
+    }
+
+    /**
+     *
+     * @param list
+     */
+    @Override
+    public void choosePowerUpToUse(List<CardPower> list){
+        System.out.println("Choose which power-up card you want to use after that the damages of your attack have been applied:");
+        choosePowerUp(list);
+    }
+
+    @Override
+    public void notifyStart(Game game) {
+
+    }
+
+    @Override
+    public void notifyInvalidMessage() {
+
+    }
+
+    @Override
+    public void notifyTurnChanged() {
+
+    }
+
+    @Override
+    public void notifyMarks() {
+
+    }
+
+    @Override
+    public void notifyGrabAmmo() {
+
+    }
+
+    @Override
+    public void notifyRespawn() {
+
+    }
+
+    /**
+     *  Allow the choice of a power-up card from the list of cards available for the player
+     * @param list
+     */
+    private void choosePowerUp(List<CardPower> list) {
+        int k=0;
         for(int i=1;i<=list.size();i++)
             System.out.println(i+">>>"+list.get(i-1).toString());
         do{

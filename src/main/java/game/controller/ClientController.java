@@ -188,12 +188,19 @@ public class ClientController implements ServerMessageHandler {
 
     }
 
+    /**
+     * Show the player the final results of the game
+     * @param serverMsg
+     */
     @Override
     public void handle(NotifyEndGameResponse serverMsg) {
-        // TODO view method to show the player the final ranking of the game, the game is over, how you take first blood points (?)
-        return;
+        clientView.showRanking(serverMsg.ranking);
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(NotifyGrabWeapon serverMsg) {
         ClientContext instance = ClientContext.get();
@@ -208,6 +215,10 @@ public class ClientController implements ServerMessageHandler {
 
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(NotifyMovement serverMsg) {
         try {
@@ -218,6 +229,10 @@ public class ClientController implements ServerMessageHandler {
         }
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(NotifyPowerUpUsage serverMsg) {
         ClientContext instance = ClientContext.get();
@@ -227,6 +242,10 @@ public class ClientController implements ServerMessageHandler {
         clientView.powerUpUsageNotification(serverMsg.getId(),serverMsg.getCp().getName(),serverMsg.getCp().getDescription());
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(PickUpAmmoResponse serverMsg) {
         try {
@@ -237,6 +256,10 @@ public class ClientController implements ServerMessageHandler {
         }
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(PickUpWeaponResponse serverMsg) {
         try {
@@ -246,79 +269,125 @@ public class ClientController implements ServerMessageHandler {
         } catch (NoCardWeaponSpaceException e) {
             clientView.invalidWeaponNotification();
         }
-        //TODO call view methods already grabweaponnotification?
-        return;
+        clientView.notifyWeaponGrab(serverMsg.cw.getName());
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(RespawnRequest serverMsg) {
         ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower().add(serverMsg.getcPU());
         clientView.choosePowerUpToRespawn(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower());
-        // TODO view method that allows the player to choose a power-up card to discard to select the map color where respawn
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(InsufficientAmmoResponse serverMsg) {
         clientView.insufficientAmmoNotification();
-        return;
-
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(OperationCompletedResponse serverMsg) {
-        return;
-
+        clientView.notifyCompletedOpeartion(serverMsg.getMessage());
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(InvalidPowerUpResponse serverMsg) {
-
+        clientView.notifyInvalidPowerUP();
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(InvalidGrabPositionRsponse serverMsg) {
-
+        clientView.notifyInvalidGrabPosition();
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle (AfterDamagePowerUpRequest serverMsg){
-        //TODO richiesta powerUp
+        clientView.choosePowerUpToUse(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower());
         return;
     }
 
+    /**
+     *
+     * @param serverMsg
+     */
     @Override
     public void handle(NotifyGameStarted serverMsg) {
-        //TODO
+        clientView.notifyStart(serverMsg.getGame());
     }
 
-
+    /**
+     *
+     * @param waitingRoomsListResponse
+     */
     @Override
     public void handle(WaitingRoomsListResponse waitingRoomsListResponse) {
         ///TODO
     }
 
+    /**
+     *
+     * @param invalidMessageResponse
+     */
     @Override
     public void handle(InvalidMessageResponse invalidMessageResponse) {
-
+        clientView.notifyInvalidMessage();
     }
 
+    /**
+     *
+     * @param notifyTurnChanged
+     */
     @Override
     public void handle(NotifyTurnChanged notifyTurnChanged) {
-        //TODO
+        clientView.notifyTurnChanged();
     }
 
+    /**
+     *
+     * @param notifyMarks
+     */
     @Override
     public void handle(NotifyMarks notifyMarks) {
-
+        clientView.notifyMarks();
     }
 
+    /**
+     *
+     * @param notifyGrabAmmo
+     */
     @Override
     public void handle(NotifyGrabAmmo notifyGrabAmmo) {
-
+        clientView.notifyGrabAmmo();
     }
 
+    /**
+     *
+     * @param notifyRespawn
+     */
     @Override
     public void handle(NotifyRespawn notifyRespawn) {
-
+        clientView.notifyRespawn();
     }
 }

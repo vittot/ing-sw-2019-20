@@ -6,7 +6,7 @@ import game.model.Player;
 import java.util.Map;
 
 public class NotifyEndGameResponse implements ServerMessage {
-    private Map<Player,Integer> ranking;
+    public Map<Player,Integer> ranking;
 
     public NotifyEndGameResponse(Map<Player, Integer> gameRanking) {
         this.ranking = gameRanking;
