@@ -64,4 +64,8 @@ public interface View {
     void notifyGrabAmmo();
 
     void notifyRespawn();
+
+    void chooseRoomPhase(List<WaitingRoom> waitingRooms);
+
+    void showMapsPhase(List<Map> availableMaps);
 }

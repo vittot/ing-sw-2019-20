@@ -17,4 +17,5 @@ public interface ClientMessageHandler {
     ServerMessage handle(JoinWaitingRoomRequest joinWaitingRoomRequest);
     ServerMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest);
     ServerMessage handle(EndTurnRequest endTurnRequest);
+    ServerMessage handle(GetAvailableMapsRequest getAvailableMapsRequest);
 }

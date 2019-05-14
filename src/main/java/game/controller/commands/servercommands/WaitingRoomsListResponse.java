@@ -14,6 +14,10 @@ public class WaitingRoomsListResponse implements ServerMessage {
         this.avaiableWaitingRooms = avaiableWaitingRooms;
     }
 
+    public List<WaitingRoom> getAvaiableWaitingRooms() {
+        return avaiableWaitingRooms;
+    }
+
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

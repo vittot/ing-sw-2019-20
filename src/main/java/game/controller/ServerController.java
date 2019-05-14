@@ -375,6 +375,11 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         return new OperationCompletedResponse("Your turn is terminated");
     }
 
+    @Override
+    public ServerMessage handle(GetAvailableMapsRequest getAvailableMapsRequest) {
+        return new AvailableMapsListResponse(Game.getAvailableMaps());
+    }
+
     /**
      * Ask the user for the targets of the next simpleEffect, if there is the need of a choice
      * If the choice is not needed, it passes to the next simpleEffect

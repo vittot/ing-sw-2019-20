@@ -73,12 +73,28 @@ public class Game {
         readMap(mapId, "mapFile.xml");
     }
 
+    public static List<Map> getAvailableMaps()
+    {
+        int id = 1;
+        List<Map> availableMaps = new ArrayList<>();
+        Map m;
+        do{
+            m = readMap(id,"mapFile.xml");
+            if(m != null)
+                availableMaps.add(m);
+            id++;
+        }while(m != null);
 
-    public Map readMap(int id,String fileName){
-        Map map = new Map(id,4,3);
-        Square [][] grid = new Square[4][3];
+        return availableMaps;
+    }
+
+
+    public static Map readMap(int id,String fileName){
+        Map map = null;
+        Square [][] grid = null;
         int x = 0;
         int y = 0;
+        String desc = null;
         Edge [] edges = new Edge[4];
         int k = 0;
         SAXBuilder builder = new SAXBuilder();
@@ -89,20 +105,25 @@ public class Game {
             Element root = document.getRootElement();
             for (Element tmpMap : root.getChildren("map")){
                 if(tmpMap.getAttribute("id").getIntValue() == id){
-                    map.setDescription(tmpMap.getChildText("desc"));
+                    grid = new Square[4][3];
+                    desc = tmpMap.getChildText("desc");
                     for(Element sq : tmpMap.getChildren("square")){
-                        grid[x][y] = new Square();
-                        grid[x][y].setColor(createEquivalentMapColor(sq.getChildText("color")));
-                        for(Element edg : sq.getChildren("edge")){
-                            edges[k] = createEquivalentEdge(edg.getText());
+
+                        if(!sq.getChildren().isEmpty()) {
+                            grid[x][y] = new Square();
+
+                            grid[x][y].setColor(createEquivalentMapColor(sq.getChildText("color")));
+                            for (Element edg : sq.getChildren("edge")) {
+                                edges[k] = createEquivalentEdge(edg.getText());
+                            }
+                            k = 0;
+                            grid[x][y].setEdges(edges);
+                            grid[x][y].setRespawn(sq.getChildText("respown").equals("true"));
                         }
-                        k = 0;
-                        grid[x][y].setEdges(edges);
-                        grid[x][y].setRespawn(sq.getChildText("respown").equals("true"));
-                        if(x == 3){
+                        if (x == 3) {
                             x = 0;
                             y++;
-                        }else{
+                        } else {
                             x++;
                         }
                     }
@@ -116,18 +137,23 @@ public class Game {
         } catch (IOException e1) {
             //TODO ecc
         }
-        map.setGrid(grid);
+        if(grid != null){
+            map = new Map(id,4,3);
+            map.setDescription(desc);
+            map.setGrid(grid);
+        }
+
         return map;
     }
 
-    public Edge createEquivalentEdge (String name){
+    public static Edge createEquivalentEdge (String name){
         if(name.equals("door")) return Edge.DOOR;
         if(name.equals("open")) return Edge.OPEN;
         if(name.equals("wall")) return Edge.WALL;
         return null;
     }
 
-    public MapColor createEquivalentMapColor (String name){
+    public static MapColor createEquivalentMapColor (String name){
         if(name.equals("blue")) return MapColor.BLUE;
         if(name.equals("grey")) return MapColor.GREY;
         if(name.equals("purple")) return MapColor.PURPLE;

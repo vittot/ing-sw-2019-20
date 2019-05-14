@@ -55,14 +55,14 @@ public class SocketClient implements Client {
     }
 
     public void close() {
-        try {
+        /*try {
             inputStream.close();
             outStream.close();
             socket.close();
         }catch(IOException e)
         {
             e.printStackTrace();
-        }
+        }*/
     }
 
     //TODO: send Requests and receive Responses

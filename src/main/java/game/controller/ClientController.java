@@ -343,7 +343,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(WaitingRoomsListResponse waitingRoomsListResponse) {
-        ///TODO
+        clientView.chooseRoomPhase(waitingRoomsListResponse.getAvaiableWaitingRooms());
     }
 
     /**
@@ -389,5 +389,10 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyRespawn notifyRespawn) {
         clientView.notifyRespawn();
+    }
+
+    @Override
+    public void handle(AvailableMapsListResponse availableMapsListResponse) {
+        clientView.showMapsPhase(availableMapsListResponse.getAvaiableMaps());
     }
 }

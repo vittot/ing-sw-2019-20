@@ -23,6 +23,7 @@ public class GameServer {
         serverSocket = new ServerSocket(port);
         pool = Executors.newCachedThreadPool();
         close = false;
+        System.out.println("GameServer listening on port 5000");
         //TODO bind on registy for RMI
     }
 

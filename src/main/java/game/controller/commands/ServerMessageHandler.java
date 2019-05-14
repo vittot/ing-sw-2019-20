@@ -36,4 +36,5 @@ public interface ServerMessageHandler {
     void handle(NotifyMarks notifyMarks);
     void handle(NotifyGrabAmmo notifyGrabAmmo);
     void handle(NotifyRespawn notifyRespawn);
+    void handle(AvailableMapsListResponse availableMapsListResponse);
 }

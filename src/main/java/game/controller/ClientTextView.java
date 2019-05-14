@@ -12,6 +12,7 @@ public class ClientTextView implements View {
     private ClientController controller;
     private Scanner fromKeyBoard;
     private String user;
+    private List<Map> availableMaps;
 
     public ClientTextView(ClientController controller) {
         this.controller = controller;
@@ -35,10 +36,72 @@ public class ClientTextView implements View {
         } while ( this.user == null);
 
         writeText("Welcome, " + this.user + ", good luck!");
-        //TODO:
-        //get list of waiting rooms and available maps
-        //choose if join a room or create a new room
 
+        controller.getClient().sendMessage(new GetAvailableMapsRequest());
+    }
+
+    /**
+     * Show available maps and ask server for available rooms
+     * @param availableMaps
+     */
+    public void showMapsPhase(List<Map> availableMaps)
+    {
+        this.availableMaps = availableMaps;
+        printAvailableMaps();
+        controller.getClient().sendMessage(new GetWaitingRoomsRequest());
+    }
+
+    /**
+     * Show the avaiable maps
+     */
+    private void printAvailableMaps()
+    {
+        writeText("Avaiable game maps:\n");
+        for(Map m : availableMaps)
+            writeText(m.toString());
+    }
+
+    /**
+     * Show avaible rooms and choose if join one of these or create a new one
+     * @param waitingRooms
+     */
+    public void chooseRoomPhase(List<WaitingRoom> waitingRooms)
+    {
+        int nRoom;
+        for(WaitingRoom w : waitingRooms)
+        {
+            writeText(w.toString());
+        }
+        writeText("Enter the id for the selected waiting room or -1 if you want to create a new waiting room:");
+        do{
+            nRoom = readInt();
+        }while((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1);
+        if(nRoom != -1)
+        {
+            controller.getClient().sendMessage(new JoinWaitingRoomRequest(nRoom));
+        }
+        else
+            createRoomPhase();
+    }
+
+    /**
+     * Ask to create a new waiting room on the server
+     */
+    public void createRoomPhase()
+    {
+        int mapId, nPlayer;
+        printAvailableMaps();
+        do{
+            writeText("Enter the room map id:");
+            mapId = readInt();
+        }while(mapId < 1 || mapId > availableMaps.size());
+
+        do{
+            writeText("Enter the number of player for the room [3-5]:");
+            nPlayer = readInt();
+        }while(nPlayer < 3 || nPlayer > 5);
+
+        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer));
     }
 
     /**
@@ -231,7 +294,7 @@ public class ClientTextView implements View {
     public void damageNotification(int idShooter, int dmg, int idHitted){
         if(idHitted == ClientContext.get().getMyID())
             writeText("Player "+idShooter+" dealt "+dmg+" damage to you");
-        else
+        else if(idShooter != ClientContext.get().getMyID())
             writeText("Player "+idShooter+" dealt "+dmg+" to player "+idHitted);
     }
 

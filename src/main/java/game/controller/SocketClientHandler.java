@@ -27,6 +27,7 @@ public class SocketClientHandler implements Runnable, GameListener {
         this.inStream = new ObjectInputStream(s.getInputStream());
 
         this.controller = new ServerController(this);
+        stop = false;
         //the controller game will be set after the request of a new game or to join an existing game
     }
 
