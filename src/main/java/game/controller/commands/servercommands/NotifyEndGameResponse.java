@@ -6,7 +6,7 @@ import game.model.Player;
 import java.util.Map;
 
 public class NotifyEndGameResponse implements ServerMessage {
-    public Map<Player,Integer> ranking;
+    private Map<Player,Integer> ranking;
 
     public NotifyEndGameResponse(Map<Player, Integer> gameRanking) {
         this.ranking = gameRanking;
@@ -15,5 +15,9 @@ public class NotifyEndGameResponse implements ServerMessage {
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
+    }
+
+    public Map<Player, Integer> getRanking() {
+        return ranking;
     }
 }

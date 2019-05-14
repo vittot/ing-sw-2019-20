@@ -9,11 +9,19 @@ import game.model.CardWeapon;
 import java.util.List;
 
 public class ReloadWeaponRequest implements ClientMessage {
-    public CardWeapon weapon;
-    public List<CardPower> powerups;
+    private CardWeapon weapon;
+    private List<CardPower> powerups;
 
     @Override
     public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);
+    }
+
+    public CardWeapon getWeapon() {
+        return weapon;
+    }
+
+    public List<CardPower> getPowerups() {
+        return powerups;
     }
 }

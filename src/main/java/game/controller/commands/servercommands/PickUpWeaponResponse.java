@@ -8,12 +8,24 @@ import game.model.CardWeapon;
 import java.util.List;
 
 public class PickUpWeaponResponse implements ServerMessage {
-    public CardWeapon cw;
-    public CardWeapon cwToWaste;
-    public List<CardPower> cp;
+    private CardWeapon cw;
+    private CardWeapon cwToWaste;
+    private List<CardPower> cp;
 
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
+    }
+
+    public CardWeapon getCw() {
+        return cw;
+    }
+
+    public CardWeapon getCwToWaste() {
+        return cwToWaste;
+    }
+
+    public List<CardPower> getCp() {
+        return cp;
     }
 }

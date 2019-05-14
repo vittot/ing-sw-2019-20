@@ -18,4 +18,5 @@ public interface ClientMessageHandler {
     ServerMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest);
     ServerMessage handle(EndTurnRequest endTurnRequest);
     ServerMessage handle(GetAvailableMapsRequest getAvailableMapsRequest);
+    ServerMessage handle(ChoosePowerUpResponse choosePowerUpResponse);
 }

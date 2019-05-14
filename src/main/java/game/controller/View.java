@@ -35,15 +35,13 @@ public interface View {
 
     void notifyDeath(Kill kill);
 
-    void grabWeaponNotification(int p, int x, int y);
+    void grabWeaponNotification(int pID, String name, int x, int y);
 
     void powerUpUsageNotification(int id, String name, String description);
 
     void choosePowerUpToRespawn(List<CardPower> cardPower);
 
     void showRanking(Map<Player, Integer> ranking);
-
-    void notifyWeaponGrab(String name);
 
     void notifyCompletedOperation(String message);
 
@@ -57,13 +55,13 @@ public interface View {
 
     void notifyInvalidMessage();
 
-    void notifyTurnChanged();
+    void notifyTurnChanged(int pID);
 
-    void notifyMarks();
+    void notifyMarks(int marks, int idHitten, int idShooter);
 
-    void notifyGrabAmmo();
+    void notifyGrabAmmo(int pID);
 
-    void notifyRespawn();
+    void notifyRespawn(int pID);
 
     void chooseRoomPhase(List<WaitingRoom> waitingRooms);
 

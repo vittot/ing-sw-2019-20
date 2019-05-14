@@ -73,6 +73,10 @@ public class Game {
         readMap(mapId, "mapFile.xml");
     }
 
+    public int getId() {
+        return id;
+    }
+
     public static List<GameMap> getAvailableMaps()
     {
         int id = 1;
@@ -115,10 +119,13 @@ public class Game {
                             grid[x][y].setColor(createEquivalentMapColor(sq.getChildText("color")));
                             for (Element edg : sq.getChildren("edge")) {
                                 edges[k] = createEquivalentEdge(edg.getText());
+                                k++;
                             }
                             k = 0;
-                            grid[x][y].setEdges(edges);
+                            grid[x][y].setEdges(edges.clone());
                             grid[x][y].setRespawn(sq.getChildText("respown").equals("true"));
+                            grid[x][y].setX(x);
+                            grid[x][y].setY(y);
                         }
                         if (y == 3) {
                             y = 0;
@@ -156,6 +163,7 @@ public class Game {
     public static MapColor createEquivalentMapColor (String name){
         if(name.equals("blue")) return MapColor.BLUE;
         if(name.equals("grey")) return MapColor.GREY;
+        if(name.equals("green")) return MapColor.GREEN;
         if(name.equals("purple")) return MapColor.PURPLE;
         if(name.equals("red")) return MapColor.RED;
         if(name.equals("yellow")) return MapColor.YELLOW;

@@ -8,8 +8,8 @@ import game.model.CardWeapon;
 import java.util.List;
 
 public class CheckReloadResponse implements ServerMessage {
-    public CardWeapon weapon;
-    public List<CardPower> powerUps;
+    private CardWeapon weapon;
+    private List<CardPower> powerUps;
 
     public CheckReloadResponse(CardWeapon weapon, List<CardPower> powerUps) {
         this.weapon = weapon;
@@ -19,5 +19,13 @@ public class CheckReloadResponse implements ServerMessage {
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
+    }
+
+    public CardWeapon getWeapon() {
+        return weapon;
+    }
+
+    public List<CardPower> getPowerUps() {
+        return powerUps;
     }
 }

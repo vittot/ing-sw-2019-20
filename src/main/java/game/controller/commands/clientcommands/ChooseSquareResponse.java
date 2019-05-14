@@ -10,10 +10,14 @@ import java.util.List;
 public class ChooseSquareResponse implements ClientMessage {
 
 
-    public Square selectedSquare;
+    private Square selectedSquare;
 
     public ChooseSquareResponse(Square selectedSquare) {
         this.selectedSquare=selectedSquare;
+    }
+
+    public Square getSelectedSquare() {
+        return selectedSquare;
     }
 
     @Override

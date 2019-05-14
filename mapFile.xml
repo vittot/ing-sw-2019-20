@@ -128,7 +128,7 @@
             <edge>wall</edge>
             <edge>wall</edge>
             <edge>door</edge>
-            <edge>door</edge>
+            <edge>wall</edge>
             <respown>false</respown>
         </square>
         <square>

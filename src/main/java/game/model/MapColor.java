@@ -5,5 +5,6 @@ public enum MapColor {
     BLUE,
     YELLOW,
     PURPLE,
-    GREY;
+    GREY,
+    GREEN;
 }

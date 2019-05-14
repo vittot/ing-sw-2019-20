@@ -9,16 +9,18 @@ import java.util.Scanner;
 import java.util.Map;
 
 public class ClientTextView implements View {
-    private ClientController controller;
-    private Scanner fromKeyBoard;
-    private String user;
-    private List<GameMap> availableMaps;
+    private static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_GREEN = "\u001B[32m";
+    private ClientController controller;
+    private Scanner fromKeyBoard;
+    private String user;
+    private List<GameMap> availableMaps;
+
 
     public ClientTextView(){
 
@@ -312,14 +314,19 @@ public class ClientTextView implements View {
     }
 
     /**
-     * notify the player that someone grab a weapon in a specific position
-     * @param p
+     *
+     * @param pID
+     * @param name
      * @param x
      * @param y
      */
     @Override
-    public void grabWeaponNotification(int p, int x, int y){
-        writeText("Player "+p+" grabbed a weapon in position X:"+x+" Y:"+y);
+    public void grabWeaponNotification(int pID, String name, int x, int y){
+        if(pID == ClientContext.get().getMyID())
+            writeText("Player "+pID+" grabbed the weapon "+name+" in position X:"+x+" Y:"+y);
+        else
+            writeText("Player "+ClientContext.get().getMap().getPlayerById(pID).getNickName()+" grab the weapon "+name+" in position X:"+x+" Y:"+y);
+
     }
 
     /**
@@ -350,9 +357,9 @@ public class ClientTextView implements View {
     public void notifyDeath(Kill kill) {
         System.out.print("Player "+kill.getVictim().getId()+" was killed by the player "+kill.getKiller().getId());
         if(kill.isRage())
-            System.out.println(" that also has raged him!");
+            writeText(" that also has raged him!");
         else
-            System.out.println("!");
+            writeText("!");
     }
 
     /**
@@ -361,9 +368,8 @@ public class ClientTextView implements View {
      */
     @Override
     public void choosePowerUpToRespawn(List <CardPower> list){
-        System.out.println("Choose which power-up card you want to discard to respawn (you will respawn in the room with the same color of the discard card):");
-        choosePowerUp(list);
-
+        writeText("Choose which power-up card you want to discard to respawn (you will respawn in the room with the same color of the discard card):");
+        controller.getClient().sendMessage(new RespawnResponse(choosePowerUp(list)));
     }
 
     /**
@@ -398,13 +404,8 @@ public class ClientTextView implements View {
 
     /**
      *
-     * @param name
+     * @param message
      */
-    @Override
-    public void notifyWeaponGrab(String name){
-        System.out.println("You grab "+name);
-    }
-
     @Override
     public void notifyCompletedOperation(String message) {
         writeText(message);
@@ -433,169 +434,229 @@ public class ClientTextView implements View {
     @Override
     public void choosePowerUpToUse(List<CardPower> list){
         System.out.println("Choose which power-up card you want to use after that the damages of your attack have been applied:");
-        choosePowerUp(list);
+        controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(list)));
     }
 
+    /**
+     *
+     *
+     */
     @Override
     public void notifyStart() {
-        writeText("The game is started!");
+        writeText("Game is started!");
     }
 
+    /**
+     *
+     */
     @Override
     public void notifyInvalidMessage() {
-
+        writeText("ERROR! Invalid choice!");
     }
 
+    /**
+     *
+     * @param pID
+     */
     @Override
-    public void notifyTurnChanged() {
-
+    public void notifyTurnChanged(int pID) {
+        writeText("The turn is finished! "+ClientContext.get().getMap().getPlayerById(pID).getNickName()+" now it's your time!");
     }
 
+    /**
+     *
+     * @param marks
+     * @param idHitten
+     * @param idShooter
+     */
     @Override
-    public void notifyMarks() {
-
+    public void notifyMarks(int marks, int idHitten, int idShooter) {
+        if(idHitten == ClientContext.get().getMyID())
+            writeText("You have received "+marks+" marks from "+ClientContext.get().getMap().getPlayerById(idShooter).getNickName()+"!");
+        else
+            writeText("Player "+ClientContext.get().getMap().getPlayerById(idHitten).getNickName()+" has received "+marks+" marks from "+ClientContext.get().getMap().getPlayerById(idShooter).getNickName()+"!");
     }
 
+    /**
+     *
+     * @param pID
+     */
     @Override
-    public void notifyGrabAmmo() {
-
+    public void notifyGrabAmmo(int pID) {
+        if(pID == ClientContext.get().getMyID())
+            writeText("You grab a card ammo from the field");
+        else
+            writeText("Player "+ClientContext.get().getMap().getPlayerById(pID).getNickName()+" grab a card ammo from the field!");
     }
 
+    /**
+     *
+     * @param pID
+     */
     @Override
-    public void notifyRespawn() {
-
+    public void notifyRespawn(int pID) {
+        if(pID == ClientContext.get().getMyID())
+            writeText("You are respawn!");
+        else
+            writeText("Player "+ClientContext.get().getMap().getPlayerById(pID).getNickName()+" is respawn!");
     }
 
     /**
      *  Allow the choice of a power-up card from the list of cards available for the player
      * @param list
      */
-    private void choosePowerUp(List<CardPower> list) {
+    private CardPower choosePowerUp(List<CardPower> list) {
         int k=0;
         for(int i=1;i<=list.size();i++)
             System.out.println(i+">>>"+list.get(i-1).toString());
         do{
             k=readInt();
         }while(k<1 && k>list.size());
-        //TODO have we to remove the card power from the list or we waiting for the notify of the operation?
-        controller.getClient().sendMessage(new RespawnResponse(list.get(k-1)));
+        return list.get(k);
     }
 
     public void showMap(Square[][] grid) {
         String col;
-        String wallVert = " │ ";
-        String[] wallHor = {
-                "────",
-                "    "};
-        String[] wallHor2 = {
-                "    ",
-                "────"};
-        String doorVert =" ¦ ";
-        String[] doorHor = {
-                "┤  ├",
-                "    "};
-        String[] doorHor2 = {
-                "    ",
-                "┤  ├"};
-        String open = "    ";
-        String[] angleLeftUp = {" ┌─",
-                " │ "};
-        String[] angleRigUp = {
-                "─┐ ",
-                " │ "};
-        String[] angleLeftDown = {" │ ",
-                " └─"};
-        String[] angleRigDown = {" │ ",
-                "─┘ "};
+        String wallVert = " │";
+        String wallHor ="────";
+        String wallHor2 = "────";
+        String doorVert1 =" ┴";
+        String doorVert2 =" ┬";
+        String doorHor ="┤  ├";
+        String doorHor2 ="┤  ├";
+        String openV = "  ";
+        String openH = "    ";
+        String angleLeftUp =" ┌─";
+        String angleRigUp = "─┐";
+        String angleLeftDown = " └─";
+        String angleRigDown ="─┘";
 
         for (int x = 0; x < 3; x++) { //change with pos in the string
-            for (int j = 0; j < 2; j++) { //change with square
-                col = checkColor(grid[x][0].getColor());
-                System.out.print(col + angleLeftUp[j] + ANSI_RESET);
-                if (grid[x][0].getEdge(Direction.UP).name().equals("WALL"))
-                    System.out.print(col + wallHor[j] + ANSI_RESET);
-                if (grid[x][0].getEdge(Direction.UP).name().equals("DOOR"))
-                    System.out.print(col + doorHor[j] + ANSI_RESET);
-                if (grid[x][0].getEdge(Direction.UP).name().equals("OPEN"))
-                    System.out.print(col + open + ANSI_RESET);
-                System.out.print(col + angleRigUp[j] + ANSI_RESET);
-                col = checkColor(grid[x][1].getColor());
-                System.out.print(col + angleLeftUp[j] + ANSI_RESET);
-                if (grid[x][1].getEdge(Direction.UP).name().equals("WALL"))
-                    System.out.print(col + wallHor[j] + ANSI_RESET);
-                if (grid[x][1].getEdge(Direction.UP).name().equals("DOOR"))
-                    System.out.print(col + doorHor[j] + ANSI_RESET);
-                if (grid[x][1].getEdge(Direction.UP).name().equals("OPEN"))
-                    System.out.print(col + open + ANSI_RESET);
-                System.out.print(col + angleRigUp[j] + ANSI_RESET);
-                col = checkColor(grid[x][0].getColor());
-                System.out.print(col + angleLeftUp[j] + ANSI_RESET);
-                if (grid[x][2].getEdge(Direction.UP).name().equals("WALL"))
-                    System.out.print(col + wallHor[j] + ANSI_RESET);
-                if (grid[x][2].getEdge(Direction.UP).name().equals("DOOR"))
-                    System.out.print(col + doorHor[j] + ANSI_RESET);
-                if (grid[x][2].getEdge(Direction.UP).name().equals("OPEN"))
-                    System.out.print(col + open + ANSI_RESET);
-                System.out.print(col + angleRigUp[j] + ANSI_RESET);
-                System.out.println(" ");
-            }
-            for(int j = 0; j < 3; j++){
-                col = checkColor(grid[x][j].getColor());
-                if (grid[x][j].getEdge(Direction.LEFT).name().equals("WALL"))
-                    System.out.print(col + wallVert + ANSI_RESET);
-                if (grid[x][j].getEdge(Direction.LEFT).name().equals("DOOR"))
-                    System.out.print(col + doorVert + ANSI_RESET);
-                if (grid[x][j].getEdge(Direction.LEFT).name().equals("OPEN"))
-                    System.out.print(col + open + ANSI_RESET);
-                System.out.print(col + open + ANSI_RESET);
-                if (grid[x][j].getEdge(Direction.RIGHT).name().equals("WALL"))
-                    System.out.print(col + wallVert + ANSI_RESET);
-                if (grid[x][j].getEdge(Direction.RIGHT).name().equals("DOOR"))
-                    System.out.print(col + doorVert + ANSI_RESET);
-                if (grid[x][j].getEdge(Direction.RIGHT).name().equals("OPEN"))
-                    System.out.print(col + open + ANSI_RESET);
+            for (int j = 0; j < 4; j++) { //change with square
+                if(grid[x][j]!=null) {
+                    col = checkColor(grid[x][j].getColor());
+                    System.out.print(col + angleLeftUp + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.UP).name().equals("WALL"))
+                        System.out.print(col + wallHor + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.UP).name().equals("DOOR"))
+                        System.out.print(col + doorHor + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.UP).name().equals("OPEN"))
+                        System.out.print(col + openH + ANSI_RESET);
+                    System.out.print(col + angleRigUp + ANSI_RESET);
+                }
+                else{
+                    System.out.print("         ");
+                }
             }
             System.out.println("");
-            for (int j = 0; j < 2; j++){
-                col = checkColor(grid[x][0].getColor());
-                System.out.print(col + angleLeftDown[j] + ANSI_RESET);
-                if (grid[x][0].getEdge(Direction.DOWN).name().equals("WALL"))
-                    System.out.print(col + wallHor2[j] + ANSI_RESET);
-                if (grid[x][0].getEdge(Direction.DOWN).name().equals("DOOR"))
-                    System.out.print(col + doorHor2[j] + ANSI_RESET);
-                if (grid[x][0].getEdge(Direction.DOWN).name().equals("OPEN"))
-                    System.out.print(col + open + ANSI_RESET);
-                System.out.print(col + angleRigDown[j] + ANSI_RESET);
-                col = checkColor(grid[x][1].getColor());
-                System.out.print(col + angleLeftDown[j] + ANSI_RESET);
-                if (grid[x][1].getEdge(Direction.DOWN).name().equals("WALL"))
-                    System.out.print(col + wallHor2[j] + ANSI_RESET);
-                if (grid[x][1].getEdge(Direction.DOWN).name().equals("DOOR"))
-                    System.out.print(col + doorHor2[j] + ANSI_RESET);
-                if (grid[x][1].getEdge(Direction.DOWN).name().equals("OPEN"))
-                    System.out.print(col + open + ANSI_RESET);
-                System.out.print(col + angleRigDown[j] + ANSI_RESET);
-                col = checkColor(grid[x][0].getColor());
-                System.out.print(col + angleLeftDown[j] + ANSI_RESET);
-                if (grid[x][2].getEdge(Direction.DOWN).name().equals("WALL"))
-                    System.out.print(col + wallHor2[j] + ANSI_RESET);
-                if (grid[x][2].getEdge(Direction.DOWN).name().equals("DOOR"))
-                    System.out.print(col + doorHor2[j] + ANSI_RESET);
-                if (grid[x][2].getEdge(Direction.DOWN).name().equals("OPEN"))
-                    System.out.print(col + open + ANSI_RESET);
-                System.out.print(col + angleRigDown[j] + ANSI_RESET);
-                System.out.println(" ");
+            for(int j = 0; j < 4; j++){ // first mid
+                if(grid[x][j]!=null) {
+                    col = checkColor(grid[x][j].getColor());
+                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("WALL"))
+                        System.out.print(col + wallVert + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("DOOR"))
+                        System.out.print(col + doorVert1 + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("OPEN"))
+                        System.out.print(col + openV + ANSI_RESET);
+                    System.out.print(col + "     " + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("WALL"))
+                        System.out.print(col + wallVert + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("DOOR"))
+                        System.out.print(col + doorVert1 + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("OPEN"))
+                        System.out.print(col + openV + ANSI_RESET);
+                }
+                else{
+                    System.out.print("         ");
+                }
             }
+            System.out.println("");
+            for(int j = 0; j < 4; j++){ // second mid
+                if(grid[x][j]!=null) {
+                    col = checkColor(grid[x][j].getColor());
+                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("WALL"))
+                        System.out.print(col + wallVert + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("DOOR"))
+                        System.out.print(col + doorVert2 + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("OPEN"))
+                        System.out.print(col + openV + ANSI_RESET);
+                    System.out.print(col + "     " + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("WALL"))
+                        System.out.print(col + wallVert + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("DOOR"))
+                        System.out.print(col + doorVert2 + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("OPEN"))
+                        System.out.print(col + openV + ANSI_RESET);
+                }
+                else{
+                    System.out.print("         ");
+                }
+            }
+            System.out.println("");
+            for (int j = 0; j < 4; j++) {
+                if(grid[x][j]!=null) {
+                    col = checkColor(grid[x][j].getColor());
+                    System.out.print(col + angleLeftDown + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.DOWN).name().equals("WALL"))
+                        System.out.print(col + wallHor2 + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.DOWN).name().equals("DOOR"))
+                        System.out.print(col + doorHor2 + ANSI_RESET);
+                    if (grid[x][j].getEdge(Direction.DOWN).name().equals("OPEN"))
+                        System.out.print(col + openH + ANSI_RESET);
+                    System.out.print(col + angleRigDown + ANSI_RESET);
+                }
+                else{
+                    System.out.print("         ");
+                }
+            }
+            System.out.println("");
+        }
+        //showPlayerPosition();
+        //showMyPlayerInformation();
+    }
 
+    private void showMyPlayerInformation() {
+        Player p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
+        writeText("Your weapon: ");
+        for(CardWeapon cw : p.getWeapons()){
+            writeText(cw.getName());
+        }
+        writeText("Your munition");
+        for(Color c : p.getAmmo()){
+            System.out.print(checkAmmoColor(c)+"■"+ANSI_RESET);
         }
     }
 
+    private void showPlayerPosition() {
+        for(Player p : ClientContext.get().getMap().getAllPlayers()) {
+            if (p.getId() != ClientContext.get().getMyID())
+                writeText(checkPlayerColor(p.getColor()) + "Player " + p.getNickName() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
+            for(PlayerColor d : p.getDamage()) {
+                System.out.print(checkPlayerColor(d) + "¤" + ANSI_RESET);
+            }
+        }
+    }
+
+    private String checkAmmoColor(Color color){
+        if(color.equals(Color.YELLOW))return ANSI_YELLOW;
+        if(color.equals(Color.RED))return ANSI_RED;
+        return ANSI_BLUE;
+    }
+    private String checkPlayerColor(PlayerColor color) {
+        if(color.equals(PlayerColor.YELLOW))return ANSI_YELLOW;
+        if(color.equals(PlayerColor.GREEN))return ANSI_GREEN;
+        if(color.equals(PlayerColor.BLUE))return ANSI_BLUE;
+        if(color.equals(PlayerColor.PURPLE))return ANSI_PURPLE;
+        if(color.equals(PlayerColor.GREY))return ANSI_RED;
+        return ANSI_CYAN;
+    }
 
     private String checkColor(MapColor color){
         if(color.equals(MapColor.YELLOW))return ANSI_YELLOW;
+        if(color.equals(MapColor.GREEN))return ANSI_GREEN;
         if(color.equals(MapColor.BLUE))return ANSI_BLUE;
         if(color.equals(MapColor.PURPLE))return ANSI_PURPLE;
         if(color.equals(MapColor.RED))return ANSI_RED;
-        return ANSI_GREEN;
+        return ANSI_CYAN;
     }
 }

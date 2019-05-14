@@ -9,10 +9,14 @@ import java.util.List;
 
 public class ChooseTargetResponse implements ClientMessage {
 
-    public List<Target> selectedTargets;
+    private List<Target> selectedTargets;
 
     public ChooseTargetResponse(List<Target> selectedTargets) {
         this.selectedTargets = selectedTargets;
+    }
+
+    public List<Target> getSelectedTargets() {
+        return selectedTargets;
     }
 
     @Override

@@ -7,7 +7,7 @@ import game.model.Target;
 import java.util.List;
 
 public class ChooseTargetRequest implements ServerMessage {
-    public List<Target> possibleTargets;
+    private List<Target> possibleTargets;
 
     public ChooseTargetRequest(List<Target> possibleTargets) {
         this.possibleTargets = possibleTargets;
@@ -16,5 +16,9 @@ public class ChooseTargetRequest implements ServerMessage {
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
+    }
+
+    public List<Target> getPossibleTargets() {
+        return possibleTargets;
     }
 }

@@ -63,7 +63,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
 
     @Override
     public ServerMessage handle(ChooseSquareResponse clientMsg) {
-        Square selectedSquare = clientMsg.selectedSquare;
+        Square selectedSquare = clientMsg.getSelectedSquare();
         if(!selectableSquares.contains(selectedSquare))
             return new InvalidTargetResponse();
 
@@ -83,7 +83,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(ChooseTargetResponse clientMsg)
     {
-        List<Target> selectedTarget = clientMsg.selectedTargets;
+        List<Target> selectedTarget = clientMsg.getSelectedTargets();
         if(!selectableTarget.containsAll(selectedTarget))
             return new InvalidTargetResponse();
 
@@ -173,8 +173,8 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(ChooseTurnActionResponse clientMsg) {
         try {
-            if (Action.checkAction(clientMsg.typeOfAction)) {
-                currPlayer.getGame().getCurrentTurn().newAction(clientMsg.typeOfAction, currPlayer.getAdrenaline());
+            if (Action.checkAction(clientMsg.getTypeOfAction())) {
+                currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline());
                 return new OperationCompletedResponse("Action completed"); //TODO check this
             } else {
                 return new InvalidActionResponse();
@@ -209,7 +209,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             currPlayer.pickUpAmmo();
             return new OperationCompletedResponse("Ammo picked up"); //TODO check this
         }catch (NoCardAmmoAvailableException e){
-            return new InvalidGrabPositionRsponse();
+            return new InvalidGrabPositionResponse();
         }
     }
 
@@ -222,12 +222,12 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     public ServerMessage handle(PickUpWeaponRequest clientMsg) {
         if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB))
             return new InvalidStepResponse();
-        if(!currPlayer.getPosition().getWeapons().contains(clientMsg.weapon))
+        if(!currPlayer.getPosition().getWeapons().contains(clientMsg.getWeapon()))
             return new InvalidWeaponResponse();
-        if(!currPlayer.getCardPower().containsAll(clientMsg.powerup))
+        if(!currPlayer.getCardPower().containsAll(clientMsg.getPowerup()))
             return new InvalidPowerUpResponse();
         try {
-            currPlayer.pickUpWeapon(clientMsg.weapon, clientMsg.weaponToWaste, clientMsg.powerup);
+            currPlayer.pickUpWeapon(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup());
             return  new OperationCompletedResponse("Weapon picked up"); //TODO check this
         }catch (InsufficientAmmoException e){
             return new InsufficientAmmoResponse();
@@ -247,16 +247,16 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
      */
     @Override
     public ServerMessage handle(ReloadWeaponRequest clientMsg) {
-        CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.weapon.getId()).findFirst().orElse(null);
-        if(!currPlayer.getCardPower().containsAll(clientMsg.powerups))
+        CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
+        if(!currPlayer.getCardPower().containsAll(clientMsg.getPowerups()))
             return new InvalidPowerUpResponse();
         if( w == null)
             return new InvalidWeaponResponse();
         if( w.isLoaded())
             return new InvalidWeaponResponse();
         try{
-            w.reloadWeapon(clientMsg.powerups);
-            return new CheckReloadResponse(clientMsg.weapon, clientMsg.powerups);
+            w.reloadWeapon(clientMsg.getPowerups());
+            return new CheckReloadResponse(clientMsg.getWeapon(), clientMsg.getPowerups());
         }catch(InsufficientAmmoException e)
         {
             return new InsufficientAmmoResponse();
@@ -266,9 +266,9 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(RespawnResponse clientMsg) {
         if(currPlayer.isDead()) {
-            if (currPlayer.getCardPower().contains(clientMsg.powerUp)) {
-                currPlayer.respawn(clientMsg.powerUp);
-                currPlayer.removePowerUp(Collections.singletonList(clientMsg.powerUp));
+            if (currPlayer.getCardPower().contains(clientMsg.getPowerUp())) {
+                currPlayer.respawn(clientMsg.getPowerUp());
+                currPlayer.removePowerUp(Collections.singletonList(clientMsg.getPowerUp()));
                 return new OperationCompletedResponse("You are respawned!"); //TODO check this
             }
             else
@@ -280,46 +280,46 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
 
     @Override
     public ServerMessage handle(ShootActionRequest clientMsg) {
-        CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.weapon.getId()).findFirst().orElse(null);
+        CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
         if( w == null)
             return new InvalidWeaponResponse();
         if( !w.isLoaded())
             return new InvalidWeaponResponse();
-        if( (clientMsg.baseEffect != null && clientMsg.altEffect != null))
+        if( (clientMsg.getBaseEffect() != null && clientMsg.getAltEffect() != null))
             return new InvalidWeaponResponse();
-        if(clientMsg.baseEffect != null && !clientMsg.baseEffect.equals(w.getBaseEffect()))
+        if(clientMsg.getBaseEffect() != null && !clientMsg.getBaseEffect().equals(w.getBaseEffect()))
             return new InvalidWeaponResponse();
-        if(clientMsg.altEffect != null && !clientMsg.altEffect.equals((w.getAltEffect())))
+        if(clientMsg.getAltEffect() != null && !clientMsg.getAltEffect().equals((w.getAltEffect())))
             return new InvalidWeaponResponse();
-        if(!w.getPlusEffects().containsAll(clientMsg.plusEffects))
+        if(!w.getPlusEffects().containsAll(clientMsg.getPlusEffects()))
             return new InvalidWeaponResponse();
-        if(!w.isPlusBeforeBase() && clientMsg.plusBeforeBase)
+        if(!w.isPlusBeforeBase() && clientMsg.isPlusBeforeBase())
             return new InvalidWeaponResponse();
         if(w.isPlusOrder())
         {
-            for(int i=0;i<clientMsg.plusEffects.size();i++)
-                if(!clientMsg.plusEffects.get(i).equals(w.getPlusEffects().get(i)))
+            for(int i=0;i<clientMsg.getPlusEffects().size();i++)
+                if(!clientMsg.getPlusEffects().get(i).equals(w.getPlusEffects().get(i)))
                     return new InvalidWeaponResponse();
         }
 
         List<Color> totalAmmo = new ArrayList<>();
-        for(FullEffect fe : clientMsg.plusEffects)
+        for(FullEffect fe : clientMsg.getPlusEffects())
             totalAmmo.addAll(fe.getPrice());
-        if(clientMsg.altEffect != null)
-            totalAmmo.addAll(clientMsg.altEffect.getPrice());
+        if(clientMsg.getAltEffect() != null)
+            totalAmmo.addAll(clientMsg.getAltEffect().getPrice());
 
         try{
-            currPlayer.pay(totalAmmo,clientMsg.paymentWithPowerUp);
+            currPlayer.pay(totalAmmo,clientMsg.getPaymentWithPowerUp());
         }catch (InsufficientAmmoException ex)
         {
             return new InvalidWeaponResponse();
         }
 
         selectedWeapon = w;
-        selectedPlusEffects = clientMsg.plusEffects;
+        selectedPlusEffects = clientMsg.getPlusEffects();
         nSimpleEffect = 0;
-        baseAltEffect = (clientMsg.baseEffect != null) ? clientMsg.baseEffect : clientMsg.altEffect;
-        if(clientMsg.plusBeforeBase)
+        baseAltEffect = (clientMsg.getBaseEffect() != null) ? clientMsg.getBaseEffect() : clientMsg.getAltEffect();
+        if(clientMsg.isPlusBeforeBase())
         {
             baseDone = false;
             currFullEffect = selectedPlusEffects.stream().filter(FullEffect::isBeforeBase).findFirst().orElse(selectedPlusEffects.get(0));
@@ -332,8 +332,6 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
 
         }
         return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
-
-
     }
 
     /**
@@ -383,6 +381,12 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(GetAvailableMapsRequest getAvailableMapsRequest) {
         return new AvailableMapsListResponse(Game.getAvailableMaps());
+    }
+
+    @Override
+    public ServerMessage handle(ChoosePowerUpResponse choosePowerUpResponse) {
+        //TODO later
+        return null;
     }
 
     /**
@@ -462,7 +466,6 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
 
         return new OperationCompletedResponse();
-
     }
 
 
@@ -481,7 +484,6 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             }
             else
                 currFullEffect = null;
-
         }
     }
 

@@ -63,9 +63,9 @@ public class ClientController implements ServerMessageHandler {
     public void handle(CheckReloadResponse serverMsg) {
         List<CardWeapon> weapons = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getWeapons();
         for(CardWeapon cW : weapons){
-            if(cW.equals(serverMsg.weapon)) {
+            if(cW.equals(serverMsg.getWeapon())) {
                 try {
-                    cW.reloadWeapon(serverMsg.powerUps);
+                    cW.reloadWeapon(serverMsg.getPowerUps());
                 }
                 catch(InsufficientAmmoException e){
                     clientView.insufficientAmmoNotification();
@@ -81,7 +81,7 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(ChooseSingleActionRequest serverMsg) {
         List<Action> possibleAction = new ArrayList<>();
-        for(Action ac : serverMsg.actions ){
+        for(Action ac : serverMsg.getActions() ){
             if(!possibleAction.contains(ac))
                 possibleAction.add(ac);
         }
@@ -94,7 +94,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(ChooseSquareRequest serverMsg) {
-        clientView.chooseSquarePhase(serverMsg.possiblePositions);
+        clientView.chooseSquarePhase(serverMsg.getPossiblePositions());
     }
 
     /**
@@ -103,7 +103,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(ChooseTargetRequest serverMsg) {
-        clientView.chooseTargetPhase(serverMsg.possibleTargets);
+        clientView.chooseTargetPhase(serverMsg.getPossibleTargets());
     }
 
     /**
@@ -195,7 +195,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyEndGameResponse serverMsg) {
-        clientView.showRanking(serverMsg.ranking);
+        clientView.showRanking(serverMsg.getRanking());
     }
 
     /**
@@ -212,7 +212,7 @@ public class ClientController implements ServerMessageHandler {
         } catch (MapOutOfLimitException e) {
             //TODO shouldnt append
         }
-        clientView.grabWeaponNotification(serverMsg.getP(),serverMsg.getX(),serverMsg.getY());
+        clientView.grabWeaponNotification(serverMsg.getP(),serverMsg.getCw().getName(),serverMsg.getX(),serverMsg.getY());
 
     }
 
@@ -264,13 +264,12 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(PickUpWeaponResponse serverMsg) {
         try {
-            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).pickUpWeapon(serverMsg.cw,serverMsg.cwToWaste,serverMsg.cp);
+            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).pickUpWeapon(serverMsg.getCw(),serverMsg.getCwToWaste(),serverMsg.getCp());
         } catch (InsufficientAmmoException e) {
             clientView.insufficientAmmoNotification();
         } catch (NoCardWeaponSpaceException e) {
             clientView.invalidWeaponNotification();
         }
-        clientView.notifyWeaponGrab(serverMsg.cw.getName());
     }
 
     /**
@@ -315,7 +314,7 @@ public class ClientController implements ServerMessageHandler {
      * @param serverMsg
      */
     @Override
-    public void handle(InvalidGrabPositionRsponse serverMsg) {
+    public void handle(InvalidGrabPositionResponse serverMsg) {
         clientView.notifyInvalidGrabPosition();
     }
 
@@ -363,7 +362,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyTurnChanged notifyTurnChanged) {
-        clientView.notifyTurnChanged();
+        clientView.notifyTurnChanged(notifyTurnChanged.getCurrPlayerId());
     }
 
     /**
@@ -372,7 +371,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyMarks notifyMarks) {
-        clientView.notifyMarks();
+        clientView.notifyMarks(notifyMarks.getMarks(),notifyMarks.getHitId(),notifyMarks.getShooterId());
     }
 
     /**
@@ -381,7 +380,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyGrabAmmo notifyGrabAmmo) {
-        clientView.notifyGrabAmmo();
+        clientView.notifyGrabAmmo(notifyGrabAmmo.getP());
     }
 
     /**
@@ -390,7 +389,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyRespawn notifyRespawn) {
-        clientView.notifyRespawn();
+        clientView.notifyRespawn(notifyRespawn.getpId());
     }
 
     @Override

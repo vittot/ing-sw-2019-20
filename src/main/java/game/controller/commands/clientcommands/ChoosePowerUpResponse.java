@@ -3,17 +3,13 @@ package game.controller.commands.clientcommands;
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
-import game.model.Action;
+import game.model.CardPower;
 
-public class ChooseTurnActionResponse implements ClientMessage {
-    private Action typeOfAction;
+public class ChoosePowerUpResponse implements ClientMessage {
+    private CardPower cardPower;
 
-    public ChooseTurnActionResponse(Action typeOfAction) {
-        this.typeOfAction = typeOfAction;
-    }
-
-    public Action getTypeOfAction() {
-        return typeOfAction;
+    public ChoosePowerUpResponse(CardPower cardPower) {
+        this.cardPower = cardPower;
     }
 
     @Override

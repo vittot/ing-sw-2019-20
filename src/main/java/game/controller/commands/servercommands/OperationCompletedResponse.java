@@ -11,6 +11,7 @@ public class OperationCompletedResponse implements ServerMessage {
     public OperationCompletedResponse(String message) {
         this.message = message;
     }
+
     public String getMessage() {
         return message;
     }

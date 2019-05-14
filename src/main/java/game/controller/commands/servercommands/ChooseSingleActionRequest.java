@@ -7,9 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseSingleActionRequest implements ServerMessage {
-    public List<Action> actions = new ArrayList<>();
+    private List<Action> actions = new ArrayList<>();
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
+    }
+
+    public List<Action> getActions() {
+        return actions;
     }
 }

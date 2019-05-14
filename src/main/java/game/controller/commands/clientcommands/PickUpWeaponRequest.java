@@ -9,11 +9,24 @@ import game.model.CardWeapon;
 import java.util.List;
 
 public class PickUpWeaponRequest implements ClientMessage {
-    public CardWeapon weapon;
-    public List<CardPower> powerup;
-    public CardWeapon weaponToWaste;
+    private CardWeapon weapon;
+    private List<CardPower> powerup;
+    private CardWeapon weaponToWaste;
+
     @Override
     public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);
+    }
+
+    public CardWeapon getWeapon() {
+        return weapon;
+    }
+
+    public List<CardPower> getPowerup() {
+        return powerup;
+    }
+
+    public CardWeapon getWeaponToWaste() {
+        return weaponToWaste;
     }
 }

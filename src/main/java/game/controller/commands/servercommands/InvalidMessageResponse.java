@@ -15,4 +15,8 @@ public class InvalidMessageResponse implements ServerMessage {
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
     }
+
+    public String getMessage() {
+        return message;
+    }
 }

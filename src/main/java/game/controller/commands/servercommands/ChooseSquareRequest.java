@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ChooseSquareRequest implements ServerMessage {
 
-    public List<Square> possiblePositions;
+    private List<Square> possiblePositions;
 
     public ChooseSquareRequest(List<Square> possiblePositions) {
         this.possiblePositions = possiblePositions;
@@ -17,5 +17,9 @@ public class ChooseSquareRequest implements ServerMessage {
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
+    }
+
+    public List<Square> getPossiblePositions() {
+        return possiblePositions;
     }
 }
