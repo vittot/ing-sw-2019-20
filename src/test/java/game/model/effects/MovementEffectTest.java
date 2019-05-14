@@ -1,17 +1,14 @@
 package game.model.effects;
 
 import game.model.*;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class MovementEffectTest {
     private MovementEffect effect;
@@ -20,7 +17,7 @@ class MovementEffectTest {
     @BeforeEach
     public void before()
     {
-        Map map = new Map(1,2,3);
+        GameMap map = new GameMap(1,2,3);
         Square[][] grid = new Square[3][2];
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.DOOR,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.DOOR,Edge.WALL,Edge.OPEN,Edge.WALL};

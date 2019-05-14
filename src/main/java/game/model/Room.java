@@ -8,9 +8,9 @@ import java.util.List;
 public class Room implements Target, Serializable {
 
     private MapColor color;
-    private Map map;
+    private GameMap map;
 
-    public Room(MapColor color, Map map) {
+    public Room(MapColor color, GameMap map) {
         this.color = color;
         this.map = map;
     }
@@ -54,7 +54,7 @@ public class Room implements Target, Serializable {
      * Apply the movement effect to all Players in the room
      * @param numSquare movement amount
      * @param dir movement direction
-     * @throws MapOutOfLimitException if the movement would put players outside of the Map
+     * @throws MapOutOfLimitException if the movement would put players outside of the GameMap
      */
     @Override
     public void move(int numSquare, Direction dir) throws MapOutOfLimitException {

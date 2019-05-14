@@ -1,7 +1,6 @@
 package game.model.effects;
 
 import game.model.*;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +10,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class PlainDamageEffectTest {
 
@@ -22,7 +20,7 @@ class PlainDamageEffectTest {
     @BeforeEach
     public void before()
     {
-        Map map = new Map(1,2,3);
+        GameMap map = new GameMap(1,2,3);
         Square[][] grid = new Square[3][2];
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
@@ -72,7 +70,7 @@ class PlainDamageEffectTest {
      */
     @Test
     void searchVisibleTargets() {
-        effect = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
+        effect = new PlainDamageEffect(1,1, 0, GameMap.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
         List<Target> targets = effect.searchTarget(game.getPlayer(1));
         List<Target> expTargets = new ArrayList<>();
         expTargets.add( game.getPlayer(4) );
@@ -84,7 +82,7 @@ class PlainDamageEffectTest {
      */
     @Test
     void searchInvisibleTargets(){
-        effect = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.INVISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
+        effect = new PlainDamageEffect(1,1, 0, GameMap.MAX_DIST, TargetVisibility.INVISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
         List<Target> targets = effect.searchTarget(game.getPlayer(4));
         List<Target> expTargets = new ArrayList<>();
         expTargets.add( game.getPlayer(2) );
@@ -96,7 +94,7 @@ class PlainDamageEffectTest {
      */
     @Test
     void searchDirectionalTargets(){
-        effect = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.DIRECTION,3,0,false,DifferentTarget.ANYONE,false,false);
+        effect = new PlainDamageEffect(1,1,1, GameMap.MAX_DIST,TargetVisibility.DIRECTION,3,0,false,DifferentTarget.ANYONE,false,false);
         List<Target> targets = effect.searchTarget(game.getPlayer(4));
         List<Target> expTargets = new ArrayList<>();
         expTargets.add( game.getPlayer(1) );
@@ -110,7 +108,7 @@ class PlainDamageEffectTest {
      */
     @Test
     void searchSameDirectionTargets(){
-        effect = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,true);
+        effect = new PlainDamageEffect(1,1,1, GameMap.MAX_DIST,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.ANYONE,false,true);
         List<Target> targets = effect.searchTarget(game.getPlayer(3));
         List<Target> expTargets = new ArrayList<>();
         expTargets.add( game.getPlayer(1) );
@@ -123,7 +121,7 @@ class PlainDamageEffectTest {
      */
     @Test
     void searchDifferentTargets(){
-        effect = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.NOTTHELAST,false,false);
+        effect = new PlainDamageEffect(1,1,1, GameMap.MAX_DIST,TargetVisibility.VISIBLE,3,0,false,DifferentTarget.NOTTHELAST,false,false);
         List<Target> targets = effect.searchTarget(game.getPlayer(2));
         List<Target> expTargets = new ArrayList<>();
         expTargets.add( game.getPlayer(4) );
@@ -132,7 +130,7 @@ class PlainDamageEffectTest {
 
     @Test
     void applyEffect() {
-        effect = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
+        effect = new PlainDamageEffect(1,1, 0, GameMap.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
         List<Target> targets = new ArrayList<>();
         Player p1 = game.getPlayer(1);
         Player p3 = game.getPlayer(3);

@@ -17,9 +17,9 @@ public class Square implements Target, Serializable {
     //Convention: the map starts with (0,0) the left upper corner and ends with (map.dimY-1,map.dimX-1) at the lower right corner
     private int x;
     private int y;
-    private Map map;
+    private GameMap map;
 
-    public Square(MapColor color, boolean respawn, int x, int y, Map map, Edge[] edges) {
+    public Square(MapColor color, boolean respawn, int x, int y, GameMap map, Edge[] edges) {
         this.color = color;
         this.edges = edges;
         this.respawn = respawn;
@@ -35,7 +35,7 @@ public class Square implements Target, Serializable {
     }
 
 
-    public Map getMap() { return map; }
+    public GameMap getMap() { return map; }
 
     public MapColor getColor() {
         return color;
@@ -91,7 +91,7 @@ public class Square implements Target, Serializable {
     /**
      * Get the next Square in the indicate Direction
      * @param d
-     * @return the next Square or null if it doesn't exist in the Map
+     * @return the next Square or null if it doesn't exist in the GameMap
      */
     public Square getNextSquare(Direction d)
     {
@@ -217,7 +217,7 @@ public class Square implements Target, Serializable {
      */
     public List<Square> getSquaresInDirections(int minDist, int maxDist)
     {
-        return map.getAllSquares().stream().filter(s -> s.getX() == this.x || s.getY() == this.y).filter(s -> Map.distanceBtwSquares(this,s)<=maxDist && Map.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
+        return map.getAllSquares().stream().filter(s -> s.getX() == this.x || s.getY() == this.y).filter(s -> GameMap.distanceBtwSquares(this,s)<=maxDist && GameMap.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
     }
 
 
@@ -245,13 +245,13 @@ public class Square implements Target, Serializable {
     {
         Square next;
         MapColor c = this.getColor();
-        List<Square> result = map.getRoomSquares(c).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList());
+        List<Square> result = map.getRoomSquares(c).stream().filter(s2 -> GameMap.distanceBtwSquares(this,s2)<=maxDist && GameMap.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList());
         for(Direction d : Direction.values())
         {
             if(this.getEdge(d) == Edge.DOOR)
             {
                 next = this.getNextSquare(d);
-                result.addAll(map.getRoomSquares(next.getColor()).stream().filter(s2 -> Map.distanceBtwSquares(this,s2)<=maxDist && Map.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList()));
+                result.addAll(map.getRoomSquares(next.getColor()).stream().filter(s2 -> GameMap.distanceBtwSquares(this,s2)<=maxDist && GameMap.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList()));
             }
 
         }
@@ -267,7 +267,7 @@ public class Square implements Target, Serializable {
     public List<Square> getInvisibleSquares(int minDist, int maxDist)
     {
         List<Square> visibleSquares = getVisibleSquares(minDist,maxDist);
-        return map.getAllSquares().stream().filter(s -> !visibleSquares.contains(s) && Map.distanceBtwSquares(this,s)<=maxDist && Map.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
+        return map.getAllSquares().stream().filter(s -> !visibleSquares.contains(s) && GameMap.distanceBtwSquares(this,s)<=maxDist && GameMap.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
     }
 
     /**public List<List<Square>> getVisibleSquares(){
@@ -329,7 +329,7 @@ public class Square implements Target, Serializable {
      * Move all players in the Square
      * @param numSquare movement amount
      * @param dir movement Direction
-     * @throws MapOutOfLimitException if the movement put any Player outside of the Map
+     * @throws MapOutOfLimitException if the movement put any Player outside of the GameMap
      */
     @Override
     public void move(int numSquare, Direction dir) throws MapOutOfLimitException {

@@ -31,8 +31,8 @@
             </ammo>
         </optionalPrice>
         <!--
-        SimpleEffect distr01 = new PlainDamageEffect(1,1, 0, Map.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
-        SimpleEffect distr21 = new PlainDamageEffect(1,1,0, Map.MAX_DIST, TargetVisibility.VISIBLE, 0,1,false,DifferentTarget.NOTTHELAST,false,false);
+        SimpleEffect distr01 = new PlainDamageEffect(1,1, 0, GameMap.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);
+        SimpleEffect distr21 = new PlainDamageEffect(1,1,0, GameMap.MAX_DIST, TargetVisibility.VISIBLE, 0,1,false,DifferentTarget.NOTTHELAST,false,false);
         -->
         <baseEffect>
             <plainDamage>
@@ -146,10 +146,10 @@
             </plainDamage>
         </optionalEffect>
         <!--
-        SimpleEffect mitr01 = new PlainDamageEffect(1,2,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        SimpleEffect mitr21 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
-        SimpleEffect mitr31 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NOTTHELAST,false,false);
-        SimpleEffect mitr32 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
+        SimpleEffect mitr01 = new PlainDamageEffect(1,2,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect mitr21 = new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        SimpleEffect mitr31 = new PlainDamageEffect(0,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.NOTTHELAST,false,false);
+        SimpleEffect mitr32 = new PlainDamageEffect(0,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.NONEOFTHEPREVIOUS,false,false);
 
 
         -->
@@ -332,9 +332,9 @@
             </ammo>
         </optionalPrice>
         <!--
-                SimpleEffect plas01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+                SimpleEffect plas01 = new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
         SimpleEffect plas21 = new MovementEffect(0,0,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
-        SimpleEffect plas31 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        SimpleEffect plas31 = new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
 -->
 
         <baseEffect>
@@ -418,7 +418,7 @@
                 yellow
             </ammo>
         </price>
-        <!--        SimpleEffect prec01 = new PlainDamageEffect(1,1,2,Map.MAX_DIST,TargetVisibility.VISIBLE,3,1,false,DifferentTarget.ANYONE,false,false);
+        <!--        SimpleEffect prec01 = new PlainDamageEffect(1,1,2,GameMap.MAX_DIST,TargetVisibility.VISIBLE,3,1,false,DifferentTarget.ANYONE,false,false);
 -->
         <baseEffect>
             <plainDamage>
@@ -545,8 +545,8 @@
                 yellow
             </ammo>
         </alternativePrice>
-        <!--         SimpleEffect ray01 = new MovementEffect(1,1,0,Map.MAX_DIST,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,false,false,false,false,false,DifferentTarget.ANYONE);
-        SimpleEffect ray02 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
+        <!--         SimpleEffect ray01 = new MovementEffect(1,1,0,GameMap.MAX_DIST,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,false,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect ray02 = new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,true,DifferentTarget.ANYONE,false,false);
         SimpleEffect ray11 = new MovementEffect(1,1,0,2,0,2,TargetVisibility.EVERYWHERE,false,TargetVisibility.VISIBLE,true,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect ray12 = new PlainDamageEffect(1,1,0,0,TargetVisibility.VISIBLE,3,0,true,DifferentTarget.ANYONE,false,false);
 -->
@@ -653,7 +653,7 @@
             </ammo>
         </optionalPrice>
         <!--
-                SimpleEffect vort01 = new SquareDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE, 0,0,false,false);
+                SimpleEffect vort01 = new SquareDamageEffect(1,1,1,GameMap.MAX_DIST,TargetVisibility.VISIBLE, 0,0,false,false);
         SimpleEffect vort02 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.VISIBLE,false,true,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect vort03 = new PlainDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,2,0,true,DifferentTarget.ANYONE,false,false);
 
@@ -806,7 +806,7 @@
             </ammo>
         </alternativePrice>
         <!--
-                SimpleEffect vulc01 = new RoomDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0);
+                SimpleEffect vulc01 = new RoomDamageEffect(0,Game.MAXPLAYERS,1,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0);
         SimpleEffect vulc11 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,1,TargetVisibility.VISIBLE,1,1,false,false);
 
         -->
@@ -865,7 +865,7 @@
             </ammo>
         </price>
             <!--
-              SimpleEffect rock01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.INVISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
+              SimpleEffect rock01 = new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.INVISIBLE,3,0,false,DifferentTarget.ANYONE,false,false);
             -->
         <baseEffect>
             <plainDamage>
@@ -960,10 +960,10 @@
             </squareDamageEffect>
         </baseEffect>
         <!--
-                SimpleEffect flash01 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        SimpleEffect flash02 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 1,true,false);
-        SimpleEffect flash11 = new PlainDamageEffect(1,1,1,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        SimpleEffect flash12 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,Map.MAX_DIST,TargetVisibility.VISIBLE,0, 2,true,false);
+                SimpleEffect flash01 = new PlainDamageEffect(1,1,1,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect flash02 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,GameMap.MAX_DIST,TargetVisibility.VISIBLE,0, 1,true,false);
+        SimpleEffect flash11 = new PlainDamageEffect(1,1,1,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect flash12 = new SquareDamageEffect(0,Game.MAXPLAYERS,1,GameMap.MAX_DIST,TargetVisibility.VISIBLE,0, 2,true,false);
         -->
 
         <alternativeEffect>
@@ -1130,9 +1130,9 @@
             </ammo>
         </optionalPrice>
         <!--
-        SimpleEffect gran01 =  new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
-        SimpleEffect gran02 = new MovementEffect(0,1,0,Map.MAX_DIST,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false, DifferentTarget.ANYONE);
-        SimpleEffect gran21 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,Map.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,false);
+        SimpleEffect gran01 =  new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect gran02 = new MovementEffect(0,1,0,GameMap.MAX_DIST,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false, DifferentTarget.ANYONE);
+        SimpleEffect gran21 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,false);
         //TODO Effetto plus su puo fare rima del effetto base
         -->
         <baseEffect>
@@ -1229,7 +1229,7 @@
             </ammo>
         </alternativePrice>
 <!--
-    SimpleEffect lcrz01 = new PlainDamageEffect(1,1,1, Map.MAX_DIST, TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
+    SimpleEffect lcrz01 = new PlainDamageEffect(1,1,1, GameMap.MAX_DIST, TargetVisibility.VISIBLE,2,0,false,DifferentTarget.ANYONE,false,false);
     SimpleEffect lcrz02 = new MovementEffect(0,1,1, 1,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false,DifferentTarget.ANYONE);
     SimpleEffect lcrz21 = new MovementEffect(1,1,0,0,1,2,TargetVisibility.VISIBLE,true,TargetVisibility.EVERYWHERE,false,false,false,false,true,DifferentTarget.ANYONE);
     SimpleEffect lcrz11 = new SquareDamageEffect(1,Game.MAXPLAYERS,1,Game.MAXPLAYERS,TargetVisibility.VISIBLE,1,0,false,false);
@@ -1373,9 +1373,9 @@
             </ammo>
         </alternativePrice>
         <!--
-        SimpleEffect lsr01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
-        SimpleEffect lsr11 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
-        SimpleEffect lsr12 = new PlainDamageEffect(0,1,0,Map.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,true);
+        SimpleEffect lsr01 = new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect lsr11 = new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect lsr12 = new PlainDamageEffect(0,1,0,GameMap.MAX_DIST,TargetVisibility.EVERYWHERE,3,0,false,DifferentTarget.ANYONE,false,true);
 
         -->
         <baseEffect>
@@ -1569,8 +1569,8 @@
             </ammo>
         </alternativePrice>
         <!--
-                SimpleEffect zx01 = new PlainDamageEffect(1,1,0,Map.MAX_DIST,TargetVisibility.VISIBLE,2,1,false,DifferentTarget.ANYONE,false,false);
-        SimpleEffect zx11 = new PlainDamageEffect(1,3,0,Map.MAX_DIST,TargetVisibility.VISIBLE,0,1,false, DifferentTarget.ANYONE,false,false);
+                SimpleEffect zx01 = new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,2,1,false,DifferentTarget.ANYONE,false,false);
+        SimpleEffect zx11 = new PlainDamageEffect(1,3,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,0,1,false, DifferentTarget.ANYONE,false,false);
         -->
         <baseEffect>
             <plainDamage>

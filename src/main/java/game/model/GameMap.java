@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Map implements Serializable {
+public class GameMap implements Serializable {
     private int id;
     private Square[][] grid;
     private int dimX; //number of cols
@@ -63,7 +63,7 @@ public class Map implements Serializable {
         this.dimY = dimY;
     }
 
-    public Map(int id, int dimX,int dimY)
+    public GameMap(int id, int dimX, int dimY)
     {
         this.id = id;
         this.dimX = dimX;
@@ -74,7 +74,7 @@ public class Map implements Serializable {
     }
 
     /**
-     * Return all spawnpoints of the Map
+     * Return all spawnpoints of the GameMap
      * @return
      */
     public List<Square> getSpawnpoints()
@@ -92,7 +92,7 @@ public class Map implements Serializable {
     }
 
     /**
-     * Get all Map squares as List<Square>
+     * Get all GameMap squares as List<Square>
      * @return
      */
     public List<Square> getAllSquares()
@@ -102,7 +102,7 @@ public class Map implements Serializable {
     }
 
     /**
-     * Get all Rooms of the Map
+     * Get all Rooms of the GameMap
      * @return
      */
     public List<Room> getAllRooms()
@@ -128,7 +128,7 @@ public class Map implements Serializable {
      * @param x number of col (from zero)
      * @param y number of row (from zero)
      * @return the Square
-     * @throws MapOutOfLimitException if the given coordinates go outside of the Map
+     * @throws MapOutOfLimitException if the given coordinates go outside of the GameMap
      */
     public Square getSquare(int x, int y) throws MapOutOfLimitException
     {
@@ -194,7 +194,7 @@ public class Map implements Serializable {
     }
 
     /**
-     * Get a List of all Players on the Map
+     * Get a List of all Players on the GameMap
      * @return
      */
     public List<Player> getAllPlayers()

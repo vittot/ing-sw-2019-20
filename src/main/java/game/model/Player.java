@@ -309,7 +309,7 @@ public class Player implements Target, Serializable {
      * Move the Player
      * @param numSquare movement amount
      * @param dir movement direction
-     * @throws MapOutOfLimitException if this movement would put the Player outside the Map
+     * @throws MapOutOfLimitException if this movement would put the Player outside the GameMap
      */
     @Override
     public void move(int numSquare, Direction dir) throws MapOutOfLimitException {

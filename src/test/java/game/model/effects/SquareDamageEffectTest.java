@@ -20,7 +20,7 @@ class SquareDamageEffectTest {
     @BeforeEach
     public void before()
     {
-        Map map = new Map(1,2,3);
+        GameMap map = new GameMap(1,2,3);
         Square[][] grid = new Square[3][2];
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};

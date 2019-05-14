@@ -13,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-class MapTest {
+class GameMapTest {
 
-    private Map map;
+    private GameMap map;
 
     @BeforeEach
     public void before()  {
-        map = new Map(1,2,3);
+        map = new GameMap(1,2,3);
         Square[][] grid = new Square[3][2];
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
@@ -38,7 +38,7 @@ class MapTest {
     }
 
     /**
-     * Check getRoomSquares return exactly all the Map's Squares of a given MapColor
+     * Check getRoomSquares return exactly all the GameMap's Squares of a given MapColor
      */
     @Test
     void getRoom() {
@@ -78,7 +78,7 @@ class MapTest {
     }
 
     /**
-     * Check getSpawoints return exactly the Map's spawnpoints
+     * Check getSpawoints return exactly the GameMap's spawnpoints
      */
     @Test
     void getSpawnpoints() {
@@ -117,7 +117,7 @@ class MapTest {
     }
 
     /**
-     * Check that sensible player data are correctly serialized when serializing the Map
+     * Check that sensible player data are correctly serialized when serializing the GameMap
      * @throws IOException
      * @throws ClassNotFoundException
      * @throws MapOutOfLimitException
@@ -153,7 +153,7 @@ class MapTest {
         oo.writeObject(map);
         ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
         ObjectInputStream oi = new ObjectInputStream(bi);
-        Map des = (Map)oi.readObject();
+        GameMap des = (GameMap)oi.readObject();
         Player des1 = des.getSquare(0,0).getPlayers().get(0);
         Player des2 = des.getSquare(1,1).getPlayers().get(0);
         Player des3 = des.getSquare(0,2).getPlayers().get(0);

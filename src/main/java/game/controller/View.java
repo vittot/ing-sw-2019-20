@@ -67,5 +67,5 @@ public interface View {
 
     void chooseRoomPhase(List<WaitingRoom> waitingRooms);
 
-    void showMapsPhase(List<Map> availableMaps);
+    void showMapsPhase(List<GameMap> availableMaps);
 }

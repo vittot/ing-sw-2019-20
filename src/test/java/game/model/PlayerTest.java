@@ -44,7 +44,7 @@ class PlayerTest {
         powerups.add(new CardPower(2,"PW2","d2",Color.YELLOW,null,false,null));
         p.setCardPower(powerups);
 
-        Map map = new Map(1,2,3);
+        GameMap map = new GameMap(1,2,3);
         Square[][] grid = new Square[3][2];
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.DOOR,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.DOOR,Edge.WALL,Edge.OPEN,Edge.WALL};

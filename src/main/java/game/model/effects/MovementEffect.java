@@ -95,7 +95,7 @@ public class MovementEffect extends SimpleEffect {
         }
         else {
             if (lastTarget) {
-                targets = prevTargets.stream().filter(p -> Map.distanceBtwSquares(shooterPos, p.getPosition()) <= maxDist && Map.distanceBtwSquares(shooterPos, p.getPosition()) >= minDist).collect(Collectors.toList());
+                targets = prevTargets.stream().filter(p -> GameMap.distanceBtwSquares(shooterPos, p.getPosition()) <= maxDist && GameMap.distanceBtwSquares(shooterPos, p.getPosition()) >= minDist).collect(Collectors.toList());
             } else {
                 switch (visibility) {
                     case VISIBLE:
@@ -158,13 +158,13 @@ public class MovementEffect extends SimpleEffect {
                 List<Square> squares = shooter.getGame().getMap().getAllSquares();
                 for(Square s : squares){
                     if(s.getX()!=currentPosition.getX() || s.getY()!=currentPosition.getY())
-                        if(Map.distanceBtwSquares(s,currentPosition)>=minMove && Map.distanceBtwSquares(s,currentPosition)<=maxMove)
+                        if(GameMap.distanceBtwSquares(s,currentPosition)>=minMove && GameMap.distanceBtwSquares(s,currentPosition)<=maxMove)
                             result.add(s);
                 }
             }
             if(visibilityAfter==TargetVisibility.VISIBLE) {
                 List <Target> notVisibleNext = new ArrayList<>();
-                List<Square> visibles = shooter.getGame().getCurrentTurn().getCurrentPlayer().getPosition().getVisibleSquares(0, Map.MAX_DIST);
+                List<Square> visibles = shooter.getGame().getCurrentTurn().getCurrentPlayer().getPosition().getVisibleSquares(0, GameMap.MAX_DIST);
                 for (Target t : result)
                     if(!visibles.contains(t)){
                         notVisibleNext.add(t);

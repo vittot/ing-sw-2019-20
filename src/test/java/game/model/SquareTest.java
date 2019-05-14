@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SquareTest {
 
-    private Map map;
+    private GameMap map;
 
     @BeforeEach
     public void before()  {
-        map = new Map(1,2,3);
+        map = new GameMap(1,2,3);
         Square[][] grid = new Square[3][2];
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.DOOR,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.DOOR,Edge.WALL,Edge.OPEN,Edge.WALL};

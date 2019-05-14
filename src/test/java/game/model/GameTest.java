@@ -1,7 +1,6 @@
 package game.model;
 
 import game.model.exceptions.MapOutOfLimitException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +18,7 @@ class GameTest {
     @BeforeEach
     void before()  {
         int i;
-        Map m = new Map(1,2,3);
+        GameMap m = new GameMap(1,2,3);
         Square[][] grid = new Square[3][2];
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
         Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
@@ -137,7 +136,7 @@ class GameTest {
     @Test
     void checkMap() throws MapOutOfLimitException {
         g.setMap(g.readMap(1, "mapFile.xml"));
-        Map map = new Map(1,4,3);
+        GameMap map = new GameMap(1,4,3);
         Edge [] ed = new Edge[4];
         ed[0] = Edge.WALL;
         ed[1] = Edge.WALL;

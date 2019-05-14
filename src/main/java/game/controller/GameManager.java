@@ -1,7 +1,7 @@
 package game.controller;
 
 import game.model.Game;
-import game.model.Map;
+import game.model.GameMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public class GameManager {
     private int nextId;
     private List<Game> games;
     private List<WaitingRoom> waitingRooms;
-    private List<Map> availableMaps;
+    private List<GameMap> availableMaps;
 
     private GameManager(){
         nextId = 1;
@@ -31,7 +31,7 @@ public class GameManager {
         return instance;
     }
 
-    public Map getMap(int mapId)
+    public GameMap getMap(int mapId)
     {
         return availableMaps.get(mapId);
     }

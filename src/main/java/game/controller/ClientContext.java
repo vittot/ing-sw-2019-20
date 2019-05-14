@@ -2,8 +2,7 @@ package game.controller;
 
 import game.model.Kill;
 import java.util.List;
-import game.model.Map;
-import game.model.effects.FullEffect;
+import game.model.GameMap;
 import game.model.effects.SimpleEffect;
 
 /**
@@ -13,7 +12,7 @@ import game.model.effects.SimpleEffect;
 public class ClientContext {
     private static ClientContext instance;
 
-    private Map map;
+    private GameMap map;
     private int myID;
     private List<Kill> killboard;
     private SimpleEffect currentEffect;
@@ -41,11 +40,11 @@ public class ClientContext {
         this.currentEffect = currentEffect;
     }
 
-    public Map getMap() {
+    public GameMap getMap() {
         return map;
     }
 
-    public void setMap(Map map) {
+    public void setMap(GameMap map) {
         this.map = map;
     }
 

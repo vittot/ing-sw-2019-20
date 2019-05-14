@@ -83,7 +83,7 @@ public class PlainDamageEffect extends SimpleEffect {
         Square shooterPos = chainTarget ? shooter.getActualWeapon().getLastTarget().getPosition() : shooter.getPosition();
         List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
         if(lastTarget){
-            targets = prevTargets.stream().filter(p -> Map.distanceBtwSquares(shooterPos,p.getPosition())<=maxDist && Map.distanceBtwSquares(shooterPos,p.getPosition())>=minDist).collect(Collectors.toList());
+            targets = prevTargets.stream().filter(p -> GameMap.distanceBtwSquares(shooterPos,p.getPosition())<=maxDist && GameMap.distanceBtwSquares(shooterPos,p.getPosition())>=minDist).collect(Collectors.toList());
         }
         else{
             switch(visibility){

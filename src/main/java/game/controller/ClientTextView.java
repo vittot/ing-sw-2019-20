@@ -12,7 +12,7 @@ public class ClientTextView implements View {
     private ClientController controller;
     private Scanner fromKeyBoard;
     private String user;
-    private List<Map> availableMaps;
+    private List<GameMap> availableMaps;
 
     public ClientTextView(ClientController controller) {
         this.controller = controller;
@@ -44,7 +44,7 @@ public class ClientTextView implements View {
      * Show available maps and ask server for available rooms
      * @param availableMaps
      */
-    public void showMapsPhase(List<Map> availableMaps)
+    public void showMapsPhase(List<GameMap> availableMaps)
     {
         this.availableMaps = availableMaps;
         printAvailableMaps();
@@ -57,7 +57,7 @@ public class ClientTextView implements View {
     private void printAvailableMaps()
     {
         writeText("Avaiable game maps:\n");
-        for(Map m : availableMaps)
+        for(GameMap m : availableMaps)
             writeText(m.toString());
     }
 

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class Game {
     private int id;
     private List <Player> players;
-    private Map map;
+    private GameMap map;
     private List<CardPower> deckPower;
     private List<CardAmmo> deckAmmo;
     private List<CardWeapon> deckWeapon;
@@ -55,7 +55,7 @@ public class Game {
 
     }
 
-    public Game(List<Player> players, Map map,int killBoardSize) {
+    public Game(List<Player> players, GameMap map, int killBoardSize) {
         this(killBoardSize);
         this.players = players;
         this.map = map;
@@ -73,11 +73,11 @@ public class Game {
         readMap(mapId, "mapFile.xml");
     }
 
-    public static List<Map> getAvailableMaps()
+    public static List<GameMap> getAvailableMaps()
     {
         int id = 1;
-        List<Map> availableMaps = new ArrayList<>();
-        Map m;
+        List<GameMap> availableMaps = new ArrayList<>();
+        GameMap m;
         do{
             m = readMap(id,"mapFile.xml");
             if(m != null)
@@ -89,8 +89,8 @@ public class Game {
     }
 
 
-    public static Map readMap(int id,String fileName){
-        Map map = null;
+    public static GameMap readMap(int id, String fileName){
+        GameMap map = null;
         Square [][] grid = null;
         int x = 0;
         int y = 0;
@@ -138,7 +138,7 @@ public class Game {
             //TODO ecc
         }
         if(grid != null){
-            map = new Map(id,4,3);
+            map = new GameMap(id,4,3);
             map.setDescription(desc);
             map.setGrid(grid);
         }
@@ -576,11 +576,11 @@ public class Game {
         this.players = players;
     }
 
-    public Map getMap() {
+    public GameMap getMap() {
         return map;
     }
 
-    public void setMap(Map map) {
+    public void setMap(GameMap map) {
         this.map = map;
     }
 
@@ -736,7 +736,7 @@ public class Game {
         List<Square> spawnpoints = map.getSpawnpoints();
         for(Square s : spawnpoints)
         {
-            while(s.getWeapons().size() < Map.WEAPON_PER_SQUARE && !deckWeapon.isEmpty())
+            while(s.getWeapons().size() < GameMap.WEAPON_PER_SQUARE && !deckWeapon.isEmpty())
                 s.addWeapon(Collections.singletonList(deckWeapon.remove(0)));
         }
 
