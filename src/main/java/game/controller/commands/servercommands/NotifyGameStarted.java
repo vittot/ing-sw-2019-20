@@ -3,17 +3,21 @@ package game.controller.commands.servercommands;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
 import game.model.Game;
+import game.model.GameMap;
+import game.model.Kill;
+
+import java.util.List;
 
 public class NotifyGameStarted implements ServerMessage {
 
-    private Game game;
+    private GameMap map;
 
-    public NotifyGameStarted(Game game) {
-        this.game = game;
+    public NotifyGameStarted(GameMap map) {
+        this.map = map;
     }
 
-    public Game getGame() {
-        return game;
+    public GameMap getMap() {
+        return map;
     }
 
     @Override

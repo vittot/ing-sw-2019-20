@@ -937,13 +937,13 @@
                 <sameDirection>false</sameDirection>
             </plainDamage>
             <squareDamageEffect>
-                <minEnemy></minEnemy>
-                <maxEnemy></maxEnemy>
-                <minDist></minDist>
-                <maxDist></maxDist>
+                <minEnemy>0</minEnemy>
+                <maxEnemy>5</maxEnemy>
+                <minDist>1</minDist>
+                <maxDist>12</maxDist>
                 <targetVisib>Visible</targetVisib>
-                <damage></damage>
-                <marks></marks>
+                <damage>1</damage>
+                <marks>0</marks>
                 <lastTargetSquare>false</lastTargetSquare>
                 <sameDirection>false</sameDirection>
             </squareDamageEffect>

@@ -45,7 +45,7 @@ public interface View {
 
     void notifyWeaponGrab(String name);
 
-    void notifyCompletedOpeartion(String message);
+    void notifyCompletedOperation(String message);
 
     void notifyInvalidPowerUP();
 
@@ -53,7 +53,7 @@ public interface View {
 
     void choosePowerUpToUse(List<CardPower> cardPower);
 
-    void notifyStart(Game game);
+    void notifyStart();
 
     void notifyInvalidMessage();
 

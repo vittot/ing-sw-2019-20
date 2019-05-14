@@ -112,6 +112,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(ChooseTurnActionRequest serverMsg) {
+
         clientView.chooseTurnActionPhase();
     }
 
@@ -297,7 +298,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(OperationCompletedResponse serverMsg) {
-        clientView.notifyCompletedOpeartion(serverMsg.getMessage());
+        clientView.notifyCompletedOperation(serverMsg.getMessage());
     }
 
     /**
@@ -325,7 +326,6 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle (AfterDamagePowerUpRequest serverMsg){
         clientView.choosePowerUpToUse(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower());
-        return;
     }
 
     /**
@@ -334,7 +334,9 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyGameStarted serverMsg) {
-        clientView.notifyStart(serverMsg.getGame());
+
+        ClientContext.get().setMap(serverMsg.getMap());
+        clientView.notifyStart();
     }
 
     /**

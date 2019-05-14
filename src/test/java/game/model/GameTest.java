@@ -135,8 +135,8 @@ class GameTest {
 
     @Test
     void checkMap() throws MapOutOfLimitException {
-        g.setMap(g.readMap(1, "mapFile.xml"));
-        GameMap map = new GameMap(1,4,3);
+        g.setMap(g.readMap(99, "mapFile.xml"));
+        GameMap map = new GameMap(99,4,3);
         Edge [] ed = new Edge[4];
         ed[0] = Edge.WALL;
         ed[1] = Edge.WALL;
@@ -145,5 +145,10 @@ class GameTest {
         Square sq0 = new Square(MapColor.YELLOW,false,0,0,g.getMap(),ed);
         assertTrue(g.getMap().getSquare(0,0).getColor().equals(MapColor.YELLOW));
 
+    }
+
+    @Test
+    void readDeck() {
+        g.readDeck("effectFile.xml");
     }
 }

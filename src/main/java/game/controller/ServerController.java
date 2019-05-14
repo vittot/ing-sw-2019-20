@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class ServerController implements ClientMessageHandler, RespawnObserver {
     // reference to the Networking layer
-    private final SocketClientHandler clientHandler;
+    private SocketClientHandler clientHandler;
 
     // reference to the Model
     private Game model;
@@ -41,6 +41,8 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         this.clientHandler = clientHandler;
     }
 
+    public ServerController(){ }
+
     public SocketClientHandler getClientHandler() {
         return clientHandler;
     }
@@ -54,12 +56,10 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     {
         this.model = g;
         this.currPlayer = p;
-        this.clientHandler.sendMessage(new NotifyGameStarted(g));
+        this.clientHandler.sendMessage(new NotifyGameStarted(g.getMap()));
         if(g.getCurrentTurn().getCurrentPlayer().equals(p))
             clientHandler.sendMessage(new ChooseTurnActionRequest());
     }
-
-    // TODO: ------ ClientMessage handling
 
     @Override
     public ServerMessage handle(ChooseSquareResponse clientMsg) {
@@ -355,14 +355,19 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     public ServerMessage handle(JoinWaitingRoomRequest joinWaitingRoomRequest) {
         WaitingRoom w = GameManager.get().getWaitingRoom(joinWaitingRoomRequest.getRoomId());
         if(w != null)
-            return new OperationCompletedResponse();
+        {
+            w.addWaitingPlayer(this, joinWaitingRoomRequest.getNickName());
+            return new OperationCompletedResponse("You correctly joined the waiting room! Wait for other players...");
+        }
+
         return new InvalidMessageResponse("The indicated room id does not exist on the Server");
     }
 
     @Override
     public ServerMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest) {
-        GameManager.get().addWaitingRoom(createWaitingRoomRequest.getMapId(),createWaitingRoomRequest.getNumWaitingPlayers());
-        return new OperationCompletedResponse("Waiting room correctly created");
+        WaitingRoom w = GameManager.get().addWaitingRoom(createWaitingRoomRequest.getMapId(),createWaitingRoomRequest.getNumWaitingPlayers());
+        w.addWaitingPlayer(this, createWaitingRoomRequest.getCreatorNicknme());
+        return new OperationCompletedResponse("Waiting room correctly created! \n>>Wait for other players...");
     }
 
     @Override

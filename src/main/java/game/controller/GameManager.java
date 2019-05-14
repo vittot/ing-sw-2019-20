@@ -2,6 +2,7 @@ package game.controller;
 
 import game.model.Game;
 import game.model.GameMap;
+import game.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class GameManager {
         nextId = 1;
         games = new ArrayList<>();
         availableMaps = new ArrayList<>();
+        waitingRooms = new ArrayList<>();
     }
 
     public static synchronized GameManager get() {
@@ -41,8 +43,8 @@ public class GameManager {
      * @param mapId
      * @return
      */
-    public Game addGame(int mapId){
-        Game g = new Game(nextId, mapId, 8);
+    public Game addGame(int mapId, List<Player> players){
+        Game g = new Game(nextId, mapId, 8,players);
         nextId++;
         games.add(g);
         return g;
@@ -77,8 +79,10 @@ public class GameManager {
      * Add a new WaitingRoom with the given mapId and num of players
      * @param mapId
      * @param numWaitingPlayers
+     * @return the WaitingRoom created
      */
-    public void addWaitingRoom(int mapId, int numWaitingPlayers) {
+    public WaitingRoom addWaitingRoom(int mapId, int numWaitingPlayers) {
         waitingRooms.add(new WaitingRoom(waitingRooms.size()+1,mapId, numWaitingPlayers));
+        return waitingRooms.get(waitingRooms.size()-1);
     }
 }

@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Player implements Target, Serializable {
@@ -49,6 +50,12 @@ public class Player implements Target, Serializable {
         this.serializeEverything = false;
         this.weapons = new ArrayList<>();
         this.cardPower = new ArrayList<>();
+    }
+
+    public Player(int id, PlayerColor color, String nick)
+    {
+        this(id,color);
+        this.nickName = nick;
     }
 
     public void setRespawnListener(RespawnObserver respawnListener) {
@@ -501,4 +508,39 @@ public class Player implements Target, Serializable {
         }
     }
 
+    /**
+     * Return a short string representation of player id and nickname
+     * @return
+     */
+    public String toShortString()
+    {
+        return "Id: " + id + "\nNickname: " + nickName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return id == player.id &&
+                color == player.color; /*&&
+                deaths == player.deaths &&
+                points == player.points &&
+                isDead == player.isDead &&
+                Objects.equals(marks, player.marks) &&
+                Objects.equals(thisTurnMarks, player.thisTurnMarks) &&
+                Objects.equals(nickName, player.nickName) &&
+                Objects.equals(damage, player.damage) &&
+                adrenaline == player.adrenaline &&
+                Objects.equals(weapons, player.weapons) &&
+                Objects.equals(actualWeapon, player.actualWeapon) &&
+                Objects.equals(ammo, player.ammo) &&
+                Objects.equals(cardPower, player.cardPower) &&
+                Objects.equals(position, player.position);*/
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color,id);
+    }
 }

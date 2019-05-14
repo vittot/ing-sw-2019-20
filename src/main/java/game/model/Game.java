@@ -41,13 +41,14 @@ public class Game {
         this.killboardSize = killBoardSize;
         gameObservers = new ArrayList<>();
         this.killBoard = new ArrayList<>(killBoardSize);
-        generateDecks("loadingGame.txt");
+        this.deckWeapon = new ArrayList<>();
     }
 
-    public Game(int id, int mapId, int killBoardSize)
+    public Game(int id, int mapId, int killBoardSize, List<Player> players)
     {
         this(killBoardSize);
         this.id = id;
+        this.players = players;
         currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
@@ -66,7 +67,6 @@ public class Game {
         this.players = players;
         this.killboardSize = killBoardSize;
         this.killBoard = new ArrayList<>(killBoardSize);
-        generateDecks("loadingGame.txt");
         currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
@@ -105,7 +105,7 @@ public class Game {
             Element root = document.getRootElement();
             for (Element tmpMap : root.getChildren("map")){
                 if(tmpMap.getAttribute("id").getIntValue() == id){
-                    grid = new Square[4][3];
+                    grid = new Square[3][4];
                     desc = tmpMap.getChildText("desc");
                     for(Element sq : tmpMap.getChildren("square")){
 
@@ -120,11 +120,11 @@ public class Game {
                             grid[x][y].setEdges(edges);
                             grid[x][y].setRespawn(sq.getChildText("respown").equals("true"));
                         }
-                        if (x == 3) {
-                            x = 0;
-                            y++;
-                        } else {
+                        if (y == 3) {
+                            y = 0;
                             x++;
+                        } else {
+                            y++;
                         }
                     }
 
@@ -173,11 +173,16 @@ public class Game {
         {
             document = builder.build(fileName);
             Element root = document.getRootElement();
-            for (Element weapon : root.getChildren("weapon")) addWeapon(weapon);
+            for (Element weapon : root.getChildren("weapon"))
+                addWeapon(weapon);
         } catch (JDOMException e1) {
-            //TODO ecce
-        } catch (IOException e1) {
+            e1.printStackTrace();
             //TODO ecc
+            return false;
+        } catch (IOException el) {
+            el.printStackTrace();
+            //TODO ecc
+            return false;
         }
         return true;
     }
@@ -199,7 +204,7 @@ public class Game {
         FullEffect effectal = takeEffectal(weapon);
         List<FullEffect> effectop = takeEffectopz(weapon);
         plusBefore = (weapon.getChild("plusBeforeBase").getText().equals("true"));
-        plusOrder = (weapon.getChild("plusOrdere").getText().equals("true"));
+        plusOrder = (weapon.getChild("plusOrder").getText().equals("true"));
         insertDescription(effect, effectal, effectop, desc, names);
         insertPrice(effect,effectal,effectop,price,priceal,priceop);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
@@ -227,11 +232,12 @@ public class Game {
             aef.setDescription(desc.get(i));
             i++;
         }
-        for(FullEffect fe : oef){
-            fe.setDescription(desc.get(i));
-            fe.setName(name.get(i));
-            i++;
-        }
+        if(oef != null)
+            for(FullEffect fe : oef){
+                fe.setDescription(desc.get(i));
+                fe.setName(name.get(i));
+                i++;
+            }
     }
 
     /**
@@ -241,18 +247,18 @@ public class Game {
      * @throws DataConversionException
      */
     public SimpleEffect createEquivalentMovementEffect (Element effect) throws DataConversionException {
-        int mine = effect.getAttribute("minEnemy").getIntValue();
-        int maxd = effect.getAttribute("maxDist").getIntValue();
-        int maxe = effect.getAttribute("maxEnemy").getIntValue();
-        int mind = effect.getAttribute("minDist").getIntValue();
-        int minm = effect.getAttribute("minMove").getIntValue();
-        int maxm = effect.getAttribute("maxMove").getIntValue();
+        int mine = Integer.parseInt(effect.getChildText("minEnemy"));
+        int maxd = Integer.parseInt(effect.getChildText("maxDist"));
+        int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
+        int mind = Integer.parseInt(effect.getChildText("minDist"));
+        int minm = Integer.parseInt(effect.getChildText("minMove"));
+        int maxm = Integer.parseInt(effect.getChildText("maxMove"));
         TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
         boolean moves = (effect.getChildText("moveShooter").equals("true"));
         TargetVisibility after = createVisibility(effect.getChild("targetVisibAfter").getText());
         boolean mypos= (effect.getChildText("myPos").equals("true"));
-        boolean chain = (effect.getChildText("chainTarget").equals("true"));
-        boolean last = (effect.getChildText("lastTargetSquare").equals("true"));
+        boolean chain = (effect.getChildText("chainMove").equals("true"));
+        boolean last = (effect.getChildText("lastTarget").equals("true"));
         boolean same = (effect.getChildText("sameDirection").equals("true"));
         DifferentTarget diff = createDifferent(effect.getChild("differentTarget").getText());
         SimpleEffect move = new MovementEffect(mine,maxe,mind,maxd,minm,maxm,visib,moves,after,mypos,chain,last,same,diff);
@@ -265,14 +271,14 @@ public class Game {
      * @throws DataConversionException
      */
     public SimpleEffect createEquivalentPlainEffect (Element effect) throws DataConversionException {
-        int mine = effect.getAttribute("minEnemy").getIntValue();
-        int mind = effect.getAttribute("minDist").getIntValue();
-        int dam = effect.getAttribute("damage").getIntValue();
-        int maxd = effect.getAttribute("maxDist").getIntValue();
+        int mine = Integer.parseInt(effect.getChildText("minEnemy"));
+        int mind = Integer.parseInt(effect.getChildText("minDist"));
+        int dam = Integer.parseInt(effect.getChildText("damage"));
+        int maxd = Integer.parseInt(effect.getChildText("maxDist"));
         TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
-        int maxe = effect.getAttribute("maxEnemy").getIntValue();
-        boolean last = (effect.getChildText("lastTargetSquare").equals("true"));
-        int marks = effect.getAttribute("marks").getIntValue();
+        int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
+        boolean last = (effect.getChildText("lastTarget").equals("true"));
+        int marks = Integer.parseInt(effect.getChildText("marks"));
         DifferentTarget diff = createDifferent(effect.getChild("differentTarget").getText());
         boolean chain = (effect.getChildText("chainTarget").equals("true"));
         boolean same = (effect.getChildText("sameDirection").equals("true"));
@@ -286,13 +292,13 @@ public class Game {
      * @throws DataConversionException
      */
     public SimpleEffect createEquivalentSquareEffect (Element effect) throws DataConversionException {
-        int mine = effect.getAttribute("minEnemy").getIntValue();
-        int marks = effect.getAttribute("marks").getIntValue();
-        int maxe = effect.getAttribute("maxEnemy").getIntValue();
-        int maxd = effect.getAttribute("maxDist").getIntValue();
+        int mine = Integer.parseInt(effect.getChildText("minEnemy"));
+        int marks = Integer.parseInt(effect.getChildText("marks"));
+        int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
+        int maxd = Integer.parseInt(effect.getChildText("maxDist"));
         TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
-        int mind = effect.getAttribute("minDist").getIntValue();
-        int dam = effect.getAttribute("damage").getIntValue();
+        int mind = Integer.parseInt(effect.getChildText("minDist"));
+        int dam = Integer.parseInt(effect.getChildText("damage"));
         boolean last = (effect.getChildText("lastTargetSquare").equals("true"));
         boolean same = (effect.getChildText("sameDirection").equals("true"));
         SimpleEffect square = new SquareDamageEffect(mine,maxe,mind,maxd,visib,dam,marks,last,same);
@@ -305,13 +311,13 @@ public class Game {
      * @throws DataConversionException
      */
     public SimpleEffect createEquivalentRoomEffect (Element effect) throws DataConversionException {
-        int maxd = effect.getAttribute("maxDist").getIntValue();
-        int maxe = effect.getAttribute("maxEnemy").getIntValue();
-        int mind = effect.getAttribute("minDist").getIntValue();
-        int mine = effect.getAttribute("minEnemy").getIntValue();
-        int marks = effect.getAttribute("marks").getIntValue();
+        int maxd = Integer.parseInt(effect.getChildText("maxDist"));
+        int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
+        int mind = Integer.parseInt(effect.getChildText("minDist"));
+        int mine = Integer.parseInt(effect.getChildText("minEnemy"));
+        int marks = Integer.parseInt(effect.getChildText("marks"));
         TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
-        int dam = effect.getAttribute("damage").getIntValue();
+        int dam = Integer.parseInt(effect.getChildText("damage"));
         SimpleEffect room = new RoomDamageEffect(mine,maxe,mind,maxd,visib,dam,marks);
         return room;
     }
@@ -322,14 +328,14 @@ public class Game {
      * @throws DataConversionException
      */
     public SimpleEffect createEquivalentAreaEffect (Element effect) throws DataConversionException {
-        int mine = effect.getAttribute("minEnemy").getIntValue();
-        int maxe = effect.getAttribute("maxEnemy").getIntValue();
-        int mind = effect.getAttribute("minDist").getIntValue();
-        int maxd = effect.getAttribute("maxDist").getIntValue();
+        int mine = Integer.parseInt(effect.getChildText("minEnemy"));
+        int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
+        int mind = Integer.parseInt(effect.getChildText("minDist"));
+        int maxd = Integer.parseInt(effect.getChildText("maxDist"));
         TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
-        int dam = effect.getAttribute("damage").getIntValue();
-        int marks = effect.getAttribute("marks").getIntValue();
-        int perSquare = effect.getAttribute("maxEnemyPerSquare").getIntValue();
+        int dam = Integer.parseInt(effect.getChildText("damage"));
+        int marks = Integer.parseInt(effect.getChildText("marks"));
+        int perSquare = Integer.parseInt(effect.getChildText("maxEnemyPerSquare"));
         SimpleEffect area = new AreaDamageEffect(mine,maxe,mind,maxd,visib,dam,marks,perSquare);
         return area;
     }
@@ -384,11 +390,11 @@ public class Game {
         for(Element ef : weapon.getChildren("optionalEffect")) {
             for(Element efo : ef.getChildren()) {
                 try {
-                    if (efo.getName().equals("areaDamageEffect")) temp.addSimpleEffect(createEquivalentAreaEffect(ef));
-                    if (efo.getName().equals("roomDamageEffect")) temp.addSimpleEffect(createEquivalentRoomEffect(ef));
-                    if (efo.getName().equals("plainDamage")) temp.addSimpleEffect(createEquivalentPlainEffect(ef));
-                    if (efo.getName().equals("movementEffect")) temp.addSimpleEffect(createEquivalentMovementEffect(ef));
-                    if (efo.getName().equals("squareDamageEffect")) temp.addSimpleEffect(createEquivalentSquareEffect(ef));
+                    if (efo.getName().equals("areaDamageEffect")) temp.addSimpleEffect(createEquivalentAreaEffect(efo));
+                    if (efo.getName().equals("roomDamageEffect")) temp.addSimpleEffect(createEquivalentRoomEffect(efo));
+                    if (efo.getName().equals("plainDamage")) temp.addSimpleEffect(createEquivalentPlainEffect(efo));
+                    if (efo.getName().equals("movementEffect")) temp.addSimpleEffect(createEquivalentMovementEffect(efo));
+                    if (efo.getName().equals("squareDamageEffect")) temp.addSimpleEffect(createEquivalentSquareEffect(efo));
                 } catch (DataConversionException e) {
                     //TODO eccezione
                 }
@@ -396,6 +402,8 @@ public class Game {
             int i = 0;
             effect.add(temp);
         }
+        if(effect.isEmpty())
+            return null;
         return effect;
     }
 
@@ -406,6 +414,8 @@ public class Game {
      */
     public FullEffect takeEffectal(Element weapon){
         FullEffect effect = new FullEffect();
+        if( weapon.getChild("alternativeEffect") == null)
+            return null;
         for(Element ef : weapon.getChild("alternativeEffect").getChildren()) {
             try{
                 if (ef.getName().equals("roomDamageEffect")) effect.addSimpleEffect(createEquivalentRoomEffect(ef));
@@ -460,9 +470,10 @@ public class Game {
     }
     public List<Color> takePriceAl(Element weapon){
         List price = new ArrayList<Color>();
-        for (Element pr : weapon.getChild("alternativePrice").getChildren("ammo")){
-            price.add(createEquivalentAmmo(pr.getText()));
-        }
+        if(weapon.getChild("alternativePrice") != null)
+            for (Element pr : weapon.getChild("alternativePrice").getChildren("ammo")){
+                price.add(createEquivalentAmmo(pr.getText()));
+            }
         return price;
     }
 
@@ -643,11 +654,6 @@ public class Game {
     public void addNewPlayer(Player p){
         if(this.players.size()<MAXPLAYERS)
             this.players.add(p);
-    }
-
-    public void generateDecks(String fileLoading){
-        //TODO only one method or one for any type of card?
-
     }
 
     /**

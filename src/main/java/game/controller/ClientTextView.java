@@ -62,21 +62,26 @@ public class ClientTextView implements View {
     }
 
     /**
-     * Show the avaiable maps
+     * Show the available maps
      */
     private void printAvailableMaps()
     {
-        writeText("Avaiable game maps:\n");
+        writeText("Available game maps:\n");
         for(GameMap m : availableMaps)
             writeText(m.toString());
     }
 
     /**
-     * Show avaible rooms and choose if join one of these or create a new one
+     * Show available rooms and choose if join one of these or create a new one
      * @param waitingRooms
      */
     public void chooseRoomPhase(List<WaitingRoom> waitingRooms)
     {
+        if(waitingRooms.isEmpty()){
+            writeText("No waiting room currently available on the server");
+            createRoomPhase();
+            return;
+        }
         int nRoom;
         for(WaitingRoom w : waitingRooms)
         {
@@ -88,7 +93,7 @@ public class ClientTextView implements View {
         }while((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1);
         if(nRoom != -1)
         {
-            controller.getClient().sendMessage(new JoinWaitingRoomRequest(nRoom));
+            controller.getClient().sendMessage(new JoinWaitingRoomRequest(nRoom,user));
         }
         else
             createRoomPhase();
@@ -111,7 +116,7 @@ public class ClientTextView implements View {
             nPlayer = readInt();
         }while(nPlayer < 3 || nPlayer > 5);
 
-        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer));
+        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,user));
     }
 
     /**
@@ -229,12 +234,10 @@ public class ClientTextView implements View {
             try {
                 choosenAction = Action.valueOf(action);
             }
-            catch (IllegalArgumentException e) {
+            catch (IllegalArgumentException | NullPointerException e) {
                 choosenAction = null;
             }
-            catch (NullPointerException e) {
-                choosenAction = null;
-            }
+
         }while(choosenAction==null);
         controller.getClient().sendMessage(new ChooseTurnActionResponse(choosenAction));
     }
@@ -403,8 +406,8 @@ public class ClientTextView implements View {
     }
 
     @Override
-    public void notifyCompletedOpeartion(String message) {
-
+    public void notifyCompletedOperation(String message) {
+        writeText(message);
     }
 
     /**
@@ -434,8 +437,8 @@ public class ClientTextView implements View {
     }
 
     @Override
-    public void notifyStart(Game game) {
-
+    public void notifyStart() {
+        writeText("The game is started!");
     }
 
     @Override
