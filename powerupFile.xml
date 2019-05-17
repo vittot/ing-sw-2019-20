@@ -4,9 +4,18 @@
         <name>
             Targeting scope
         </name>
-        <descriprion>
+        <description>
             You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
-        </descriprion>
+        </description>
+        <color>
+            blue
+        </color>
+        <price>
+            <ammo>
+                any
+            </ammo>
+        </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -23,13 +32,240 @@
             </plainDamage>
         </effect>
     </powerUp>
+
+    <powerUp>
+        <name>
+            Targeting scope
+        </name>
+        <description>
+            You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
+        </description>
+        <color>
+            blue
+        </color>
+        <price>
+            <ammo>
+                any
+            </ammo>
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Targeting scope
+        </name>
+        <description>
+            You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
+        </description>
+        <color>
+            red
+        </color>
+        <price>
+            <ammo>
+                any
+            </ammo>
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Targeting scope
+        </name>
+        <description>
+            You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
+        </description>
+        <color>
+            red
+        </color>
+        <price>
+            <ammo>
+                any
+            </ammo>
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Targeting scope
+        </name>
+        <description>
+            You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
+        </description>
+        <color>
+            yellow
+        </color>
+        <price>
+            <ammo>
+                any
+            </ammo>
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Targeting scope
+        </name>
+        <description>
+            You can play this card when you are dealing damage. Pay 1 ammo cube of any color. Choose 1 of those target and deal 1 more damage.
+        </description>
+        <color>
+            yellow
+        </color>
+        <price>
+            <ammo>
+                any
+            </ammo>
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>1</damage>
+                <marks>0</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+    <name>
+        Newton
+    </name>
+    <description>
+        Choose any other player and move 1 or 2 square on teh same direction.
+    </description>
+    <color>
+        blue
+    </color>
+    <price>
+         
+    </price>
+    <!--
+            SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+    SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
+    -->
+    <effect>
+        <movementEffect>
+            <minEnemy>1</minEnemy>
+            <maxEnemy>1</maxEnemy>
+            <minDist>0</minDist>
+            <maxDist>12</maxDist>
+            <minMove>1</minMove>
+            <maxMove>1</maxMove>
+            <targetVisib>Everwehre</targetVisib>
+            <moveShooter>false</moveShooter>
+            <targetVisibAfter>Everywhere</targetVisibAfter>
+            <myPos>false</myPos>
+            <chainMove>false</chainMove>
+            <lastTarget>false</lastTarget>
+            <sameDirection>false</sameDirection>
+            <beforeBase>false</beforeBase>
+            <differentTarget>Anyone</differentTarget>
+        </movementEffect>
+        <movementEffect>
+            <minEnemy>1</minEnemy>
+            <maxEnemy>1</maxEnemy>
+            <minDist>0</minDist>
+            <maxDist>12</maxDist>
+            <minMove>0</minMove>
+            <maxMove>1</maxMove>
+            <targetVisib>Everywhere</targetVisib>
+            <moveShooter>false</moveShooter>
+            <targetVisibAfter>Everywhere</targetVisibAfter>
+            <myPos>false</myPos>
+            <chainMove>false</chainMove>
+            <lastTarget>true</lastTarget>
+            <sameDirection>true</sameDirection>
+            <beforeBase>false</beforeBase>
+            <differentTarget>Anyone</differentTarget>
+        </movementEffect>
+    </effect>
+</powerUp>
+
     <powerUp>
         <name>
             Newton
         </name>
-        <descriprion>
+        <description>
             Choose any other player and move 1 or 2 square on teh same direction.
-        </descriprion>
+        </description>
+        <color>
+            blue
+        </color>
+        <price>
+             
+        </price>
         <!--
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
@@ -71,14 +307,244 @@
             </movementEffect>
         </effect>
     </powerUp>
+
+    <powerUp>
+        <name>
+            Newton
+        </name>
+        <description>
+            Choose any other player and move 1 or 2 square on teh same direction.
+        </description>
+        <color>
+            red
+        </color>
+        <price>
+             
+        </price>
+        <!--
+                SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
+        -->
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>1</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everwehre</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>true</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Newton
+        </name>
+        <description>
+            Choose any other player and move 1 or 2 square on teh same direction.
+        </description>
+        <color>
+            red
+        </color>
+        <price>
+             
+        </price>
+        <!--
+                SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
+        -->
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>1</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everwehre</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>true</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Newton
+        </name>
+        <description>
+            Choose any other player and move 1 or 2 square on teh same direction.
+        </description>
+        <color>
+            yellow
+        </color>
+        <price>
+             
+        </price>
+        <!--
+                SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
+        -->
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>1</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everwehre</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>true</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Newton
+        </name>
+        <description>
+            Choose any other player and move 1 or 2 square on teh same direction.
+        </description>
+        <color>
+            yellow
+        </color>
+        <price>
+             
+        </price>
+        <!--
+                SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
+        SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
+        -->
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>1</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everwehre</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>1</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>false</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>true</lastTarget>
+                <sameDirection>true</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
+
+
     <powerUp>
         <name>
             Tagback Grenade
         </name>
-        <descriprion>
+        <description>
             Give 1 mark to a enemy that deal you damage and you can see.
             <!--TODO gestire quando ti fanno danno-->
-        </descriprion>
+        </description>
+        <color>
+            blue
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>true</usedWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -95,13 +561,181 @@
             </plainDamage>
         </effect>
     </powerUp>
+
+    <powerUp>
+        <name>
+            Tagback Grenade
+        </name>
+        <description>
+            Give 1 mark to a enemy that deal you damage and you can see.
+            <!--TODO gestire quando ti fanno danno-->
+        </description>
+        <color>
+            red
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>true</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Tagback Grenade
+        </name>
+        <description>
+            Give 1 mark to a enemy that deal you damage and you can see.
+            <!--TODO gestire quando ti fanno danno-->
+        </description>
+        <color>
+            red
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>true</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Tagback Grenade
+        </name>
+        <description>
+            Give 1 mark to a enemy that deal you damage and you can see.
+            <!--TODO gestire quando ti fanno danno-->
+        </description>
+        <color>
+            blue
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>true</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Tagback Grenade
+        </name>
+        <description>
+            Give 1 mark to a enemy that deal you damage and you can see.
+            <!--TODO gestire quando ti fanno danno-->
+        </description>
+        <color>
+            yellow
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>true</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Tagback Grenade
+        </name>
+        <description>
+            Give 1 mark to a enemy that deal you damage and you can see.
+            <!--TODO gestire quando ti fanno danno-->
+        </description>
+        <color>
+            yellow
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>true</usedWhenDamaged>
+        <effect>
+            <plainDamage>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <targetVisib>Visible</targetVisib>
+                <damage>0</damage>
+                <marks>1</marks>
+                <lastTarget>true</lastTarget>
+                <differentTarget>Anyone</differentTarget>
+                <chainTarget>false</chainTarget>
+                <sameDirection>false</sameDirection>
+            </plainDamage>
+        </effect>
+    </powerUp>
+
     <powerUp>
         <name>
             Teleporter
         </name>
-        <descriprion>
+        <description>
             Play this card in any moment of your turn, move your figure and set it down on any square.
-        </descriprion>
+        </description>
+        <color>
+            blue
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -122,4 +756,180 @@
             </movementEffect>
         </effect>
     </powerUp>
+
+    <powerUp>
+        <name>
+            Teleporter
+        </name>
+        <description>
+            Play this card in any moment of your turn, move your figure and set it down on any square.
+        </description>
+        <color>
+            red
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>12</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Teleporter
+        </name>
+        <description>
+            Play this card in any moment of your turn, move your figure and set it down on any square.
+        </description>
+        <color>
+            blue
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>12</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Teleporter
+        </name>
+        <description>
+            Play this card in any moment of your turn, move your figure and set it down on any square.
+        </description>
+        <color>
+            red
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>12</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Teleporter
+        </name>
+        <description>
+            Play this card in any moment of your turn, move your figure and set it down on any square.
+        </description>
+        <color>
+            yellow
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>12</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
+    <powerUp>
+        <name>
+            Teleporter
+        </name>
+        <description>
+            Play this card in any moment of your turn, move your figure and set it down on any square.
+        </description>
+        <color>
+            yellow
+        </color>
+        <price>
+             
+         </price>
+        <usedWhenDamaged>false</usedWhenDamaged>
+        <effect>
+            <movementEffect>
+                <minEnemy>1</minEnemy>
+                <maxEnemy>1</maxEnemy>
+                <minDist>0</minDist>
+                <maxDist>12</maxDist>
+                <minMove>0</minMove>
+                <maxMove>12</maxMove>
+                <targetVisib>Everywhere</targetVisib>
+                <moveShooter>true</moveShooter>
+                <targetVisibAfter>Everywhere</targetVisibAfter>
+                <myPos>false</myPos>
+                <chainMove>false</chainMove>
+                <lastTarget>false</lastTarget>
+                <sameDirection>false</sameDirection>
+                <beforeBase>false</beforeBase>
+                <differentTarget>Anyone</differentTarget>
+            </movementEffect>
+        </effect>
+    </powerUp>
+
 </powerUpList>

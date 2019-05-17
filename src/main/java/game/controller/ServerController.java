@@ -34,6 +34,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     private int nSimpleEffect; //the number of the current simpleEffect of the current FullEffect
     private List<Target> selectableTarget;
     private List<Square> selectableSquares;
+    private ServerState state;
 
 
     public ServerController(SocketClientHandler clientHandler) {
@@ -54,11 +55,14 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
      */
     void startGame(Game g, Player p)
     {
+        state = ServerState.WAITING_SPAWN;
         this.model = g;
         this.currPlayer = p;
-        this.clientHandler.sendMessage(new NotifyGameStarted(g.getMap()));
-        if(g.getCurrentTurn().getCurrentPlayer().equals(p))
-            clientHandler.sendMessage(new ChooseTurnActionRequest());
+        CardPower c1 = g.drawPowerUp();
+        CardPower c2 = g.drawPowerUp();
+        this.currPlayer.addCardPower(c1);
+        this.currPlayer.addCardPower(c2);
+        this.clientHandler.sendMessage(new NotifyGameStarted(g.getMap(),g.drawPowerUp(),g.drawPowerUp()));
     }
 
     @Override
@@ -269,7 +273,16 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             if (currPlayer.getCardPower().contains(clientMsg.getPowerUp())) {
                 currPlayer.respawn(clientMsg.getPowerUp());
                 currPlayer.removePowerUp(Collections.singletonList(clientMsg.getPowerUp()));
-                return new OperationCompletedResponse("You are respawned!"); //TODO check this
+                model.addPowerWaste(clientMsg.getPowerUp());
+                if(model.getCurrentTurn().getCurrentPlayer().equals(currPlayer))
+                {
+                    state = ServerState.WAITING_ACTION;
+                    return new ChooseTurnActionRequest();
+                }
+                else
+                {
+                    return new OperationCompletedResponse("");
+                }
             }
             else
                 return new InvalidPowerUpResponse();

@@ -51,7 +51,7 @@ public interface View {
 
     void choosePowerUpToUse(List<CardPower> cardPower);
 
-    void notifyStart();
+    int notifyStart(CardPower[] powerups);
 
     void notifyInvalidMessage();
 

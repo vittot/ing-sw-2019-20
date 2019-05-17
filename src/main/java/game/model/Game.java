@@ -53,6 +53,8 @@ public class Game {
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
         readMap(mapId, "mapFile.xml");
+        readPowerUpDeck("powerupFile.xml");
+        readAmmoDeck("ammoFile.xml");
 
     }
 
@@ -193,6 +195,96 @@ public class Game {
             return false;
         }
         return true;
+    }
+
+    /**
+     * read from xml and call the methods to build the ammo deck
+     * @param fileName
+     * @return
+     */
+    public boolean readAmmoDeck(String fileName){
+        SAXBuilder builder = new SAXBuilder();
+        Document document = null;
+        try
+        {
+            document = builder.build(fileName);
+            Element root = document.getRootElement();
+            for (Element cardAmmo : root.getChildren("ammo"))
+                addAmmoCard(cardAmmo);
+        } catch (JDOMException e1) {
+            e1.printStackTrace();
+            //TODO ecc
+            return false;
+        } catch (IOException el) {
+            el.printStackTrace();
+            //TODO ecc
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * read from xml and call the methods to build the powerup deck
+     * @param fileName
+     * @return
+     */
+    public boolean readPowerUpDeck(String fileName){
+        SAXBuilder builder = new SAXBuilder();
+        Document document = null;
+        try
+        {
+            document = builder.build(fileName);
+            Element root = document.getRootElement();
+            for (Element powerup : root.getChildren("powerUp"))
+                addPowerUp(powerup);
+        } catch (JDOMException e1) {
+            e1.printStackTrace();
+            //TODO ecc
+            return false;
+        } catch (IOException el) {
+            el.printStackTrace();
+            //TODO ecc
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Get a Element powerup and build it
+     * @param ammo
+     */
+    public void addAmmoCard(Element ammo){
+
+        List<Color> ammos = new ArrayList<>();
+        for(Element e : ammo.getChildren("color")) {
+            if(!e.getText().equals(""))
+                ammos.add(createEquivalentAmmo(e.getText()));
+        }
+        int cardPower = Integer.parseInt(ammo.getChildText("powerup"));
+
+        CardAmmo cardAmmo = new CardAmmo(ammos,cardPower);
+        this.deckAmmo.add(cardAmmo);
+    }
+
+    /**
+     * Get a Element powerup and build it
+     * @param powerup
+     */
+    public void addPowerUp(Element powerup){
+        String name = powerup.getChild("name").getText();
+        String desc = powerup.getChild("description").getText();
+        Color c = createEquivalentAmmo(powerup.getChild("color").getText());
+        List<Color> price = takePrice(powerup);
+        boolean flag = (powerup.getChild("plusBeforeBase").getText().equals("true"));
+
+        FullEffect effect = takeEffect(powerup);
+
+        effect.setPrice(price);
+
+        int id = this.deckPower.size() + 1;
+
+        CardPower cardPower = new CardPower(id,name,desc,c,price,flag,effect);
+        this.deckPower.add(cardPower);
     }
 
     /**
@@ -382,7 +474,7 @@ public class Game {
             return Color.BLUE;
         if(name.equals("red"))
             return Color.RED;
-        if(name.equals("Yellow"))
+        if(name.equals("yellow"))
             return Color.YELLOW;
         return Color.ANY;
     }
@@ -497,6 +589,7 @@ public class Game {
         }
         return desc;
     }
+
     public List<String> takeNameEffect(Element weapon){
         List eff = new ArrayList<String>();
         for (Element ds : weapon.getChildren("effectDescription")){
@@ -654,6 +747,11 @@ public class Game {
     public List<CardAmmo> getAmmoWaste() { return ammoWaste; }
 
     public void setAmmoWaste(List<CardAmmo> ammoWaste) { this.ammoWaste = ammoWaste; }
+
+    public void addPowerWaste(CardPower c)
+    {
+        powerWaste.add(c);
+    }
 
     /**
      * Add new player to the game

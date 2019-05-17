@@ -81,4 +81,17 @@ public class CardPower implements Serializable {
 
         }
     }
+
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Name: " + name + "\nDescription: " + description + "\nColor: " + color.toString() + "\nPrice:\n");
+
+        for(Color c: price)
+            sb.append(c.toString());
+
+        if(price.isEmpty())
+            sb.append("free");
+        return sb.toString();
+    }
 }

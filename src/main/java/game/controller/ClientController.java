@@ -2,6 +2,7 @@ package game.controller;
 
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
+import game.controller.commands.clientcommands.RespawnResponse;
 import game.controller.commands.servercommands.*;
 import game.model.CardWeapon;
 import game.model.Player;
@@ -297,7 +298,8 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(OperationCompletedResponse serverMsg) {
-        clientView.notifyCompletedOperation(serverMsg.getMessage());
+        if(!serverMsg.getMessage().equals(""))
+            clientView.notifyCompletedOperation(serverMsg.getMessage());
     }
 
     /**
@@ -335,7 +337,14 @@ public class ClientController implements ServerMessageHandler {
     public void handle(NotifyGameStarted serverMsg) {
 
         ClientContext.get().setMap(serverMsg.getMap());
-        clientView.notifyStart();
+        int choice = clientView.notifyStart(serverMsg.getPowerups());
+        int toAdd;
+        int myId = ClientContext.get().getMyID();
+        Player me = ClientContext.get().getMap().getPlayerById(myId);
+        toAdd = choice == 2 ? 0 : 1;
+        me.addCardPower(serverMsg.getPowerups()[toAdd]);
+        ClientContext.get().getMap().respawnColor(serverMsg.getPowerups()[choice-1].getMapColor()).addPlayer(me);
+        client.sendMessage(new RespawnResponse(serverMsg.getPowerups()[choice-1]));
     }
 
     /**
@@ -389,6 +398,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyRespawn notifyRespawn) {
+
         clientView.notifyRespawn(notifyRespawn.getpId());
     }
 

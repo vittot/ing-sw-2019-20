@@ -71,7 +71,7 @@ public class ClientTextView implements View {
     {
         writeText("Available game maps:\n");
         for(GameMap m : availableMaps)
-            writeText(m.toString());
+            showMap(m.getGrid());
     }
 
     /**
@@ -443,8 +443,17 @@ public class ClientTextView implements View {
      *
      */
     @Override
-    public void notifyStart() {
+    public int notifyStart(CardPower[] powerups) {
+        int choice;
         writeText("Game is started!");
+        writeText("Choose one of this two powerups to spawn on the map:");
+        writeText("1)\n" + powerups[0].toString());
+        writeText("2)\n" + powerups[1].toString());
+        do{
+            choice = readInt();
+        }while(choice != 1 && choice != 2);
+
+        return choice;
     }
 
     /**
@@ -571,7 +580,7 @@ public class ClientTextView implements View {
                                 System.out.print(col + insideSquare.substring(3) + ANSI_RESET); // da togliere quando si testa i player
                             }  // print ammo color
                             if(grid[x][j].getCardAmmo() != null){
-                                if(grid[x][j].getCardAmmo().getCardPower()!= null)
+                                if(grid[x][j].getCardAmmo().getCardPower() > 0)
                                     System.out.print(ANSI_GREY + "■" + ANSI_RESET);
                                 for(Color c :grid[x][j].getCardAmmo().getAmmo()){
                                     System.out.print(checkAmmoColor(c) + "■" + ANSI_RESET);
