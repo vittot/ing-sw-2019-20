@@ -241,7 +241,7 @@ public class ClientController implements ServerMessageHandler {
         if(instance.getMyID() == serverMsg.getId()){
             instance.getMap().getPlayerById(serverMsg.getId()).getCardPower().remove(serverMsg.getCp());
         }
-        clientView.powerUpUsageNotification(serverMsg.getId(),serverMsg.getCp().getName(),serverMsg.getCp().getDescription());
+        clientView.powerUpUsageNotification(serverMsg.getId(),serverMsg.getCp().getEffect().getName(),serverMsg.getCp().getEffect().getDescription());
     }
 
     /**

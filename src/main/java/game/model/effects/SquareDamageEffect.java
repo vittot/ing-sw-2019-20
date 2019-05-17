@@ -7,6 +7,7 @@ import game.model.Target;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SquareDamageEffect extends SimpleEffect {
@@ -119,5 +120,21 @@ public class SquareDamageEffect extends SimpleEffect {
             t.addDamage(shooter,damage);
             t.addThisTurnMarks(shooter,marks);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SquareDamageEffect that = (SquareDamageEffect) o;
+        return damage == that.damage &&
+                marks == that.marks &&
+                lastTargetSquare == that.lastTargetSquare &&
+                sameDirection == that.sameDirection;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(damage, marks, lastTargetSquare, sameDirection);
     }
 }

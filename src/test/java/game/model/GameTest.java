@@ -1,5 +1,6 @@
 package game.model;
 
+import game.model.effects.*;
 import game.model.exceptions.MapOutOfLimitException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -150,5 +151,30 @@ class GameTest {
     @Test
     void readDeck() {
         g.readDeck("effectFile.xml");
+    }
+
+    @Test
+    void readAmmoDeck()
+    {
+        List<Color> ammo = new ArrayList<>();
+        ammo.add(Color.RED);
+        ammo.add(Color.BLUE);
+        CardAmmo c = new CardAmmo(ammo,1);
+        g.readAmmoDeck("ammoFile.xml");
+        assertTrue(g.getDeckAmmo().size() == 36 && g.getDeckAmmo().get(35).equals(c));
+    }
+
+    @Test
+    void readPowerUpDeck()
+    {
+        List<Color> price = new ArrayList<>();
+        SimpleEffect ef1 = new MovementEffect(1,1,0,12,0,12,TargetVisibility.EVERYWHERE,true,TargetVisibility.EVERYWHERE,false,false,false,false,DifferentTarget.ANYONE);
+        FullEffect eff = new FullEffect(Collections.singletonList(ef1),"Teleporter","Play this card in any moment of your turn, move your figure and set it down on any square.",price,false);
+
+        CardPower cp = new CardPower(24,Color.YELLOW,false,eff);
+        g.readPowerUpDeck("powerupFile.xml");
+
+        assertTrue(g.getDeckPower().size() == 24 && g.getDeckPower().get(23).equals(cp));
+
     }
 }

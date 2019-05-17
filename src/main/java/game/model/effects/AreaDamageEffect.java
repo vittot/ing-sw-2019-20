@@ -4,6 +4,7 @@ import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class AreaDamageEffect extends SimpleEffect {
@@ -81,5 +82,20 @@ public class AreaDamageEffect extends SimpleEffect {
             t.addDamage(shooter,damage);
             t.addThisTurnMarks(shooter,marks);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AreaDamageEffect that = (AreaDamageEffect) o;
+        return damage == that.damage &&
+                marks == that.marks &&
+                maxEnemyPerSquare == that.maxEnemyPerSquare;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(damage, marks, maxEnemyPerSquare);
     }
 }

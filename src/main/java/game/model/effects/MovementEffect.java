@@ -4,6 +4,7 @@ import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -184,5 +185,26 @@ public class MovementEffect extends SimpleEffect {
     public void applyEffect(Player player, List<Target> targets){
         player.getPosition().removePlayer(player);
         player.setPosition((Square)targets.get(0));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MovementEffect that = (MovementEffect) o;
+        return moveShooter == that.moveShooter &&
+                myPos == that.myPos &&
+                chainMove == that.chainMove &&
+                lastTarget == that.lastTarget &&
+                sameDirection == that.sameDirection &&
+                minMove == that.minMove &&
+                maxMove == that.maxMove &&
+                visibilityAfter == that.visibilityAfter &&
+                differentTarget == that.differentTarget;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(moveShooter, visibilityAfter, myPos, chainMove, lastTarget, sameDirection, differentTarget, minMove, maxMove);
     }
 }

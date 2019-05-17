@@ -42,6 +42,10 @@ public class Game {
         gameObservers = new ArrayList<>();
         this.killBoard = new ArrayList<>(killBoardSize);
         this.deckWeapon = new ArrayList<>();
+        this.deckAmmo = new ArrayList<>();
+        this.deckPower = new ArrayList<>();
+        this.ammoWaste = new ArrayList<>();
+        this.powerWaste =  new ArrayList<>();
     }
 
     public Game(int id, int mapId, int killBoardSize, List<Player> players)
@@ -271,19 +275,21 @@ public class Game {
      * @param powerup
      */
     public void addPowerUp(Element powerup){
-        String name = powerup.getChild("name").getText();
-        String desc = powerup.getChild("description").getText();
+        String name = powerup.getChild("name").getText().trim();
+        String desc = powerup.getChild("description").getText().trim();
         Color c = createEquivalentAmmo(powerup.getChild("color").getText());
         List<Color> price = takePrice(powerup);
-        boolean flag = (powerup.getChild("plusBeforeBase").getText().equals("true"));
+        boolean flag = (powerup.getChild("usedWhenDamaged").getText().equals("true"));
 
-        FullEffect effect = takeEffect(powerup);
+        FullEffect effect = takePowerUpEffect(powerup);
 
         effect.setPrice(price);
+        effect.setName(name);
+        effect.setDescription(desc);
 
         int id = this.deckPower.size() + 1;
 
-        CardPower cardPower = new CardPower(id,name,desc,c,price,flag,effect);
+        CardPower cardPower = new CardPower(id,c,flag,effect);
         this.deckPower.add(cardPower);
     }
 
@@ -470,6 +476,7 @@ public class Game {
      * @return
      */
     public Color createEquivalentAmmo(String name){
+        name = name.trim();
         if(name.equals("blue"))
             return Color.BLUE;
         if(name.equals("red"))
@@ -531,6 +538,29 @@ public class Game {
     }
 
     /**
+     * Create the effect of a powerup
+     * @param powerup
+     * @return
+     */
+    public FullEffect takePowerUpEffect(Element powerup){
+        FullEffect effect = new FullEffect();
+        if( powerup.getChild("effect") == null)
+            return null;
+        for(Element ef : powerup.getChild("effect").getChildren()) {
+            try{
+                if (ef.getName().equals("roomDamageEffect")) effect.addSimpleEffect(createEquivalentRoomEffect(ef));
+                if (ef.getName().equals("squareDamageEffect")) effect.addSimpleEffect(createEquivalentSquareEffect(ef));
+                if (ef.getName().equals("movementEffect")) effect.addSimpleEffect(createEquivalentMovementEffect(ef));
+                if (ef.getName().equals("plainDamage")) effect.addSimpleEffect(createEquivalentPlainEffect(ef));
+                if (ef.getName().equals("areaDamageEffect")) effect.addSimpleEffect(createEquivalentAreaEffect(ef));
+            }catch (DataConversionException e){
+                //TODO eccezione
+            }
+        }
+        return effect;
+    }
+
+    /**
      * Create all the base effect of a weapon
      * @param weapon
      * @return
@@ -550,6 +580,7 @@ public class Game {
         }
         return effect;
     }
+
     public List<List<Color>> takePriceOpz(Element weapon){
         List<List<Color>> pricetot = new ArrayList<List<Color>>();
         List<Color> price = new ArrayList<Color>();

@@ -1,6 +1,7 @@
 package game.model;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CardAmmo {
     private List<Color> ammo;
@@ -25,5 +26,19 @@ public class CardAmmo {
 
     public void setCardPower(int cardPower) {
         this.cardPower = cardPower;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CardAmmo cardAmmo = (CardAmmo) o;
+        return cardPower == cardAmmo.cardPower &&
+                Objects.equals(ammo, cardAmmo.ammo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ammo, cardPower);
     }
 }

@@ -2,10 +2,12 @@ package game.model.effects;
 
 import game.model.Color;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class FullEffect {
+public class FullEffect implements Serializable {
     private List<SimpleEffect> simpleEffects;
     private String name;
     private String description;
@@ -73,5 +75,28 @@ public class FullEffect {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FullEffect that = (FullEffect) o;
+        return beforeBase == that.beforeBase &&
+                Objects.equals(simpleEffects, that.simpleEffects) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(description, that.description) &&
+                priceEquals(price, that.price);
+    }
+
+    private boolean priceEquals(List<Color> price1, List<Color> price2)
+    {
+        if(price1 == null && price2 == null) return  true;
+        return price1.size() == price2.size() && price1.containsAll(price2) && price2.containsAll(price1);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(simpleEffects, name, description, price, beforeBase);
     }
 }

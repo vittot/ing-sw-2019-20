@@ -215,6 +215,7 @@
             SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
     SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
     -->
+    <usedWhenDamaged>false</usedWhenDamaged>
     <effect>
         <movementEffect>
             <minEnemy>1</minEnemy>
@@ -230,7 +231,7 @@
             <chainMove>false</chainMove>
             <lastTarget>false</lastTarget>
             <sameDirection>false</sameDirection>
-            <beforeBase>false</beforeBase>
+             
             <differentTarget>Anyone</differentTarget>
         </movementEffect>
         <movementEffect>
@@ -247,7 +248,7 @@
             <chainMove>false</chainMove>
             <lastTarget>true</lastTarget>
             <sameDirection>true</sameDirection>
-            <beforeBase>false</beforeBase>
+             
             <differentTarget>Anyone</differentTarget>
         </movementEffect>
     </effect>
@@ -270,6 +271,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
+        <usedWhenDamaged>false</usedWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -285,7 +287,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <movementEffect>
@@ -302,7 +304,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>true</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -325,6 +327,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
+        <usedWhenDamaged>false</usedWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -340,7 +343,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <movementEffect>
@@ -357,7 +360,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>true</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -380,6 +383,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
+        <usedWhenDamaged>false</usedWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -395,7 +399,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <movementEffect>
@@ -412,7 +416,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>true</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -435,6 +439,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
+        <usedWhenDamaged>false</usedWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -450,7 +455,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <movementEffect>
@@ -467,7 +472,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>true</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -490,6 +495,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
+        <usedWhenDamaged>false</usedWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -505,7 +511,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
             <movementEffect>
@@ -522,7 +528,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>true</lastTarget>
                 <sameDirection>true</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -751,7 +757,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -786,7 +792,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -821,7 +827,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -856,7 +862,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -891,7 +897,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>
@@ -926,7 +932,7 @@
                 <chainMove>false</chainMove>
                 <lastTarget>false</lastTarget>
                 <sameDirection>false</sameDirection>
-                <beforeBase>false</beforeBase>
+                 
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
         </effect>

@@ -4,6 +4,7 @@ import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -150,5 +151,23 @@ public class PlainDamageEffect extends SimpleEffect {
             t.addDamage(shooter,damage);
             t.addThisTurnMarks(shooter,marks);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PlainDamageEffect that = (PlainDamageEffect) o;
+        return damage == that.damage &&
+                marks == that.marks &&
+                lastTarget == that.lastTarget &&
+                chainTarget == that.chainTarget &&
+                sameDirection == that.sameDirection &&
+                differentTarget == that.differentTarget;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(damage, marks, lastTarget, differentTarget, chainTarget, sameDirection);
     }
 }
