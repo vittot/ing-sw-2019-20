@@ -10,12 +10,13 @@ import java.util.Map;
 
 public class ClientTextView implements View {
     private static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_GREY = "\u001b[37m";
     private ClientController controller;
     private Scanner fromKeyBoard;
     private String user;
@@ -517,19 +518,23 @@ public class ClientTextView implements View {
 
     public void showMap(Square[][] grid) {
         String col;
-        String wallVert = " │";
+        String wallVert = "│";
         String wallHor ="────";
         String wallHor2 = "────";
-        String doorVert1 =" ┴";
-        String doorVert2 =" ┬";
+        String doorVert[] ={"┴","┬"};
         String doorHor ="┤  ├";
         String doorHor2 ="┤  ├";
-        String openV = "  ";
+        String openV = " ";
         String openH = "    ";
-        String angleLeftUp =" ┌─";
+        String insideSquare = "      ";
+        String angleLeftUp ="┌─";
         String angleRigUp = "─┐";
-        String angleLeftDown = " └─";
+        String angleLeftDown = "└─";
         String angleRigDown ="─┘";
+        String emptySquare = "        ";
+        String spawnPoint = "s"; //ˢ s Ⓢ
+        String player = "\u265F";
+        int numberP = 0;
 
         for (int x = 0; x < 3; x++) { //change with pos in the string
             for (int j = 0; j < 4; j++) { //change with square
@@ -545,54 +550,61 @@ public class ClientTextView implements View {
                     System.out.print(col + angleRigUp + ANSI_RESET);
                 }
                 else{
-                    System.out.print("         ");
+                    System.out.print(emptySquare);
                 }
             }
             System.out.println("");
-            for(int j = 0; j < 4; j++){ // first mid
-                if(grid[x][j]!=null) {
-                    col = checkColor(grid[x][j].getColor());
-                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("WALL"))
-                        System.out.print(col + wallVert + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("DOOR"))
-                        System.out.print(col + doorVert1 + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("OPEN"))
-                        System.out.print(col + openV + ANSI_RESET);
-                    System.out.print(col + "     " + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("WALL"))
-                        System.out.print(col + wallVert + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("DOOR"))
-                        System.out.print(col + doorVert1 + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("OPEN"))
-                        System.out.print(col + openV + ANSI_RESET);
+            for(int height = 0; height < 2; height++){
+                for(int j = 0; j < 4; j++) {
+                    if (grid[x][j] != null) {
+                        col = checkColor(grid[x][j].getColor());
+                        if (grid[x][j].getEdge(Direction.LEFT).name().equals("WALL"))
+                            System.out.print(col + wallVert + ANSI_RESET);
+                        if (grid[x][j].getEdge(Direction.LEFT).name().equals("DOOR"))
+                            System.out.print(col + doorVert[height] + ANSI_RESET);
+                        if (grid[x][j].getEdge(Direction.LEFT).name().equals("OPEN"))
+                            System.out.print(col + openV + ANSI_RESET);
+                        if(height == 0){
+                            if(grid[x][j].isRespawn()) { //check respown point
+                                System.out.print(col + spawnPoint + insideSquare.substring(4));
+                            }else {
+                                System.out.print(col + insideSquare.substring(3) + ANSI_RESET); // da togliere quando si testa i player
+                            }  // print ammo color
+                            if(grid[x][j].getCardAmmo() != null){
+                                if(grid[x][j].getCardAmmo().getCardPower()!= null)
+                                    System.out.print(ANSI_GREY + "■" + ANSI_RESET);
+                                for(Color c :grid[x][j].getCardAmmo().getAmmo()){
+                                    System.out.print(checkAmmoColor(c) + "■" + ANSI_RESET);
+                                }
+                            }
+                            else
+                                System.out.print(insideSquare.substring(0,3));
+                        }
+
+                        if(height == 1){//show player in map
+                           /* if (grid[x][j].getPlayers().isEmpty())// check lpayer in the square
+                                System.out.print(col + insideSquare + ANSI_RESET);
+                            else {
+                                numberP = grid[x][j].getPlayers().size();
+                                System.out.print(col + insideSquare.substring(numberP) + ANSI_RESET);
+                                for (int num = 0; num < numberP; num++) {
+                                    System.out.print(checkPlayerColor(grid[x][j].getPlayers().get(num).getColor()) + player + ANSI_RESET);
+                                }
+                            }*/
+                            System.out.print(insideSquare); // da togliere con il commento sopra (per player)
+                        }
+                        if (grid[x][j].getEdge(Direction.RIGHT).name().equals("WALL"))
+                            System.out.print(col + wallVert + ANSI_RESET);
+                        if (grid[x][j].getEdge(Direction.RIGHT).name().equals("DOOR"))
+                            System.out.print(col + doorVert[height] + ANSI_RESET);
+                        if (grid[x][j].getEdge(Direction.RIGHT).name().equals("OPEN"))
+                            System.out.print(col + openV + ANSI_RESET);
+                    } else {
+                        System.out.print(emptySquare);
+                    }
                 }
-                else{
-                    System.out.print("         ");
-                }
+                System.out.println("");
             }
-            System.out.println("");
-            for(int j = 0; j < 4; j++){ // second mid
-                if(grid[x][j]!=null) {
-                    col = checkColor(grid[x][j].getColor());
-                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("WALL"))
-                        System.out.print(col + wallVert + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("DOOR"))
-                        System.out.print(col + doorVert2 + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.LEFT).name().equals("OPEN"))
-                        System.out.print(col + openV + ANSI_RESET);
-                    System.out.print(col + "     " + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("WALL"))
-                        System.out.print(col + wallVert + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("DOOR"))
-                        System.out.print(col + doorVert2 + ANSI_RESET);
-                    if (grid[x][j].getEdge(Direction.RIGHT).name().equals("OPEN"))
-                        System.out.print(col + openV + ANSI_RESET);
-                }
-                else{
-                    System.out.print("         ");
-                }
-            }
-            System.out.println("");
             for (int j = 0; j < 4; j++) {
                 if(grid[x][j]!=null) {
                     col = checkColor(grid[x][j].getColor());
@@ -606,7 +618,7 @@ public class ClientTextView implements View {
                     System.out.print(col + angleRigDown + ANSI_RESET);
                 }
                 else{
-                    System.out.print("         ");
+                    System.out.print(emptySquare);
                 }
             }
             System.out.println("");
@@ -616,6 +628,7 @@ public class ClientTextView implements View {
     }
 
     private void showMyPlayerInformation() {
+        String death = "\u2620";
         Player p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         writeText("Your weapon: ");
         for(CardWeapon cw : p.getWeapons()){
@@ -648,7 +661,7 @@ public class ClientTextView implements View {
         if(color.equals(PlayerColor.BLUE))return ANSI_BLUE;
         if(color.equals(PlayerColor.PURPLE))return ANSI_PURPLE;
         if(color.equals(PlayerColor.GREY))return ANSI_RED;
-        return ANSI_CYAN;
+        return ANSI_GREY;
     }
 
     private String checkColor(MapColor color){
@@ -657,6 +670,6 @@ public class ClientTextView implements View {
         if(color.equals(MapColor.BLUE))return ANSI_BLUE;
         if(color.equals(MapColor.PURPLE))return ANSI_PURPLE;
         if(color.equals(MapColor.RED))return ANSI_RED;
-        return ANSI_CYAN;
+        return ANSI_GREY;
     }
 }
