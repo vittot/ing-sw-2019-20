@@ -55,14 +55,18 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
      */
     void startGame(Game g, Player p)
     {
-        state = ServerState.WAITING_SPAWN;
+        state = ServerState.WAITING_SPAWN; //TODO management of the first spawn of the players in order
         this.model = g;
         this.currPlayer = p;
         CardPower c1 = g.drawPowerUp();
         CardPower c2 = g.drawPowerUp();
         this.currPlayer.addCardPower(c1);
         this.currPlayer.addCardPower(c2);
-        this.clientHandler.sendMessage(new NotifyGameStarted(g.getMap(),g.drawPowerUp(),g.drawPowerUp()));
+        this.currPlayer.addAmmo(Color.BLUE);
+        this.currPlayer.addAmmo(Color.YELLOW);
+        this.currPlayer.addAmmo(Color.RED);
+        this.model.addNewPlayer(this.currPlayer);
+        this.clientHandler.sendMessage(new NotifyGameStarted(this.currPlayer,g.getMap(),c1,c2));
     }
 
     @Override
@@ -267,28 +271,49 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         }
     }
 
+    /*
+    @Override
+    public ServerMessage handle(SpawnResponse clientMsg){
+         if(state == ServerState.WAITING_SPAWN){
+             if (currPlayer.getCardPower().contains(clientMsg.getPowerUp())) {
+                 currPlayer.respawn(clientMsg.getPowerUp());
+                 currPlayer.removePowerUp(Collections.singletonList(clientMsg.getPowerUp()));
+                 model.addPowerWaste(clientMsg.getPowerUp());
+                 if (model.getCurrentTurn().getCurrentPlayer().equals(currPlayer)) {
+                     state = ServerState.WAITING_ACTION;
+                     return new ChooseTurnActionRequest();
+                 } else {
+                     state = ServerState.WAITING_TURN;
+                     return new OperationCompletedResponse("Wait for your turn");
+                 }
+             } else
+                 return new InvalidPowerUpResponse();
+         }
+         else{
+             return new InvalidMessageResponse("You are not dead, you can't respawn!");
+         }
+         }
+    */
     @Override
     public ServerMessage handle(RespawnResponse clientMsg) {
-        if(currPlayer.isDead()) {
+        if (currPlayer.isDead() || state == ServerState.WAITING_SPAWN) {
             if (currPlayer.getCardPower().contains(clientMsg.getPowerUp())) {
                 currPlayer.respawn(clientMsg.getPowerUp());
                 currPlayer.removePowerUp(Collections.singletonList(clientMsg.getPowerUp()));
                 model.addPowerWaste(clientMsg.getPowerUp());
-                if(model.getCurrentTurn().getCurrentPlayer().equals(currPlayer))
-                {
+                if (model.getCurrentTurn().getCurrentPlayer().equals(currPlayer)) {
                     state = ServerState.WAITING_ACTION;
                     return new ChooseTurnActionRequest();
+                } else {
+                    state = ServerState.WAITING_TURN;
+                    return new OperationCompletedResponse("You are respawned, wait for your turn!");
                 }
-                else
-                {
-                    return new OperationCompletedResponse("");
-                }
-            }
-            else
+            } else
                 return new InvalidPowerUpResponse();
         }
-        else
+        else{
             return new InvalidMessageResponse("You are not dead, you can't respawn!");
+        }
     }
 
     @Override
@@ -365,10 +390,11 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(JoinWaitingRoomRequest joinWaitingRoomRequest) {
         WaitingRoom w = GameManager.get().getWaitingRoom(joinWaitingRoomRequest.getRoomId());
+        int n = 0;
         if(w != null)
         {
-            w.addWaitingPlayer(this, joinWaitingRoomRequest.getNickName());
-            return new OperationCompletedResponse("You correctly joined the waiting room! Wait for other players...");
+            n = w.addWaitingPlayer(this, joinWaitingRoomRequest.getNickName());
+            return new JoinWaitingRoomResponse(n);
         }
 
         return new InvalidMessageResponse("The indicated room id does not exist on the Server");
@@ -377,8 +403,8 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest) {
         WaitingRoom w = GameManager.get().addWaitingRoom(createWaitingRoomRequest.getMapId(),createWaitingRoomRequest.getNumWaitingPlayers());
-        w.addWaitingPlayer(this, createWaitingRoomRequest.getCreatorNicknme());
-        return new OperationCompletedResponse("Waiting room correctly created! \n>>Wait for other players...");
+        int n=w.addWaitingPlayer(this, createWaitingRoomRequest.getCreatorNicknme());
+        return new CreateWaitingRoomResponse(n);
     }
 
     @Override

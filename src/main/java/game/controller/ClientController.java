@@ -4,12 +4,10 @@ import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.RespawnResponse;
 import game.controller.commands.servercommands.*;
-import game.model.CardWeapon;
-import game.model.Player;
+import game.model.*;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardAmmoAvailableException;
-import game.model.Action;
 import game.model.exceptions.NoCardWeaponSpaceException;
 
 import java.io.IOException;
@@ -335,14 +333,20 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyGameStarted serverMsg) {
-
         ClientContext.get().setMap(serverMsg.getMap());
         int choice = clientView.notifyStart(serverMsg.getPowerups());
         int toAdd;
         int myId = ClientContext.get().getMyID();
-        Player me = ClientContext.get().getMap().getPlayerById(myId);
+        Player me = serverMsg.getP();
+        me.setId(myId);
         toAdd = choice == 2 ? 0 : 1;
+        // this part will be delete when we correctly manage the serialization
+        List<CardPower> cardPowers = new ArrayList<>();
+        me.setCardPower(cardPowers);
         me.addCardPower(serverMsg.getPowerups()[toAdd]);
+        me.addAmmo(Color.BLUE);
+        me.addAmmo(Color.YELLOW);
+        me.addAmmo(Color.RED);
         ClientContext.get().getMap().respawnColor(serverMsg.getPowerups()[choice-1].getMapColor()).addPlayer(me);
         client.sendMessage(new RespawnResponse(serverMsg.getPowerups()[choice-1]));
     }
@@ -405,5 +409,17 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(AvailableMapsListResponse availableMapsListResponse) {
         clientView.showMapsPhase(availableMapsListResponse.getAvaiableMaps());
+    }
+
+    @Override
+    public void handle(JoinWaitingRoomResponse joinWaitingRoomResponse) {
+        ClientContext.get().setMyID(joinWaitingRoomResponse.getId());
+        clientView.notifyCompletedOperation("You correctly joined the waiting room! Wait for other players...");
+    }
+
+    @Override
+    public void handle(CreateWaitingRoomResponse createWaitingRoomResponse) {
+        ClientContext.get().setMyID(createWaitingRoomResponse.getId());
+        clientView.notifyCompletedOperation("Waiting room correctly created! \n>>Wait for other players...");
     }
 }

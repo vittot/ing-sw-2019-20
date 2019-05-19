@@ -39,6 +39,7 @@ public class SocketClientHandler implements Runnable, GameListener {
     public void sendMessage(ServerMessage msg) {
         try{
             outStream.writeObject(msg);
+            outStream.reset();
         }catch(IOException e)
         {
             e.printStackTrace();

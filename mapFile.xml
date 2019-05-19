@@ -178,7 +178,7 @@
             <color>yellow</color>
             <edge>open</edge>
             <edge>open</edge>
-            <edge>open</edge>
+            <edge>wall</edge>
             <edge>door</edge>
             <respown>false</respown>
         </square>

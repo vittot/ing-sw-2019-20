@@ -37,7 +37,7 @@ public class WaitingRoom implements Serializable {
      * Add a waiting client in this room, when the room is full it starts the game and notify the clients about it
      * @param s
      */
-    public void addWaitingPlayer(ServerController s, String nick)
+    public int addWaitingPlayer(ServerController s, String nick)
     {
         int n = players.size();
         Player p = new Player(n+1, PlayerColor.values()[n],nick);
@@ -52,6 +52,7 @@ public class WaitingRoom implements Serializable {
                 g.addGameListener(e.getKey().getClientHandler());
             }
         }
+        return n+1;
 
     }
 

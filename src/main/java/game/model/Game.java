@@ -268,6 +268,7 @@ public class Game {
 
         CardAmmo cardAmmo = new CardAmmo(ammos,cardPower);
         this.deckAmmo.add(cardAmmo);
+        Collections.shuffle(this.deckAmmo);
     }
 
     /**
@@ -291,6 +292,7 @@ public class Game {
 
         CardPower cardPower = new CardPower(id,c,flag,effect);
         this.deckPower.add(cardPower);
+        Collections.shuffle(this.deckPower);
     }
 
     /**
@@ -315,6 +317,7 @@ public class Game {
         insertPrice(effect,effectal,effectop,price,priceal,priceop);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
         this.deckWeapon.add(wp);
+        Collections.shuffle(this.deckWeapon);
     }
 
     private void insertPrice(FullEffect effect, FullEffect effectal, List<FullEffect> effectop, List price, List<Color> priceal, List<List<Color>> priceop) {

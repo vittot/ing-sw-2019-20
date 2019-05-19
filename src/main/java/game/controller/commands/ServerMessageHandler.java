@@ -37,4 +37,6 @@ public interface ServerMessageHandler {
     void handle(NotifyGrabAmmo notifyGrabAmmo);
     void handle(NotifyRespawn notifyRespawn);
     void handle(AvailableMapsListResponse availableMapsListResponse);
+    void handle(JoinWaitingRoomResponse joinWaitingRoomResponse);
+    void handle(CreateWaitingRoomResponse createWaitingRoomResponse);
 }

@@ -39,6 +39,7 @@ public class SocketClient implements Client {
     public void sendMessage(ClientMessage msg) {
         try{
             outStream.writeObject(msg);
+            outStream.reset();
         }catch(IOException e)
         {
             e.printStackTrace();

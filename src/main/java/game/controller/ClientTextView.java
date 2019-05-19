@@ -108,7 +108,7 @@ public class ClientTextView implements View {
     public void createRoomPhase()
     {
         int mapId, nPlayer;
-        printAvailableMaps();
+        //printAvailableMaps();
         do{
             writeText("Enter the room map id:");
             mapId = readInt();
@@ -632,8 +632,8 @@ public class ClientTextView implements View {
             }
             System.out.println("");
         }
-        //showPlayerPosition();
         //showMyPlayerInformation();
+        //showPlayerPosition();
     }
 
     private void showMyPlayerInformation() {
@@ -647,14 +647,17 @@ public class ClientTextView implements View {
         for(Color c : p.getAmmo()){
             System.out.print(checkAmmoColor(c)+"■"+ANSI_RESET);
         }
+        System.out.println("");
     }
 
     private void showPlayerPosition() {
+        System.out.println("");
         for(Player p : ClientContext.get().getMap().getAllPlayers()) {
-            if (p.getId() != ClientContext.get().getMyID())
+            if (p.getId() != ClientContext.get().getMyID()){
                 writeText(checkPlayerColor(p.getColor()) + "Player " + p.getNickName() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
-            for(PlayerColor d : p.getDamage()) {
-                System.out.print(checkPlayerColor(d) + "¤" + ANSI_RESET);
+                for(PlayerColor d : p.getDamage()) {
+                    System.out.println(checkPlayerColor(d) + "¤" + ANSI_RESET);
+                }
             }
         }
     }

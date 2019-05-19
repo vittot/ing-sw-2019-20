@@ -31,7 +31,8 @@ public class Square implements Target, Serializable {
     }
 
     public Square() {
-
+        players = new ArrayList<>();
+        weapons = new ArrayList<>();
     }
 
 

@@ -50,12 +50,20 @@ public class Player implements Target, Serializable {
         this.serializeEverything = false;
         this.weapons = new ArrayList<>();
         this.cardPower = new ArrayList<>();
+        this.ammo = new ArrayList<>();
     }
 
     public Player(int id, PlayerColor color, String nick)
     {
         this(id,color);
         this.nickName = nick;
+        this.cardPower = new ArrayList<>();
+        this.ammo = new ArrayList<>();
+        this.marks = new ArrayList<>();
+        this.thisTurnMarks = new ArrayList<>();
+        this.damage = new ArrayList<>();
+        this.serializeEverything = false;
+        this.weapons = new ArrayList<>();
     }
 
     public void setRespawnListener(RespawnObserver respawnListener) {
@@ -268,7 +276,7 @@ public class Player implements Target, Serializable {
             lastKill = game.getLastKill(this);
             lastKill.setRage(true);
         }
-        game.notifyDamage(this,shooter,damage);
+        //game.notifyDamage(this,shooter,damage);
 
     }
 
@@ -542,5 +550,9 @@ public class Player implements Target, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(color,id);
+    }
+
+    public void addAmmo(Color ammo) {
+        this.ammo.add(ammo);
     }
 }

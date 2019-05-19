@@ -21,7 +21,7 @@ public class GameManager {
     private GameManager(){
         nextId = 1;
         games = new ArrayList<>();
-        availableMaps = new ArrayList<>();
+        availableMaps = Game.getAvailableMaps();
         waitingRooms = new ArrayList<>();
     }
 
@@ -45,6 +45,7 @@ public class GameManager {
      */
     public Game addGame(int mapId, List<Player> players){
         Game g = new Game(nextId, mapId, 8,players);
+        g.setMap(getMap(mapId));
         nextId++;
         games.add(g);
         return g;
