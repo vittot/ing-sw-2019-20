@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class GameMap implements Serializable {
     private int id;
-    private Square[][] grid;
+    private Square[][] grid;  // grid[y][x] y -> 0 : 2 | x -> 0 : 3
     private int dimX; //number of cols
     private int dimY; //number of rows
     public static final int MAX_DIST = 12;

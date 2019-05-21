@@ -120,24 +120,24 @@ public class Game {
                     for(Element sq : tmpMap.getChildren("square")){
 
                         if(!sq.getChildren().isEmpty()) {
-                            grid[x][y] = new Square();
+                            grid[y][x] = new Square();
 
-                            grid[x][y].setColor(createEquivalentMapColor(sq.getChildText("color")));
+                            grid[y][x].setColor(createEquivalentMapColor(sq.getChildText("color")));
                             for (Element edg : sq.getChildren("edge")) {
                                 edges[k] = createEquivalentEdge(edg.getText());
                                 k++;
                             }
                             k = 0;
-                            grid[x][y].setEdges(edges.clone());
-                            grid[x][y].setRespawn(sq.getChildText("respown").equals("true"));
-                            grid[x][y].setX(y);
-                            grid[x][y].setY(x);
+                            grid[y][x].setEdges(edges.clone());
+                            grid[y][x].setRespawn(sq.getChildText("respown").equals("true"));
+                            grid[y][x].setX(x);
+                            grid[y][x].setY(y);
                         }
-                        if (y == 3) {
-                            y = 0;
-                            x++;
-                        } else {
+                        if (x == 3) {
+                            x = 0;
                             y++;
+                        } else {
+                            x++;
                         }
                     }
 
@@ -151,7 +151,7 @@ public class Game {
             //TODO ecc
         }
         if(grid != null){
-            map = new GameMap(id,4,3);
+            map = new GameMap(id,3,2);
             map.setDescription(desc);
             map.setGrid(grid);
         }
@@ -823,7 +823,7 @@ public class Game {
      * Shuffle the power up waste deck to reuse them
      */
     public void replacePowerUpDeck(){
-        Collections.shuffle(ammoWaste);
+        Collections.shuffle(powerWaste);
         deckPower.clear();
         deckPower.addAll(powerWaste);
         powerWaste.clear();
@@ -835,6 +835,8 @@ public class Game {
      */
     public CardPower drawPowerUp()
     {
+        if(deckPower.size() == 0 )
+            replacePowerUpDeck();
         return deckPower.remove(0);
     }
 

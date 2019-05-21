@@ -36,8 +36,14 @@ public class ClientTextView implements View {
         System.out.println(">> " + text);
     }
 
-    public String readText(){return this.fromKeyBoard.nextLine();}
-    public  int readInt(){return this.fromKeyBoard.nextInt();}
+    public String readText(){
+        String string = fromKeyBoard.nextLine();
+        return string;
+    }
+    public  int readInt(){
+        /int save = Integer.parseInt(this.fromKeyBoard.nextLine());
+        return save;
+    }
 
     /**
      * Starting phase during the player enter his username for the game
@@ -231,11 +237,11 @@ public class ClientTextView implements View {
     public void chooseTurnActionPhase(){
         Action choosenAction;
         String action;
-
+        writeText("Choose movement, shoot or grab: ");
         do{
             writeText("Choose the action you want to make: ");
             action = readText();
-            action.toUpperCase();
+            action = action.toUpperCase();
             try {
                 choosenAction = Action.valueOf(action);
             }
