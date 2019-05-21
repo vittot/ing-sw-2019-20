@@ -84,6 +84,8 @@ public class Turn {
      */
     public boolean applyStep(Action ac){
         int i = 0;
+        currentPlayer.rifleActualWeapon();
+        game.getPlayers().forEach(Player::updateMarks);
         if(this.actionList.contains(ac)){
             i = actionList.indexOf(ac);
             setActionList(actionList.subList(i,actionList.size()));
@@ -132,8 +134,6 @@ public class Turn {
                 actionList.add(Action.MOVEMENT);
                 actionList.add(Action.MOVEMENT);
         }
-        currentPlayer.rifleActualWeapon();
-        game.getPlayers().forEach(Player::updateMarks);
     }
 
     

@@ -377,9 +377,13 @@ public class Player implements Target, Serializable {
      * Clear the content of the actual weapon parameters used during the current turn
      */
     public void rifleActualWeapon(){
-        this.actualWeapon.getPreviousTargets().clear();
-        this.actualWeapon.setLastTargetSquare(null);
-        this.actualWeapon.setLastDirection(null);
+        if(this.actualWeapon != null)
+        {
+            this.actualWeapon.getPreviousTargets().clear();
+            this.actualWeapon.setLastTargetSquare(null);
+            this.actualWeapon.setLastDirection(null);
+        }
+
     }
 
     /**

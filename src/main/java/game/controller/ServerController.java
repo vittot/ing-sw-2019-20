@@ -59,14 +59,19 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         this.model = g;
         this.currPlayer = p;
         CardPower c1 = g.drawPowerUp();
-        CardPower c2 = g.drawPowerUp();
         this.currPlayer.addCardPower(c1);
-        this.currPlayer.addCardPower(c2);
         this.currPlayer.addAmmo(Color.BLUE);
         this.currPlayer.addAmmo(Color.YELLOW);
         this.currPlayer.addAmmo(Color.RED);
         this.model.addNewPlayer(this.currPlayer);
-        this.clientHandler.sendMessage(new NotifyGameStarted(this.currPlayer,g.getMap(),c1,c2));
+    }
+
+    public Game getModel() {
+        return model;
+    }
+
+    public Player getCurrPlayer() {
+        return currPlayer;
     }
 
     @Override
@@ -394,7 +399,54 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         if(w != null)
         {
             n = w.addWaitingPlayer(this, joinWaitingRoomRequest.getNickName());
-            return new JoinWaitingRoomResponse(n);
+            if(n != w.getNumWaitingPlayers())
+            {
+                return new JoinWaitingRoomResponse(n);
+            }
+            else{
+                for(ServerController sc : w.getServerControllers())
+                {
+                    sc.getCurrPlayer().setSerializeEverything(true);
+                    if(sc != this){
+
+                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getPlayers(),sc.getModel().getMap()));
+                    }
+                    else{
+                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getMap(),sc.getModel().getPlayers(),n));
+
+                    }
+
+                }
+
+                for(ServerController sc : w.getServerControllers())
+                {
+                    if(sc!=this)
+                    {
+                        if(model.getCurrentTurn().getCurrentPlayer() == sc.getCurrPlayer())
+                        {
+                            CardPower cp = model.drawPowerUp();
+                            sc.getCurrPlayer().addCardPower(cp);
+                            sc.getClientHandler().sendMessage(new RespawnRequest(cp));
+                        }
+                        else
+                            sc.getClientHandler().sendMessage(new OperationCompletedResponse("Wait your turn.."));
+                    }
+
+
+                }
+
+
+                if(model.getCurrentTurn().getCurrentPlayer() == getCurrPlayer())
+                {
+                    CardPower cp = model.drawPowerUp();
+                    getCurrPlayer().addCardPower(cp);
+                    return new RespawnRequest(cp);
+                }
+
+                return new OperationCompletedResponse("Wait your turn..");
+
+            }
+
         }
 
         return new InvalidMessageResponse("The indicated room id does not exist on the Server");

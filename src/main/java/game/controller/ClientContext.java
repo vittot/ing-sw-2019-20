@@ -3,6 +3,7 @@ package game.controller;
 import game.model.Kill;
 import java.util.List;
 import game.model.GameMap;
+import game.model.Player;
 import game.model.effects.SimpleEffect;
 
 /**
@@ -16,6 +17,7 @@ public class ClientContext {
     private int myID;
     private List<Kill> killboard;
     private SimpleEffect currentEffect;
+    private List<Player> playersInWaiting;
 
     private ClientContext() {
     }
@@ -30,6 +32,14 @@ public class ClientContext {
         }
 
         return instance;
+    }
+
+    public List<Player> getPlayersInWaiting() {
+        return playersInWaiting;
+    }
+
+    public void setPlayersInWaiting(List<Player> playersInWaiting) {
+        this.playersInWaiting = playersInWaiting;
     }
 
     public SimpleEffect getCurrentEffect() {

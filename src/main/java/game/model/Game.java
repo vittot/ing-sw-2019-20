@@ -130,8 +130,8 @@ public class Game {
                             k = 0;
                             grid[x][y].setEdges(edges.clone());
                             grid[x][y].setRespawn(sq.getChildText("respown").equals("true"));
-                            grid[x][y].setX(x);
-                            grid[x][y].setY(y);
+                            grid[x][y].setX(y);
+                            grid[x][y].setY(x);
                         }
                         if (y == 3) {
                             y = 0;

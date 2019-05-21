@@ -277,8 +277,12 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(RespawnRequest serverMsg) {
-        ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower().add(serverMsg.getcPU());
-        clientView.choosePowerUpToRespawn(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower());
+        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == ClientContext.get().getMyID()).findFirst().orElse(null);
+        if(p == null){
+            p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
+        }
+        p.addCardPower(serverMsg.getcPU());
+        clientView.choosePowerUpToRespawn(p.getCardPower());
     }
 
     /**
@@ -334,21 +338,11 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyGameStarted serverMsg) {
         ClientContext.get().setMap(serverMsg.getMap());
-        int choice = clientView.notifyStart(serverMsg.getPowerups());
-        int toAdd;
-        int myId = ClientContext.get().getMyID();
-        Player me = serverMsg.getP();
-        me.setId(myId);
-        toAdd = choice == 2 ? 0 : 1;
-        // this part will be delete when we correctly manage the serialization
-        List<CardPower> cardPowers = new ArrayList<>();
-        me.setCardPower(cardPowers);
-        me.addCardPower(serverMsg.getPowerups()[toAdd]);
-        me.addAmmo(Color.BLUE);
-        me.addAmmo(Color.YELLOW);
-        me.addAmmo(Color.RED);
-        ClientContext.get().getMap().respawnColor(serverMsg.getPowerups()[choice-1].getMapColor()).addPlayer(me);
-        client.sendMessage(new RespawnResponse(serverMsg.getPowerups()[choice-1]));
+        if(serverMsg.getId() != 0)
+            ClientContext.get().setMyID(serverMsg.getId());
+        ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
+
+
     }
 
     /**
@@ -402,6 +396,17 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyRespawn notifyRespawn) {
+
+        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyRespawn.getpId()).findFirst().orElse(null);
+        if(p == null){
+            p = ClientContext.get().getMap().getPlayerById(notifyRespawn.getpId());
+        }
+
+        try {
+            ClientContext.get().getMap().movePlayer(p,notifyRespawn.getX(),notifyRespawn.getY());
+        } catch (MapOutOfLimitException e) {
+            e.printStackTrace();
+        }
 
         clientView.notifyRespawn(notifyRespawn.getpId());
     }

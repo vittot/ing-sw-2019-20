@@ -9,24 +9,26 @@ import java.util.List;
 public class NotifyGameStarted implements ServerMessage {
 
     private GameMap map;
-    private CardPower [] powerups;
-    private Player p;
+    private List<Player> players;
+    private int id = 0;
 
-    public NotifyGameStarted(Player p, GameMap map, CardPower c1, CardPower c2) {
+    public NotifyGameStarted(List<Player> players, GameMap map) {
         this.map = map;
-        this.powerups = new CardPower[2];
-        this.powerups[0] = c1;
-        this.powerups[1] = c2;
-        this.p = p;
-
+        this.players = players;
     }
 
-    public Player getP() {
-        return p;
+    public NotifyGameStarted(GameMap map, List<Player> players, int id) {
+        this.map = map;
+        this.players = players;
+        this.id = id;
     }
 
-    public CardPower[] getPowerups() {
-        return powerups;
+    public int getId() {
+        return id;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 
     public GameMap getMap() {

@@ -58,6 +58,8 @@ public class SocketClientHandler implements Runnable, GameListener {
                 ClientMessage inMsg = (ClientMessage)inStream.readObject();
                 ServerMessage outMsg = inMsg.handle(controller);
                 sendMessage(outMsg);
+                if(controller.getCurrPlayer() != null)
+                    controller.getCurrPlayer().setSerializeEverything(false); //it is not always necessary
             } while (!stop);
             close();
 

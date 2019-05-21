@@ -215,4 +215,12 @@ public class GameMap implements Serializable {
         }
         return null;
     }
+
+    public void movePlayer(Player p, int x, int y) throws MapOutOfLimitException {
+        if(p.getPosition() != null)
+            p.getPosition().removePlayer(p);
+        Square s = getSquare(x,y);
+        s.addPlayer(p);
+        p.setPosition(s);
+    }
 }

@@ -33,6 +33,15 @@ public class WaitingRoom implements Serializable {
         return this.id;
     }
 
+    public Collection<ServerController> getServerControllers()
+    {
+        return players.keySet();
+    }
+
+    public int getNumWaitingPlayers() {
+        return numWaitingPlayers;
+    }
+
     /**
      * Add a waiting client in this room, when the room is full it starts the game and notify the clients about it
      * @param s

@@ -231,9 +231,11 @@ public class ClientTextView implements View {
     public void chooseTurnActionPhase(){
         Action choosenAction;
         String action;
-        writeText("Choose the action you want to make: ");
+
         do{
+            writeText("Choose the action you want to make: ");
             action = readText();
+            action.toUpperCase();
             try {
                 choosenAction = Action.valueOf(action);
             }
@@ -506,9 +508,9 @@ public class ClientTextView implements View {
     @Override
     public void notifyRespawn(int pID) {
         if(pID == ClientContext.get().getMyID())
-            writeText("You are respawn!");
+            writeText("You are spawn!");
         else
-            writeText("Player "+ClientContext.get().getMap().getPlayerById(pID).getNickName()+" is respawn!");
+            writeText("Player "+ ClientContext.get().getMap().getPlayerById(pID).getNickName()+" is spawned!");
     }
 
     /**
@@ -522,7 +524,7 @@ public class ClientTextView implements View {
         do{
             k=readInt();
         }while(k<1 && k>list.size());
-        return list.get(k);
+        return list.get(k-1);
     }
 
     public void showMap(Square[][] grid) {
