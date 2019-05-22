@@ -88,7 +88,7 @@ public class Turn {
         game.getPlayers().forEach(Player::updateMarks);
         if(this.actionList.contains(ac)){
             i = actionList.indexOf(ac);
-            setActionList(actionList.subList(i,actionList.size()));
+            setActionList(actionList.subList(i+1,actionList.size()));
             return true;
         }
         return false;
@@ -99,7 +99,7 @@ public class Turn {
      * @param action
      * @param adrenaline
      */
-    public void newAction(Action action, AdrenalineLevel adrenaline) throws NoResidualActionAvaiableException {
+    public List<Action> newAction(Action action, AdrenalineLevel adrenaline) throws NoResidualActionAvaiableException {
         actionList.clear();
 
         if (numOfActions == 0){
@@ -134,6 +134,7 @@ public class Turn {
                 actionList.add(Action.MOVEMENT);
                 actionList.add(Action.MOVEMENT);
         }
+        return actionList;
     }
 
     

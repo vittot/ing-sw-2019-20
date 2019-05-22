@@ -475,8 +475,15 @@ public class Player implements Target, Serializable {
         }
         if(position.getCardAmmo()!=null){
             List<Color> ammos = position.getCardAmmo().getAmmo();
+            List<CardPower> powerups = null;
             ammo.addAll(ammos);
-            game.notifyGrabAmmo(this,ammos);
+            if(position.getCardAmmo().getCardPower() > 0){
+                powerups = new ArrayList<>();
+                for(int i=0; i<position.getCardAmmo().getCardPower(); i++)
+                    powerups.add(game.drawPowerUp());
+            }
+
+            game.notifyGrabCardAmmo(this,ammos,powerups);
             position.setCardAmmo(null);
         }
 

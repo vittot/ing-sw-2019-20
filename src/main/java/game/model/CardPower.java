@@ -8,8 +8,8 @@ import java.util.Objects;
 
 public class CardPower implements Serializable {
     int id;
-    //private String name;
-    //private String description;
+    private String name;
+    private String description;
     private Color color;    //card color (for respawn or to pay ammo)
     //private List<Color> price; //price for the use of the effect
     private boolean usedWhenDamaged;
@@ -32,7 +32,7 @@ public class CardPower implements Serializable {
         this.id = id;
     }
 
-    /*public String getName() {
+    public String getName() {
         return name;
     }
 
@@ -46,7 +46,7 @@ public class CardPower implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }*/
+    }
 
     public Color getColor() {
         return color;

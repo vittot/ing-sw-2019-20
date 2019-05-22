@@ -40,8 +40,14 @@ public class ClientTextView implements View {
         String string = fromKeyBoard.nextLine();
         return string;
     }
+
+    public char readChar(){
+        String string = fromKeyBoard.next();
+        return string.charAt(0);
+    }
+
     public  int readInt(){
-        /int save = Integer.parseInt(this.fromKeyBoard.nextLine());
+        int save = Integer.parseInt(this.fromKeyBoard.nextLine());
         return save;
     }
 
@@ -76,8 +82,11 @@ public class ClientTextView implements View {
     private void printAvailableMaps()
     {
         writeText("Available game maps:\n");
-        for(GameMap m : availableMaps)
+        for(GameMap m : availableMaps) {
+            writeText("MAP-ID : "+m.getId()+"\n");
             showMap(m.getGrid());
+            System.out.println();
+        }
     }
 
     /**
@@ -116,12 +125,12 @@ public class ClientTextView implements View {
         int mapId, nPlayer;
         //printAvailableMaps();
         do{
-            writeText("Enter the room map id:");
+            writeText("Enter the id of the map you want to use in your game:");
             mapId = readInt();
         }while(mapId < 1 || mapId > availableMaps.size());
 
         do{
-            writeText("Enter the number of player for the room [3-5]:");
+            writeText("Enter the number of player to start the game [3-5]:");
             nPlayer = readInt();
         }while(nPlayer < 3 || nPlayer > 5);
 
@@ -133,32 +142,33 @@ public class ClientTextView implements View {
      * @param possibleAction
      */
     public void chooseStepActionPhase(List<Action> possibleAction){
-        Action choosenAction = null;
+        Action chosenAction = null;
         String action;
         do{
-            writeText("Choose one of the possible step for this action, that are:");
+            writeText("The action you have selected preview this ordered single step combination, choose the next:");
             for(Action ac : possibleAction){
-                writeText(">>> " + ac.name());
+                writeText(ac.name());
             }
             action = readText();
+            action = action.toUpperCase();
             try {
-                choosenAction = Action.valueOf(action);
+                chosenAction = Action.valueOf(action);
             }catch ( NullPointerException f){
-                choosenAction = null;
+                chosenAction = null;
             }catch (IllegalArgumentException e){
-                choosenAction = null;
+                chosenAction = null;
             }
-        }while(!possibleAction.contains(choosenAction));
+        }while(!possibleAction.contains(chosenAction));
 
-        switch (choosenAction){
+        switch (chosenAction){
             case GRAB:
-                //TODO this.controller.handle(GrabActionRequest mse);
+                controller.getClient().sendMessage(new GrabActionRequest());
                 break;
             case SHOOT:
-                //todo call ShootActionResponse in clietController
+                controller.getClient().sendMessage(new ShootActionRequest());
                 break;
             case MOVEMENT:
-                //TODO callMovementResponse in clientControllore
+                controller.getClient().sendMessage(new MovementActionRequest());
                 break;
         }
     }
@@ -175,7 +185,7 @@ public class ClientTextView implements View {
         do{
             writeText("Choose a square for complete your move: ");
             for(Square sq : possibleSquare){
-                writeText(">>> X :" + sq.getX() + " Y : " + sq.getY());
+                writeText("X :" + sq.getX() + " Y : " + sq.getY());
             }
             writeText("Write X position: ");
             posX = readInt();
@@ -237,9 +247,8 @@ public class ClientTextView implements View {
     public void chooseTurnActionPhase(){
         Action choosenAction;
         String action;
-        writeText("Choose movement, shoot or grab: ");
         do{
-            writeText("Choose the action you want to make: ");
+            writeText("Choose the action you want to make between {MOVEMENT, GRAB, SHOOT}: ");
             action = readText();
             action = action.toUpperCase();
             try {
@@ -360,6 +369,22 @@ public class ClientTextView implements View {
 
     /**
      *
+     * @param pId
+     * @param newX
+     * @param newY
+     */
+    @Override
+    public void notifyMovement(int pId, int newX, int newY) {
+        if(pId != ClientContext.get().getMyID()) {
+            writeText("Player " + ClientContext.get().getMap().getPlayerById(pId).getNickName() + " has moved in square (X : " + newX + ", Y : " + newY);
+        }
+        else{
+            writeText("You have successfully moved in square (X : " + newX + ", Y : " + newY);
+        }
+    }
+
+    /**
+     *
      * @param kill
      */
     @Override
@@ -446,14 +471,14 @@ public class ClientTextView implements View {
         controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(list)));
     }
 
-    /**
+    /*
      *
      *
-     */
+     *
     @Override
     public int notifyStart(CardPower[] powerups) {
         int choice;
-        writeText("Game is started!");
+        writeText("Game has started!");
         writeText("Choose one of this two powerups to spawn on the map:");
         writeText("1)\n" + powerups[0].toString());
         writeText("2)\n" + powerups[1].toString());
@@ -462,7 +487,7 @@ public class ClientTextView implements View {
         }while(choice != 1 && choice != 2);
 
         return choice;
-    }
+    }*/
 
     /**
      *
@@ -500,7 +525,7 @@ public class ClientTextView implements View {
      * @param pID
      */
     @Override
-    public void notifyGrabAmmo(int pID) {
+    public void notifyGrabCardAmmo(int pID) {
         if(pID == ClientContext.get().getMyID())
             writeText("You grab a card ammo from the field");
         else
@@ -691,5 +716,62 @@ public class ClientTextView implements View {
         if(color.equals(MapColor.PURPLE))return ANSI_PURPLE;
         if(color.equals(MapColor.RED))return ANSI_RED;
         return ANSI_GREY;
+    }
+
+    public void chooseWeaponToGrab(List<CardWeapon> weapons){
+        int i=1;
+        int choiceWG = 0;
+        int choiceWD = 0;
+        char t = 'Y';
+        List<CardPower> toUse = null;
+        CardWeapon toDiscard = null;
+        Player myP = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
+        //Choose which weapon to grab
+        writeText("Choose one weapon to grab between the possible: ");
+        for(CardWeapon cw : weapons){
+            writeText(i+"- "+cw.getName());
+            i++;
+        }
+        do{
+            choiceWG = readInt();
+        }while(choiceWG>=i || choiceWG<=0);
+        //Selection of weapon to discard
+        if(myP.getWeapons().size()==3) {
+            writeText("You already have 3 weapons, do you want to discard one of them to grab the new one ([Y]es, [N]o)?");
+            do {
+                t = readChar();
+            } while (t != 'Y' || t != 'N');
+            if (t == 'Y') {
+                i = 1;
+                for (CardWeapon cw : myP.getWeapons()) {
+                    writeText(i + "- " + cw.getName());
+                }
+                do{
+                    choiceWD = readInt();
+                }while (choiceWD <1 || choiceWD>3);
+            }
+        }
+        //Selection of power-up to pay
+        writeText("Do you want to use some of your power-up to pay the grab ([Y]es, [N]o)?");
+        do{
+            t = readChar();
+        }while(t != 'Y' || t != 'N');
+        if(t == 'Y')
+        {
+            i=1;
+            toUse = new ArrayList<>();
+            writeText("Insert the number of the correspondent power-up you want to use separated by comma (ex: 1,3,...):");
+            for(CardPower cp : myP.getCardPower()) {
+                writeText(i + "- " + cp.getName() + " [" + cp.getColor() + "]");
+                i++;
+            }
+            String selection = readText();
+            String [] parts = selection.split(",");
+            for(int j=0; j<parts.length;j++)
+                if(myP.getCardPower().contains(parts[j]))
+                    toUse.add(myP.getCardPower().get(Integer.parseInt(parts[j])-1));
+
+        }
+        controller.getClient().sendMessage(new PickUpWeaponRequest(weapons.get(choiceWG-1),toUse, myP.getWeapons().get(choiceWD-1)));
     }
 }

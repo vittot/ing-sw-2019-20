@@ -33,6 +33,10 @@ public class MovementEffect extends SimpleEffect {
         this.differentTarget = differentTarget;
     }
 
+    public MovementEffect() {
+        super();
+    }
+
     public boolean isMoveShooter() {
         return moveShooter;
     }

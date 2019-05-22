@@ -11,7 +11,7 @@
             <edge>open</edge>
             <edge>door</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>blue</color>
@@ -19,7 +19,7 @@
             <edge>open</edge>
             <edge>wall</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>blue</color>
@@ -27,7 +27,7 @@
             <edge>wall</edge>
             <edge>door</edge>
             <edge>open</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
         <square>
         <!-- NULL -->
@@ -38,7 +38,7 @@
             <edge>open</edge>
             <edge>wall</edge>
             <edge>wall</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
         <square>
             <color>red</color>
@@ -46,7 +46,7 @@
             <edge>open</edge>
             <edge>door</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>red</color>
@@ -54,7 +54,7 @@
             <edge>door</edge>
             <edge>wall</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -62,7 +62,7 @@
             <edge>wall</edge>
             <edge>open</edge>
             <edge>door</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
         <!-- NULL -->
@@ -73,7 +73,7 @@
             <edge>open</edge>
             <edge>wall</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>grey</color>
@@ -81,7 +81,7 @@
             <edge>door</edge>
             <edge>wall</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -89,7 +89,7 @@
             <edge>wall</edge>
             <edge>wall</edge>
             <edge>door</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
     </map>
     <map id="2">
@@ -105,7 +105,7 @@
             <edge>open</edge>
             <edge>door</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>blue</color>
@@ -113,7 +113,7 @@
             <edge>open</edge>
             <edge>wall</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>blue</color>
@@ -121,7 +121,7 @@
             <edge>wall</edge>
             <edge>door</edge>
             <edge>open</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
         <square>
             <color>green</color>
@@ -129,7 +129,7 @@
             <edge>wall</edge>
             <edge>door</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>red</color>
@@ -137,7 +137,7 @@
             <edge>open</edge>
             <edge>wall</edge>
             <edge>wall</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
         <square>
             <color>red</color>
@@ -145,7 +145,7 @@
             <edge>wall</edge>
             <edge>door</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -153,7 +153,7 @@
             <edge>open</edge>
             <edge>open</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -161,7 +161,7 @@
             <edge>wall</edge>
             <edge>open</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
         <!-- NULL -->
@@ -172,7 +172,7 @@
             <edge>door</edge>
             <edge>wall</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -180,7 +180,7 @@
             <edge>open</edge>
             <edge>wall</edge>
             <edge>door</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -188,7 +188,7 @@
             <edge>wall</edge>
             <edge>wall</edge>
             <edge>open</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
     </map>
     <map id="3">
@@ -204,7 +204,7 @@
             <edge>door</edge>
             <edge>open</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>blue</color>
@@ -212,7 +212,7 @@
             <edge>open</edge>
             <edge>door</edge>
             <edge>door</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>blue</color>
@@ -220,7 +220,7 @@
             <edge>door</edge>
             <edge>door</edge>
             <edge>open</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
         <square>
             <color>green</color>
@@ -228,7 +228,7 @@
             <edge>wall</edge>
             <edge>door</edge>
             <edge>door</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>red</color>
@@ -236,7 +236,7 @@
             <edge>wall</edge>
             <edge>door</edge>
             <edge>wall</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
         <square>
             <color>purple</color>
@@ -244,7 +244,7 @@
             <edge>wall</edge>
             <edge>door</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -252,7 +252,7 @@
             <edge>open</edge>
             <edge>open</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -260,7 +260,7 @@
             <edge>wall</edge>
             <edge>open</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>grey</color>
@@ -268,7 +268,7 @@
             <edge>open</edge>
             <edge>wall</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>grey</color>
@@ -276,7 +276,7 @@
             <edge>door</edge>
             <edge>wall</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -284,7 +284,7 @@
             <edge>open</edge>
             <edge>wall</edge>
             <edge>door</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>yellow</color>
@@ -292,7 +292,7 @@
             <edge>wall</edge>
             <edge>wall</edge>
             <edge>open</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
     </map>
     <map id="99">
@@ -304,7 +304,7 @@
             <edge>wall</edge>
             <edge>wall</edge>
             <edge>wall</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>red</color>
@@ -312,7 +312,7 @@
             <edge>open</edge>
             <edge>open</edge>
             <edge>open</edge>
-            <respown>false</respown>
+            <respawn>false</respawn>
         </square>
         <square>
             <color>blue</color>
@@ -320,7 +320,7 @@
             <edge>door</edge>
             <edge>door</edge>
             <edge>door</edge>
-            <respown>true</respown>
+            <respawn>true</respawn>
         </square>
     </map>
 </mapList>

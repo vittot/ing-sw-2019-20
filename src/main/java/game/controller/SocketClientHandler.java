@@ -65,6 +65,7 @@ public class SocketClientHandler implements Runnable, GameListener {
 
         } catch (Exception e) {
             //TODO: handle exception
+            e.printStackTrace();
         }
 
 
@@ -139,8 +140,8 @@ public class SocketClientHandler implements Runnable, GameListener {
     }
 
     @Override
-    public void onGrabAmmo(Player p, List<Color> ammo) {
-        sendMessage(new NotifyGrabAmmo(p.getId(),p.getPosition().getX(),p.getPosition().getY(),ammo));
+    public void onGrabCardAmmo(Player p, List<Color> ammo, List<CardPower> powerups) {
+        sendMessage(new NotifyGrabCardAmmo(p.getId(),p.getPosition().getX(),p.getPosition().getY(),ammo,powerups));
     }
 
     @Override

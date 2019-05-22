@@ -2,7 +2,6 @@ package game.controller;
 
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
-import game.controller.commands.clientcommands.RespawnResponse;
 import game.controller.commands.servercommands.*;
 import game.model.*;
 import game.model.exceptions.InsufficientAmmoException;
@@ -12,7 +11,6 @@ import game.model.exceptions.NoCardWeaponSpaceException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ArrayList;
 
 public class ClientController implements ServerMessageHandler {
     private final Client client;
@@ -79,12 +77,12 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(ChooseSingleActionRequest serverMsg) {
-        List<Action> possibleAction = new ArrayList<>();
+        /*List<Action> possibleAction = new ArrayList<>();
         for(Action ac : serverMsg.getActions() ){
             if(!possibleAction.contains(ac))
                 possibleAction.add(ac);
-        }
-        clientView.chooseStepActionPhase(possibleAction);
+        }*/
+        clientView.chooseStepActionPhase(serverMsg.getActions());
     }
 
     /**
@@ -222,7 +220,12 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyMovement serverMsg) {
         try {
-            ClientContext.get().getMap().getPlayerById(serverMsg.getId()).setPosition(ClientContext.get().getMap().getSquare(serverMsg.getX(), serverMsg.getY()));
+            Player toMove = ClientContext.get().getMap().getPlayerById(serverMsg.getId());
+            GameMap map = ClientContext.get().getMap();
+            map.getSquare(toMove.getPosition().getX(),toMove.getPosition().getY()).removePlayer(toMove);
+            toMove.setPosition(map.getSquare(serverMsg.getX(),serverMsg.getY()));
+            map.getSquare(serverMsg.getX(),serverMsg.getY()).addPlayer(toMove);
+            clientView.notifyMovement(toMove.getId(),toMove.getPosition().getX(),toMove.getPosition().getY());
         }
         catch(MapOutOfLimitException e){
             // TODO shouldnt append
@@ -383,11 +386,16 @@ public class ClientController implements ServerMessageHandler {
 
     /**
      *
-     * @param notifyGrabAmmo
+     * @param notifyGrabCardAmmo
      */
     @Override
-    public void handle(NotifyGrabAmmo notifyGrabAmmo) {
-        clientView.notifyGrabAmmo(notifyGrabAmmo.getP());
+    public void handle(NotifyGrabCardAmmo notifyGrabCardAmmo) {
+        for(Color c : notifyGrabCardAmmo.getAmmos())
+            ClientContext.get().getMap().getPlayerById(notifyGrabCardAmmo.getpId()).addAmmo(c);
+        if(notifyGrabCardAmmo.getpId() == ClientContext.get().getMyID())
+            for(CardPower cp : notifyGrabCardAmmo.getPowerUps())
+                ClientContext.get().getMap().getPlayerById(notifyGrabCardAmmo.getpId()).addCardPower(cp); //TO REVIEW
+        clientView.notifyGrabCardAmmo(notifyGrabCardAmmo.getpId());
     }
 
     /**
@@ -426,5 +434,10 @@ public class ClientController implements ServerMessageHandler {
     public void handle(CreateWaitingRoomResponse createWaitingRoomResponse) {
         ClientContext.get().setMyID(createWaitingRoomResponse.getId());
         clientView.notifyCompletedOperation("Waiting room correctly created! \n>>Wait for other players...");
+    }
+
+    @Override
+    public void handle(ChooseWeaponToGrabRequest chooseWeaponToGrabRequest){
+        clientView.chooseWeaponToGrab(chooseWeaponToGrabRequest.getWeapons());
     }
 }

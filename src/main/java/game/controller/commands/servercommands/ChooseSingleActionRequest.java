@@ -8,6 +8,11 @@ import java.util.List;
 
 public class ChooseSingleActionRequest implements ServerMessage {
     private List<Action> actions = new ArrayList<>();
+
+    public ChooseSingleActionRequest(List<Action> actions) {
+        this.actions = new ArrayList<>(actions);
+    }
+
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

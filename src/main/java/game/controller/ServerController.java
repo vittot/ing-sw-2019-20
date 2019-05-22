@@ -83,8 +83,8 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         currSimpleEffect.applyEffect(toBeMoved,Collections.singletonList(selectedSquare));
         if(currFullEffect != null)
             return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
-
-        return new OperationCompletedResponse();
+        //TODO update the client context of every player in game
+        return new NotifyMovement(currPlayer.getId(),clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
 
     }
 
@@ -186,9 +186,20 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(ChooseTurnActionResponse clientMsg) {
         try {
-            if (Action.checkAction(clientMsg.getTypeOfAction())) {
-                currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline());
-                return new OperationCompletedResponse("Action completed"); //TODO check this
+            Action action = clientMsg.getTypeOfAction();
+            if (Action.checkAction(action)) {
+                switch(action){
+                    case MOVEMENT:
+                        currFullEffect = null;
+                        currSimpleEffect = new MovementEffect();
+                        toBeMoved = currPlayer;
+                        break;
+                    case GRAB:
+                        break;
+                    case SHOOT:
+                        break;
+                }
+                return new ChooseSingleActionRequest(currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline())); //TODO check this
             } else {
                 return new InvalidActionResponse();
             }
@@ -198,16 +209,35 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         }
     }
 
-    //TODO probably useless
     @Override
     public ServerMessage handle(GrabActionRequest clientMsg) {
-        return null;
+        if(currPlayer.getPosition().isRespawn())
+            if(currPlayer.getPosition().getWeapons() != null)
+                return new ChooseWeaponToGrabRequest(currPlayer.getPosition().getWeapons());
+        else {
+            if(currPlayer.getPosition().getCardAmmo() != null){
+                CardAmmo toGrab = currPlayer.getPosition().getCardAmmo();
+                currPlayer.getPosition().setCardAmmo(null);
+                for(Color c : toGrab.getAmmo())
+                    currPlayer.addAmmo(c);
+                List<CardPower> list = new ArrayList<>();
+                CardPower cp = null;
+                for(int i = 0; i<toGrab.getCardPower();i++) {
+                    cp = model.drawPowerUp();
+                    currPlayer.addCardPower(cp);
+                    list.add(cp);
+                }
+                return new NotifyGrabCardAmmo(currPlayer.getId(),currPlayer.getPosition().getX(),currPlayer.getPosition().getY(),toGrab.getAmmo(),list);
+            }
+        }
+        return new InvalidGrabPositionResponse();
     }
 
     @Override
     public ServerMessage handle(MovementActionRequest clientMsg) {
         if(currPlayer.getGame().getCurrentTurn().applyStep(Action.MOVEMENT)){
-            return new ChooseSquareRequest(currPlayer.getPosition().getSquaresInDirections(1,1));
+            selectableSquares = currPlayer.getPosition().getSquaresInDirections(1,1);
+            return new ChooseSquareRequest(selectableSquares);
         }
         else{
             return new InvalidStepResponse();
@@ -241,7 +271,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             return new InvalidPowerUpResponse();
         try {
             currPlayer.pickUpWeapon(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup());
-            return  new OperationCompletedResponse("Weapon picked up"); //TODO check this
+            return  new PickUpWeaponResponse(clientMsg.getWeapon(),clientMsg.getWeaponToWaste(),clientMsg.getPowerup()); //TODO manage this!
         }catch (InsufficientAmmoException e){
             return new InsufficientAmmoResponse();
         }
@@ -426,10 +456,11 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                         {
                             CardPower cp = model.drawPowerUp();
                             sc.getCurrPlayer().addCardPower(cp);
+                            sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
                             sc.getClientHandler().sendMessage(new RespawnRequest(cp));
                         }
                         else
-                            sc.getClientHandler().sendMessage(new OperationCompletedResponse("Wait your turn.."));
+                            sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!\nWait your turn.."));
                     }
 
 
@@ -440,10 +471,11 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                 {
                     CardPower cp = model.drawPowerUp();
                     getCurrPlayer().addCardPower(cp);
+                    getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
                     return new RespawnRequest(cp);
                 }
 
-                return new OperationCompletedResponse("Wait your turn..");
+                return new OperationCompletedResponse("Game has started!\nWait your turn..");
 
             }
 

@@ -33,6 +33,8 @@ public interface View {
 
     void damageNotification(int shooterId, int damage, int hit);
 
+    void notifyMovement(int pId, int newX, int newY);
+
     void notifyDeath(Kill kill);
 
     void grabWeaponNotification(int pID, String name, int x, int y);
@@ -51,7 +53,7 @@ public interface View {
 
     void choosePowerUpToUse(List<CardPower> cardPower);
 
-    int notifyStart(CardPower[] powerups);
+    //int notifyStart(CardPower[] powerups);
 
     void notifyInvalidMessage();
 
@@ -59,11 +61,15 @@ public interface View {
 
     void notifyMarks(int marks, int idHitten, int idShooter);
 
-    void notifyGrabAmmo(int pID);
+    void notifyGrabCardAmmo(int pID);
 
     void notifyRespawn(int pID);
+
+    void chooseWeaponToGrab(List<CardWeapon> weapons);
 
     void chooseRoomPhase(List<WaitingRoom> waitingRooms);
 
     void showMapsPhase(List<GameMap> availableMaps);
+
+
 }

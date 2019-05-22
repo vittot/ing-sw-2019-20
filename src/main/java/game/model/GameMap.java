@@ -149,7 +149,7 @@ public class GameMap implements Serializable {
         int j;
         for(i=0; i< dimY; i++)
         {
-            for(j=0; j< dimX; j++)
+            for(j=0; j<dimX; j++)
                 if(grid[i][j]!=null && grid[i][j].getColor() == c)
                     room.add(grid[i][j]);
         }

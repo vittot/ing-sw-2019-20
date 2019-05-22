@@ -13,6 +13,12 @@ public class PickUpWeaponRequest implements ClientMessage {
     private List<CardPower> powerup;
     private CardWeapon weaponToWaste;
 
+    public PickUpWeaponRequest(CardWeapon weapon, List<CardPower> powerup, CardWeapon weaponToWaste) {
+        this.weapon = weapon;
+        this.powerup = powerup;
+        this.weaponToWaste = weaponToWaste;
+    }
+
     @Override
     public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);

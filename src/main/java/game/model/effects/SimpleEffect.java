@@ -24,6 +24,10 @@ public abstract class SimpleEffect implements Serializable {
 
     }
 
+    public SimpleEffect() {
+        
+    }
+
 
     public int getMinEnemy() {
         return minEnemy;

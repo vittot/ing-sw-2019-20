@@ -38,6 +38,10 @@ public class Square implements Target, Serializable {
 
     public GameMap getMap() { return map; }
 
+    public void setMap(GameMap map) {
+        this.map = map;
+    }
+
     public MapColor getColor() {
         return color;
     }
@@ -218,7 +222,8 @@ public class Square implements Target, Serializable {
      */
     public List<Square> getSquaresInDirections(int minDist, int maxDist)
     {
-        return map.getAllSquares().stream().filter(s -> s.getX() == this.x || s.getY() == this.y).filter(s -> GameMap.distanceBtwSquares(this,s)<=maxDist && GameMap.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
+        List<Square> list = map.getAllSquares().stream().filter(s -> s.getX() == this.x || s.getY() == this.y).filter(s -> GameMap.distanceBtwSquares(this,s)<=maxDist && GameMap.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
+        return list;
     }
 
 

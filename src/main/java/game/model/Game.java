@@ -100,7 +100,7 @@ public class Game {
 
 
     public static GameMap readMap(int id, String fileName){
-        GameMap map = null;
+        GameMap map = new GameMap(id,4,3);;
         Square [][] grid = null;
         int x = 0;
         int y = 0;
@@ -129,7 +129,8 @@ public class Game {
                             }
                             k = 0;
                             grid[y][x].setEdges(edges.clone());
-                            grid[y][x].setRespawn(sq.getChildText("respown").equals("true"));
+                            grid[y][x].setRespawn(sq.getChildText("respawn").equals("true"));
+                            grid[y][x].setMap(map);
                             grid[y][x].setX(x);
                             grid[y][x].setY(y);
                         }
@@ -151,9 +152,11 @@ public class Game {
             //TODO ecc
         }
         if(grid != null){
-            map = new GameMap(id,3,2);
             map.setDescription(desc);
             map.setGrid(grid);
+        }
+        else{
+            map = null;
         }
 
         return map;
@@ -931,9 +934,9 @@ public class Game {
     }
 
 
-    void notifyGrabAmmo(Player p, List<Color> ammo)
+    void notifyGrabCardAmmo(Player p, List<Color> ammo, List<CardPower> powerups)
     {
-        gameObservers.forEach(o -> o.onGrabAmmo(p,ammo));
+        gameObservers.forEach(o -> o.onGrabCardAmmo(p,ammo,powerups));
     }
 
     /**

@@ -12,6 +12,12 @@ public class PickUpWeaponResponse implements ServerMessage {
     private CardWeapon cwToWaste;
     private List<CardPower> cp;
 
+    public PickUpWeaponResponse(CardWeapon cw, CardWeapon cwToWaste, List<CardPower> cp) {
+        this.cw = cw;
+        this.cwToWaste = cwToWaste;
+        this.cp = cp;
+    }
+
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

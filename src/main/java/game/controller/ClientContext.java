@@ -58,6 +58,14 @@ public class ClientContext {
         this.map = map;
     }
 
+    public static ClientContext getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(ClientContext instance) {
+        ClientContext.instance = instance;
+    }
+
     public int getMyID() {
         return myID;
     }

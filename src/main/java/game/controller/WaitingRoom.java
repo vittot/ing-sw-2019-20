@@ -23,6 +23,10 @@ public class WaitingRoom implements Serializable {
         this.numWaitingPlayers = numWaitingPlayers;
     }
 
+    public int getNumWaitingPlayers() {
+        return numWaitingPlayers;
+    }
+
     public Collection<Player> getPlayers()
     {
         return players.values();
@@ -36,10 +40,6 @@ public class WaitingRoom implements Serializable {
     public Collection<ServerController> getServerControllers()
     {
         return players.keySet();
-    }
-
-    public int getNumWaitingPlayers() {
-        return numWaitingPlayers;
     }
 
     /**
