@@ -37,7 +37,11 @@ public class ClientController implements ServerMessageHandler {
                     ServerMessage sm;
                     do{
                         sm = client.receiveMessage();
-                        sm.handle(this);
+                        try {
+                            sm.handle(this);
+                        } catch (MapOutOfLimitException e) {
+                            e.printStackTrace();
+                        }
                     }while(sm != null);
                 }
         );
@@ -204,7 +208,7 @@ public class ClientController implements ServerMessageHandler {
         ClientContext instance = ClientContext.get();
         try {
             instance.getMap().getSquare(serverMsg.getX(),serverMsg.getY()).getWeapons().remove(serverMsg.getCw());
-            if(serverMsg.getwWaste() == null)
+            if(serverMsg.getwWaste() != null)
                 instance.getMap().getSquare(serverMsg.getX(),serverMsg.getY()).getWeapons().add(serverMsg.getwWaste());
         } catch (MapOutOfLimitException e) {
             //TODO shouldnt append
@@ -251,12 +255,12 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(PickUpAmmoResponse serverMsg) {
-        try {
-            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).pickUpAmmo();
-        }
-        catch(NoCardAmmoAvailableException e){
-            clientView.insufficientAmmoNotification();
-        }
+        //notify set null the card-ammo on the square
+        for(Color c : serverMsg.getColors())
+            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).addAmmo(c);
+        if(serverMsg.getPowerups() != null)
+            for(CardPower cp : serverMsg.getPowerups())
+                ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).addCardPower(cp);
     }
 
     /**
@@ -341,6 +345,7 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyGameStarted serverMsg) {
         ClientContext.get().setMap(serverMsg.getMap());
+
         if(serverMsg.getId() != 0)
             ClientContext.get().setMyID(serverMsg.getId());
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
@@ -389,12 +394,11 @@ public class ClientController implements ServerMessageHandler {
      * @param notifyGrabCardAmmo
      */
     @Override
-    public void handle(NotifyGrabCardAmmo notifyGrabCardAmmo) {
-        for(Color c : notifyGrabCardAmmo.getAmmos())
-            ClientContext.get().getMap().getPlayerById(notifyGrabCardAmmo.getpId()).addAmmo(c);
-        if(notifyGrabCardAmmo.getpId() == ClientContext.get().getMyID())
-            for(CardPower cp : notifyGrabCardAmmo.getPowerUps())
-                ClientContext.get().getMap().getPlayerById(notifyGrabCardAmmo.getpId()).addCardPower(cp); //TO REVIEW
+    public void handle(NotifyGrabCardAmmo notifyGrabCardAmmo) throws MapOutOfLimitException {
+        ClientContext.get().getMap().getSquare(notifyGrabCardAmmo.getX(),notifyGrabCardAmmo.getY()).setCardAmmo(null);
+        if(notifyGrabCardAmmo.getpId() != ClientContext.get().getMyID())
+            for(Color c : notifyGrabCardAmmo.getAmmos())
+                ClientContext.get().getMap().getPlayerById(notifyGrabCardAmmo.getpId()).addAmmo(c);
         clientView.notifyGrabCardAmmo(notifyGrabCardAmmo.getpId());
     }
 

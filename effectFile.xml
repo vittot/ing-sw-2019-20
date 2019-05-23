@@ -2,9 +2,7 @@
 <weaponList>
 
     <weapon>
-        <name>
-            Lock Rifle
-        </name>
+        <name>Lock Rifle</name>
         <effectDescription>
             <name>
                 Basic effect
@@ -75,9 +73,7 @@
 
 
     <weapon>
-        <name>
-            Machine gun
-        </name>
+        <name>Machine gun</name>
         <effectDescription>
             <name>
                 basic effect
@@ -191,9 +187,7 @@
     </weapon>
 
     <weapon>
-        <name>
-            T.H.O.R
-        </name>
+        <name>T.H.O.R</name>
         <effectDescription>
             <name>
                 basic effect
@@ -289,9 +283,7 @@
     </weapon>
 
     <weapon>
-        <name>
-            Plasma Gun
-        </name>
+        <name>Plasma Gun</name>
 
         <effectDescription>
             <name>
@@ -395,9 +387,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Whisper
-        </name>
+        <name>Whisper</name>
 
         <effectDescription>
             <name>
@@ -444,9 +434,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Electroscythe
-        </name>
+        <name>Electroscythe</name>
 
         <effectDescription>
             <name>
@@ -514,9 +502,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Tarctor Beam
-        </name>
+        <name>Tarctor Beam</name>
 
         <effectDescription>
             <name>
@@ -622,9 +608,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Vortex Cannon
-        </name>
+        <name>Vortex Cannon</name>
 
         <effectDescription>
             <name>
@@ -774,9 +758,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Furnace
-        </name>
+        <name>Furnace</name>
 
         <effectDescription>
             <name>
@@ -842,9 +824,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Heatseeker
-        </name>
+        <name>Heatseeker</name>
 
         <effectDescription>
             <name>
@@ -891,9 +871,7 @@
     </weapon>
 
     <weapon>
-        <name>
-            Hellion
-        </name>
+        <name>Hellion</name>
 
         <effectDescription>
             <name>
@@ -1001,9 +979,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Flamethrower
-        </name>
+        <name>Flamethrower</name>
 
         <effectDescription>
             <name>
@@ -1101,9 +1077,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Grenade Launcher
-        </name>
+        <name>Grenade </name>
 
         <effectDescription>
             <name>
@@ -1187,9 +1161,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Rocket launcher
-        </name>
+        <name>Rocket launcher</name>
 
         <effectDescription>
             <name>
@@ -1338,9 +1310,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Railgun
-        </name>
+        <name>Railgun</name>
 
         <effectDescription>
             <name>
@@ -1432,9 +1402,7 @@
     </weapon>
 
     <weapon>
-        <name>
-            Cyberblade
-        </name>
+        <name>Cyberblade</name>
         <effectDescription>
             <name>
                 Basic effect
@@ -1536,9 +1504,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            ZX-2
-        </name>
+        <name>ZX-2</name>
 
         <effectDescription>
             <name>
@@ -1610,9 +1576,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Shotgun
-        </name>
+        <name>Shotgun</name>
 
         <effectDescription>
             <name>
@@ -1702,9 +1666,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Power glove
-        </name>
+        <name>Power glove</name>
 
         <effectDescription>
             <name>
@@ -1843,9 +1805,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Shockwave
-        </name>
+        <name>Shockwave</name>
 
         <effectDescription>
             <name>
@@ -1909,9 +1869,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>
-            Sledgehammer
-        </name>
+        <name>Sledgehammer</name>
 
         <effectDescription>
             <name>

@@ -1,9 +1,11 @@
 package game.controller.commands;
 
+import game.model.exceptions.NoCardAmmoAvailableException;
+
 import java.io.Serializable;
 
 public interface ClientMessage extends Serializable {
-     ServerMessage handle(ClientMessageHandler handler);
+     ServerMessage handle(ClientMessageHandler handler) throws NoCardAmmoAvailableException;
       /*
         raccogli ammo -> power up
         raccogli arma

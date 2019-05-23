@@ -60,6 +60,7 @@ public class WaitingRoom implements Serializable {
                 e.getKey().startGame(g, e.getValue());
                 g.addGameListener(e.getKey().getClientHandler());
             }
+            g.refillMap();
         }
         return n+1;
 

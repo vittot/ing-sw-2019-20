@@ -1,9 +1,10 @@
 package game.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class CardAmmo {
+public class CardAmmo implements Serializable {
     private List<Color> ammo;
     private int cardPower; //number of cardpower to be taken with this card ammo
 

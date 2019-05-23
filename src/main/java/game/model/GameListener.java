@@ -12,7 +12,7 @@ public interface GameListener {
     public void onDeath(Player dead);
     void onDeath(Kill kill);
     public void onGrabWeapon(Player p, CardWeapon cw);
-    public void onGrabCardAmmo(Player p, List<Color> ammo, List<CardPower> powerups);
+    public void onGrabCardAmmo(Player p, List<Color> ammo);
     public void onMove(Player p);
     public void onRespawn(Player p);
     public void onPowerUpUse(Player p, CardPower c);

@@ -1,6 +1,7 @@
 package game.controller.commands;
 
 import game.controller.commands.servercommands.*;
+import game.model.exceptions.MapOutOfLimitException;
 
 public interface ServerMessageHandler {
 
@@ -34,7 +35,7 @@ public interface ServerMessageHandler {
     void handle(InvalidMessageResponse invalidMessageResponse);
     void handle(NotifyTurnChanged notifyTurnChanged);
     void handle(NotifyMarks notifyMarks);
-    void handle(NotifyGrabCardAmmo notifyGrabCardAmmo);
+    void handle(NotifyGrabCardAmmo notifyGrabCardAmmo) throws MapOutOfLimitException;
     void handle(NotifyRespawn notifyRespawn);
     void handle(AvailableMapsListResponse availableMapsListResponse);
     void handle(JoinWaitingRoomResponse joinWaitingRoomResponse);

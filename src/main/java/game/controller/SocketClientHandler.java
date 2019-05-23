@@ -140,8 +140,8 @@ public class SocketClientHandler implements Runnable, GameListener {
     }
 
     @Override
-    public void onGrabCardAmmo(Player p, List<Color> ammo, List<CardPower> powerups) {
-        sendMessage(new NotifyGrabCardAmmo(p.getId(),p.getPosition().getX(),p.getPosition().getY(),ammo,powerups));
+    public void onGrabCardAmmo(Player p, List<Color> ammo) {
+        sendMessage(new NotifyGrabCardAmmo(p.getId(),p.getPosition().getX(),p.getPosition().getY(),ammo));
     }
 
     @Override

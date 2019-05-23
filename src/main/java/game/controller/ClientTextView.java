@@ -730,6 +730,12 @@ public class ClientTextView implements View {
         writeText("Choose one weapon to grab between the possible: ");
         for(CardWeapon cw : weapons){
             writeText(i+"- "+cw.getName());
+            writeText("PRICE:");
+            if(cw.getPrice().size() != 1)
+                for(Color p : cw.getPrice().subList(1,cw.getPrice().size()))
+                    System.out.println("   "+p.toString());
+            else
+                System.out.println("    FREE");
             i++;
         }
         do{
@@ -740,8 +746,8 @@ public class ClientTextView implements View {
             writeText("You already have 3 weapons, do you want to discard one of them to grab the new one ([Y]es, [N]o)?");
             do {
                 t = readChar();
-            } while (t != 'Y' || t != 'N');
-            if (t == 'Y') {
+            } while (t != 'Y' || t != 'N' || t != 'y' || t != 'n');
+            if (t == 'Y' || t == 'y') {
                 i = 1;
                 for (CardWeapon cw : myP.getWeapons()) {
                     writeText(i + "- " + cw.getName());
@@ -755,8 +761,8 @@ public class ClientTextView implements View {
         writeText("Do you want to use some of your power-up to pay the grab ([Y]es, [N]o)?");
         do{
             t = readChar();
-        }while(t != 'Y' || t != 'N');
-        if(t == 'Y')
+        }while(t != 'Y' || t != 'N' || t != 'y' || t != 'n');
+        if(t == 'Y' || t != 'y')
         {
             i=1;
             toUse = new ArrayList<>();
