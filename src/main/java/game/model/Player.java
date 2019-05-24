@@ -478,24 +478,23 @@ public class Player implements Target, Serializable {
     /**
      * Pick an ammo from the current Player position
      */
-    public void pickUpAmmo()throws NoCardAmmoAvailableException {
+    public List<CardPower> pickUpAmmo()throws NoCardAmmoAvailableException {
+        List<CardPower> powerups = null;
         if (position.getCardAmmo() == null){
             throw new NoCardAmmoAvailableException();
         }
         if(position.getCardAmmo()!=null){
             List<Color> ammos = position.getCardAmmo().getAmmo();
-            List<CardPower> powerups = null;
             ammo.addAll(ammos);
             if(position.getCardAmmo().getCardPower() > 0){
                 powerups = new ArrayList<>();
                 for(int i=0; i<position.getCardAmmo().getCardPower(); i++)
                     powerups.add(game.drawPowerUp());
             }
-
-            game.notifyGrabCardAmmo(this,ammos,powerups);
+            game.notifyGrabCardAmmo(this,ammos);
             position.setCardAmmo(null);
         }
-
+        return powerups;
     }
 
     /**

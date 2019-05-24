@@ -935,9 +935,9 @@ public class Game {
     }
 
 
-    void notifyGrabCardAmmo(Player p, List<Color> ammo, List<CardPower> powerups)
+    void notifyGrabCardAmmo(Player p, List<Color> ammo)
     {
-        gameObservers.forEach(o -> o.onGrabCardAmmo(p,ammo,powerups));
+        gameObservers.forEach(o -> o.onGrabCardAmmo(p,ammo));
     }
 
     /**

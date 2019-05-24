@@ -236,24 +236,18 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     }
 
     @Override
-    public ServerMessage handle(GrabActionRequest clientMsg) {
+    public ServerMessage handle(GrabActionRequest clientMsg) throws NoCardAmmoAvailableException {
         if(currPlayer.getPosition().isRespawn())
-            if(currPlayer.getPosition().getWeapons() != null)
+            if(currPlayer.getPosition().getWeapons() != null) {
+                //TODO create new method that list the weapon the player can pay and grab
                 return new ChooseWeaponToGrabRequest(currPlayer.getPosition().getWeapons());
+            }
         else {
             if(currPlayer.getPosition().getCardAmmo() != null){
                 CardAmmo toGrab = currPlayer.getPosition().getCardAmmo();
-                currPlayer.getPosition().setCardAmmo(null);
-                for(Color c : toGrab.getAmmo())
-                    currPlayer.addAmmo(c);
-                List<CardPower> list = new ArrayList<>();
-                CardPower cp = null;
-                for(int i = 0; i<toGrab.getCardPower();i++) {
-                    cp = model.drawPowerUp();
-                    currPlayer.addCardPower(cp);
-                    list.add(cp);
-                }
-                return new NotifyGrabCardAmmo(currPlayer.getId(),currPlayer.getPosition().getX(),currPlayer.getPosition().getY(),toGrab.getAmmo(),list);
+                List<Color> listA = new ArrayList<>(toGrab.getAmmo());
+                List<CardPower> listCp = new ArrayList<>(currPlayer.pickUpAmmo());
+                return new PickUpAmmoResponse(listA,listCp);
             }
         }
         return new InvalidGrabPositionResponse();

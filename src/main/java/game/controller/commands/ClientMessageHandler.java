@@ -1,12 +1,13 @@
 package game.controller.commands;
 
 import game.controller.commands.clientcommands.*;
+import game.model.exceptions.NoCardAmmoAvailableException;
 
 public interface ClientMessageHandler {
     ServerMessage handle (ChooseSquareResponse clientMsg);
     ServerMessage handle (ChooseTargetResponse clientMsg);
     ServerMessage handle (ChooseTurnActionResponse clientMsg);
-    ServerMessage handle (GrabActionRequest clientMsg);
+    ServerMessage handle (GrabActionRequest clientMsg) throws NoCardAmmoAvailableException;
     ServerMessage handle (MovementActionRequest clientMsg);
     ServerMessage handle (PickUpAmmoRequest clientMsg);
     ServerMessage handle (PickUpWeaponRequest clientMsg);

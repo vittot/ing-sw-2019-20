@@ -5,6 +5,7 @@ import game.controller.commands.ServerMessageHandler;
 import game.model.CardPower;
 import game.model.Color;
 import game.model.Player;
+import game.model.exceptions.MapOutOfLimitException;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class NotifyGrabCardAmmo implements ServerMessage {
     private List<Color> ammos;
     private List<CardPower> powerUps;
 
-    public NotifyGrabCardAmmo(int pId, int x, int y, List<Color> ammos, List<CardPower> powerUps) {
+    public NotifyGrabCardAmmo(int pId, int x, int y, List<Color> ammos) {
         this.pId = pId;
         this.x = x;
         this.y = y;
@@ -45,7 +46,7 @@ public class NotifyGrabCardAmmo implements ServerMessage {
     }
 
     @Override
-    public void handle(ServerMessageHandler handler) {
+    public void handle(ServerMessageHandler handler) throws MapOutOfLimitException {
         handler.handle(this);
     }
 }
