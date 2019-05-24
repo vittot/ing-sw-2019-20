@@ -4,7 +4,9 @@ import game.model.exceptions.MapOutOfLimitException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Square implements Target, Serializable {
@@ -352,8 +354,26 @@ public class Square implements Target, Serializable {
         players.remove(player);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Square square = (Square) o;
+        return respawn == square.respawn &&
+                x == square.x &&
+                y == square.y &&
+                color == square.color &&
+                Arrays.equals(edges, square.edges);
+    }
 
-    /*
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(color, respawn, x, y);
+        result = 31 * result + Arrays.hashCode(edges);
+        return result;
+    }
+
+/*
     public List<List<Target>> getSquaresInRange(int minDist, int maxDist){
         List<List<Target>> result=new ArrayList<>();
         List<Target> tmp=new ArrayList<>();

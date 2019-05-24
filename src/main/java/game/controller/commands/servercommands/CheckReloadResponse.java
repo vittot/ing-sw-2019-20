@@ -8,11 +8,10 @@ import game.model.CardWeapon;
 import java.util.List;
 
 public class CheckReloadResponse implements ServerMessage {
-    private CardWeapon weapon;
+    private CardWeapon weapons;
     private List<CardPower> powerUps;
 
     public CheckReloadResponse(CardWeapon weapon, List<CardPower> powerUps) {
-        this.weapon = weapon;
         this.powerUps = powerUps;
     }
 
@@ -22,7 +21,7 @@ public class CheckReloadResponse implements ServerMessage {
     }
 
     public CardWeapon getWeapon() {
-        return weapon;
+        return weapons;
     }
 
     public List<CardPower> getPowerUps() {

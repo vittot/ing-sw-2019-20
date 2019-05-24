@@ -35,6 +35,8 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     private List<Target> selectableTarget;
     private List<Square> selectableSquares;
     private ServerState state;
+    private List<Action> avaialableActionSteps;
+    private int numberOfTurnActionMade;
 
 
     public ServerController(SocketClientHandler clientHandler) {
@@ -58,6 +60,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         state = ServerState.WAITING_SPAWN; //TODO management of the first spawn of the players in order
         this.model = g;
         this.currPlayer = p;
+        this.numberOfTurnActionMade = 0;
         CardPower c1 = g.drawPowerUp();
         this.currPlayer.addCardPower(c1);
         this.currPlayer.addAmmo(Color.BLUE);
@@ -77,14 +80,36 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(ChooseSquareResponse clientMsg) {
         Square selectedSquare = clientMsg.getSelectedSquare();
-        if(!selectableSquares.contains(selectedSquare))
+        boolean correctSquare = false;
+        for(Square s : selectableSquares)
+            if(s.equals(selectedSquare))
+                correctSquare = true;
+        if(!correctSquare)
             return new InvalidTargetResponse();
 
         currSimpleEffect.applyEffect(toBeMoved,Collections.singletonList(selectedSquare));
         if(currFullEffect != null)
             return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
-        //TODO update the client context of every player in game
-        return new NotifyMovement(currPlayer.getId(),clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
+
+        //return new NotifyMovement(currPlayer.getId(),clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
+        if(state  == ServerState.HANDLING_MOVEMENT) {
+            if (!avaialableActionSteps.isEmpty())
+                return new ChooseSingleActionRequest(avaialableActionSteps);
+            else {
+                if (model.getCurrentTurn().getNumOfActions() > 0) {
+                    state = ServerState.WAITING_ACTION;
+                    return new ChooseTurnActionRequest();
+                } else {
+                    state = ServerState.WAITING_RELOAD;
+                    return new ReloadWeaponAsk();
+                }
+            }
+        }
+        else{
+            //TODO: we should ask to continue with the effects in case of a movement effect and not a movement action
+            return  new OperationCompletedResponse("Effect completed, this message will be replaced..");
+        }
+
 
     }
 
@@ -199,7 +224,8 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                     case SHOOT:
                         break;
                 }
-                return new ChooseSingleActionRequest(currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline())); //TODO check this
+                avaialableActionSteps = currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline());
+                return new ChooseSingleActionRequest(avaialableActionSteps);
             } else {
                 return new InvalidActionResponse();
             }
@@ -236,7 +262,9 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(MovementActionRequest clientMsg) {
         if(currPlayer.getGame().getCurrentTurn().applyStep(Action.MOVEMENT)){
+            avaialableActionSteps = currPlayer.getGame().getCurrentTurn().getActionList();
             selectableSquares = currPlayer.getPosition().getSquaresInDirections(1,1);
+            this.state = ServerState.HANDLING_MOVEMENT;
             return new ChooseSquareRequest(selectableSquares);
         }
         else{

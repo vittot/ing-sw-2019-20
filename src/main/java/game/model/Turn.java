@@ -9,7 +9,7 @@ import java.util.List;
 public class Turn {
     private Player currentPlayer;
     private int numOfActions;
-    private int numOfMovs;
+    private int numOfMovs;  //TODO a cosa serve?
     private Action currentAction;   //TODO a cosa serve?
     private List <Action> actionList;
     private Game game;

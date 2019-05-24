@@ -40,4 +40,5 @@ public interface ServerMessageHandler {
     void handle(JoinWaitingRoomResponse joinWaitingRoomResponse);
     void handle(CreateWaitingRoomResponse createWaitingRoomResponse);
     void handle(ChooseWeaponToGrabRequest chooseWeaponToGrabRequest);
+    void handle(ReloadWeaponAsk reloadWeaponAsk);
 }

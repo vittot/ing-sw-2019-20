@@ -1,5 +1,6 @@
 package game.controller;
 
+import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 
@@ -47,6 +48,7 @@ public class ClientTextView implements View {
     }
 
     public  int readInt(){
+        //TODO handle NumberFormatException thrown in case of a non numeric character inserted
         int save = Integer.parseInt(this.fromKeyBoard.nextLine());
         return save;
     }
@@ -74,6 +76,35 @@ public class ClientTextView implements View {
         this.availableMaps = availableMaps;
         printAvailableMaps();
         controller.getClient().sendMessage(new GetWaitingRoomsRequest());
+    }
+
+    @Override
+    public void reloadWeaponPhase() {
+        writeText("Here you will be able to choose what weapon reload");
+        List<CardWeapon> weapons = ClientContext.get().getMyPlayer().getWeapons();
+        int n;
+        List<ClientMessage> reloadRequests = new ArrayList<>();
+        do {
+            showWeapons(weapons);
+            do {
+                writeText("Insert the id of a weapon you want to reload or -1 to terminate the reload phase:");
+                n = readInt();
+            } while (n != -1 && n < 1 && n > weapons.size());
+            if(n != -1)
+            {
+                List<CardPower> cp = powerUpSelection();
+                reloadRequests.add(new ReloadWeaponRequest(weapons.get(n-1),cp));
+            }
+
+        }while(weapons.size() > 0 && n!=-1);
+
+        controller.sendMessages(reloadRequests);
+
+    }
+
+    @Override
+    public void showReloadMessage(CardWeapon cW) {
+        writeText("The weapon " + cW.getName() + " has been correctly reloaded");
     }
 
     /**
@@ -139,14 +170,14 @@ public class ClientTextView implements View {
 
     /**
      * Choose a single step for the current action the player want to make
-     * @param possibleAction
      */
-    public void chooseStepActionPhase(List<Action> possibleAction){
+    public void chooseStepActionPhase(){
+        List<Action> possibleActions = this.controller.getAvailableActions();
         Action chosenAction = null;
         String action;
         do{
             writeText("The action you have selected preview this ordered single step combination, choose the next:");
-            for(Action ac : possibleAction){
+            for(Action ac : possibleActions){
                 writeText(ac.name());
             }
             action = readText();
@@ -158,7 +189,7 @@ public class ClientTextView implements View {
             }catch (IllegalArgumentException e){
                 chosenAction = null;
             }
-        }while(!possibleAction.contains(chosenAction));
+        }while(!possibleActions.contains(chosenAction));
 
         switch (chosenAction){
             case GRAB:
@@ -376,7 +407,7 @@ public class ClientTextView implements View {
     @Override
     public void notifyMovement(int pId, int newX, int newY) {
         if(pId != ClientContext.get().getMyID()) {
-            writeText("Player " + ClientContext.get().getMap().getPlayerById(pId).getNickName() + " has moved in square (X : " + newX + ", Y : " + newY);
+            writeText("Player " + ClientContext.get().getMap().getPlayerById(pId).getNickName() + " has moved in square (X : " + newX + ", Y : " + newY + ")");
         }
         else{
             writeText("You have successfully moved in square (X : " + newX + ", Y : " + newY);
@@ -728,10 +759,7 @@ public class ClientTextView implements View {
         Player myP = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         //Choose which weapon to grab
         writeText("Choose one weapon to grab between the possible: ");
-        for(CardWeapon cw : weapons){
-            writeText(i+"- "+cw.getName());
-            i++;
-        }
+        showWeapons(weapons);
         do{
             choiceWG = readInt();
         }while(choiceWG>=i || choiceWG<=0);
@@ -752,7 +780,17 @@ public class ClientTextView implements View {
             }
         }
         //Selection of power-up to pay
-        writeText("Do you want to use some of your power-up to pay the grab ([Y]es, [N]o)?");
+        toUse = powerUpSelection();
+        controller.getClient().sendMessage(new PickUpWeaponRequest(weapons.get(choiceWG-1),toUse, myP.getWeapons().get(choiceWD-1)));
+    }
+
+    private List<CardPower> powerUpSelection()
+    {
+        List<CardPower> toUse = null;
+        char t;
+        int i;
+        Player myP = ClientContext.get().getMyPlayer();
+        writeText("Do you want to use some of your power-up to pay ([Y]es, [N]o)?");
         do{
             t = readChar();
         }while(t != 'Y' || t != 'N');
@@ -767,11 +805,28 @@ public class ClientTextView implements View {
             }
             String selection = readText();
             String [] parts = selection.split(",");
-            for(int j=0; j<parts.length;j++)
-                if(myP.getCardPower().contains(parts[j]))
-                    toUse.add(myP.getCardPower().get(Integer.parseInt(parts[j])-1));
+            for(String s : parts)
+            {
+                int id = Integer.parseInt(s);
+                if(id <= myP.getCardPower().size() && id >= 1 )
+                    toUse.add(myP.getCardPower().get(id-1));
+            }
+
 
         }
-        controller.getClient().sendMessage(new PickUpWeaponRequest(weapons.get(choiceWG-1),toUse, myP.getWeapons().get(choiceWD-1)));
+        return toUse;
+    }
+
+    /**
+     * Show a list of weapons with numeric identifiers
+     * @param weapons
+     */
+    public void showWeapons(List<CardWeapon> weapons)
+    {
+        int i = 1;
+        for(CardWeapon cw : weapons){
+            writeText(i+"- "+cw.getName());
+            i++;
+        }
     }
 }

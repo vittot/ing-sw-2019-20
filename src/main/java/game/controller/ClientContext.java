@@ -34,6 +34,10 @@ public class ClientContext {
         return instance;
     }
 
+    public Player getMyPlayer(){
+        return map.getPlayerById(myID);
+    }
+
     public List<Player> getPlayersInWaiting() {
         return playersInWaiting;
     }

@@ -12,6 +12,11 @@ public class ReloadWeaponRequest implements ClientMessage {
     private CardWeapon weapon;
     private List<CardPower> powerups;
 
+    public ReloadWeaponRequest(CardWeapon weapon, List<CardPower> powerups) {
+        this.weapon = weapon;
+        this.powerups = powerups;
+    }
+
     @Override
     public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);

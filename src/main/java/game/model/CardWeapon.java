@@ -178,4 +178,6 @@ public class CardWeapon implements Serializable {
         if(!tmp.isEmpty())
             throw new InsufficientAmmoException();
     }
+
+
 }

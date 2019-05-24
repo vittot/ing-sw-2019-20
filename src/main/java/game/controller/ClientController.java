@@ -1,5 +1,6 @@
 package game.controller;
 
+import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.servercommands.*;
@@ -16,6 +17,7 @@ public class ClientController implements ServerMessageHandler {
     private final Client client;
     private Thread receiver;
     private View clientView;
+    private List<Action> availableActions;
 
     public ClientController(Client client) {
         this.client = client;
@@ -24,6 +26,10 @@ public class ClientController implements ServerMessageHandler {
 
     public Client getClient() {
         return client;
+    }
+
+    public List<Action> getAvailableActions() {
+        return availableActions;
     }
 
     /**
@@ -53,6 +59,16 @@ public class ClientController implements ServerMessageHandler {
     }
 
     /**
+     * Send a series of messages to server
+     * @param messages
+     */
+    public void sendMessages(List<ClientMessage> messages)
+    {
+        for(ClientMessage m : messages)
+            client.sendMessage(m);
+    }
+
+    /**
      * Update the ClientContext reloading the weapon and removing the power-up cards and ammo cards used by the player
      * @param serverMsg
      */
@@ -63,6 +79,7 @@ public class ClientController implements ServerMessageHandler {
             if(cW.equals(serverMsg.getWeapon())) {
                 try {
                     cW.reloadWeapon(serverMsg.getPowerUps());
+                    clientView.showReloadMessage(cW);
                 }
                 catch(InsufficientAmmoException e){
                     clientView.insufficientAmmoNotification();
@@ -82,7 +99,8 @@ public class ClientController implements ServerMessageHandler {
             if(!possibleAction.contains(ac))
                 possibleAction.add(ac);
         }*/
-        clientView.chooseStepActionPhase(serverMsg.getActions());
+        availableActions = serverMsg.getActions();
+        clientView.chooseStepActionPhase();
     }
 
     /**
@@ -439,5 +457,10 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(ChooseWeaponToGrabRequest chooseWeaponToGrabRequest){
         clientView.chooseWeaponToGrab(chooseWeaponToGrabRequest.getWeapons());
+    }
+
+    @Override
+    public void handle(ReloadWeaponAsk reloadWeaponAsk) {
+        clientView.reloadWeaponPhase();
     }
 }

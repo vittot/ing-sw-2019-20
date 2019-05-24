@@ -1,6 +1,8 @@
 package game.model;
 
 
+import game.controller.ClientTextView;
+import game.controller.GameManager;
 import game.model.exceptions.MapOutOfLimitException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,7 +80,7 @@ class GameMapTest {
     }
 
     /**
-     * Check getSpawoints return exactly the GameMap's spawnpoints
+     * Check getSpawnpoints return exactly the GameMap's spawnpoints
      */
     @Test
     void getSpawnpoints() {
@@ -183,6 +185,22 @@ class GameMapTest {
         return true;
     }
 
+    @Test
+    public void distanceBtwSquaresTest() throws MapOutOfLimitException {
+        this.map = Game.readMap(1,"mapFile.xml");
+        ClientTextView cv = new ClientTextView();
+        cv.showMap(map.getGrid());
+        //lo spawnpoint yellow è in posizione x=3, y=2 (contando da zero le coordinate)
+        //lo square in posizione x=2, y=1 dista 2 passi
+        //lo square in posizione x=2, y=0 dista 3 passi
+        //lo square in posizione x=1, y=0 dista 4 passi
+        Square s1 = map.respawnColor(MapColor.YELLOW);
+        Square s2 = map.getSquare(1,0);
+
+        int dist = GameMap.distanceBtwSquares(s1,s2);
+        assertEquals(4, dist);
+    }
+
     /**
      * Check if two list of powerups are composed by the same powerups, comparing the powerups id
      * @param cp1
@@ -203,4 +221,6 @@ class GameMapTest {
 
         return true;
     }
+
+
 }

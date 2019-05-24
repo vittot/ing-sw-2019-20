@@ -11,7 +11,7 @@ public interface View {
 
     void insufficientAmmoNotification();
 
-    void chooseStepActionPhase(List<Action> possibleAction);
+    void chooseStepActionPhase();
 
     void chooseSquarePhase(List<Square> possiblePositions);
 
@@ -71,5 +71,7 @@ public interface View {
 
     void showMapsPhase(List<GameMap> availableMaps);
 
+    void reloadWeaponPhase();
 
+    void showReloadMessage(CardWeapon cW);
 }

@@ -3,10 +3,7 @@ package game.model;
 import game.model.exceptions.MapOutOfLimitException;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameMap implements Serializable {
@@ -165,8 +162,8 @@ public class GameMap implements Serializable {
      */
     public static int distanceBtwSquares(Square s1,Square s2)
     {
-        //return Math.abs(s1.getX() - s2.getX()) + Math.abs(s1.getY() - s2.getY());
-        return _distanceBtwSquares(s1,s2,s1);
+        //return _distanceBtwSquares(s1,s2,s1);
+        return distBfs(s1,s2);
 
     }
 
@@ -187,10 +184,56 @@ public class GameMap implements Serializable {
             dists[i] = MAX_DIST + 1;
 
         for(Direction d : Direction.values())
-            if((s1.getEdge(d) == Edge.OPEN || s1.getEdge(d) == Edge.DOOR) && s1.getNextSquare(d) != null && s1.getNextSquare(d) != originSquare)
-                dists[d.ordinal()] = 1 + _distanceBtwSquares(s1.getNextSquare(d),s2,s1);
+        {
+            Square s3 = s1.getNextSquare(d);
+            if((s1.getEdge(d) == Edge.OPEN || s1.getEdge(d) == Edge.DOOR) && s3 != null && s3 != originSquare){
+                System.out.println("Da x=" + s1.getX() + " y=" + s1.getY() + " vado in x=" + s3.getX() + " y=" + s3.getY());
+                if(dists[d.ordinal()] == MAX_DIST + 1)
+                    dists[d.ordinal()] = 1 + _distanceBtwSquares(s3,s2,s1);
+                else
+                    System.out.println("avrei voluto ricalcolarla!");
+
+            }
+        }
 
         return Arrays.stream(dists).min().getAsInt();
+    }
+
+    private static int distBfs(Square s1, Square s2)
+    {
+        Set<Square> visited = new HashSet<>();
+        Queue<Square> toVisitAdj = new ArrayDeque<>();
+        Map<Square, Integer> distances = new HashMap<>();
+        visited.add(s1);
+        distances.put(s1,0);
+        toVisitAdj.add(s1);
+        while(!toVisitAdj.isEmpty())
+        {
+            Square s = toVisitAdj.remove();
+            for(Direction d : Direction.values())
+            {
+                if(s.getEdge(d) == Edge.OPEN || s.getEdge(d) == Edge.DOOR)
+                {
+                    Square s3 = s.getNextSquare(d);
+                    if(s3 != null && !visited.contains(s3))
+                    {
+                        visited.add(s3);
+                        distances.put(s3,distances.get(s)+1);
+                        toVisitAdj.add(s3);
+                    }
+
+                }
+
+
+            }
+        }
+        if(distances.containsKey(s2))
+            return distances.get(s2);
+
+        return GameMap.MAX_DIST + 1; //not reachable
+
+
+
     }
 
     /**

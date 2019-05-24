@@ -342,8 +342,17 @@ public class Player implements Target, Serializable {
             default:
                 newPos = game.getMap().getSquare(this.position.getX() - numSquare,this.position.getY());
         }
+        move(newPos);
+    }
+
+    /**
+     * Move the player in the indicated Square, notifying the game
+     * @param s
+     */
+    public void move(Square s)
+    {
         this.position.removePlayer(this);
-        this.position = newPos;
+        s.addPlayer(this);
         game.notifyMove(this);
     }
 

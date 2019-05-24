@@ -26,6 +26,7 @@ public class Game {
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
+    
 
     static {
         POINTSCOUNT = new ArrayList<>();

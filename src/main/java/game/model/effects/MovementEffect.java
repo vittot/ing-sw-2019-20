@@ -187,8 +187,7 @@ public class MovementEffect extends SimpleEffect {
      */
     @Override
     public void applyEffect(Player player, List<Target> targets){
-        player.getPosition().removePlayer(player);
-        player.setPosition((Square)targets.get(0));
+        player.move((Square)targets.get(0));
     }
 
     @Override
