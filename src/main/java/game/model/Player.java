@@ -447,7 +447,44 @@ public class Player implements Target, Serializable {
             this.position.getWeapons().add(weaponToWaste);
             this.weapons.remove(weaponToWaste);
         }
-        game.notifyGrabWeapon(this,weapon);
+        if(game != null)
+            game.notifyGrabWeapon(this,weapon);
+
+    }
+
+    public boolean canGrabWeapon(CardWeapon cw){
+        List<Color> priceTmp;
+        if(cw.getPrice().size()>1) {
+            priceTmp = new ArrayList<>(cw.getPrice().subList(1, cw.getPrice().size()));
+            return controlPayment(priceTmp);
+        }
+        else
+            return true;
+    }
+
+    public boolean canReloadWeapon(CardWeapon cw){
+        List<Color> priceTmp;
+        priceTmp = new ArrayList<>(cw.getPrice());
+        return controlPayment(priceTmp);
+    }
+
+    public boolean controlPayment(List<Color> price){
+        if(ammo != null && !ammo.isEmpty())
+            for(int i = 0; i < ammo.size(); i++)
+                price.remove(ammo.get(i));
+        if(price.isEmpty())
+            return true;
+        else
+        if(cardPower!=null && !cardPower.isEmpty())
+            for(int i = 0; i < cardPower.size(); i++) {
+                price.remove(cardPower.get(i).getColor());
+            }
+        else
+            return false;
+        if(price.isEmpty())
+            return true;
+        else
+            return false;
 
     }
 
@@ -460,10 +497,11 @@ public class Player implements Target, Serializable {
     public void pay(List<Color> ammoToPay, List<CardPower> powerUp) throws InsufficientAmmoException {
         List <Color> tmp = new ArrayList<>(ammoToPay);
         List <CardPower> tmpPU = new ArrayList<>();
-        for(int i = 0; i < powerUp.size(); i++){
-            tmp.remove(powerUp.get(i).getColor());
-            tmpPU.add(powerUp.get(i));
-        }
+        if(powerUp != null)
+            for(int i = 0; i < powerUp.size(); i++){
+                tmp.remove(powerUp.get(i).getColor());
+                tmpPU.add(powerUp.get(i));
+            }
         if(!ammo.containsAll(tmp)) throw new InsufficientAmmoException();
         else {
             for (Color ammor : tmp) {

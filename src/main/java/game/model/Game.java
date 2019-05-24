@@ -125,7 +125,7 @@ public class Game {
 
                             grid[y][x].setColor(createEquivalentMapColor(sq.getChildText("color")));
                             for (Element edg : sq.getChildren("edge")) {
-                                edges[k] = createEquivalentEdge(edg.getText());
+                                edges[k] = createEquivalentEdge(edg.getText().trim());
                                 k++;
                             }
                             k = 0;
@@ -265,8 +265,8 @@ public class Game {
 
         List<Color> ammos = new ArrayList<>();
         for(Element e : ammo.getChildren("color")) {
-            if(!e.getText().equals(""))
-                ammos.add(createEquivalentAmmo(e.getText()));
+            if(!e.getText().trim().equals(""))
+                ammos.add(createEquivalentAmmo(e.getText().trim()));
         }
         int cardPower = Integer.parseInt(ammo.getChildText("powerup"));
 
@@ -280,11 +280,11 @@ public class Game {
      * @param powerup
      */
     public void addPowerUp(Element powerup){
-        String name = powerup.getChild("name").getText().trim();
-        String desc = powerup.getChild("description").getText().trim();
-        Color c = createEquivalentAmmo(powerup.getChild("color").getText());
+        String name = powerup.getChild("name").getText().trim().trim();
+        String desc = powerup.getChild("description").getText().trim().trim();
+        Color c = createEquivalentAmmo(powerup.getChild("color").getText().trim());
         List<Color> price = takePrice(powerup);
-        boolean flag = (powerup.getChild("usedWhenDamaged").getText().equals("true"));
+        boolean flag = (powerup.getChild("usedWhenDamaged").getText().trim().equals("true"));
 
         FullEffect effect = takePowerUpEffect(powerup);
 
@@ -304,7 +304,7 @@ public class Game {
      * @param weapon
      */
     public void addWeapon(Element weapon){
-        String name = weapon.getChild("name").getText();
+        String name = weapon.getChild("name").getText().trim().trim();
         List desc = takeDescription(weapon);
         List names = takeNameEffect(weapon);
         boolean plusBefore;
@@ -315,8 +315,8 @@ public class Game {
         FullEffect effect = takeEffect(weapon);
         FullEffect effectal = takeEffectal(weapon);
         List<FullEffect> effectop = takeEffectopz(weapon);
-        plusBefore = (weapon.getChild("plusBeforeBase").getText().equals("true"));
-        plusOrder = (weapon.getChild("plusOrder").getText().equals("true"));
+        plusBefore = (weapon.getChild("plusBeforeBase").getText().trim().equals("true"));
+        plusOrder = (weapon.getChild("plusOrder").getText().trim().equals("true"));
         insertDescription(effect, effectal, effectop, desc, names);
         insertPrice(effect,effectal,effectop,price,priceal,priceop);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
@@ -366,14 +366,14 @@ public class Game {
         int mind = Integer.parseInt(effect.getChildText("minDist"));
         int minm = Integer.parseInt(effect.getChildText("minMove"));
         int maxm = Integer.parseInt(effect.getChildText("maxMove"));
-        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText().trim());
         boolean moves = (effect.getChildText("moveShooter").equals("true"));
-        TargetVisibility after = createVisibility(effect.getChild("targetVisibAfter").getText());
+        TargetVisibility after = createVisibility(effect.getChild("targetVisibAfter").getText().trim());
         boolean mypos= (effect.getChildText("myPos").equals("true"));
         boolean chain = (effect.getChildText("chainMove").equals("true"));
         boolean last = (effect.getChildText("lastTarget").equals("true"));
         boolean same = (effect.getChildText("sameDirection").equals("true"));
-        DifferentTarget diff = createDifferent(effect.getChild("differentTarget").getText());
+        DifferentTarget diff = createDifferent(effect.getChild("differentTarget").getText().trim());
         SimpleEffect move = new MovementEffect(mine,maxe,mind,maxd,minm,maxm,visib,moves,after,mypos,chain,last,same,diff);
         return move;
     }
@@ -388,11 +388,11 @@ public class Game {
         int mind = Integer.parseInt(effect.getChildText("minDist"));
         int dam = Integer.parseInt(effect.getChildText("damage"));
         int maxd = Integer.parseInt(effect.getChildText("maxDist"));
-        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText().trim());
         int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
         boolean last = (effect.getChildText("lastTarget").equals("true"));
         int marks = Integer.parseInt(effect.getChildText("marks"));
-        DifferentTarget diff = createDifferent(effect.getChild("differentTarget").getText());
+        DifferentTarget diff = createDifferent(effect.getChild("differentTarget").getText().trim());
         boolean chain = (effect.getChildText("chainTarget").equals("true"));
         boolean same = (effect.getChildText("sameDirection").equals("true"));
         SimpleEffect plain = new PlainDamageEffect(mine,maxe,mind,maxd,visib,dam,marks,last,diff,chain,same);
@@ -409,7 +409,7 @@ public class Game {
         int marks = Integer.parseInt(effect.getChildText("marks"));
         int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
         int maxd = Integer.parseInt(effect.getChildText("maxDist"));
-        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText().trim());
         int mind = Integer.parseInt(effect.getChildText("minDist"));
         int dam = Integer.parseInt(effect.getChildText("damage"));
         boolean last = (effect.getChildText("lastTargetSquare").equals("true"));
@@ -429,7 +429,7 @@ public class Game {
         int mind = Integer.parseInt(effect.getChildText("minDist"));
         int mine = Integer.parseInt(effect.getChildText("minEnemy"));
         int marks = Integer.parseInt(effect.getChildText("marks"));
-        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText().trim());
         int dam = Integer.parseInt(effect.getChildText("damage"));
         SimpleEffect room = new RoomDamageEffect(mine,maxe,mind,maxd,visib,dam,marks);
         return room;
@@ -445,7 +445,7 @@ public class Game {
         int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
         int mind = Integer.parseInt(effect.getChildText("minDist"));
         int maxd = Integer.parseInt(effect.getChildText("maxDist"));
-        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText());
+        TargetVisibility visib = createVisibility(effect.getChild("targetVisib").getText().trim());
         int dam = Integer.parseInt(effect.getChildText("damage"));
         int marks = Integer.parseInt(effect.getChildText("marks"));
         int perSquare = Integer.parseInt(effect.getChildText("maxEnemyPerSquare"));
@@ -593,7 +593,7 @@ public class Game {
         List<Color> price = new ArrayList<Color>();
         for(int i = 0; i < weapon.getChildren("optionalPrice").size() ; i ++){
             for (Element pr : weapon.getChildren("optionalPrice").get(i).getChildren("ammo")){
-                price.add(createEquivalentAmmo(pr.getText()));
+                price.add(createEquivalentAmmo(pr.getText().trim().trim()));
             }
             pricetot.add(price);
         }
@@ -602,7 +602,7 @@ public class Game {
     public List<Color> takePrice(Element weapon){
         List price = new ArrayList<Color>();
         for (Element pr : weapon.getChild("price").getChildren("ammo")){
-            price.add(createEquivalentAmmo(pr.getText()));
+            price.add(createEquivalentAmmo(pr.getText().trim().trim()));
         }
         return price;
     }
@@ -610,7 +610,7 @@ public class Game {
         List price = new ArrayList<Color>();
         if(weapon.getChild("alternativePrice") != null)
             for (Element pr : weapon.getChild("alternativePrice").getChildren("ammo")){
-                price.add(createEquivalentAmmo(pr.getText()));
+                price.add(createEquivalentAmmo(pr.getText().trim().trim()));
             }
         return price;
     }
@@ -623,7 +623,7 @@ public class Game {
     public List<String> takeDescription(Element weapon){
         List desc = new ArrayList<String>();
         for (Element ds : weapon.getChildren("effectDescription")){
-            desc.add(ds.getText());
+            desc.add(ds.getText().trim());
         }
         return desc;
     }

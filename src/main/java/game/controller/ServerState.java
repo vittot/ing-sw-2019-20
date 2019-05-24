@@ -7,5 +7,6 @@ public enum ServerState {
     WAITING_ACTION,
     WAITING_WEAPON,
     HANDLING_MOVEMENT,
-    WAITING_RELOAD;
+    WAITING_RELOAD,
+    HANDLING_GRAB;
 }

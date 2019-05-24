@@ -372,7 +372,7 @@ public class ClientTextView implements View {
     @Override
     public void grabWeaponNotification(int pID, String name, int x, int y){
         if(pID == ClientContext.get().getMyID())
-            writeText("Player "+pID+" grabbed the weapon "+name+" in position X:"+x+" Y:"+y);
+            writeText("You the weapon "+name+" in position X:"+x+" Y:"+y);
         else
             writeText("Player "+ClientContext.get().getMap().getPlayerById(pID).getNickName()+" grab the weapon "+name+" in position X:"+x+" Y:"+y);
 
@@ -410,7 +410,7 @@ public class ClientTextView implements View {
             writeText("Player " + ClientContext.get().getMap().getPlayerById(pId).getNickName() + " has moved in square (X : " + newX + ", Y : " + newY + ")");
         }
         else{
-            writeText("You have successfully moved in square (X : " + newX + ", Y : " + newY);
+            writeText("You have successfully moved in square (X : " + newX + ", Y : " + newY+")");
         }
     }
 
@@ -752,17 +752,19 @@ public class ClientTextView implements View {
     public void chooseWeaponToGrab(List<CardWeapon> weapons){
         int i=1;
         int choiceWG = 0;
-        int choiceWD = 0;
+        int choiceWD = -1;
+        CardWeapon wG;
+        CardWeapon wD = null;
         char t = 'Y';
-        List<CardPower> toUse = null;
-        CardWeapon toDiscard = null;
+        List<CardPower> toUse;
         Player myP = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         //Choose which weapon to grab
         writeText("Choose one weapon to grab between the possible: ");
         showWeapons(weapons);
         do{
             choiceWG = readInt();
-        }while(choiceWG>=i || choiceWG<=0);
+        }while(choiceWG>weapons.size() || choiceWG<=0);
+        wG = weapons.get(choiceWG-1);
         //Selection of weapon to discard
         if(myP.getWeapons().size()==3) {
             writeText("You already have 3 weapons, do you want to discard one of them to grab the new one ([Y]es, [N]o)?");
@@ -781,7 +783,9 @@ public class ClientTextView implements View {
         }
         //Selection of power-up to pay
         toUse = powerUpSelection();
-        controller.getClient().sendMessage(new PickUpWeaponRequest(weapons.get(choiceWG-1),toUse, myP.getWeapons().get(choiceWD-1)));
+        if (choiceWD != -1)
+            wD = myP.getWeapons().get(choiceWD-1);
+        controller.getClient().sendMessage(new PickUpWeaponRequest(wG,toUse, wD));
     }
 
     private List<CardPower> powerUpSelection()
@@ -793,8 +797,8 @@ public class ClientTextView implements View {
         writeText("Do you want to use some of your power-up to pay ([Y]es, [N]o)?");
         do{
             t = readChar();
-        }while(t != 'Y' || t != 'N' || t != 'y' || t != 'n');
-        if(t == 'Y' || t != 'y')
+        }while(t != 'Y' && t != 'N' && t != 'y' && t != 'n');
+        if(t == 'Y' || t == 'y')
         {
             i=1;
             toUse = new ArrayList<>();

@@ -220,6 +220,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                         toBeMoved = currPlayer;
                         break;
                     case GRAB:
+                        toBeMoved = currPlayer;
                         break;
                     case SHOOT:
                         break;
@@ -237,17 +238,36 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
 
     @Override
     public ServerMessage handle(GrabActionRequest clientMsg) throws NoCardAmmoAvailableException {
-        if(currPlayer.getPosition().isRespawn())
-            if(currPlayer.getPosition().getWeapons() != null) {
-                //TODO create new method that list the weapon the player can pay and grab
-                return new ChooseWeaponToGrabRequest(currPlayer.getPosition().getWeapons());
+        List<CardWeapon> possibleToGrab = new ArrayList<>();
+        if(currPlayer.getPosition().isRespawn()) {
+            if (currPlayer.getPosition().getWeapons() != null) {
+                for (CardWeapon cw : currPlayer.getPosition().getWeapons())
+                    if (currPlayer.canGrabWeapon(cw))
+                        possibleToGrab.add(cw);
+                if (!possibleToGrab.isEmpty()) {
+                    state = ServerState.HANDLING_GRAB;
+                    return new ChooseWeaponToGrabRequest(possibleToGrab);
+                } else
+                    return new InsufficientAmmoResponse();
             }
+        }
         else {
             if(currPlayer.getPosition().getCardAmmo() != null){
                 CardAmmo toGrab = currPlayer.getPosition().getCardAmmo();
                 List<Color> listA = new ArrayList<>(toGrab.getAmmo());
                 List<CardPower> listCp = new ArrayList<>(currPlayer.pickUpAmmo());
-                return new PickUpAmmoResponse(listA,listCp);
+                state = ServerState.HANDLING_GRAB;
+                clientHandler.sendMessage(new PickUpAmmoResponse(listA,listCp));
+                if(model.getCurrentTurn().getNumOfActions()>0)
+                    return new ChooseTurnActionRequest();
+                else {
+                    if (!currPlayer.getWeapons().isEmpty()) {
+                        return new ReloadWeaponAsk();
+                    } else {
+                        state = ServerState.WAITING_TURN;
+                        //TODO change of turn
+                    }
+                }
             }
         }
         return new InvalidGrabPositionResponse();
@@ -285,15 +305,33 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
      */
     @Override
     public ServerMessage handle(PickUpWeaponRequest clientMsg) {
+        boolean correct = false;
+        for(CardWeapon cw : currPlayer.getPosition().getWeapons()){
+            if(cw.equals(clientMsg.getWeapon()))
+                correct = true;
+        }
+        if(!correct)
+            return new InvalidWeaponResponse();
         if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB))
             return new InvalidStepResponse();
-        if(!currPlayer.getPosition().getWeapons().contains(clientMsg.getWeapon()))
-            return new InvalidWeaponResponse();
-        if(!currPlayer.getCardPower().containsAll(clientMsg.getPowerup()))
+        correct = false;
+        if(clientMsg.getPowerup() == null)
+            correct = true;
+        else
+            for(CardPower cp : currPlayer.getCardPower())
+                if(cp.equals(clientMsg.getPowerup()))
+                    correct = true;
+        if(!correct)
             return new InvalidPowerUpResponse();
         try {
             currPlayer.pickUpWeapon(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup());
-            return  new PickUpWeaponResponse(clientMsg.getWeapon(),clientMsg.getWeaponToWaste(),clientMsg.getPowerup()); //TODO manage this!
+            clientHandler.sendMessage(new PickUpWeaponResponse(clientMsg.getWeapon(),clientMsg.getWeaponToWaste(),clientMsg.getPowerup()));
+            if(model.getCurrentTurn().getNumOfActions() > 0) {
+                state = ServerState.WAITING_ACTION;
+                return new ChooseTurnActionRequest();
+            }
+            else
+                return new ReloadWeaponAsk();
         }catch (InsufficientAmmoException e){
             return new InsufficientAmmoResponse();
         }
@@ -321,6 +359,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             return new InvalidWeaponResponse();
         try{
             w.reloadWeapon(clientMsg.getPowerups());
+            state = ServerState.WAITING_TURN;
             return new CheckReloadResponse(clientMsg.getWeapon(), clientMsg.getPowerups());
         }catch(InsufficientAmmoException e)
         {
