@@ -71,7 +71,7 @@ public interface View {
 
     void showMapsPhase(List<GameMap> availableMaps);
 
-    void reloadWeaponPhase();
+    void reloadWeaponPhase(List<CardWeapon> weaponsToReload);
 
     void showReloadMessage(CardWeapon cW);
 }

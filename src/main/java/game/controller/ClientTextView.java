@@ -79,24 +79,23 @@ public class ClientTextView implements View {
     }
 
     @Override
-    public void reloadWeaponPhase() {
-        writeText("Here you will be able to choose what weapon reload");
-        List<CardWeapon> weapons = ClientContext.get().getMyPlayer().getWeapons();
+    public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
+        writeText("Here you will be able to choose what weapon reload from the unloaded ones!");
         int n;
         List<ClientMessage> reloadRequests = new ArrayList<>();
         do {
-            showWeapons(weapons);
+            showWeapons(weaponsToReload,0);
             do {
                 writeText("Insert the id of a weapon you want to reload or -1 to terminate the reload phase:");
                 n = readInt();
-            } while (n != -1 && n < 1 && n > weapons.size());
+            } while (n != -1 && n < 1 && n > weaponsToReload.size());
             if(n != -1)
             {
                 List<CardPower> cp = powerUpSelection();
-                reloadRequests.add(new ReloadWeaponRequest(weapons.get(n-1),cp));
+                reloadRequests.add(new ReloadWeaponRequest(weaponsToReload.get(n-1),cp));
             }
 
-        }while(weapons.size() > 0 && n!=-1);
+        }while(weaponsToReload.size() > 0 && n!=-1);
 
         controller.sendMessages(reloadRequests);
 
@@ -760,7 +759,7 @@ public class ClientTextView implements View {
         Player myP = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         //Choose which weapon to grab
         writeText("Choose one weapon to grab between the possible: ");
-        showWeapons(weapons);
+        showWeapons(weapons,1);
         do{
             choiceWG = readInt();
         }while(choiceWG>weapons.size() || choiceWG<=0);
@@ -825,11 +824,19 @@ public class ClientTextView implements View {
      * Show a list of weapons with numeric identifiers
      * @param weapons
      */
-    public void showWeapons(List<CardWeapon> weapons)
+    public void showWeapons(List<CardWeapon> weapons, int p)
     {
         int i = 1;
         for(CardWeapon cw : weapons){
             writeText(i+"- "+cw.getName());
+            System.out.println("  >>PRICE");
+            if(cw.getPrice() != null) {
+                for (Color c : cw.getPrice().subList(p, cw.getPrice().size()))
+                    System.out.println("    >>" + c.toString());
+            }
+            else {
+                System.out.println("    >>FREE");
+            }
             i++;
         }
     }

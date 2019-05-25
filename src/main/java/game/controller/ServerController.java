@@ -80,6 +80,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(ChooseSquareResponse clientMsg) {
         Square selectedSquare = clientMsg.getSelectedSquare();
+        List<CardWeapon> weaponsToReload = null;
         boolean correctSquare = false;
         for(Square s : selectableSquares)
             if(s.equals(selectedSquare))
@@ -100,8 +101,15 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                     state = ServerState.WAITING_ACTION;
                     return new ChooseTurnActionRequest();
                 } else {
-                    state = ServerState.WAITING_RELOAD;
-                    return new ReloadWeaponAsk();
+                    if (!currPlayer.getWeapons().isEmpty()) {
+                        weaponsToReload = currPlayer.hasToReload();
+                        if (weaponsToReload != null) {
+                            state = ServerState.WAITING_RELOAD;
+                            return new ReloadWeaponAsk(weaponsToReload);
+                        }
+                    }
+                    state = ServerState.WAITING_TURN;
+                    return new OperationCompletedResponse("Turn finished!");
                 }
             }
         }
@@ -256,17 +264,20 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                 CardAmmo toGrab = currPlayer.getPosition().getCardAmmo();
                 List<Color> listA = new ArrayList<>(toGrab.getAmmo());
                 List<CardPower> listCp = new ArrayList<>(currPlayer.pickUpAmmo());
+                List<CardWeapon> weaponsToReload = null;
                 state = ServerState.HANDLING_GRAB;
                 clientHandler.sendMessage(new PickUpAmmoResponse(listA,listCp));
                 if(model.getCurrentTurn().getNumOfActions()>0)
                     return new ChooseTurnActionRequest();
                 else {
                     if (!currPlayer.getWeapons().isEmpty()) {
-                        return new ReloadWeaponAsk();
-                    } else {
-                        state = ServerState.WAITING_TURN;
-                        //TODO change of turn
+                        weaponsToReload = currPlayer.hasToReload();
+                        if(weaponsToReload != null)
+                            return new ReloadWeaponAsk(weaponsToReload);
                     }
+                    state = ServerState.WAITING_TURN;
+                    //TODO change of turn
+                    return new OperationCompletedResponse("Turn finished!");
                 }
             }
         }
@@ -306,6 +317,11 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(PickUpWeaponRequest clientMsg) {
         boolean correct = false;
+        int count=0;
+        List<CardPower> tmp = null;
+        if(clientMsg.getPowerup() != null)
+            tmp = new ArrayList<>(clientMsg.getPowerup());
+        List<CardWeapon> weaponsToReload = null;
         for(CardWeapon cw : currPlayer.getPosition().getWeapons()){
             if(cw.equals(clientMsg.getWeapon()))
                 correct = true;
@@ -314,24 +330,33 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             return new InvalidWeaponResponse();
         if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB))
             return new InvalidStepResponse();
-        correct = false;
-        if(clientMsg.getPowerup() == null)
-            correct = true;
-        else
-            for(CardPower cp : currPlayer.getCardPower())
-                if(cp.equals(clientMsg.getPowerup()))
-                    correct = true;
-        if(!correct)
-            return new InvalidPowerUpResponse();
+        if(clientMsg.getPowerup() != null) {
+            for (CardPower cp : currPlayer.getCardPower())
+                for (int i = 0; i < tmp.size(); i++)
+                    if (cp.equals(tmp.get(i))) {
+                        tmp.remove(i);
+                        count++;
+                    }
+            if (count != clientMsg.getPowerup().size())
+                return new InvalidPowerUpResponse();
+        }
         try {
             currPlayer.pickUpWeapon(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup());
-            clientHandler.sendMessage(new PickUpWeaponResponse(clientMsg.getWeapon(),clientMsg.getWeaponToWaste(),clientMsg.getPowerup()));
-            if(model.getCurrentTurn().getNumOfActions() > 0) {
+            clientHandler.sendMessage(new PickUpWeaponResponse(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup()));
+            if (model.getCurrentTurn().getNumOfActions() > 0) {
                 state = ServerState.WAITING_ACTION;
                 return new ChooseTurnActionRequest();
+            } else {
+                if (!currPlayer.getWeapons().isEmpty()) {
+                    weaponsToReload = currPlayer.hasToReload();
+                    if (weaponsToReload != null) {
+                        state = ServerState.WAITING_RELOAD;
+                        return new ReloadWeaponAsk(weaponsToReload);
+                    }
+                }
+                state = ServerState.WAITING_TURN;
+                return new OperationCompletedResponse("Turn finished!");
             }
-            else
-                return new ReloadWeaponAsk();
         }catch (InsufficientAmmoException e){
             return new InsufficientAmmoResponse();
         }
@@ -351,12 +376,22 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(ReloadWeaponRequest clientMsg) {
         CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
-        if(!currPlayer.getCardPower().containsAll(clientMsg.getPowerups()))
-            return new InvalidPowerUpResponse();
+        int count = 0;
+        List<CardPower> tmp = new ArrayList<>(clientMsg.getPowerups());
         if( w == null)
             return new InvalidWeaponResponse();
         if( w.isLoaded())
             return new InvalidWeaponResponse();
+        if(clientMsg.getPowerups() != null) {
+            for (CardPower cp : currPlayer.getCardPower())
+                for (int i = 0; i < tmp.size(); i++)
+                    if (cp.equals(tmp.get(i))) {
+                        tmp.remove(i);
+                        count++;
+                    }
+            if (count != clientMsg.getPowerups().size())
+                return new InvalidPowerUpResponse();
+        }
         try{
             w.reloadWeapon(clientMsg.getPowerups());
             state = ServerState.WAITING_TURN;

@@ -612,4 +612,14 @@ public class Player implements Target, Serializable {
     public void addAmmo(Color ammo) {
         this.ammo.add(ammo);
     }
+
+    public List<CardWeapon> hasToReload() {
+        List<CardWeapon> toReload = new ArrayList<>();
+        for (CardWeapon cw : weapons)
+            if(!cw.isLoaded())
+                toReload.add(cw);
+        if(toReload.isEmpty())
+            return null;
+        return toReload;
+    }
 }

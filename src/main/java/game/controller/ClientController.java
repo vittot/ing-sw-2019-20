@@ -465,6 +465,6 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(ReloadWeaponAsk reloadWeaponAsk) {
-        clientView.reloadWeaponPhase();
+        clientView.reloadWeaponPhase(reloadWeaponAsk.getWeaponsToReload());
     }
 }
