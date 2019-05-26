@@ -102,6 +102,7 @@ public class SocketClientHandler implements Runnable, GameListener {
     @Override
     public void onChangeTurn(Player p) {
         sendMessage(new NotifyTurnChanged(p.getId()));
+        
     }
 
     /**

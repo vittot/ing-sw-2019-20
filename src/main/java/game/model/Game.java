@@ -26,6 +26,7 @@ public class Game {
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
+    private int nPlayerToBeRespawned;
     
 
     static {
@@ -54,12 +55,12 @@ public class Game {
         this(killBoardSize);
         this.id = id;
         this.players = players;
-        currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
         readMap(mapId, "mapFile.xml");
         readPowerUpDeck("powerupFile.xml");
         readAmmoDeck("ammoFile.xml");
+        currentTurn = new Turn(this.players.get(0),this);
 
     }
 
@@ -79,6 +80,7 @@ public class Game {
         readDeck("effectFile.xml");
         readMap(mapId, "mapFile.xml");
     }
+
 
     public int getId() {
         return id;
@@ -791,6 +793,10 @@ public class Game {
         powerWaste.add(c);
     }
 
+    public void decreaseToBeRespawned(){if(nPlayerToBeRespawned > 0) nPlayerToBeRespawned--;}
+
+    public int getnPlayerToBeRespawned() {return nPlayerToBeRespawned; }
+
     /**
      * Add new player to the game
      * @param p Player to be added
@@ -854,7 +860,9 @@ public class Game {
             currentTurn.setCurrentPlayer(players.get(0));
         }else
             currentTurn.setCurrentPlayer(players.get(num+1));
-        return checkRespawn();
+        List<Player> toBeRespawned  = checkRespawn();
+        this.nPlayerToBeRespawned = toBeRespawned.size();
+        return toBeRespawned;
     }
 
     /**
@@ -966,5 +974,15 @@ public class Game {
     void notifyPowerUpUse(Player p, CardPower c)
     {
         gameObservers.forEach(o -> o.onPowerUpUse(p,c));
+    }
+
+    /**
+     * Notify to all player that now is the turn of player p
+     * @param p
+     */
+    void notifyTurnChange(Player p)
+    {
+        gameObservers.forEach( o -> o.onChangeTurn(p));
+        p.notifyTurn();
     }
 }

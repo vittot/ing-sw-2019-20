@@ -50,7 +50,7 @@ public class WaitingRoom implements Serializable {
     {
         int n = players.size();
         Player p = new Player(n+1, PlayerColor.values()[n],nick);
-        p.setRespawnListener(s);
+        p.setPlayerObserver(s);
         players.put(s,p);
         if(players.size() == numWaitingPlayers){
             Game g = GameManager.get().addGame(mapId,new ArrayList<>(players.values()));

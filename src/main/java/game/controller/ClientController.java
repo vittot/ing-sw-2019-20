@@ -276,9 +276,10 @@ public class ClientController implements ServerMessageHandler {
         //notify set null the card-ammo on the square
         for(Color c : serverMsg.getColors())
             ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).addAmmo(c);
-        if(serverMsg.getPowerups() != null)
+        if(!serverMsg.getPowerups().isEmpty())
             for(CardPower cp : serverMsg.getPowerups())
                 ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).addCardPower(cp);
+        //TODO: show on the view
     }
 
     /**

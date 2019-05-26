@@ -19,7 +19,8 @@ public class Turn {
         this.currentPlayer = currentPlayer;
         this.game = game;
         actionList = new ArrayList<>();
-        newTurn(currentPlayer,false);
+        this.currentPlayer = currentPlayer;
+        numOfActions = 2;
     }
 
     public List<Action> getActionList() {
@@ -75,6 +76,12 @@ public class Turn {
         }
         numOfActions = 2;
         numOfMovs = 0;
+        game.notifyTurnChange(currentPlayer);
+    }
+
+    public void newTurn(boolean finalFrezy)
+    {
+        newTurn(currentPlayer,finalFrezy);
     }
 
     /**

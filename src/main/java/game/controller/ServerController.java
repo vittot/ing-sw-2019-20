@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ServerController implements ClientMessageHandler, RespawnObserver {
+public class ServerController implements ClientMessageHandler, PlayerObserver {
     // reference to the Networking layer
     private SocketClientHandler clientHandler;
 
@@ -42,6 +42,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     public ServerController(SocketClientHandler clientHandler) {
 
         this.clientHandler = clientHandler;
+        this.state = ServerState.WAITING_SPAWN;
     }
 
     public ServerController(){ }
@@ -57,7 +58,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
      */
     void startGame(Game g, Player p)
     {
-        state = ServerState.WAITING_SPAWN; //TODO management of the first spawn of the players in order
+        //state = ServerState.WAITING_SPAWN; //TODO management of the first spawn of the players in order
         this.model = g;
         this.currPlayer = p;
         this.numberOfTurnActionMade = 0;
@@ -80,7 +81,6 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
     @Override
     public ServerMessage handle(ChooseSquareResponse clientMsg) {
         Square selectedSquare = clientMsg.getSelectedSquare();
-        List<CardWeapon> weaponsToReload = null;
         boolean correctSquare = false;
         for(Square s : selectableSquares)
             if(s.equals(selectedSquare))
@@ -97,20 +97,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             if (!avaialableActionSteps.isEmpty())
                 return new ChooseSingleActionRequest(avaialableActionSteps);
             else {
-                if (model.getCurrentTurn().getNumOfActions() > 0) {
-                    state = ServerState.WAITING_ACTION;
-                    return new ChooseTurnActionRequest();
-                } else {
-                    if (!currPlayer.getWeapons().isEmpty()) {
-                        weaponsToReload = currPlayer.hasToReload();
-                        if (weaponsToReload != null) {
-                            state = ServerState.WAITING_RELOAD;
-                            return new ReloadWeaponAsk(weaponsToReload);
-                        }
-                    }
-                    state = ServerState.WAITING_TURN;
-                    return new OperationCompletedResponse("Turn finished!");
-                }
+                return checkTurnEnd();
             }
         }
         else{
@@ -119,6 +106,13 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         }
 
 
+    }
+
+    private void endTurnManagement()
+    {
+        //state
+        List<Player> toBeRespawned = model.changeTurn();
+        toBeRespawned.forEach(p -> p.notifyRespawn());
     }
 
     /**
@@ -224,7 +218,6 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                 switch(action){
                     case MOVEMENT:
                         currFullEffect = null;
-                        currSimpleEffect = new MovementEffect();
                         toBeMoved = currPlayer;
                         break;
                     case GRAB:
@@ -256,7 +249,10 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                     state = ServerState.HANDLING_GRAB;
                     return new ChooseWeaponToGrabRequest(possibleToGrab);
                 } else
-                    return new InsufficientAmmoResponse();
+                {
+                    clientHandler.sendMessage(new InsufficientAmmoResponse());
+                    return checkTurnEnd();
+                }
             }
         }
         else {
@@ -264,30 +260,25 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                 CardAmmo toGrab = currPlayer.getPosition().getCardAmmo();
                 List<Color> listA = new ArrayList<>(toGrab.getAmmo());
                 List<CardPower> listCp = new ArrayList<>(currPlayer.pickUpAmmo());
-                List<CardWeapon> weaponsToReload = null;
                 state = ServerState.HANDLING_GRAB;
                 clientHandler.sendMessage(new PickUpAmmoResponse(listA,listCp));
                 if(model.getCurrentTurn().getNumOfActions()>0)
                     return new ChooseTurnActionRequest();
                 else {
-                    if (!currPlayer.getWeapons().isEmpty()) {
-                        weaponsToReload = currPlayer.hasToReload();
-                        if(weaponsToReload != null)
-                            return new ReloadWeaponAsk(weaponsToReload);
-                    }
-                    state = ServerState.WAITING_TURN;
-                    //TODO change of turn
-                    return new OperationCompletedResponse("Turn finished!");
+                    return checkTurnEnd();
                 }
             }
         }
-        return new InvalidGrabPositionResponse();
+        clientHandler.sendMessage(new InvalidGrabPositionResponse());
+        //TODO: if he can't grab what should we do? Now we end the action
+        return checkTurnEnd();
     }
 
     @Override
     public ServerMessage handle(MovementActionRequest clientMsg) {
-        if(currPlayer.getGame().getCurrentTurn().applyStep(Action.MOVEMENT)){
-            avaialableActionSteps = currPlayer.getGame().getCurrentTurn().getActionList();
+        if(model.getCurrentTurn().applyStep(Action.MOVEMENT)){
+            currSimpleEffect = new MovementEffect();
+            avaialableActionSteps = model.getCurrentTurn().getActionList();
             selectableSquares = currPlayer.getPosition().getSquaresInDirections(1,1);
             this.state = ServerState.HANDLING_MOVEMENT;
             return new ChooseSquareRequest(selectableSquares);
@@ -303,7 +294,8 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             return new InvalidStepResponse();
         try{
             currPlayer.pickUpAmmo();
-            return new OperationCompletedResponse("Ammo picked up"); //TODO check this
+            avaialableActionSteps = model.getCurrentTurn().getActionList();
+            return checkTurnEnd();
         }catch (NoCardAmmoAvailableException e){
             return new InvalidGrabPositionResponse();
         }
@@ -321,15 +313,13 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         List<CardPower> tmp = null;
         if(clientMsg.getPowerup() != null)
             tmp = new ArrayList<>(clientMsg.getPowerup());
-        List<CardWeapon> weaponsToReload = null;
+
         for(CardWeapon cw : currPlayer.getPosition().getWeapons()){
             if(cw.equals(clientMsg.getWeapon()))
                 correct = true;
         }
         if(!correct)
             return new InvalidWeaponResponse();
-        if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB))
-            return new InvalidStepResponse();
         if(clientMsg.getPowerup() != null) {
             for (CardPower cp : currPlayer.getCardPower())
                 for (int i = 0; i < tmp.size(); i++)
@@ -340,28 +330,43 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
             if (count != clientMsg.getPowerup().size())
                 return new InvalidPowerUpResponse();
         }
+        //This has to be the last check
+        if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB))
+            return new InvalidStepResponse();
         try {
             currPlayer.pickUpWeapon(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup());
+            avaialableActionSteps = model.getCurrentTurn().getActionList();
             clientHandler.sendMessage(new PickUpWeaponResponse(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup()));
-            if (model.getCurrentTurn().getNumOfActions() > 0) {
-                state = ServerState.WAITING_ACTION;
-                return new ChooseTurnActionRequest();
-            } else {
-                if (!currPlayer.getWeapons().isEmpty()) {
-                    weaponsToReload = currPlayer.hasToReload();
-                    if (weaponsToReload != null) {
-                        state = ServerState.WAITING_RELOAD;
-                        return new ReloadWeaponAsk(weaponsToReload);
-                    }
-                }
-                state = ServerState.WAITING_TURN;
-                return new OperationCompletedResponse("Turn finished!");
-            }
+            return checkTurnEnd();
         }catch (InsufficientAmmoException e){
             return new InsufficientAmmoResponse();
         }
         catch (NoCardWeaponSpaceException x){
             return new MaxNumberOfWeaponsResponse();
+        }
+    }
+
+    private ServerMessage checkTurnEnd()
+    {
+        List<CardWeapon> weaponsToReload;
+        if (model.getCurrentTurn().getNumOfActions() > 0) {
+            state = ServerState.WAITING_ACTION;
+            return new ChooseTurnActionRequest();
+        } else {
+            if (!currPlayer.getWeapons().isEmpty()) {
+                weaponsToReload = currPlayer.hasToReload();
+                if (weaponsToReload != null) {
+                    state = ServerState.WAITING_RELOAD;
+                    return new ReloadWeaponAsk(weaponsToReload);
+                }
+            }
+            endTurnManagement();
+            if(model.getnPlayerToBeRespawned() == 0)
+                model.getCurrentTurn().newTurn(false); //TODO: check final frezy
+            if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer()))
+                return new ChooseTurnActionRequest();
+            else
+                return new OperationCompletedResponse("Wait for you next turn!");
         }
     }
 
@@ -432,10 +437,23 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                 currPlayer.respawn(clientMsg.getPowerUp());
                 currPlayer.removePowerUp(Collections.singletonList(clientMsg.getPowerUp()));
                 model.addPowerWaste(clientMsg.getPowerUp());
-                if (model.getCurrentTurn().getCurrentPlayer().equals(currPlayer)) {
+                if (state == ServerState.WAITING_SPAWN && model.getCurrentTurn().getCurrentPlayer().equals(currPlayer)) {
                     state = ServerState.WAITING_ACTION;
                     return new ChooseTurnActionRequest();
-                } else {
+                }
+                else if(state == ServerState.WAITING_RESPAWN)
+                {
+                    state = ServerState.WAITING_TURN;
+                    model.decreaseToBeRespawned();
+                    clientHandler.sendMessage(new OperationCompletedResponse("You are respawned!"));
+                    if(model.getnPlayerToBeRespawned() == 0)
+                        model.getCurrentTurn().newTurn(false); //TODO: check final frezy
+                    if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer()))
+                        return new ChooseTurnActionRequest();
+                    else
+                        return new OperationCompletedResponse("Wait for you turn..");
+                }
+                else {
                     state = ServerState.WAITING_TURN;
                     return new OperationCompletedResponse("You are respawned, wait for your turn!");
                 }
@@ -554,6 +572,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
                             sc.getCurrPlayer().addCardPower(cp);
                             sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
                             sc.getClientHandler().sendMessage(new RespawnRequest(cp));
+
                         }
                         else
                             sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!\nWait your turn.."));
@@ -592,7 +611,7 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
         List<Player> toBeRespawned = model.changeTurn();
         for(Player p: toBeRespawned)
         {
-            p.notifyRespawnListener();
+            p.notifyRespawn();
         }
         return new OperationCompletedResponse("Your turn is terminated");
     }
@@ -712,7 +731,19 @@ public class ServerController implements ClientMessageHandler, RespawnObserver {
      */
     @Override
     public void onRespawn() {
-        //TODO state in waiting for client response
+        state = ServerState.WAITING_RESPAWN;
         clientHandler.sendMessage(new RespawnRequest(model.drawPowerUp()));
+    }
+
+    @Override
+    public void onTurnStart() {
+        if(state != ServerState.WAITING_SPAWN)
+            clientHandler.sendMessage(new ChooseTurnActionRequest());
+        else{
+            CardPower cp = model.drawPowerUp();
+            currPlayer.addCardPower(cp);
+            clientHandler.sendMessage(new RespawnRequest(cp));
+        }
+
     }
 }

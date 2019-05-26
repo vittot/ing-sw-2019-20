@@ -44,6 +44,10 @@ public class ClientTextView implements View {
         return string.charAt(0);
     }
 
+    /**
+     * Read an integer from the input stream
+     * @return
+     */
     public  int readInt(){
         try {
             int save = fromKeyBoard.nextInt();
@@ -537,7 +541,12 @@ public class ClientTextView implements View {
      */
     @Override
     public void notifyTurnChanged(int pID) {
-        writeText("The turn is finished! "+ClientContext.get().getMap().getPlayerById(pID).getNickName()+" now it's your time!");
+        if(pID != ClientContext.get().getMyID()){
+            Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == pID).findFirst().orElse(ClientContext.get().getMap().getPlayerById(pID));
+            writeText("The turn is finished! Now it's "+p.getNickName()+"'s turn!");
+        }
+        else
+            writeText("The turn is finished! Now it's your time!");
     }
 
     /**
