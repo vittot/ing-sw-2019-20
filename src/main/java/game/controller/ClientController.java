@@ -468,4 +468,41 @@ public class ClientController implements ServerMessageHandler {
     public void handle(ReloadWeaponAsk reloadWeaponAsk) {
         clientView.reloadWeaponPhase(reloadWeaponAsk.getWeaponsToReload());
     }
+
+    @Override
+    public void handle(ChooseWeaponToShootRequest chooseWeaponToShootRequest) {
+        clientView.chooseWeaponToShoot(chooseWeaponToShootRequest.getMyWeapons());
+    }
+
+    @Override
+    public void handle(ChooseFirstEffectRequest chooseFirstEffectRequest) {
+        clientView.chooseFirstEffect(chooseFirstEffectRequest.getBaseEff(),chooseFirstEffectRequest.getAltEff());
+    }
+
+    @Override
+    public void handle(BeforeBaseRequest beforeBaseRequest) {
+        clientView.usePlusBeforeBase(beforeBaseRequest.getPlusEff());
+    }
+
+    @Override
+    public void handle(UsePlusEffectRequest usePlusEffectRequest) {
+        clientView.choosePlusEffect(usePlusEffectRequest.getPlusEffects());
+    }
+
+    @Override
+    public void handle(UsePlusByOrderRequest usePlusByOrderRequest) {
+        clientView.usePlusInOrder(usePlusByOrderRequest.getPlusEffects(),usePlusByOrderRequest.getI());
+    }
+
+    @Override
+    public void handle(ShootActionResponse shootActionResponse) {
+        CardWeapon currWeapon = null;
+        for(CardWeapon cw : ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getWeapons()) {
+            if (cw.equals(shootActionResponse.getSelectedWeapon()))
+                currWeapon = cw;
+        }
+        if(currWeapon != null) {
+            currWeapon.setLoaded(false);
+        }
+    }
 }

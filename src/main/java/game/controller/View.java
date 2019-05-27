@@ -1,6 +1,7 @@
 package game.controller;
 
 import game.model.*;
+import game.model.effects.FullEffect;
 
 import java.util.List;
 import java.util.Map;
@@ -74,4 +75,14 @@ public interface View {
     void reloadWeaponPhase(List<CardWeapon> weaponsToReload);
 
     void showReloadMessage(CardWeapon cW);
+
+    void chooseWeaponToShoot(List<CardWeapon> myWeapons);
+
+    void chooseFirstEffect(FullEffect baseEff, FullEffect altEff);
+
+    void usePlusBeforeBase(FullEffect plusEff);
+
+    void usePlusInOrder(List<FullEffect> plusEffects, int i);
+
+    void choosePlusEffect(List<FullEffect> plusEffects);
 }

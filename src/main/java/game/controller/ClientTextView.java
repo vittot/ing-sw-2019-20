@@ -2,7 +2,11 @@ package game.controller;
 
 import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
+import game.controller.commands.servercommands.ChooseFirstEffectRequest;
+import game.controller.commands.servercommands.ChooseWeaponToShootRequest;
+import game.controller.commands.servercommands.UsePlusEffectRequest;
 import game.model.*;
+import game.model.effects.FullEffect;
 
 import java.util.*;
 
@@ -113,6 +117,81 @@ public class ClientTextView implements View {
         writeText("The weapon " + cW.getName() + " has been correctly reloaded");
     }
 
+    @Override
+    public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
+        int n;
+        writeText("Choose which of your weapons you want to use:");
+        showWeapons(myWeapons,0,true);
+        do{
+            n = readInt();
+        }while (n<1 || n>=myWeapons.size());
+        controller.getClient().sendMessage(new ChooseWeaponToShootResponse(myWeapons.get(n-1)));
+
+    }
+
+    @Override
+    public void chooseFirstEffect(FullEffect baseEff, FullEffect altEff) {
+        int n;
+        writeText("Choose the base effect you want to apply:");
+        writeText("1. "+baseEff.getName());
+        writeText("   Description: "+baseEff.getDescription());
+        writeText("2. "+altEff.getName());
+        writeText("   Description: "+altEff.getDescription());
+        do{
+            n = readInt();
+        }while(n != 1 || n != 2);
+        controller.getClient().sendMessage(new ChooseFirstEffectResponse(n));
+    }
+
+    @Override
+    public void usePlusBeforeBase(FullEffect plusEff) {
+        char t;
+        writeText("Do you want to use this plus effect before than your weapon base effect?");
+        writeText("Name: "+plusEff.getName());
+        writeText("Description: "+plusEff.getDescription());
+        writeText("[Y]es or [N]o?");
+        do{
+            t = readChar();
+        }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
+        controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t));
+    }
+
+    @Override
+    public void usePlusInOrder(List<FullEffect> plusEffects, int i) {
+        char t;
+        writeText("Do you want to apply the plus effect, allow by your weapon, listed here:");
+        writeText("Name: "+plusEffects.get(i).getName());
+        writeText("Description: "+plusEffects.get(i).getDescription());
+        writeText("[Y]es or [N]o?");
+        do{
+            t = readChar();
+        }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
+        controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,i,t));
+    }
+
+    @Override
+    public void choosePlusEffect(List<FullEffect> plusEffects) {
+        int n;
+        int i=1;
+        FullEffect toApply = null;
+        writeText("Choose the plus effect you want to apply or insert -1 to terminate your action:");
+        for(FullEffect f : plusEffects){
+            writeText(i+"- Name: "+f.getName());
+            writeText("   Description: "+f.getDescription());
+            i++;
+        }
+        do{
+            n = readInt();
+        }while(n != -1 && (n<1 || n>plusEffects.size()));
+        if(n == -1)
+            controller.getClient().sendMessage(new TerminateShootAction());
+        else {
+            toApply = plusEffects.get(n-1);
+            plusEffects.remove(n-1);
+            controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, toApply));
+        }
+    }
+
     /**
      * Show the available maps
      */
@@ -195,7 +274,7 @@ public class ClientTextView implements View {
             }catch (IllegalArgumentException e){
                 chosenAction = null;
             }
-        }while(!possibleActions.contains(chosenAction));
+        }while(!possibleActions.contains(chosenAction) || chosenAction == null);
 
         switch (chosenAction){
             case GRAB:
@@ -867,6 +946,7 @@ public class ClientTextView implements View {
 
     /**
      * print a list of weapont and they cost.
+     * p = 0 if we want to print the weapons reload price; p = 1 if we want to print the weapons grab price
      * numeric = true for print the numeric identifiers od the list
      * @param cws
      * @param p

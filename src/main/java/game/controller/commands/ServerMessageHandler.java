@@ -42,4 +42,10 @@ public interface ServerMessageHandler {
     void handle(CreateWaitingRoomResponse createWaitingRoomResponse);
     void handle(ChooseWeaponToGrabRequest chooseWeaponToGrabRequest);
     void handle(ReloadWeaponAsk reloadWeaponAsk);
+    void handle(ChooseWeaponToShootRequest chooseWeaponToShootRequest);
+    void handle(ChooseFirstEffectRequest chooseFirstEffectRequest);
+    void handle(BeforeBaseRequest beforeBaseRequest);
+    void handle(UsePlusEffectRequest usePlusEffectRequest);
+    void handle(UsePlusByOrderRequest usePlusByOrderRequest);
+    void handle(ShootActionResponse shootActionResponse);
 }

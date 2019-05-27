@@ -467,7 +467,19 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
 
     @Override
     public ServerMessage handle(ShootActionRequest clientMsg) {
-        CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
+        List<CardWeapon> myWeapons = currPlayer.getWeapons();
+        FullEffect tmpEff;
+        boolean check;
+        /*for(CardWeapon cw : myWeapons){
+            tmpEff = cw.getBaseEffect();
+            check = true;
+            for(SimpleEffect sE : tmpEff.getSimpleEffects())
+                if()
+        }*/
+        if(myWeapons.isEmpty())
+            return new InvalidActionResponse();
+        return new ChooseWeaponToShootRequest(myWeapons);
+        /*CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
         if( w == null)
             return new InvalidWeaponResponse();
         if( !w.isLoaded())
@@ -518,7 +530,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
             currFullEffect = baseAltEffect;
 
         }
-        return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+        return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));*/
     }
 
     /**
@@ -626,6 +638,104 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         //TODO later
         return null;
     }
+
+    @Override
+    public ServerMessage handle(ChooseWeaponToShootResponse chooseWeaponToShootResponse) {
+        selectedWeapon = chooseWeaponToShootResponse.getSelectedWeapon();
+        FullEffect plusEff = null;
+        for(FullEffect pE : selectedWeapon.getPlusEffects())
+            if(pE.isBeforeBase())
+                plusEff = pE;
+        if(plusEff != null)
+            return new BeforeBaseRequest(plusEff);
+        else
+            return firstEffect();
+    }
+
+    private ServerMessage firstEffect(){
+        FullEffect baseEff = selectedWeapon.getBaseEffect();
+        FullEffect altEff = null;
+        if (selectedWeapon.getAltEffect() != null) {
+            altEff = selectedWeapon.getAltEffect();
+            return new ChooseFirstEffectRequest(baseEff, altEff);
+        } else {
+            currFullEffect = baseEff;
+            for (SimpleEffect sE : baseEff.getSimpleEffects()) {
+                currSimpleEffect = sE;
+                handleEffect(currSimpleEffect);
+            }
+        }
+        return managePlusEffectChoice();
+    }
+
+    private ServerMessage managePlusEffectChoice() {
+        if(selectedWeapon.getPlusEffects() != null)
+            if(selectedWeapon.isPlusOrder())
+                return new UsePlusByOrderRequest(selectedWeapon.getPlusEffects(),0);
+            else
+                return new UsePlusEffectRequest(selectedWeapon.getPlusEffects());
+        else
+            return terminateShootAction();
+    }
+
+    @Override
+    public ServerMessage handle(ChooseFirstEffectResponse chooseFirstEffectResponse) {
+        if(chooseFirstEffectResponse.getN() == 1)
+            currFullEffect = selectedWeapon.getBaseEffect();
+        else
+            currFullEffect = selectedWeapon.getAltEffect();
+        for (SimpleEffect sE : currFullEffect.getSimpleEffects()) {
+            currSimpleEffect = sE;
+            handleEffect(currSimpleEffect);
+        }
+        return managePlusEffectChoice();
+    }
+
+    @Override
+    public ServerMessage handle(UsePlusBeforeResponse usePlusBeforeResponse) {
+        if(usePlusBeforeResponse.getT() == 'Y' || usePlusBeforeResponse.getT() == 'y')
+            for(SimpleEffect sE : usePlusBeforeResponse.getPlusEff().getSimpleEffects()) {
+                currSimpleEffect = sE;
+                handleEffect(sE);
+            }
+        return firstEffect();
+    }
+
+    @Override
+    public ServerMessage handle(UseOrderPlusResponse useOrderPlusResponse) {
+        if(useOrderPlusResponse.getT() == 'Y' || useOrderPlusResponse.getT() == 'y') {
+            currFullEffect = useOrderPlusResponse.getPlusEffects().get(useOrderPlusResponse.getI());
+            for(SimpleEffect se : currFullEffect.getSimpleEffects()) {
+                currSimpleEffect = se;
+                handleEffect(se);
+            }
+            return new UsePlusByOrderRequest(useOrderPlusResponse.getPlusEffects(),useOrderPlusResponse.getI()+1);
+        }
+        else
+            return terminateShootAction();
+
+    }
+
+    private ServerMessage terminateShootAction() {
+        selectedWeapon.setLoaded(false);
+        return new ShootActionResponse(selectedWeapon);
+    }
+
+    @Override
+    public ServerMessage handle(UsePlusEffectResponse usePlusEffectResponse) {
+        currFullEffect = usePlusEffectResponse.getEffectToApply();
+        for(SimpleEffect se : currFullEffect.getSimpleEffects()) {
+            currSimpleEffect = se;
+            handleEffect(se);
+        }
+        return new UsePlusEffectRequest(usePlusEffectResponse.getPlusRemained());
+    }
+
+    @Override
+    public ServerMessage handle(TerminateShootAction terminateShootAction) {
+        return terminateShootAction();
+    }
+
 
     /**
      * Ask the user for the targets of the next simpleEffect, if there is the need of a choice
