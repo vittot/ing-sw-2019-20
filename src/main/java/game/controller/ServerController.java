@@ -2,6 +2,7 @@ package game.controller;
 
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.*;
 import game.controller.commands.servercommands.*;
 import game.model.*;
@@ -73,6 +74,18 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     public Game getModel() {
         return model;
     }
+
+    public ServerMessage handle(CheckValidWeaponRequst clientMsg){
+        List<CardWeapon> cardWeapon = new ArrayList<>();
+        for(CardWeapon cw : currPlayer.getWeapons()){
+            if(cw.checkweapon(clientMsg.getPlayer())){
+                cardWeapon.add(cw);
+                System.out.println("added" + cw.toString());
+            }
+        }
+        return new OperationCompletedResponse();
+    }
+
 
     public Player getCurrPlayer() {
         return currPlayer;
@@ -226,7 +239,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                     case SHOOT:
                         break;
                 }
-                avaialableActionSteps = currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline());
+                avaialableActionSteps = currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline(),model.isFinalFreazy());
                 return new ChooseSingleActionRequest(avaialableActionSteps);
             } else {
                 return new InvalidActionResponse();
@@ -235,8 +248,8 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         catch(NoResidualActionAvaiableException e){
             return new InsufficientNumberOfActionResponse();
         }
-    }
 
+    }
     @Override
     public ServerMessage handle(GrabActionRequest clientMsg) throws NoCardAmmoAvailableException {
         List<CardWeapon> possibleToGrab = new ArrayList<>();
@@ -248,8 +261,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                 if (!possibleToGrab.isEmpty()) {
                     state = ServerState.HANDLING_GRAB;
                     return new ChooseWeaponToGrabRequest(possibleToGrab);
-                } else
-                {
+                }else{
                     clientHandler.sendMessage(new InsufficientAmmoResponse());
                     return checkTurnEnd();
                 }
@@ -284,14 +296,17 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
             return new ChooseSquareRequest(selectableSquares);
         }
         else{
-            return new InvalidStepResponse();
+            clientHandler.sendMessage(new InvalidStepResponse());
+            return checkTurnEnd();
         }
     }
 
     @Override
     public ServerMessage handle(PickUpAmmoRequest clientMsg) {
-        if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB))
-            return new InvalidStepResponse();
+        if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB)){
+            clientHandler.sendMessage(new InvalidStepResponse());
+            return checkTurnEnd();
+        }
         try{
             currPlayer.pickUpAmmo();
             avaialableActionSteps = model.getCurrentTurn().getActionList();
@@ -331,15 +346,18 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                 return new InvalidPowerUpResponse();
         }
         //This has to be the last check
-        if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB))
-            return new InvalidStepResponse();
+        if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB)){
+            clientHandler.sendMessage(new InvalidStepResponse());
+            return checkTurnEnd();
+        }
         try {
             currPlayer.pickUpWeapon(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup());
             avaialableActionSteps = model.getCurrentTurn().getActionList();
             clientHandler.sendMessage(new PickUpWeaponResponse(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup()));
             return checkTurnEnd();
         }catch (InsufficientAmmoException e){
-            return new InsufficientAmmoResponse();
+            clientHandler.sendMessage(new InsufficientAmmoResponse());
+            return checkTurnEnd();
         }
         catch (NoCardWeaponSpaceException x){
             return new MaxNumberOfWeaponsResponse();
@@ -620,12 +638,12 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
 
     @Override
     public ServerMessage handle(EndTurnRequest endTurnRequest) {
-        List<Player> toBeRespawned = model.changeTurn();
-        for(Player p: toBeRespawned)
-        {
-            p.notifyRespawn();
-        }
-        return new OperationCompletedResponse("Your turn is terminated");
+        if(model.getCurrentTurn().getCurrentPlayer() != currPlayer)
+            return new OperationCompletedResponse("Not your turn!");
+        if(model.getCurrentTurn().getNumOfMovs() > 0 && model.getCurrentTurn().getCurrentAction().equals(Action.MOVEMENT))
+            return checkTurnEnd();
+        clientHandler.sendMessage(new OperationCompletedResponse("You can't stop the action!"));
+        return new ChooseSingleActionRequest(avaialableActionSteps);
     }
 
     @Override

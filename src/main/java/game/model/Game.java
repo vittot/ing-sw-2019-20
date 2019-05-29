@@ -21,13 +21,14 @@ public class Game {
     private List<CardPower> powerWaste;
     private List<CardAmmo> ammoWaste;
     private List<Kill> killBoard;
+    private Player fistPlayerToPlay;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
     private int nPlayerToBeRespawned;
-    
+
 
     static {
         POINTSCOUNT = new ArrayList<>();
@@ -55,6 +56,8 @@ public class Game {
         this(killBoardSize);
         this.id = id;
         this.players = players;
+        currentTurn = new Turn(this.players.get(0),this);
+        this.fistPlayerToPlay = this.players.get(0);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
         readMap(mapId, "mapFile.xml");
@@ -62,6 +65,10 @@ public class Game {
         readAmmoDeck("ammoFile.xml");
         currentTurn = new Turn(this.players.get(0),this);
 
+    }
+
+    public Player getFistPlayerToPlay() {
+        return fistPlayerToPlay;
     }
 
     public Game(List<Player> players, GameMap map, int killBoardSize) {
@@ -189,12 +196,15 @@ public class Game {
     public boolean readDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
+        int id=1;
         try
         {
             document = builder.build(fileName);
             Element root = document.getRootElement();
-            for (Element weapon : root.getChildren("weapon"))
-                addWeapon(weapon);
+            for (Element weapon : root.getChildren("weapon")){
+                addWeapon(weapon,id);
+                id++;
+            }
         } catch (JDOMException e1) {
             e1.printStackTrace();
             //TODO ecc
@@ -245,8 +255,10 @@ public class Game {
         {
             document = builder.build(fileName);
             Element root = document.getRootElement();
-            for (Element powerup : root.getChildren("powerUp"))
+            for (Element powerup : root.getChildren("powerUp")){
                 addPowerUp(powerup);
+                id++;
+            }
         } catch (JDOMException e1) {
             e1.printStackTrace();
             //TODO ecc
@@ -305,7 +317,7 @@ public class Game {
      * Get a Element weapon and build it
      * @param weapon
      */
-    public void addWeapon(Element weapon){
+    public void addWeapon(Element weapon, int id){
         String name = weapon.getChild("name").getText().trim().trim();
         List desc = takeDescription(weapon);
         List names = takeNameEffect(weapon);
@@ -322,6 +334,7 @@ public class Game {
         insertDescription(effect, effectal, effectop, desc, names);
         insertPrice(effect,effectal,effectop,price,priceal,priceop);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
+        wp.setId(id);
         this.deckWeapon.add(wp);
         Collections.shuffle(this.deckWeapon);
     }
@@ -974,6 +987,12 @@ public class Game {
     void notifyPowerUpUse(Player p, CardPower c)
     {
         gameObservers.forEach(o -> o.onPowerUpUse(p,c));
+    }
+
+    public boolean isFinalFreazy(){
+        if(killBoard.size() == killboardSize)
+            return true;
+        return false;
     }
 
     /**

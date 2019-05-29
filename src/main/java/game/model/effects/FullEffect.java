@@ -99,4 +99,7 @@ public class FullEffect implements Serializable {
     public int hashCode() {
         return Objects.hash(simpleEffects, name, description, price, beforeBase);
     }
+
+
+
 }

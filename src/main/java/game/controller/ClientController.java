@@ -92,6 +92,7 @@ public class ClientController implements ServerMessageHandler {
         }
     }
 
+
     /**
      * Ask the player which possible step, contained in the list of the possible move he can make, want to select
      * @param serverMsg

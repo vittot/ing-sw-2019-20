@@ -42,7 +42,7 @@ class TurnTest {
     @Test
     void newAction() throws NoResidualActionAvaiableException {
         turn.setNumOfActions(2);
-        turn.newAction(action,al);
+        turn.newAction(action,al,false);
         assertEquals(actionList,turn.getActionList());
 
     }

@@ -47,4 +47,6 @@ public interface ClientMessageHandler {
     ServerMessage handle(UsePlusEffectResponse usePlusEffectResponse);
 
     ServerMessage handle(TerminateShootAction terminateShootAction);
+
+    ServerMessage handle(CheckValidWeaponRequst clientMsg);
 }

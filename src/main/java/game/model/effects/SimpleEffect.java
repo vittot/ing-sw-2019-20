@@ -72,4 +72,8 @@ public abstract class SimpleEffect implements Serializable {
     public abstract List<Target> searchTarget(Player shooter);
 
     public abstract void applyEffect(Player shooter, List<Target> targets);
+
+    public abstract boolean checkEffect(MovementEffect effect, Player p );
+
+    public abstract boolean checkEffect(SimpleEffect effect, Player p);
 }

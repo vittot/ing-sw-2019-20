@@ -154,6 +154,11 @@ public class PlainDamageEffect extends SimpleEffect {
     }
 
     @Override
+    public boolean checkEffect(MovementEffect effect, Player p) {
+        return false;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -169,5 +174,12 @@ public class PlainDamageEffect extends SimpleEffect {
     @Override
     public int hashCode() {
         return Objects.hash(damage, marks, lastTarget, differentTarget, chainTarget, sameDirection);
+    }
+
+    @Override
+    public boolean checkEffect(SimpleEffect effect, Player p) {
+        if(searchTarget(p) == null)
+            return false;
+        return true;
     }
 }

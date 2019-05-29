@@ -23,6 +23,7 @@ public class ClientTextView implements View {
     private Scanner fromKeyBoard;
     private String user;
     private List<GameMap> availableMaps;
+    private ClientState state;
 
 
     public ClientTextView(){
@@ -119,6 +120,7 @@ public class ClientTextView implements View {
 
     @Override
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
+        state = ClientState.WAITING_SHOOT;
         int n;
         writeText("Choose which of your weapons you want to use:");
         showWeapons(myWeapons,0,true);
@@ -261,13 +263,28 @@ public class ClientTextView implements View {
         Action chosenAction = null;
         String action;
         do{
-            writeText("The action you have selected preview this ordered single step combination, choose the next:");
+            writeText("The action you have selected preview this ordered single step combination, choose the next: (info for player information/power to use Power-Up/exit to stop action)");
             for(Action ac : possibleActions){
                 writeText(ac.name());
             }
             action = readText();
             action = action.toUpperCase();
             try {
+                if(action.toString().equals("EXIT")){
+                    controller.getClient().sendMessage(new EndTurnRequest());
+                    return;
+                }
+
+                if(action.toString().equals("INFO")){
+                    showMap(ClientContext.get().getMap().getGrid());
+                    showMyPlayerInformation();
+                    showPlayerPosition();
+                    chosenAction = null;
+                }
+
+                if(action.toString().equals("POWER"))
+                    controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(ClientContext.get().getMyPlayer().getCardPower())));
+
                 chosenAction = Action.valueOf(action);
             }catch ( NullPointerException f){
                 chosenAction = null;
@@ -277,6 +294,8 @@ public class ClientTextView implements View {
         }while(!possibleActions.contains(chosenAction) || chosenAction == null);
 
         switch (chosenAction){
+            case EXIT:
+                return;
             case GRAB:
                 controller.getClient().sendMessage(new GrabActionRequest());
                 break;
@@ -408,8 +427,17 @@ public class ClientTextView implements View {
     @Override
     public void insufficientAmmoNotification() {
         writeText("Not enough ammo");
+        resumeState();
 
     }
+
+    public void resumeState(){
+        switch(state){
+            case WAITING_GRAB_WEAPON:
+                controller.getClient().sendMessage(new GrabActionRequest());
+        }
+    }
+
     /**
      * Notify invalid targets selection
      */
@@ -420,10 +448,11 @@ public class ClientTextView implements View {
 
     /**
      * Notify invalid step selection
+     * MANAGED
      */
     @Override
     public void invalidStepNotification(){
-        writeText("The step selected is not valid!");
+        writeText("The step selected is not valid, you loose the action!! xd!!1!1!!");
     }
 
     /**
@@ -458,7 +487,7 @@ public class ClientTextView implements View {
     @Override
     public void grabWeaponNotification(int pID, String name, int x, int y){
         if(pID == ClientContext.get().getMyID())
-            writeText("You the weapon "+name+" in position X:"+x+" Y:"+y);
+            writeText("You grab the weapon "+name+" in position X:"+x+" Y:"+y);
         else
             writeText("Player "+ClientContext.get().getMap().getPlayerById(pID).getNickName()+" grab the weapon "+name+" in position X:"+x+" Y:"+y);
 
@@ -672,6 +701,7 @@ public class ClientTextView implements View {
      */
     private CardPower choosePowerUp(List<CardPower> list) {
         int k=0;
+        showMap(ClientContext.get().getMap().getGrid());
         for(int i=1;i<=list.size();i++)
             System.out.println(i+">>>"+list.get(i-1).toString());
         do{
@@ -796,7 +826,7 @@ public class ClientTextView implements View {
         if(ClientContext.get().getMap() != null)
             for(Square sq : ClientContext.get().getMap().getSpawnpoints()){
                 if(sq.getWeapons() != null) {
-                    writeText("In position X: " + sq.getX() + "     Y: " + sq.getY() + " there are:");
+                    writeText("In position X= " + sq.getX() + "  Y= " + sq.getY() + " there are:");
                     for(CardWeapon cw : sq.getWeapons()){
                         printWeapon(cw,0);
                     }
@@ -825,6 +855,8 @@ public class ClientTextView implements View {
         for(Player p : ClientContext.get().getMap().getAllPlayers()) {
             if (p.getId() != ClientContext.get().getMyID()){
                 writeText(checkPlayerColor(p.getColor()) + "Player " + p.getId() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
+                if(p.getDamage().size()==0)
+                    System.out.print("0 damage");
                 for(PlayerColor d : p.getDamage()) {
                     System.out.println(checkPlayerColor(d) + "¤" + ANSI_RESET);
                 }
@@ -856,17 +888,18 @@ public class ClientTextView implements View {
     }
 
     public void chooseWeaponToGrab(List<CardWeapon> weapons){
+        state = ClientState.WAITING_GRAB_WEAPON;
         int i=1;
         int choiceWG = 0;
         int choiceWD = -1;
         CardWeapon wG;
         CardWeapon wD = null;
+        String input;
         char t = 'Y';
         List<CardPower> toUse;
         Player myP = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         //Choose which weapon to grab
         writeText("Choose one weapon to grab between the possible: ");
-        for (CardWeapon wp : weapons)
             showWeapons(weapons,1, true);
         do{
             choiceWG = readInt();
@@ -876,7 +909,8 @@ public class ClientTextView implements View {
         if(myP.getWeapons().size()==3) {
             writeText("You already have 3 weapons, do you want to discard one of them to grab the new one ([Y]es, [N]o)?");
             do {
-                t = readChar();
+                input = readText();
+                t = input.charAt(0);
             } while (t != 'Y' || t != 'N' || t != 'y' || t != 'n');
             if (t == 'Y' || t == 'y') {
                 i = 1;
@@ -897,13 +931,15 @@ public class ClientTextView implements View {
 
     private List<CardPower> powerUpSelection()
     {
+        String input;
         List<CardPower> toUse = null;
         char t;
         int i;
         Player myP = ClientContext.get().getMyPlayer();
         writeText("Do you want to use some of your power-up to pay ([Y]es, [N]o)?");
         do{
-            t = readChar();
+            input = readText();
+            t = input.charAt(0);
         }while(t != 'Y' && t != 'N' && t != 'y' && t != 'n');
         if(t == 'Y' || t == 'y')
         {
@@ -936,7 +972,7 @@ public class ClientTextView implements View {
     {
         writeText(cw.getName());
         System.out.print("       Cost: ");
-        if(cw.getPrice().size() == 1)
+        if(cw.getPrice().size() == 1 && p==1)
             System.out.print("Free");
         else
             for(Color c : cw.getPrice().subList(p,cw.getPrice().size()))
@@ -953,7 +989,7 @@ public class ClientTextView implements View {
      * @param numeric
      */
     public void showWeapons(List<CardWeapon> cws, int p, boolean numeric) {
-        int i = 0;
+        int i = 1;
         if(numeric){
             for (CardWeapon cw : cws){
                 System.out.print(i + " ");
@@ -961,10 +997,11 @@ public class ClientTextView implements View {
                 printWeapon(cw,p);
             }
         }
-        else
+        else {
             for (CardWeapon cw : cws) {
                 printWeapon(cw, p);
             }
+        }
 
 
     }

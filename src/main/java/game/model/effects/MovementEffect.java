@@ -124,9 +124,12 @@ public class MovementEffect extends SimpleEffect {
 
             targets.remove(shooter);
         }
+
         List<Target> retList = new ArrayList<>();
-        for(Player p: targets)
-            retList.add(p);
+        for(Player p: targets){
+            if(selectPosition(p) != null)
+                retList.add(p);
+        }
         return retList;
     }
 
@@ -188,6 +191,16 @@ public class MovementEffect extends SimpleEffect {
     @Override
     public void applyEffect(Player player, List<Target> targets){
         player.move((Square)targets.get(0));
+    }
+
+    @Override
+    public boolean checkEffect(MovementEffect effect, Player p) {
+        return searchTarget(p)==null;
+    }
+
+    @Override
+    public boolean checkEffect(SimpleEffect effect, Player p) {
+        return false;
     }
 
     @Override

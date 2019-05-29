@@ -502,7 +502,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>Tarctor Beam</name>
+        <name>Tractor Beam</name>
 
         <effectDescription>
             <name>
@@ -1021,7 +1021,7 @@
                 <maxEnemy>1</maxEnemy>
                 <minDist>1</minDist>
                 <maxDist>1</maxDist>
-                <targetVisib>Visible</targetVisib>
+                <targetVisib>Direction</targetVisib>
                 <damage>1</damage>
                 <marks>0</marks>
                 <lastTarget>false</lastTarget>
@@ -1035,7 +1035,7 @@
                 <maxEnemy>1</maxEnemy>
                 <minDist>1</minDist>
                 <maxDist>1</maxDist>
-                <targetVisib>Visible</targetVisib>
+                <targetVisib>Direction</targetVisib>
                 <damage>1</damage>
                 <marks>0</marks>
                 <lastTarget>false</lastTarget>
@@ -1077,7 +1077,7 @@
         </plusOrder>
     </weapon>
     <weapon>
-        <name>Grenade </name>
+        <name>Grenade Launcher</name>
 
         <effectDescription>
             <name>
@@ -1354,7 +1354,7 @@
                 <maxEnemy>1</maxEnemy>
                 <minDist>0</minDist>
                 <maxDist>12</maxDist>
-                <targetVisib>Everywhere</targetVisib>
+                <targetVisib>Direction</targetVisib>
                 <damage>3</damage>
                 <marks>0</marks>
                 <lastTarget>false</lastTarget>
@@ -1370,7 +1370,7 @@
                 <maxEnemy>1</maxEnemy>
                 <minDist>0</minDist>
                 <maxDist>12</maxDist>
-                <targetVisib>Everywhere</targetVisib>
+                <targetVisib>Direction</targetVisib>
                 <damage>2</damage>
                 <marks>0</marks>
                 <lastTarget>false</lastTarget>
@@ -1383,7 +1383,7 @@
                 <maxEnemy>1</maxEnemy>
                 <minDist>0</minDist>
                 <maxDist>12</maxDist>
-                <targetVisib>Everywhere</targetVisib>
+                <targetVisib>Direction</targetVisib>
                 <damage>2</damage>
                 <marks>0</marks>
                 <lastTarget>false</lastTarget>

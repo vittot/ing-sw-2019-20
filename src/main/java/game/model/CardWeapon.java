@@ -1,6 +1,7 @@
 package game.model;
 
 import game.model.effects.FullEffect;
+import game.model.effects.SimpleEffect;
 import game.model.exceptions.InsufficientAmmoException;
 
 
@@ -192,5 +193,24 @@ public class CardWeapon implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, name);
+    }
+
+    //TODO it doesnt check player dist 2 not visible
+    public boolean checkweapon(Player p){
+        List<Square> squaretmp = new ArrayList<>();
+        if (this.plusBeforeBase)
+            return true;
+        if(this.getBaseEffect().getSimpleEffect(0).searchTarget(p) != null){
+            return true;
+        }
+        if(this.getName().equals("VORTEX CANNON")){
+            for(Target tg : this.getBaseEffect().getSimpleEffect(0).searchTarget(p))
+                squaretmp.add((Square) tg);
+            for(Square sq : squaretmp){
+                if(!sq.getVisiblePlayers(1,2).isEmpty())
+                    return true;
+            }
+        }
+        return false;
     }
 }

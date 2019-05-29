@@ -13,6 +13,8 @@ public class Turn {
     private Action currentAction;   //TODO a cosa serve?
     private List <Action> actionList;
     private Game game;
+    private boolean afterFirstPlayer = false;
+    private List <Player> lastTurnPlayed;
 
     public Turn(Player currentPlayer, Game game)
     {
@@ -71,8 +73,20 @@ public class Turn {
     public void newTurn(Player player, boolean finalFrezy){
         
         currentPlayer = player;
-        if (finalFrezy) {
+
+        if(finalFrezy && player.equals(game.getFistPlayerToPlay())){
+            this.afterFirstPlayer = true;
+        }
+        if(afterFirstPlayer)
+            lastTurnPlayed.add(player);
+
+        if (finalFrezy && afterFirstPlayer) {
             numOfMovs = 0;
+            numOfActions = 1;
+        }
+        if(finalFrezy && !afterFirstPlayer){
+            numOfMovs = 0;
+            numOfActions = 2;
         }
         numOfActions = 2;
         numOfMovs = 0;
@@ -93,6 +107,8 @@ public class Turn {
         int i = 0;
         currentPlayer.rifleActualWeapon();
         game.getPlayers().forEach(Player::updateMarks);
+        if(ac.equals(Action.MOVEMENT))
+            this.numOfMovs++;
         if(this.actionList.contains(ac)){
             i = actionList.indexOf(ac);
             setActionList(actionList.subList(i+1,actionList.size()));
@@ -106,40 +122,79 @@ public class Turn {
      * @param action
      * @param adrenaline
      */
-    public List<Action> newAction(Action action, AdrenalineLevel adrenaline) throws NoResidualActionAvaiableException {
+    public List<Action> newAction(Action action, AdrenalineLevel adrenaline, boolean finalFreazy) throws NoResidualActionAvaiableException {
         actionList.clear();
+        currentAction = action;
 
         if (numOfActions == 0){
             throw new NoResidualActionAvaiableException();
         }
         numOfActions = numOfActions - 1;
-        switch (action){
-            case GRAB:
-                if (adrenaline == AdrenalineLevel.GRABLEVEL || adrenaline == AdrenalineLevel.SHOOTLEVEL){
-                            actionList.add(Action.MOVEMENT);
-                            actionList.add(Action.MOVEMENT);
-                            actionList.add(Action.GRAB);
+        if(finalFreazy) {
+            if (this.lastTurnPlayed.contains(currentPlayer)){
+                switch (action) {
+                    case GRAB:
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.GRAB);
+                        break;
+                    case SHOOT:
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.RELOAD);
+                        actionList.add(Action.SHOOT);
+                        break;
+                }
+            }else {
+                switch (action) {
+                    case GRAB:
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.GRAB);
+                        break;
+                    case SHOOT:
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.RELOAD);
+                        actionList.add(Action.SHOOT);
+                        break;
+                    case MOVEMENT:
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.MOVEMENT);
+                        break;
+                }
+            }
+        }
+        else {
+            switch (action) {
+                case GRAB:
+                    if (adrenaline == AdrenalineLevel.GRABLEVEL || adrenaline == AdrenalineLevel.SHOOTLEVEL) {
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.GRAB);
 
-                }
-                else{
-                    actionList.add(Action.MOVEMENT);
-                    actionList.add(Action.GRAB);
-                }
-                break;
+                    } else {
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.GRAB);
+                    }
+                    break;
 
-            case SHOOT:
-                if(adrenaline == AdrenalineLevel.SHOOTLEVEL){
+                case SHOOT:
+                    if (adrenaline == AdrenalineLevel.SHOOTLEVEL) {
+                        actionList.add(Action.MOVEMENT);
+                        actionList.add(Action.SHOOT);
+                    } else {
+                        actionList.add(Action.SHOOT);
+                    }
+                    break;
+                case MOVEMENT:
                     actionList.add(Action.MOVEMENT);
-                    actionList.add(Action.GRAB);
-                }
-                else{
-                    actionList.add(Action.GRAB);
-                }
-                break;
-            case MOVEMENT:
-                actionList.add(Action.MOVEMENT);
-                actionList.add(Action.MOVEMENT);
-                actionList.add(Action.MOVEMENT);
+                    actionList.add(Action.MOVEMENT);
+                    actionList.add(Action.MOVEMENT);
+            }
+            return actionList;
         }
         return actionList;
     }

@@ -434,6 +434,7 @@ public class Player implements Target, Serializable {
                 this.position.getWeapons().add(weaponToWaste);
                 this.weapons.remove(weaponToWaste);
             }
+            game.notifyGrabWeapon(this,weapon);
             return;
         }
 

@@ -123,6 +123,16 @@ public class SquareDamageEffect extends SimpleEffect {
     }
 
     @Override
+    public boolean checkEffect(MovementEffect effect, Player p) {
+        return false;
+    }
+
+    @Override
+    public boolean checkEffect(SimpleEffect effect, Player p) {
+        return searchTarget(p)==null;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
