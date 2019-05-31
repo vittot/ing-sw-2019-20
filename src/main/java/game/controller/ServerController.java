@@ -68,7 +68,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         this.currPlayer.addAmmo(Color.BLUE);
         this.currPlayer.addAmmo(Color.YELLOW);
         this.currPlayer.addAmmo(Color.RED);
-        this.model.addNewPlayer(this.currPlayer);
     }
 
     public Game getModel() {
@@ -121,11 +120,13 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
 
     }
 
-    private void endTurnManagement()
+    void endTurnManagement()
     {
         //state
         List<Player> toBeRespawned = model.changeTurn();
         toBeRespawned.forEach(p -> p.notifyRespawn());
+        if(model.getnPlayerToBeRespawned() == 0)
+            model.getCurrentTurn().newTurn(false); //TODO: check final frezy
     }
 
     /**
@@ -282,7 +283,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
             }
         }
         clientHandler.sendMessage(new InvalidGrabPositionResponse());
-        //TODO: if he can't grab what should we do? Now we end the action
         return checkTurnEnd();
     }
 
@@ -379,8 +379,8 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                 }
             }
             endTurnManagement();
-            if(model.getnPlayerToBeRespawned() == 0)
-                model.getCurrentTurn().newTurn(false); //TODO: check final frezy
+            //if(model.getnPlayerToBeRespawned() == 0)
+            //    model.getCurrentTurn().newTurn(false); //TODO: check final frezy
             if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer()))
                 return new ChooseTurnActionRequest();
             else
@@ -457,6 +457,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                 model.addPowerWaste(clientMsg.getPowerUp());
                 if (state == ServerState.WAITING_SPAWN && model.getCurrentTurn().getCurrentPlayer().equals(currPlayer)) {
                     state = ServerState.WAITING_ACTION;
+                    model.getCurrentTurn().startTimer();
                     return new ChooseTurnActionRequest();
                 }
                 else if(state == ServerState.WAITING_RESPAWN)
@@ -655,6 +656,53 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     public ServerMessage handle(ChoosePowerUpResponse choosePowerUpResponse) {
         //TODO later
         return null;
+    }
+
+    @Override
+    public ServerMessage handle(LoginMessage loginMessage) {
+        if(GameManager.get().getUsersLogged().contains(loginMessage.getNickname()))
+            return new UserAlreadyLoggedResponse();
+
+        if(GameManager.get().getUsersSuspended().contains(loginMessage.getNickname()))
+        {
+            model = GameManager.get().getNameOfSuspendedUser(loginMessage.getNickname());
+            List<String> otherPlayerNames = model.getMap().getAllPlayers().stream().filter(p -> !p.isSuspended()).map(Player::getNickName).collect(Collectors.toList());
+
+            return new RejoinGameRequest(otherPlayerNames);
+        }
+
+        GameManager.get().addLoggedUser(loginMessage.getNickname());
+        return new UserLoggedResponse();
+    }
+
+    /**
+     * Handle the rejoin game response, rejoining the user to its old game if he accepted, otherwise simply logging it on the server
+     * @param rejoinGameResponse
+     * @return
+     */
+    @Override
+    public ServerMessage handle(RejoinGameResponse rejoinGameResponse) {
+        boolean rejoin = rejoinGameResponse.isRejoin();
+        if(rejoin)
+        {
+            int id = 0;
+            model.addGameListener(this.clientHandler);
+            Player p = model.getPlayers().stream().filter(pl -> pl.getNickName().equals(rejoinGameResponse.getUser())).findFirst().orElse(null);
+            if(p!=null){
+                this.currPlayer = p;
+                p.setPlayerObserver(this);
+                p.setSerializeEverything(true);
+                id = p.getId();
+            }
+            this.state = ServerState.WAITING_TURN;
+            GameManager.get().rejoinUser(rejoinGameResponse.getUser());
+            return new RejoinGameConfirm(model.getMap(),model.getPlayers(),id);
+        }
+        else
+        {
+            GameManager.get().addLoggedUser(rejoinGameResponse.getUser());
+            return new UserLoggedResponse();
+        }
     }
 
     @Override
@@ -873,5 +921,18 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
             clientHandler.sendMessage(new RespawnRequest(cp));
         }
 
+    }
+
+    /**
+     * When the player is suspended from the game end the current turn if it's his turn and eventually notify him if the suspension is caused by a timeout (and not by a connection error)
+     * @param timeOut
+     */
+    @Override
+    public void onSuspend(boolean timeOut) {
+
+        if(model.getCurrentTurn().getCurrentPlayer().equals(this.currPlayer))
+            endTurnManagement();
+        if(timeOut)
+            clientHandler.sendMessage(new TimeOutNotify());
     }
 }

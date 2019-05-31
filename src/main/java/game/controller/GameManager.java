@@ -4,8 +4,7 @@ import game.model.Game;
 import game.model.GameMap;
 import game.model.Player;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Menage the different games currently running on the Server
@@ -17,10 +16,15 @@ public class GameManager {
     private List<Game> games;
     private List<WaitingRoom> waitingRooms;
     private List<GameMap> availableMaps;
+    private List<String> usersLogged;
+    private Map<String,Game> usersSuspended;
+
 
     private GameManager(){
         nextId = 1;
         games = new ArrayList<>();
+        usersLogged = new ArrayList<>();
+        usersSuspended = new HashMap<>();
         availableMaps = Game.getAvailableMaps();
         waitingRooms = new ArrayList<>();
     }
@@ -36,6 +40,36 @@ public class GameManager {
     public GameMap getMap(int mapId)
     {
         return availableMaps.get(mapId);
+    }
+
+    public void addLoggedUser(String user)
+    {
+        usersLogged.add(user);
+    }
+
+    public void suspendPlayer(Player player)
+    {
+        usersLogged.remove(player.getNickName());
+        usersSuspended.put(player.getNickName(),player.getGame());
+    }
+
+    /**
+     * Rejoin a user previously suspended to its old game
+     * @param user
+     */
+    public void rejoinUser(String user)
+    {
+        Game g = usersSuspended.remove(user);
+        g.rejoinUser(user);
+        usersLogged.add(user);
+    }
+
+    public List<String> getUsersLogged() {
+        return usersLogged;
+    }
+
+    public Set<String> getUsersSuspended() {
+        return usersSuspended.keySet();
     }
 
     /**
@@ -85,5 +119,14 @@ public class GameManager {
     public WaitingRoom addWaitingRoom(int mapId, int numWaitingPlayers) {
         waitingRooms.add(new WaitingRoom(waitingRooms.size()+1,mapId, numWaitingPlayers));
         return waitingRooms.get(waitingRooms.size()-1);
+    }
+
+    /**
+     * Return the game in which was involveed a suspender user
+     * @param nickname
+     * @return
+     */
+    public Game getNameOfSuspendedUser(String nickname) {
+        return usersSuspended.get(nickname);
     }
 }

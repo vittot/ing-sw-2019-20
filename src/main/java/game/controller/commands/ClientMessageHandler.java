@@ -36,6 +36,10 @@ public interface ClientMessageHandler {
 
     ServerMessage handle(ChoosePowerUpResponse choosePowerUpResponse);
 
+    ServerMessage handle(LoginMessage loginMessage);
+
+    ServerMessage handle(RejoinGameResponse rejoinGameResponse);
+
     ServerMessage handle(ChooseWeaponToShootResponse chooseWeaponToShootResponse);
 
     ServerMessage handle(ChooseFirstEffectResponse chooseFirstEffectResponse);

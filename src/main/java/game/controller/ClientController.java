@@ -58,7 +58,6 @@ public class ClientController implements ServerMessageHandler {
     public void run() throws IOException {
         clientView.setUserNamePhase();
         this.start();
-        //TODO: launch various phases on the view
 
     }
 
@@ -91,7 +90,6 @@ public class ClientController implements ServerMessageHandler {
             }
         }
     }
-
 
     /**
      * Ask the player which possible step, contained in the list of the possible move he can make, want to select
@@ -304,10 +302,8 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(RespawnRequest serverMsg) {
-        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == ClientContext.get().getMyID()).findFirst().orElse(null);
-        if(p == null){
-            p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
-        }
+        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == ClientContext.get().getMyID()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()));
+
         p.addCardPower(serverMsg.getcPU());
         clientView.choosePowerUpToRespawn(p.getCardPower());
     }
@@ -429,10 +425,7 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyRespawn notifyRespawn) {
 
-        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyRespawn.getpId()).findFirst().orElse(null);
-        if(p == null){
-            p = ClientContext.get().getMap().getPlayerById(notifyRespawn.getpId());
-        }
+        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyRespawn.getpId()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(notifyRespawn.getpId()));
 
         try {
             ClientContext.get().getMap().movePlayer(p,notifyRespawn.getX(),notifyRespawn.getY());
@@ -468,6 +461,49 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(ReloadWeaponAsk reloadWeaponAsk) {
         clientView.reloadWeaponPhase(reloadWeaponAsk.getWeaponsToReload());
+    }
+
+    @Override
+    public void handle(NotifyPlayerSuspend notifyPlayerSuspend) {
+        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyPlayerSuspend.getpId()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(notifyPlayerSuspend.getpId()));
+        p.setSuspended(true);
+        clientView.notifyPlayerSuspended(p);
+    }
+
+    @Override
+    public void handle(TimeOutNotify timeOutNotify) {
+        clientView.timeOutPhase();
+    }
+
+    @Override
+    public void handle(UserAlreadyLoggedResponse userAlreadyLoggedResponse) {
+        clientView.alreadyLoggedPhase();
+    }
+
+    @Override
+    public void handle(UserLoggedResponse userLoggedResponse) {
+        clientView.loginCompletedPhase();
+    }
+
+    @Override
+    public void handle(RejoinGameRequest rejoinGameRequest) {
+        clientView.rejoinGamePhase(rejoinGameRequest.getOtherPlayerNames());
+    }
+
+    @Override
+    public void handle(NotifyPlayerRejoin notifyPlayerRejoin) {
+        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyPlayerRejoin.getPlayerId()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(notifyPlayerRejoin.getPlayerId()));
+        p.setSuspended(false);
+        clientView.notifyPlayerRejoin(p);
+    }
+
+    @Override
+    public void handle(RejoinGameConfirm rejoinGameConfirm) {
+        ClientContext.get().setMap(rejoinGameConfirm.getMap());
+        if(rejoinGameConfirm.getId() != 0)
+            ClientContext.get().setMyID(rejoinGameConfirm.getId());
+        ClientContext.get().setPlayersInWaiting(rejoinGameConfirm.getPlayers());
+        clientView.rejoinGameConfirm();
     }
 
     @Override

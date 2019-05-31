@@ -4,6 +4,8 @@ import game.model.exceptions.NoResidualActionAvaiableException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class Turn {
@@ -13,6 +15,7 @@ public class Turn {
     private Action currentAction;   //TODO a cosa serve?
     private List <Action> actionList;
     private Game game;
+    private Timer timer;
     private boolean afterFirstPlayer = false;
     private List <Player> lastTurnPlayed;
 
@@ -21,7 +24,6 @@ public class Turn {
         this.currentPlayer = currentPlayer;
         this.game = game;
         actionList = new ArrayList<>();
-        this.currentPlayer = currentPlayer;
         numOfActions = 2;
     }
 
@@ -91,11 +93,29 @@ public class Turn {
         numOfActions = 2;
         numOfMovs = 0;
         game.notifyTurnChange(currentPlayer);
+        startTimer();
+    }
+
+    public void startTimer()
+    {
+        timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                currentPlayer.suspend(true);
+            }
+        };
+        timer.schedule(task,Game.TIME_FOR_ACTION);
     }
 
     public void newTurn(boolean finalFrezy)
     {
         newTurn(currentPlayer,finalFrezy);
+    }
+
+    public void stopTimer()
+    {
+        timer.cancel();
     }
 
     /**
@@ -104,6 +124,7 @@ public class Turn {
      * @return
      */
     public boolean applyStep(Action ac){
+        timer.cancel();
         int i = 0;
         currentPlayer.rifleActualWeapon();
         game.getPlayers().forEach(Player::updateMarks);
@@ -112,8 +133,10 @@ public class Turn {
         if(this.actionList.contains(ac)){
             i = actionList.indexOf(ac);
             setActionList(actionList.subList(i+1,actionList.size()));
+            startTimer();
             return true;
         }
+        startTimer();
         return false;
     }
 

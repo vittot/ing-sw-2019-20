@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,13 +38,14 @@ public class SocketClientHandler implements Runnable, GameListener {
      * @param msg
      */
     public void sendMessage(ServerMessage msg) {
-        try{
-            outStream.writeObject(msg);
-            outStream.reset();
-        }catch(IOException e)
-        {
-            e.printStackTrace();
-        }
+        if(controller.getCurrPlayer() == null || !controller.getCurrPlayer().isSuspended())
+            try{
+                outStream.writeObject(msg);
+                outStream.reset();
+            }catch(IOException e)
+            {
+                e.printStackTrace();
+            }
     }
 
 
@@ -63,7 +65,13 @@ public class SocketClientHandler implements Runnable, GameListener {
             } while (!stop);
             close();
 
-        } catch (Exception e) {
+        }
+        catch(SocketException e)
+        {
+            controller.getModel().removeGameListener(this);
+            controller.getCurrPlayer().suspend(false);
+        }
+        catch (Exception e) {
             //TODO: handle exception
             e.printStackTrace();
         }
@@ -158,5 +166,19 @@ public class SocketClientHandler implements Runnable, GameListener {
     @Override
     public void onPowerUpUse(Player p, CardPower c) {
         sendMessage(new NotifyPowerUpUsage(p.getId(),c));
+    }
+
+    @Override
+    public void onPlayerSuspend(Player p) {
+        if(!controller.getCurrPlayer().equals(p)){
+            sendMessage(new NotifyPlayerSuspend(p.getId()));
+        }
+    }
+
+    @Override
+    public void onPlayerRejoined(Player player) {
+        if(!controller.getCurrPlayer().equals(player)){
+            sendMessage(new NotifyPlayerRejoin(player.getId()));
+        }
     }
 }

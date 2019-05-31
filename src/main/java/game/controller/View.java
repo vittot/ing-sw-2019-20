@@ -68,6 +68,8 @@ public interface View {
 
     void chooseWeaponToGrab(List<CardWeapon> weapons);
 
+    void rejoinGamePhase(List<String> otherPlayers);
+
     void chooseRoomPhase(List<WaitingRoom> waitingRooms);
 
     void showMapsPhase(List<GameMap> availableMaps);
@@ -85,4 +87,16 @@ public interface View {
     void usePlusInOrder(List<FullEffect> plusEffects, int i);
 
     void choosePlusEffect(List<FullEffect> plusEffects);
+
+    void notifyPlayerSuspended(Player p);
+
+    void timeOutPhase();
+
+    void alreadyLoggedPhase();
+
+    void loginCompletedPhase();
+
+    void rejoinGameConfirm();
+
+    void notifyPlayerRejoin(Player p);
 }

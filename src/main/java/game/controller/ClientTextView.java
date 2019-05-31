@@ -21,7 +21,6 @@ public class ClientTextView implements View {
     private static final String ANSI_GREY = "\u001b[37m";
     private ClientController controller;
     private Scanner fromKeyBoard;
-    private String user;
     private List<GameMap> availableMaps;
     private ClientState state;
 
@@ -71,12 +70,11 @@ public class ClientTextView implements View {
     public void setUserNamePhase (){
         do {
             writeText("Provide username:");
-            this.user = readText();
-        } while ( this.user == null);
+            ClientContext.get().setUser(readText());
+        } while (  ClientContext.get().getUser() == null);
 
-        writeText("Welcome, " + this.user + ", good luck!");
-
-        controller.getClient().sendMessage(new GetAvailableMapsRequest());
+        writeText("Wait for login...");
+        controller.getClient().sendMessage(new LoginMessage(ClientContext.get().getUser()));
     }
 
     /**
@@ -116,6 +114,54 @@ public class ClientTextView implements View {
     @Override
     public void showReloadMessage(CardWeapon cW) {
         writeText("The weapon " + cW.getName() + " has been correctly reloaded");
+    }
+
+    @Override
+    public void notifyPlayerSuspended(Player p) {
+        writeText("Player " + p.getNickName() +  " has been suspended from the game because of connection lost");
+    }
+
+    @Override
+    public void timeOutPhase() {
+        writeText("You timed out and you have been kicked out!");
+    }
+
+    @Override
+    public void alreadyLoggedPhase() {
+        writeText("There is already a user logged with this name on the server! Choose another name:");
+        setUserNamePhase();
+    }
+
+    @Override
+    public void loginCompletedPhase() {
+        writeText("You correctly logged in!");
+        controller.getClient().sendMessage(new GetAvailableMapsRequest());
+    }
+
+    @Override
+    public void rejoinGameConfirm() {
+        writeText("You successfully rejoin your previous game! Now wait for your turn..");
+    }
+
+    @Override
+    public void notifyPlayerRejoin(Player p) {
+        writeText("Player " + p.getNickName() + " has rejoined the game!");
+    }
+
+    @Override
+    public void rejoinGamePhase(List<String> otherPlayers) {
+        char choice;
+        boolean rejoin;
+        writeText("Hi " + ClientContext.get().getUser() + ", welcome back! We have found on the server a game which is currently running where you where previously playing. This are the players actually connected in this game:");
+        otherPlayers.forEach(this::writeText);
+        do{
+            writeText("Do you want to rejoin this game? [Y/N]:");
+            choice = readChar();
+        }while(choice != 'Y' && choice != 'y' && choice != 'n' && choice != 'N');
+
+        rejoin = choice == 'Y' || choice == 'y';
+        controller.getClient().sendMessage(new RejoinGameResponse(rejoin,ClientContext.get().getUser()));
+
     }
 
     @Override
@@ -229,7 +275,7 @@ public class ClientTextView implements View {
         }while((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1);
         if(nRoom != -1)
         {
-            controller.getClient().sendMessage(new JoinWaitingRoomRequest(nRoom,user));
+            controller.getClient().sendMessage(new JoinWaitingRoomRequest(nRoom,ClientContext.get().getUser()));
         }
         else
             createRoomPhase();
@@ -252,7 +298,7 @@ public class ClientTextView implements View {
             nPlayer = readInt();
         }while(nPlayer < 3 || nPlayer > 5);
 
-        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,user));
+        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,ClientContext.get().getUser()));
     }
 
     /**

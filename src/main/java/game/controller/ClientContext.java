@@ -15,6 +15,7 @@ public class ClientContext {
 
     private GameMap map;
     private int myID;
+    private String user;
     private List<Kill> killboard;
     private SimpleEffect currentEffect;
     private List<Player> playersInWaiting;
@@ -32,6 +33,14 @@ public class ClientContext {
         }
 
         return instance;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public Player getMyPlayer(){

@@ -1,5 +1,6 @@
 package game.model;
 
+import game.controller.GameManager;
 import game.controller.PlayerObserver;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
@@ -35,6 +36,7 @@ public class Player implements Target, Serializable {
     private static final int MARKS_PER_ENEMY=3;
     private boolean serializeEverything;
     private transient PlayerObserver playerObserver;
+    private boolean suspended;
 
     public Player(int id, PlayerColor color)
     {
@@ -51,19 +53,17 @@ public class Player implements Target, Serializable {
         this.weapons = new ArrayList<>();
         this.cardPower = new ArrayList<>();
         this.ammo = new ArrayList<>();
+        this.suspended = false;
     }
 
     public Player(int id, PlayerColor color, String nick)
     {
         this(id,color);
         this.nickName = nick;
-        this.cardPower = new ArrayList<>();
-        this.ammo = new ArrayList<>();
-        this.marks = new ArrayList<>();
-        this.thisTurnMarks = new ArrayList<>();
-        this.damage = new ArrayList<>();
-        this.serializeEverything = false;
-        this.weapons = new ArrayList<>();
+    }
+
+    public boolean isSuspended() {
+        return suspended;
     }
 
     public void setPlayerObserver(PlayerObserver playerObserver) {
@@ -76,7 +76,10 @@ public class Player implements Target, Serializable {
 
     public void setSerializeEverything(boolean serializeEverything) {
         this.serializeEverything = serializeEverything;
-        this.weapons = new ArrayList<>();
+    }
+
+    public void setSuspended(boolean suspended) {
+        this.suspended = suspended;
     }
 
     public String getNickName() {
@@ -224,6 +227,7 @@ public class Player implements Target, Serializable {
         this.damage.clear();
         this.adrenaline = AdrenalineLevel.NONE;
         this.position = game.getMap().respawnColor(discard.getMapColor());
+        this.position.addPlayer(this);
         this.isDead = false;
         game.notifyRespawn(this);
     }
@@ -276,7 +280,7 @@ public class Player implements Target, Serializable {
             lastKill = game.getLastKill(this);
             lastKill.setRage(true);
         }
-        //game.notifyDamage(this,shooter,damage);
+        game.notifyDamage(this,shooter,damage);
 
     }
 
@@ -434,7 +438,8 @@ public class Player implements Target, Serializable {
                 this.position.getWeapons().add(weaponToWaste);
                 this.weapons.remove(weaponToWaste);
             }
-            game.notifyGrabWeapon(this,weapon);
+            if(game != null)
+                game.notifyGrabWeapon(this,weapon);
             return;
         }
 
@@ -577,6 +582,9 @@ public class Player implements Target, Serializable {
             weapons = (List<CardWeapon>)ois.readObject();
             points = ois.readInt();
         }
+        else{
+            weapons = new ArrayList<>();
+        }
     }
 
     /**
@@ -627,5 +635,25 @@ public class Player implements Target, Serializable {
         if(toReload.isEmpty())
             return null;
         return toReload;
+    }
+
+    /**
+     * Suspend the player and notify the other players
+     */
+    public void suspend(boolean timeOut)
+    {
+        this.suspended = true;
+        GameManager.get().suspendPlayer(this);
+
+        if(!timeOut)
+            this.game.getCurrentTurn().stopTimer();
+        this.game.notifyPlayerSuspended(this);
+        this.playerObserver.onSuspend(timeOut);
+    }
+
+    public void rejoin()
+    {
+        this.suspended = false;
+        this.game.notifyPlayerRejoined(this);
     }
 }

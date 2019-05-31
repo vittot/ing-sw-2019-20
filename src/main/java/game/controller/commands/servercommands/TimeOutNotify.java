@@ -1,0 +1,13 @@
+package game.controller.commands.servercommands;
+
+import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerMessageHandler;
+import game.model.exceptions.MapOutOfLimitException;
+
+public class TimeOutNotify implements ServerMessage {
+
+    @Override
+    public void handle(ServerMessageHandler handler) throws MapOutOfLimitException {
+        handler.handle(this);
+    }
+}

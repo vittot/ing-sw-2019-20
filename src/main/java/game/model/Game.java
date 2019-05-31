@@ -24,6 +24,7 @@ public class Game {
     private Player fistPlayerToPlay;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
+    public static int TIME_FOR_ACTION = 1000000; //TODO: read from config file
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
@@ -868,11 +869,13 @@ public class Game {
      */
     public List<Player> changeTurn (){
         int num;
-        num = players.indexOf(currentTurn.getCurrentPlayer());
-        if(num + 1 == players.size()){
-            currentTurn.setCurrentPlayer(players.get(0));
-        }else
-            currentTurn.setCurrentPlayer(players.get(num+1));
+        do {
+            num = players.indexOf(currentTurn.getCurrentPlayer());
+            if (num + 1 == players.size()) {
+                currentTurn.setCurrentPlayer(players.get(0));
+            } else
+                currentTurn.setCurrentPlayer(players.get(num + 1));
+        }while(currentTurn.getCurrentPlayer().isSuspended());
         List<Player> toBeRespawned  = checkRespawn();
         this.nPlayerToBeRespawned = toBeRespawned.size();
         return toBeRespawned;
@@ -892,7 +895,7 @@ public class Game {
     public List<Player> checkRespawn() {
         List<Player> toRespawn = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).isDead()) {
+            if (players.get(i).isDead() && !players.get(i).isSuspended()) {
                 updatePoints(players.get(i));
                 toRespawn.add(players.get(i));
             }
@@ -934,6 +937,11 @@ public class Game {
     public void addGameListener(GameListener gl)
     {
         this.gameObservers.add(gl);
+    }
+
+    public void removeGameListener(GameListener gl)
+    {
+        this.gameObservers.remove(gl);
     }
 
     void notifyDamage(Player hit, Player attacker, int damage){
@@ -1003,5 +1011,30 @@ public class Game {
     {
         gameObservers.forEach( o -> o.onChangeTurn(p));
         p.notifyTurn();
+    }
+
+    /**
+     * Notify all players that a player has been suspended from the game
+     * @param p - Player suspended
+     */
+    void notifyPlayerSuspended(Player p) {
+        gameObservers.forEach( o -> o.onPlayerSuspend(p));
+    }
+
+
+    public void rejoinUser(String user)
+    {
+        for(Player p : this.getPlayers())
+        {
+            if(p.getNickName().equals(user))
+            {
+                p.rejoin();
+                //return;
+            }
+        }
+    }
+
+    public void notifyPlayerRejoined(Player player) {
+        gameObservers.forEach(o -> o.onPlayerRejoined(player));
     }
 }

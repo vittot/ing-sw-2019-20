@@ -42,6 +42,13 @@ public interface ServerMessageHandler {
     void handle(CreateWaitingRoomResponse createWaitingRoomResponse);
     void handle(ChooseWeaponToGrabRequest chooseWeaponToGrabRequest);
     void handle(ReloadWeaponAsk reloadWeaponAsk);
+    void handle(NotifyPlayerSuspend notifyPlayerSuspend);
+    void handle(TimeOutNotify timeOutNotify);
+    void handle(UserAlreadyLoggedResponse userAlreadyLoggedResponse);
+    void handle(UserLoggedResponse userLoggedResponse);
+    void handle(RejoinGameRequest rejoinGameRequest);
+    void handle(NotifyPlayerRejoin notifyPlayerRejoin);
+    void handle(RejoinGameConfirm rejoinGameConfirm);
     void handle(ChooseWeaponToShootRequest chooseWeaponToShootRequest);
     void handle(ChooseFirstEffectRequest chooseFirstEffectRequest);
     void handle(BeforeBaseRequest beforeBaseRequest);

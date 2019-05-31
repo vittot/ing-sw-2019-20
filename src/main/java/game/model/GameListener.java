@@ -4,16 +4,18 @@ import java.util.List;
 import java.util.Map;
 
 public interface GameListener {
-    public void onChangeTurn(Player p);
-    public void onGameEnd(Map<Player,Integer> gameRanking);
 
-    public void onDamage(Player damaged, Player attacker, int damage);
-    public void onMarks(Player marked, Player marker, int marks);
-    public void onDeath(Player dead);
+    void onChangeTurn(Player p);
+    void onGameEnd(Map<Player,Integer> gameRanking);
+    void onDamage(Player damaged, Player attacker, int damage);
+    void onMarks(Player marked, Player marker, int marks);
+    void onDeath(Player dead);
     void onDeath(Kill kill);
-    public void onGrabWeapon(Player p, CardWeapon cw);
-    public void onGrabCardAmmo(Player p, List<Color> ammo);
-    public void onMove(Player p);
-    public void onRespawn(Player p);
-    public void onPowerUpUse(Player p, CardPower c);
+    void onGrabWeapon(Player p, CardWeapon cw);
+    void onGrabCardAmmo(Player p, List<Color> ammo);
+    void onMove(Player p);
+    void onRespawn(Player p);
+    void onPowerUpUse(Player p, CardPower c);
+    void onPlayerSuspend(Player p);
+    void onPlayerRejoined(Player player);
 }
