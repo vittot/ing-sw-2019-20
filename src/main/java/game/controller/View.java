@@ -99,4 +99,8 @@ public interface View {
     void rejoinGameConfirm();
 
     void notifyPlayerRejoin(Player p);
+
+    void notifyPlayerLeavedWaitingRoom(Player p);
+
+    void notifyPlayerJoinedWaitingRoom(Player p);
 }

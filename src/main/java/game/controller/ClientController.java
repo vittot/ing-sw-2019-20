@@ -11,6 +11,7 @@ import game.model.exceptions.NoCardAmmoAvailableException;
 import game.model.exceptions.NoCardWeaponSpaceException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClientController implements ServerMessageHandler {
@@ -444,12 +445,14 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(JoinWaitingRoomResponse joinWaitingRoomResponse) {
         ClientContext.get().setMyID(joinWaitingRoomResponse.getId());
+        ClientContext.get().setPlayersInWaiting(new ArrayList(joinWaitingRoomResponse.getWaitingRoom().getPlayers()));
         clientView.notifyCompletedOperation("You correctly joined the waiting room! Wait for other players...");
     }
 
     @Override
     public void handle(CreateWaitingRoomResponse createWaitingRoomResponse) {
         ClientContext.get().setMyID(createWaitingRoomResponse.getId());
+        ClientContext.get().setPlayersInWaiting(new ArrayList<>());
         clientView.notifyCompletedOperation("Waiting room correctly created! \n>>Wait for other players...");
     }
 
@@ -541,5 +544,18 @@ public class ClientController implements ServerMessageHandler {
         if(currWeapon != null) {
             currWeapon.setLoaded(false);
         }
+    }
+
+    @Override
+    public void handle(NotifyPlayerExitedWaitingRoom notifyPlayerExitedWaitingRoom) {
+        ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyPlayerExitedWaitingRoom.getPlayerId()).findFirst().ifPresent(clientView::notifyPlayerLeavedWaitingRoom);
+
+    }
+
+    @Override
+    public void handle(NotifyPlayerJoinedWaitingRoom notifyPlayerJoinedWaitingRoom) {
+        Player p = notifyPlayerJoinedWaitingRoom.getPlayer();
+        ClientContext.get().getPlayersInWaiting().add(p);
+        clientView.notifyPlayerJoinedWaitingRoom(p);
     }
 }

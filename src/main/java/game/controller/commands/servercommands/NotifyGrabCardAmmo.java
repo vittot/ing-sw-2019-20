@@ -15,14 +15,13 @@ public class NotifyGrabCardAmmo implements ServerMessage {
     private int x;
     private int y;
     private List<Color> ammos;
-    private List<CardPower> powerUps;
+    //private List<CardPower> powerUps;
 
     public NotifyGrabCardAmmo(int pId, int x, int y, List<Color> ammos) {
         this.pId = pId;
         this.x = x;
         this.y = y;
         this.ammos = ammos;
-        this.powerUps = powerUps;
     }
 
     public int getpId() {
@@ -39,10 +38,6 @@ public class NotifyGrabCardAmmo implements ServerMessage {
 
     public List<Color> getAmmos() {
         return ammos;
-    }
-
-    public List<CardPower> getPowerUps() {
-        return powerUps;
     }
 
     @Override

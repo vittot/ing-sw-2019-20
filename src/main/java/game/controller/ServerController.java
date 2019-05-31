@@ -2,7 +2,6 @@ package game.controller;
 
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
-import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.*;
 import game.controller.commands.servercommands.*;
 import game.model.*;
@@ -38,18 +37,31 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     private ServerState state;
     private List<Action> avaialableActionSteps;
     private int numberOfTurnActionMade;
+    private WaitingRoom waitingRoom;
 
 
     public ServerController(SocketClientHandler clientHandler) {
 
         this.clientHandler = clientHandler;
-        this.state = ServerState.WAITING_SPAWN;
+        this.state = ServerState.WAITING_FOR_PLAYERS;
     }
 
     public ServerController(){ }
 
     public SocketClientHandler getClientHandler() {
         return clientHandler;
+    }
+
+    public ServerState getState() {
+        return state;
+    }
+
+    public WaitingRoom getWaitingRoom() {
+        return waitingRoom;
+    }
+
+    public void setWaitingRoom(WaitingRoom waitingRoom) {
+        this.waitingRoom = waitingRoom;
     }
 
     /**
@@ -59,7 +71,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
      */
     void startGame(Game g, Player p)
     {
-        //state = ServerState.WAITING_SPAWN; //TODO management of the first spawn of the players in order
+        state = ServerState.WAITING_SPAWN;
         this.model = g;
         this.currPlayer = p;
         this.numberOfTurnActionMade = 0;
@@ -576,7 +588,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
             n = w.addWaitingPlayer(this, joinWaitingRoomRequest.getNickName());
             if(n != w.getNumWaitingPlayers())
             {
-                return new JoinWaitingRoomResponse(n);
+                return new JoinWaitingRoomResponse(n,w);
             }
             else{
                 for(ServerController sc : w.getServerControllers())
@@ -694,7 +706,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                 p.setSerializeEverything(true);
                 id = p.getId();
             }
-            this.state = ServerState.WAITING_TURN;
+            if(p.getPosition() != null)
+                this.state = ServerState.WAITING_TURN;
+            else
+                this.state = ServerState.WAITING_SPAWN;
             GameManager.get().rejoinUser(rejoinGameResponse.getUser());
             return new RejoinGameConfirm(model.getMap(),model.getPlayers(),id);
         }
@@ -935,4 +950,19 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         if(timeOut)
             clientHandler.sendMessage(new TimeOutNotify());
     }
+
+    void notifyPlayerExitedFromWaitingRoom(int pId){
+        clientHandler.sendMessage(new NotifyPlayerExitedWaitingRoom(pId));
+    }
+
+    void leaveWaitingRoom() {
+        waitingRoom.removeWaitingPlayer(this);
+    }
+
+    void notifyPlayerJoinedWaitingRoom(Player p)
+    {
+        clientHandler.sendMessage(new NotifyPlayerJoinedWaitingRoom(p));
+    }
+
+
 }

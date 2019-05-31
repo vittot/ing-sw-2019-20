@@ -51,7 +51,9 @@ public class WaitingRoom implements Serializable {
         int n = players.size();
         Player p = new Player(n+1, PlayerColor.values()[n],nick);
         p.setPlayerObserver(s);
+        notifyPlayerJoin(p);
         players.put(s,p);
+        s.setWaitingRoom(this);
         if(players.size() == numWaitingPlayers){
             Game g = GameManager.get().addGame(mapId,new ArrayList<>(players.values()));
             GameManager.get().removeWaitingRoom(this);
@@ -63,6 +65,20 @@ public class WaitingRoom implements Serializable {
             g.refillMap();
         }
         return n+1;
+
+    }
+
+    private void notifyPlayerJoin(Player p) {
+       players.keySet().forEach(sc -> sc.notifyPlayerJoinedWaitingRoom(p));
+    }
+
+    public void removeWaitingPlayer(ServerController sc)
+    {
+        Player p = players.remove(sc);
+        for(ServerController s: players.keySet())
+        {
+            s.notifyPlayerExitedFromWaitingRoom(p.getId());
+        }
 
     }
 

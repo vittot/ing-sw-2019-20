@@ -149,6 +149,16 @@ public class ClientTextView implements View {
     }
 
     @Override
+    public void notifyPlayerJoinedWaitingRoom(Player p) {
+        writeText("Player " + p.getNickName() + " has joined the waiting room!");
+    }
+
+    @Override
+    public void notifyPlayerLeavedWaitingRoom(Player p) {
+        writeText("Player " + p.getNickName() + " has leaved the waiting room!");
+    }
+
+    @Override
     public void rejoinGamePhase(List<String> otherPlayers) {
         char choice;
         boolean rejoin;
@@ -902,7 +912,7 @@ public class ClientTextView implements View {
             if (p.getId() != ClientContext.get().getMyID()){
                 writeText(checkPlayerColor(p.getColor()) + "Player " + p.getId() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
                 if(p.getDamage().size()==0)
-                    System.out.print("0 damage");
+                    System.out.println("0 damage");
                 for(PlayerColor d : p.getDamage()) {
                     System.out.println(checkPlayerColor(d) + "¤" + ANSI_RESET);
                 }

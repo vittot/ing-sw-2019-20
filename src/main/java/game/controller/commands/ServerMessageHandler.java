@@ -55,4 +55,6 @@ public interface ServerMessageHandler {
     void handle(UsePlusEffectRequest usePlusEffectRequest);
     void handle(UsePlusByOrderRequest usePlusByOrderRequest);
     void handle(ShootActionResponse shootActionResponse);
+    void handle(NotifyPlayerExitedWaitingRoom notifyPlayerExitedWaitingRoom);
+    void handle(NotifyPlayerJoinedWaitingRoom notifyPlayerJoinedWaitingRoom);
 }

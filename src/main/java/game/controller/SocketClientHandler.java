@@ -68,8 +68,14 @@ public class SocketClientHandler implements Runnable, GameListener {
         }
         catch(SocketException e)
         {
-            controller.getModel().removeGameListener(this);
-            controller.getCurrPlayer().suspend(false);
+            if(controller.getState() != ServerState.WAITING_FOR_PLAYERS){
+                controller.getModel().removeGameListener(this);
+                controller.getCurrPlayer().suspend(false);
+            }
+            else
+            {
+                controller.leaveWaitingRoom();
+            }
         }
         catch (Exception e) {
             //TODO: handle exception
