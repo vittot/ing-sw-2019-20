@@ -5,9 +5,7 @@ import game.model.exceptions.MapOutOfLimitException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -171,10 +169,31 @@ class GameTest {
         SimpleEffect ef1 = new MovementEffect(1,1,0,12,0,12,TargetVisibility.EVERYWHERE,true,TargetVisibility.EVERYWHERE,false,false,false,false,DifferentTarget.ANYONE);
         FullEffect eff = new FullEffect(Collections.singletonList(ef1),"Teleporter","Play this card in any moment of your turn, move your figure and set it down on any square.",price,false);
 
-        CardPower cp = new CardPower(24,Color.YELLOW,false,eff);
+        CardPower cp = new CardPower(24,Color.YELLOW,false,false,eff);
         g.readPowerUpDeck("powerupFile.xml");
 
         assertTrue(g.getDeckPower().size() == 24 && g.getDeckPower().get(23).equals(cp));
+
+    }
+
+    @Test
+    void getRankingTest()
+    {
+        g.getPlayer(2).setPoints(3);
+        SortedMap<Player,Integer> ranking = g.getRanking();
+        int p = Integer.MAX_VALUE, id=-1;
+        boolean correct = true;
+        for(Map.Entry<Player,Integer> e : ranking.entrySet())
+        {
+            if(e.getValue() > p)
+                correct = false;
+            if(e.getValue() == p && e.getKey().getId() < id)
+                correct = false;
+            p = e.getValue();
+            id = e.getKey().getId();
+
+        }
+        assertTrue(correct);
 
     }
 }

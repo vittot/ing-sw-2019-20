@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Player implements Target, Serializable {
+public class Player implements Target, Serializable, Comparable<Player> {
     private PlayerColor color;
     private List<PlayerColor> marks;
     private List<PlayerColor> thisTurnMarks;
@@ -648,6 +648,8 @@ public class Player implements Target, Serializable {
         if(!timeOut)
             this.game.getCurrentTurn().stopTimer();
         this.game.notifyPlayerSuspended(this);
+        if(this.game.getNumPlayersAlive() < 3)
+            this.game.endGame();
         this.playerObserver.onSuspend(timeOut);
     }
 
@@ -655,5 +657,13 @@ public class Player implements Target, Serializable {
     {
         this.suspended = false;
         this.game.notifyPlayerRejoined(this);
+    }
+
+    @Override
+    public int compareTo(Player p2)
+    {
+        if(this.points == p2.getPoints())
+            return this.id - p2.getId();
+        return p2.getPoints() - this.points;
     }
 }

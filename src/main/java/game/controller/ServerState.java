@@ -1,6 +1,7 @@
 package game.controller;
 
 public enum ServerState {
+    JUST_LOGGED,
     WAITING_FOR_PLAYERS,
     WAITING_SPAWN,
     WAITING_TURN,

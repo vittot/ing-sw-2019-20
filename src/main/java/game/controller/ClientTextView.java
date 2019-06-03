@@ -2,13 +2,11 @@ package game.controller;
 
 import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
-import game.controller.commands.servercommands.ChooseFirstEffectRequest;
-import game.controller.commands.servercommands.ChooseWeaponToShootRequest;
-import game.controller.commands.servercommands.UsePlusEffectRequest;
 import game.model.*;
 import game.model.effects.FullEffect;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ClientTextView implements View {
     private static final String ANSI_CYAN = "\u001B[36m";
@@ -22,7 +20,7 @@ public class ClientTextView implements View {
     private ClientController controller;
     private Scanner fromKeyBoard;
     private List<GameMap> availableMaps;
-    private ClientState state;
+
 
 
     public ClientTextView(){
@@ -176,7 +174,6 @@ public class ClientTextView implements View {
 
     @Override
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
-        state = ClientState.WAITING_SHOOT;
         int n;
         writeText("Choose which of your weapons you want to use:");
         showWeapons(myWeapons,0,true);
@@ -326,20 +323,28 @@ public class ClientTextView implements View {
             action = readText();
             action = action.toUpperCase();
             try {
-                if(action.toString().equals("EXIT")){
+                if(action.equals("EXIT")){
                     controller.getClient().sendMessage(new EndTurnRequest());
                     return;
                 }
 
-                if(action.toString().equals("INFO")){
+                if(action.equals("INFO")){
                     showMap(ClientContext.get().getMap().getGrid());
                     showMyPlayerInformation();
                     showPlayerPosition();
                     chosenAction = null;
                 }
 
-                if(action.toString().equals("POWER"))
-                    controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(ClientContext.get().getMyPlayer().getCardPower())));
+                if(action.equals("POWER"))
+                {
+                    List<CardPower> powerUpsAvailable = ClientContext.get().getMyPlayer().getCardPower().stream().filter(c -> !c.isUseWhenAttacking() && !c.isUseWhenDamaged()).collect(Collectors.toList());
+                    if(powerUpsAvailable.isEmpty())
+                    {
+                        writeText("There are no power-up cards available for use in this moment!");             action = "";
+                    }
+                    else
+                        controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerUpsAvailable)));
+                }
 
                 chosenAction = Action.valueOf(action);
             }catch ( NullPointerException f){
@@ -347,21 +352,22 @@ public class ClientTextView implements View {
             }catch (IllegalArgumentException e){
                 chosenAction = null;
             }
-        }while(!possibleActions.contains(chosenAction) || chosenAction == null);
+        }while(!action.equals("POWER") && (chosenAction == null || (!possibleActions.contains(chosenAction))));
 
-        switch (chosenAction){
-            case EXIT:
-                return;
-            case GRAB:
-                controller.getClient().sendMessage(new GrabActionRequest());
-                break;
-            case SHOOT:
-                controller.getClient().sendMessage(new ShootActionRequest());
-                break;
-            case MOVEMENT:
-                controller.getClient().sendMessage(new MovementActionRequest());
-                break;
-        }
+        if(chosenAction != null)
+            switch (chosenAction){
+                case EXIT:
+                    return;
+                case GRAB:
+                    controller.getClient().sendMessage(new GrabActionRequest());
+                    break;
+                case SHOOT:
+                    controller.getClient().sendMessage(new ShootActionRequest());
+                    break;
+                case MOVEMENT:
+                    controller.getClient().sendMessage(new MovementActionRequest());
+                    break;
+            }
     }
 
     /**
@@ -483,15 +489,8 @@ public class ClientTextView implements View {
     @Override
     public void insufficientAmmoNotification() {
         writeText("Not enough ammo");
-        resumeState();
+        controller.resumeState();
 
-    }
-
-    public void resumeState(){
-        switch(state){
-            case WAITING_GRAB_WEAPON:
-                controller.getClient().sendMessage(new GrabActionRequest());
-        }
     }
 
     /**
@@ -613,7 +612,7 @@ public class ClientTextView implements View {
      * @param ranking
      */
     @Override
-    public void showRanking(Map<Player, Integer> ranking){
+    public void showRanking(SortedMap<Player, Integer> ranking){
         int i=1;
         System.out.println("The game is over! \nLet's see the final results:");
         for(Player p : ranking.keySet()) {
@@ -634,7 +633,7 @@ public class ClientTextView implements View {
                     System.out.print(">>> Fifth place : ");
                     break;
             }
-            System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+ranking.get(p)+".");
+            System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+ranking.get(p) +".");
         }
     }
 
@@ -944,7 +943,6 @@ public class ClientTextView implements View {
     }
 
     public void chooseWeaponToGrab(List<CardWeapon> weapons){
-        state = ClientState.WAITING_GRAB_WEAPON;
         int i=1;
         int choiceWG = 0;
         int choiceWD = -1;

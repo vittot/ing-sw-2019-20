@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 public class SocketClientHandler implements Runnable, GameListener {
 
@@ -68,13 +70,17 @@ public class SocketClientHandler implements Runnable, GameListener {
         }
         catch(SocketException e)
         {
-            if(controller.getState() != ServerState.WAITING_FOR_PLAYERS){
+            if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED){
                 controller.getModel().removeGameListener(this);
                 controller.getCurrPlayer().suspend(false);
             }
-            else
+            else if(controller.getState() == ServerState.WAITING_FOR_PLAYERS)
             {
                 controller.leaveWaitingRoom();
+            }
+            else
+            {
+                GameManager.get().removeLoggedUser(controller.getNickname());
             }
         }
         catch (Exception e) {
@@ -121,12 +127,12 @@ public class SocketClientHandler implements Runnable, GameListener {
 
     /**
      * Notify that the game is finished and send the final game ranking
-     * @param gameRanking
+     * @param ranking - players ordered by points
      */
     @Override
-    public void onGameEnd(Map<Player,Integer> gameRanking) {
+    public void onGameEnd(SortedMap<Player,Integer> ranking) {
 
-        sendMessage(new NotifyEndGameResponse(gameRanking));
+        sendMessage(new NotifyEndGame(ranking));
     }
 
     @Override

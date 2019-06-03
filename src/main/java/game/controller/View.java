@@ -5,6 +5,7 @@ import game.model.effects.FullEffect;
 
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 public interface View {
 
@@ -44,7 +45,7 @@ public interface View {
 
     void choosePowerUpToRespawn(List<CardPower> cardPower);
 
-    void showRanking(Map<Player, Integer> ranking);
+    void showRanking(SortedMap<Player,Integer> ranking);
 
     void notifyCompletedOperation(String message);
 

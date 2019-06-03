@@ -15,7 +15,7 @@
                 any
             </ammo>
         </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -48,7 +48,7 @@
                 any
             </ammo>
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -81,7 +81,7 @@
                 any
             </ammo>
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -114,7 +114,7 @@
                 any
             </ammo>
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -147,7 +147,7 @@
                 any
             </ammo>
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -180,7 +180,7 @@
                 any
             </ammo>
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -215,7 +215,7 @@
             SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
     SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
     -->
-    <usedWhenDamaged>false</usedWhenDamaged>
+    <useWhenDamaged>false</useWhenDamaged>
     <effect>
         <movementEffect>
             <minEnemy>1</minEnemy>
@@ -271,7 +271,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -327,7 +327,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -383,7 +383,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -439,7 +439,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -495,7 +495,7 @@
                 SimpleEffect nw01 = new MovementEffect(1,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,false,false,false,DifferentTarget.ANYONE);
         SimpleEffect nw02 = new MovementEffect(0,1,0,1,0,1,TargetVisibility.EVERYWHERE,false,TargetVisibility.EVERYWHERE,false,false,true,true,false,DifferentTarget.ANYONE);
         -->
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -550,7 +550,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>true</usedWhenDamaged>
+        <useWhenDamaged>true</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -582,7 +582,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>true</usedWhenDamaged>
+        <useWhenDamaged>true</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -614,7 +614,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>true</usedWhenDamaged>
+        <useWhenDamaged>true</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -646,7 +646,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>true</usedWhenDamaged>
+        <useWhenDamaged>true</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -678,7 +678,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>true</usedWhenDamaged>
+        <useWhenDamaged>true</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -710,7 +710,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>true</usedWhenDamaged>
+        <useWhenDamaged>true</useWhenDamaged>
         <effect>
             <plainDamage>
                 <minEnemy>1</minEnemy>
@@ -741,7 +741,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -776,7 +776,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -811,7 +811,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -846,7 +846,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -881,7 +881,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>
@@ -916,7 +916,7 @@
         <price>
              
          </price>
-        <usedWhenDamaged>false</usedWhenDamaged>
+        <useWhenDamaged>false</useWhenDamaged>
         <effect>
             <movementEffect>
                 <minEnemy>1</minEnemy>

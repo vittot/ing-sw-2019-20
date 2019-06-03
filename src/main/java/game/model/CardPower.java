@@ -3,7 +3,6 @@ package game.model;
 import game.model.effects.FullEffect;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
 public class CardPower implements Serializable {
@@ -12,15 +11,17 @@ public class CardPower implements Serializable {
     private String description;
     private Color color;    //card color (for respawn or to pay ammo)
     //private List<Color> price; //price for the use of the effect
-    private boolean usedWhenDamaged;
+    private boolean useWhenDamaged;
+    private boolean useWhenAttacking;
     private FullEffect effect;
 
-    public CardPower(int id, /*String name, String description,*/ Color color, boolean usedWhenDamaged, FullEffect effect) {
+    public CardPower(int id, /*String name, String description,*/ Color color, boolean useWhenDamaged, boolean useWhenAttacking, FullEffect effect) {
         this.id = id;
         //this.name = name;
         //this.description = description;
         this.color = color;
-        this.usedWhenDamaged = usedWhenDamaged;
+        this.useWhenDamaged = useWhenDamaged;
+        this.useWhenAttacking = useWhenAttacking;
         this.effect = effect;
     }
 
@@ -56,8 +57,12 @@ public class CardPower implements Serializable {
         this.color = color;
     }
 
-    public boolean isUsedWhenDamaged() {
-        return usedWhenDamaged;
+    public boolean isUseWhenDamaged() {
+        return useWhenDamaged;
+    }
+
+    public boolean isUseWhenAttacking() {
+        return useWhenAttacking;
     }
 
     public FullEffect getEffect() {
@@ -105,13 +110,13 @@ public class CardPower implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         CardPower cardPower = (CardPower) o;
         return id == cardPower.id &&
-                usedWhenDamaged == cardPower.usedWhenDamaged &&
+                useWhenDamaged == cardPower.useWhenDamaged &&
                 color == cardPower.color &&
                 Objects.equals(effect, cardPower.effect);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, color, usedWhenDamaged, effect);
+        return Objects.hash(id, color, useWhenDamaged, effect);
     }
 }

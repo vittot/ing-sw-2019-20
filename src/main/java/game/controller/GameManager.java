@@ -129,4 +129,13 @@ public class GameManager {
     public Game getNameOfSuspendedUser(String nickname) {
         return usersSuspended.get(nickname);
     }
+
+    /**
+     * Remove a user previously logged
+     * @param nickname username
+     */
+    void removeLoggedUser(String nickname)
+    {
+        this.usersLogged.remove(nickname);
+    }
 }

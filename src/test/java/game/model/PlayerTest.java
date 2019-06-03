@@ -40,8 +40,8 @@ class PlayerTest {
         p.setWeapons(new ArrayList<CardWeapon>());
 
         List<CardPower> powerups = new ArrayList<>();
-        powerups.add(new CardPower(1,Color.BLUE,false,null));
-        powerups.add(new CardPower(2,Color.YELLOW,false,null));
+        powerups.add(new CardPower(1,Color.BLUE,false, false,null));
+        powerups.add(new CardPower(2,Color.YELLOW,false,false,null));
         p.setCardPower(powerups);
 
         GameMap map = new GameMap(1,2,3);

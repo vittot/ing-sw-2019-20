@@ -38,12 +38,13 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     private List<Action> avaialableActionSteps;
     private int numberOfTurnActionMade;
     private WaitingRoom waitingRoom;
+    private String nickname;
 
 
     public ServerController(SocketClientHandler clientHandler) {
 
         this.clientHandler = clientHandler;
-        this.state = ServerState.WAITING_FOR_PLAYERS;
+        this.state = ServerState.JUST_LOGGED;
     }
 
     public ServerController(){ }
@@ -62,6 +63,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
 
     public void setWaitingRoom(WaitingRoom waitingRoom) {
         this.waitingRoom = waitingRoom;
+        this.state = ServerState.WAITING_FOR_PLAYERS;
     }
 
     /**
@@ -100,6 +102,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
 
     public Player getCurrPlayer() {
         return currPlayer;
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 
     @Override
@@ -287,8 +293,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                 List<CardPower> listCp = new ArrayList<>(currPlayer.pickUpAmmo());
                 state = ServerState.HANDLING_GRAB;
                 clientHandler.sendMessage(new PickUpAmmoResponse(listA,listCp));
-                if(model.getCurrentTurn().getNumOfActions()>0)
+                if(model.getCurrentTurn().getNumOfActions()>0){
+                    state = ServerState.WAITING_ACTION;
                     return new ChooseTurnActionRequest();
+                }
                 else {
                     return checkTurnEnd();
                 }
@@ -393,8 +401,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
             endTurnManagement();
             //if(model.getnPlayerToBeRespawned() == 0)
             //    model.getCurrentTurn().newTurn(false); //TODO: check final frezy
-            if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer()))
+            if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){
+                state = ServerState.WAITING_ACTION;
                 return new ChooseTurnActionRequest();
+            }
             else
                 return new OperationCompletedResponse("Wait for you next turn!");
         }
@@ -479,8 +489,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                     clientHandler.sendMessage(new OperationCompletedResponse("You are respawned!"));
                     if(model.getnPlayerToBeRespawned() == 0)
                         model.getCurrentTurn().newTurn(false); //TODO: check final frezy
-                    if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer()))
+                    if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){
+                        state = ServerState.WAITING_ACTION;
                         return new ChooseTurnActionRequest();
+                    }
                     else
                         return new OperationCompletedResponse("Wait for you turn..");
                 }
@@ -615,6 +627,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                             sc.getCurrPlayer().addCardPower(cp);
                             sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
                             sc.getClientHandler().sendMessage(new RespawnRequest(cp));
+                            model.getCurrentTurn().startTimer();
 
                         }
                         else
@@ -666,8 +679,23 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
 
     @Override
     public ServerMessage handle(ChoosePowerUpResponse choosePowerUpResponse) {
-        //TODO later
-        return null;
+        List<CardPower> avPowerUp = currPlayer.getCardPower();
+        CardPower cp = choosePowerUpResponse.getCardPower();
+        if(state == ServerState.WAITING_ACTION)
+            avPowerUp = avPowerUp.stream().filter(c -> !c.isUseWhenDamaged() && !c.isUseWhenAttacking()).collect(Collectors.toList());
+
+        if(!avPowerUp.contains(cp))
+            return new InvalidPowerUpResponse();
+
+        currFullEffect = cp.getEffect();
+        currSimpleEffect = currFullEffect.getSimpleEffects().get(0);
+        nSimpleEffect = 0;
+
+        baseDone = true; //TODO: check
+        selectedPlusEffects = new ArrayList<>();
+
+        return handleEffect(currSimpleEffect);
+
     }
 
     @Override
@@ -675,6 +703,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         if(GameManager.get().getUsersLogged().contains(loginMessage.getNickname()))
             return new UserAlreadyLoggedResponse();
 
+        this.nickname = loginMessage.getNickname();
         if(GameManager.get().getUsersSuspended().contains(loginMessage.getNickname()))
         {
             model = GameManager.get().getNameOfSuspendedUser(loginMessage.getNickname());
@@ -929,7 +958,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     @Override
     public void onTurnStart() {
         if(state != ServerState.WAITING_SPAWN)
+        {
+            state = ServerState.WAITING_ACTION;
             clientHandler.sendMessage(new ChooseTurnActionRequest());
+        }
         else{
             CardPower cp = model.drawPowerUp();
             currPlayer.addCardPower(cp);
@@ -945,7 +977,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     @Override
     public void onSuspend(boolean timeOut) {
 
-        if(model.getCurrentTurn().getCurrentPlayer().equals(this.currPlayer))
+        if(model.getCurrentTurn().getCurrentPlayer().equals(this.currPlayer) && !model.isEnded())
             endTurnManagement();
         if(timeOut)
             clientHandler.sendMessage(new TimeOutNotify());

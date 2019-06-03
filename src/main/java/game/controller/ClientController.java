@@ -3,11 +3,11 @@ package game.controller;
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
+import game.controller.commands.clientcommands.GrabActionRequest;
 import game.controller.commands.servercommands.*;
 import game.model.*;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
-import game.model.exceptions.NoCardAmmoAvailableException;
 import game.model.exceptions.NoCardWeaponSpaceException;
 
 import java.io.IOException;
@@ -19,6 +19,7 @@ public class ClientController implements ServerMessageHandler {
     private Thread receiver;
     private View clientView;
     private List<Action> availableActions;
+    private ClientState state;
 
     public ClientController(Client client) {
         this.client = client;
@@ -27,6 +28,10 @@ public class ClientController implements ServerMessageHandler {
 
     public Client getClient() {
         return client;
+    }
+
+    public ClientState getState() {
+        return state;
     }
 
     public List<Action> getAvailableActions() {
@@ -132,6 +137,7 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(ChooseTurnActionRequest serverMsg) {
 
+        this.state = ClientState.WAITING_ACTION;
         clientView.chooseTurnActionPhase();
     }
 
@@ -213,7 +219,7 @@ public class ClientController implements ServerMessageHandler {
      * @param serverMsg
      */
     @Override
-    public void handle(NotifyEndGameResponse serverMsg) {
+    public void handle(NotifyEndGame serverMsg) {
         clientView.showRanking(serverMsg.getRanking());
     }
 
@@ -335,6 +341,8 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(InvalidPowerUpResponse serverMsg) {
         clientView.notifyInvalidPowerUP();
+        if(this.state == ClientState.WAITING_ACTION)
+            clientView.chooseTurnActionPhase();
     }
 
     /**
@@ -458,6 +466,7 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(ChooseWeaponToGrabRequest chooseWeaponToGrabRequest){
+        state = ClientState.WAITING_GRAB_WEAPON;
         clientView.chooseWeaponToGrab(chooseWeaponToGrabRequest.getWeapons());
     }
 
@@ -511,6 +520,7 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(ChooseWeaponToShootRequest chooseWeaponToShootRequest) {
+        state = ClientState.WAITING_SHOOT;
         clientView.chooseWeaponToShoot(chooseWeaponToShootRequest.getMyWeapons());
     }
 
@@ -557,5 +567,12 @@ public class ClientController implements ServerMessageHandler {
         Player p = notifyPlayerJoinedWaitingRoom.getPlayer();
         ClientContext.get().getPlayersInWaiting().add(p);
         clientView.notifyPlayerJoinedWaitingRoom(p);
+    }
+
+    public void resumeState(){
+        switch(state){
+            case WAITING_GRAB_WEAPON:
+                client.sendMessage(new GrabActionRequest());
+        }
     }
 }

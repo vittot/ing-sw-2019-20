@@ -18,7 +18,7 @@ public interface ServerMessageHandler {
     void handle (MaxNumberOfWeaponsResponse serverMsg);
     void handle (NotifyDamageResponse serverMsg);
     void handle (NotifyDeathResponse serverMsg);
-    void handle (NotifyEndGameResponse serverMsg);
+    void handle (NotifyEndGame serverMsg);
     void handle (NotifyGrabWeapon serverMsg);
     void handle (NotifyMovement serverMsg);
     void handle (NotifyPowerUpUsage serverMsg);

@@ -10,6 +10,7 @@ import org.jdom2.input.SAXBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.SortedMap;
 
 public class Game {
     private int id;
@@ -29,6 +30,7 @@ public class Game {
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
     private int nPlayerToBeRespawned;
+    private boolean ended;
 
 
     static {
@@ -43,7 +45,8 @@ public class Game {
 
     public Game(int killBoardSize){
         this.killboardSize = killBoardSize;
-        gameObservers = new ArrayList<>();
+        this.ended = false;
+        this.gameObservers = new ArrayList<>();
         this.killBoard = new ArrayList<>(killBoardSize);
         this.deckWeapon = new ArrayList<>();
         this.deckAmmo = new ArrayList<>();
@@ -299,7 +302,7 @@ public class Game {
         String desc = powerup.getChild("description").getText().trim().trim();
         Color c = createEquivalentAmmo(powerup.getChild("color").getText().trim());
         List<Color> price = takePrice(powerup);
-        boolean flag = (powerup.getChild("usedWhenDamaged").getText().trim().equals("true"));
+        boolean flag = (powerup.getChild("useWhenDamaged").getText().trim().equals("true"));
 
         FullEffect effect = takePowerUpEffect(powerup);
 
@@ -309,7 +312,8 @@ public class Game {
 
         int id = this.deckPower.size() + 1;
 
-        CardPower cardPower = new CardPower(id,c,flag,effect);
+        //TODO: read (and add on power up xml) the useWhenAttacking flag
+        CardPower cardPower = new CardPower(id,c,flag,false,effect);
         this.deckPower.add(cardPower);
         Collections.shuffle(this.deckPower);
     }
@@ -1036,5 +1040,34 @@ public class Game {
 
     public void notifyPlayerRejoined(Player player) {
         gameObservers.forEach(o -> o.onPlayerRejoined(player));
+    }
+
+    /**
+     * Stops the game, notifying all players about it
+     */
+    public void endGame()
+    {
+        this.ended = true;
+        gameObservers.forEach(o -> o.onGameEnd(getRanking()));
+    }
+
+    public boolean isEnded() {
+        return ended;
+    }
+
+    /**
+     * Return the list of players ordered by points
+     * @return
+     */
+    public SortedMap<Player,Integer> getRanking()
+    {
+        SortedMap<Player,Integer> ranking = new TreeMap<>();
+        for(Player p : players)
+            ranking.put(p,p.getPoints());
+        return ranking;
+    }
+
+    public long getNumPlayersAlive() {
+        return players.stream().filter(p -> !p.isSuspended()).count();
     }
 }

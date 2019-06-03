@@ -75,6 +75,7 @@ public class WaitingRoom implements Serializable {
     public void removeWaitingPlayer(ServerController sc)
     {
         Player p = players.remove(sc);
+        GameManager.get().getUsersLogged().remove(p.getNickName());
         for(ServerController s: players.keySet())
         {
             s.notifyPlayerExitedFromWaitingRoom(p.getId());
