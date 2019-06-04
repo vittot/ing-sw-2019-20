@@ -10,7 +10,7 @@ public class LaunchClient {
     public static void main(String[] args) throws IOException {
         Client client = new SocketClient("localhost",5000);
         client.init();
-        ClientController controller = new ClientController(client);
+        ClientController controller = new ClientController(client,args);
         controller.run();
 
         client.close();

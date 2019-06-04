@@ -13,6 +13,9 @@ import game.model.exceptions.NoCardWeaponSpaceException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
+import static javafx.application.Platform.runLater;
 
 public class ClientController implements ServerMessageHandler {
     private final Client client;
@@ -20,10 +23,29 @@ public class ClientController implements ServerMessageHandler {
     private View clientView;
     private List<Action> availableActions;
     private ClientState state;
+    private Scanner in = new Scanner(System.in);
 
-    public ClientController(Client client) {
+    public ClientController(Client client,String[] args) {
         this.client = client;
-        clientView = new ClientTextView(this);
+        String input;
+        do {
+            System.out.println("CLI or GUI?");
+            input = in.nextLine();
+            input = input.toUpperCase();
+        }while(!input.equals("GUI") && !input.equals("CLI"));
+        if(input.equals("GUI")) {
+            //ClientGUIView.main(args);
+            try {
+                clientView = ClientGUIView.getInstance();
+            }catch(InterruptedException e)
+            {
+
+            }
+            clientView.setController(this);
+
+        }else {
+            clientView = new ClientTextView(this);
+        }
     }
 
     public Client getClient() {
@@ -62,7 +84,8 @@ public class ClientController implements ServerMessageHandler {
 
 
     public void run() throws IOException {
-        clientView.setUserNamePhase();
+        runLater(() -> clientView.setUserNamePhase());
+        //clientView.setUserNamePhase();
         this.start();
 
     }

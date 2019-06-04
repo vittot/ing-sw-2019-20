@@ -152,6 +152,11 @@ public class ClientTextView implements View {
     }
 
     @Override
+    public void setController(ClientController clientController) {
+        this.controller = clientController;
+    }
+
+    @Override
     public void notifyPlayerLeavedWaitingRoom(Player p) {
         writeText("Player " + p.getNickName() + " has leaved the waiting room!");
     }
@@ -633,6 +638,7 @@ public class ClientTextView implements View {
                     System.out.print(">>> Fifth place : ");
                     break;
             }
+            i++;
             System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+ranking.get(p) +".");
         }
     }

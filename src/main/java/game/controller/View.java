@@ -104,4 +104,6 @@ public interface View {
     void notifyPlayerLeavedWaitingRoom(Player p);
 
     void notifyPlayerJoinedWaitingRoom(Player p);
+
+    void setController(ClientController clientController);
 }
