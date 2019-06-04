@@ -2,6 +2,7 @@ package game.model;
 
 import game.controller.GameManager;
 import game.controller.PlayerObserver;
+import game.model.effects.FullEffect;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardWeaponSpaceException;
@@ -280,7 +281,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
             lastKill = game.getLastKill(this);
             lastKill.setRage(true);
         }
-        game.notifyDamage(this,shooter,damage);
+        if(game != null)
+            game.notifyDamage(this,shooter,damage);
 
     }
 
@@ -430,34 +432,27 @@ public class Player implements Target, Serializable, Comparable<Player> {
         if(this.weapons.size()== 3)
             if(weaponToWaste==null)
                 throw new NoCardWeaponSpaceException();
-        if(tmp.size() == 1)
+        if(tmp.size() > 1)
         {
-            this.position.getWeapons().remove(weapon);
-            this.weapons.add(weapon);
-            if (weapons.size() == 3){
-                this.position.getWeapons().add(weaponToWaste);
-                this.weapons.remove(weaponToWaste);
-            }
-            if(game != null)
-                game.notifyGrabWeapon(this,weapon);
-            return;
+            tmp = tmp.subList(1, tmp.size());
+            pay(tmp, powerUp);
         }
-
-        tmp = tmp.subList(1,tmp.size());
-
-        pay(tmp,powerUp);
-
-        this.position.getWeapons().remove(weapon);
-        this.weapons.add(weapon);
         if (weapons.size() == 3){
             this.position.getWeapons().add(weaponToWaste);
             this.weapons.remove(weaponToWaste);
         }
+        this.weapons.add(weapon);
+        this.position.getWeapons().remove(weapon);
         if(game != null)
             game.notifyGrabWeapon(this,weapon);
 
     }
 
+    /**
+     *
+     * @param cw
+     * @return
+     */
     public boolean canGrabWeapon(CardWeapon cw){
         List<Color> priceTmp;
         if(cw.getPrice().size()>1) {
@@ -468,6 +463,22 @@ public class Player implements Target, Serializable, Comparable<Player> {
             return true;
     }
 
+    /**
+     *
+     * @param effect
+     * @return
+     */
+    public boolean canUsetWeaponEffect(FullEffect effect){
+        List<Color> priceTmp;
+        priceTmp = new ArrayList<>(effect.getPrice());
+        return controlPayment(priceTmp);
+    }
+
+    /**
+     *
+     * @param cw
+     * @return
+     */
     public boolean canReloadWeapon(CardWeapon cw){
         List<Color> priceTmp;
         priceTmp = new ArrayList<>(cw.getPrice());
@@ -505,8 +516,10 @@ public class Player implements Target, Serializable, Comparable<Player> {
         List <CardPower> tmpPU = new ArrayList<>();
         if(powerUp != null)
             for(int i = 0; i < powerUp.size(); i++){
-                tmp.remove(powerUp.get(i).getColor());
-                tmpPU.add(powerUp.get(i));
+                if(tmp.contains(powerUp.get(i).getColor())) {
+                    tmp.remove(powerUp.get(i).getColor());
+                    tmpPU.add(powerUp.get(i));
+                }
             }
         if(!ammo.containsAll(tmp)) throw new InsufficientAmmoException();
         else {

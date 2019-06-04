@@ -298,8 +298,8 @@ public class Game {
      * @param powerup
      */
     public void addPowerUp(Element powerup){
-        String name = powerup.getChild("name").getText().trim().trim();
-        String desc = powerup.getChild("description").getText().trim().trim();
+        String name = powerup.getChild("name").getText().trim();
+        String desc = powerup.getChild("description").getText().trim();
         Color c = createEquivalentAmmo(powerup.getChild("color").getText().trim());
         List<Color> price = takePrice(powerup);
         boolean flag = (powerup.getChild("useWhenDamaged").getText().trim().equals("true"));
@@ -321,9 +321,10 @@ public class Game {
     /**
      * Get a Element weapon and build it
      * @param weapon
+     * @param id
      */
     public void addWeapon(Element weapon, int id){
-        String name = weapon.getChild("name").getText().trim().trim();
+        String name = weapon.getChild("name").getText().trim();
         List desc = takeDescription(weapon);
         List names = takeNameEffect(weapon);
         boolean plusBefore;
@@ -339,7 +340,7 @@ public class Game {
         insertDescription(effect, effectal, effectop, desc, names);
         insertPrice(effect,effectal,effectop,price,priceal,priceop);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
-        wp.setId(id);
+        wp.setId(this.id);
         this.deckWeapon.add(wp);
         Collections.shuffle(this.deckWeapon);
     }
@@ -613,7 +614,7 @@ public class Game {
         List<Color> price = new ArrayList<Color>();
         for(int i = 0; i < weapon.getChildren("optionalPrice").size() ; i ++){
             for (Element pr : weapon.getChildren("optionalPrice").get(i).getChildren("ammo")){
-                price.add(createEquivalentAmmo(pr.getText().trim().trim()));
+                price.add(createEquivalentAmmo(pr.getText().trim()));
             }
             pricetot.add(price);
         }
@@ -622,7 +623,7 @@ public class Game {
     public List<Color> takePrice(Element weapon){
         List price = new ArrayList<Color>();
         for (Element pr : weapon.getChild("price").getChildren("ammo")){
-            price.add(createEquivalentAmmo(pr.getText().trim().trim()));
+            price.add(createEquivalentAmmo(pr.getText().trim()));
         }
         return price;
     }
@@ -630,7 +631,7 @@ public class Game {
         List price = new ArrayList<Color>();
         if(weapon.getChild("alternativePrice") != null)
             for (Element pr : weapon.getChild("alternativePrice").getChildren("ammo")){
-                price.add(createEquivalentAmmo(pr.getText().trim().trim()));
+                price.add(createEquivalentAmmo(pr.getText().trim()));
             }
         return price;
     }

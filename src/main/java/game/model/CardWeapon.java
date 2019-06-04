@@ -39,6 +39,7 @@ public class CardWeapon implements Serializable {
         this.plusBeforeBase = plusBeforeBase;
         this.plusOrder = plusOrder;
         this.loaded = true;
+        this.previousTargets = new ArrayList<>();
     }
 
     public CardWeapon(Direction lastDirection, Square lastTargetSquare){

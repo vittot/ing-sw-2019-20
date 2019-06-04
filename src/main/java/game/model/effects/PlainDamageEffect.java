@@ -81,8 +81,10 @@ public class PlainDamageEffect extends SimpleEffect {
     public List<Target> searchTarget(Player shooter){
 
         List<Player> targets;
+        List<Player> prevTargets = null;
         Square shooterPos = chainTarget ? shooter.getActualWeapon().getLastTarget().getPosition() : shooter.getPosition();
-        List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
+        if(shooter.getActualWeapon() != null)
+            prevTargets = shooter.getActualWeapon().getPreviousTargets();
         if(lastTarget){
             targets = prevTargets.stream().filter(p -> GameMap.distanceBtwSquares(shooterPos,p.getPosition())<=maxDist && GameMap.distanceBtwSquares(shooterPos,p.getPosition())>=minDist).collect(Collectors.toList());
         }
@@ -146,11 +148,14 @@ public class PlainDamageEffect extends SimpleEffect {
      * @param targets choosen targets
      */
     public void applyEffect(Player shooter, List<Target> targets){
+        List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
         for(Target t : targets)
         {
             t.addDamage(shooter,damage);
             t.addThisTurnMarks(shooter,marks);
+            prevTargets.add((Player) t);
         }
+        shooter.getActualWeapon().setLastTargetSquare(prevTargets.get(prevTargets.size()-1).getPosition());
     }
 
     @Override

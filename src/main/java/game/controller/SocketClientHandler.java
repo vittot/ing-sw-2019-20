@@ -142,7 +142,7 @@ public class SocketClientHandler implements Runnable, GameListener {
 
     @Override
     public void onMarks(Player marked, Player marker, int marks) {
-        sendMessage(new NotifyDamageResponse(marker.getId(), marked.getId(), marks));
+        sendMessage(new NotifyMarks(marker.getId(), marked.getId(), marks));
     }
 
     @Override

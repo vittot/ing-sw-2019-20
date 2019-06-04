@@ -57,4 +57,5 @@ public interface ServerMessageHandler {
     void handle(ShootActionResponse shootActionResponse);
     void handle(NotifyPlayerExitedWaitingRoom notifyPlayerExitedWaitingRoom);
     void handle(NotifyPlayerJoinedWaitingRoom notifyPlayerJoinedWaitingRoom);
+    void handle(RemoveSpawnPowerUp removeSpawnPowerUp);
 }
