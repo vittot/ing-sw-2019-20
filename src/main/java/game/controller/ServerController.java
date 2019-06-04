@@ -774,7 +774,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         nSimpleEffect = 0;
 
         baseDone = true; //TODO: check
-        selectedPlusEffects = new ArrayList<>();
 
         return handleEffect(currSimpleEffect);
 

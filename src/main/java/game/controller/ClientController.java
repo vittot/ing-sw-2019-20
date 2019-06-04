@@ -84,8 +84,8 @@ public class ClientController implements ServerMessageHandler {
 
 
     public void run() throws IOException {
-        runLater(() -> clientView.setUserNamePhase());
-        //clientView.setUserNamePhase();
+        //runLater(() -> clientView.setUserNamePhase());
+        clientView.setUserNamePhase();
         this.start();
 
     }

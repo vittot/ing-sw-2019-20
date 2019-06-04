@@ -3,6 +3,7 @@ package game.controller;
 import game.controller.commands.clientcommands.JoinWaitingRoomRequest;
 import game.model.*;
 import game.model.effects.FullEffect;
+import game.model.effects.SimpleEffect;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -237,7 +238,7 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
-    public void chooseTargetPhase(List<Target> possibleTargets) {
+    public void chooseTargetPhase(List<Target> possibleTargets, SimpleEffect currSimpleEffect) {
 
     }
 
@@ -495,7 +496,7 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
-    public void usePlusInOrder(List<FullEffect> plusEffects, int i) {
+    public void usePlusInOrder(List<FullEffect> plusEffects) {
 
     }
 
