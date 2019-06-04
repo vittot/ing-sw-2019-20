@@ -115,11 +115,14 @@ public class SquareDamageEffect extends SimpleEffect {
      * @param targets choosen targets
      */
     public void applyEffect(Player shooter, List<Target> targets){
+        List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
         for(Target t : targets)
         {
             t.addDamage(shooter,damage);
             t.addThisTurnMarks(shooter,marks);
+            prevTargets.add((Player) t);
         }
+        shooter.getActualWeapon().setLastTargetSquare(prevTargets.get(prevTargets.size()-1).getPosition());
     }
 
     @Override

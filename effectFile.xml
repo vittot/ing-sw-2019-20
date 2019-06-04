@@ -4,15 +4,11 @@
     <weapon>
         <name>Lock Rifle</name>
         <effectDescription>
-            <name>
-                Basic effect
-            </name>
+            <name>Basic effect</name>
             Deal 2 damage and 1 marks to 1 target you ca see
         </effectDescription>
         <effectDescription>
-            <name>
-                Second lock
-            </name>
+            <name>Second lock</name>
             Deal 1 mark to a different target you ca see
         </effectDescription>
         <price>
@@ -75,21 +71,15 @@
     <weapon>
         <name>Machine gun</name>
         <effectDescription>
-            <name>
-                basic effect
-            </name>
+            <name>basic effect</name>
             Choose 1 or 2 targets you can see and deal 1 damage to each.
         </effectDescription>
         <effectDescription>
-            <name>
-                Focus shot
-            </name>
+            <name>Focus shot</name>
             Deal 1 additional damage to one of those targets.
         </effectDescription>
         <effectDescription>
-            <name>
-                Turret tripod
-            </name>
+            <name>Turret tripod</name>
             Deal 1 additional damage to the other of those targets and/or deal 1 damage to a different target you can see.
         </effectDescription>
         <price>
@@ -189,21 +179,15 @@
     <weapon>
         <name>T.H.O.R</name>
         <effectDescription>
-            <name>
-                basic effect
-            </name>
+            <name>basic effect</name>
             Deal 2 damage to 1 target you can see.
         </effectDescription>
         <effectDescription>
-            <name>
-                Chain reaction
-            </name>
+            <name>Chain reaction</name>
             Deal 1 damage to a second target that your first target can see.
         </effectDescription>
         <effectDescription>
-            <name>
-                High voltage
-            </name>
+            <name>High voltage</name>
             Deal 2 damage to a third target that your second target can see. You cannot use this effect unless you use chain reaction first.
         </effectDescription>
         <price>
@@ -284,27 +268,18 @@
 
     <weapon>
         <name>Plasma Gun</name>
-
         <effectDescription>
-            <name>
-                Base effect
-            </name>
+            <name>Base effect</name>
             Deal 2 damage to 1 target you can see.
         </effectDescription>
-
         <effectDescription>
-            <name>
-                Phase glide
-            </name>
+            <name>Phase glide</name>
             Move 1 or 2 squares. This effect can be used before the basic affect.
         </effectDescription>
         <effectDescription>
-            <name>
-                Charged shot
-            </name>
+            <name>Charged shot</name>
             deal 1 additional damage to your target.
         </effectDescription>
-
         <price>
             <ammo>
                 blue
@@ -390,9 +365,7 @@
         <name>Whisper</name>
 
         <effectDescription>
-            <name>
-                Basic effect
-            </name>
+            <name>Basic effect</name>
             Deal 3 damage and 1 mark to 1 target you can see. Your target must be at least 2 moves away from you.
         </effectDescription>
 
@@ -437,16 +410,12 @@
         <name>Electroscythe</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Deal 1 damage to every other player on your square.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Reaper mode
-            </name>
+            <name>Reaper mode</name>
             Deal 2 damage to every other player on your square.
         </effectDescription>
 
@@ -505,16 +474,12 @@
         <name>Tractor Beam</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Move a target 0,1 or 2 sqaures to a square you can see, and give it 2 damage.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Punisher mode
-            </name>
+            <name>Punisher mode</name>
             Choose a target 0,1 or 2 squares away frm you. Move the target to your sqaure and deal 3 damage to it.
         </effectDescription>
 
@@ -611,15 +576,11 @@
         <name>Vortex Cannon</name>
 
         <effectDescription>
-            <name>
-                Basic effect
-            </name>
+            <name>Basic effect</name>
             Choose a square you can see, but not your square. Call it "the vortex". Choose a target on the vortex or 1 move away from it. Move it onto the vortex and give it 2 damage.
         </effectDescription>
         <effectDescription>
-            <name>
-                Black hole
-            </name>
+            <name>Black hole</name>
             Choose up to 2 target on the vortex or 1 move away from it. Move them onto the vortex and give them each 1 damage.
         </effectDescription>
 
@@ -761,16 +722,12 @@
         <name>Furnace</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Choose a room you can see, but not the room you are in. Del 1 damage to everyone in that room.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Cozy fire mode
-            </name>
+            <name>Cozy fire mode</name>
             Choose a sqaure exacly one move away. Deal 1 damage and 1 mark to everyone on that square.
         </effectDescription>
 
@@ -827,9 +784,7 @@
         <name>Heatseeker</name>
 
         <effectDescription>
-            <name>
-                Effect
-            </name>
+            <name>Effect</name>
             Choose 1 target you cannot see and deal 3 damage to it.
         </effectDescription>
 
@@ -874,15 +829,13 @@
         <name>Hellion</name>
 
         <effectDescription>
-            <name>
-                Basic mode
+            <name>Basic mode
             </name>
             Deal 1 damage to 1 target you can see al least 1 move away. then give 1 mark to that target and everyoe else on that sqaure.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Nano-tracer mode
+            <name>Nano-tracer mode
             </name>
             Deal 1 damage to 1 target you can see at least 1 move away. then give 2 marks to that target and everyone else on tat square.
         </effectDescription>
@@ -982,16 +935,12 @@
         <name>Flamethrower</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Choose a square 1 move away and possibly a second square 1 more move away in the same direction. On each sqaure, you may choose 1 target and give it 1 damage.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Barbecue mode
-            </name>
+            <name>Barbecue mode</name>
             Choose a square 1 move away and possibly a second square 1 more move away in the same direction. deal 2 damage to everyone on the first square and 1 damage to everyone on the second square.
         </effectDescription>
 
@@ -1080,16 +1029,12 @@
         <name>Grenade Launcher</name>
 
         <effectDescription>
-            <name>
-                Basic effect
-            </name>
+            <name>Basic effect</name>
             Deal1 damage to 1 target you can see. Then you may move the target 1 square.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Extra grenade
-            </name>
+            <name>Extra grenade</name>
             deal 1 damage to every player on a square yu can see. you can use this before or after the basic effect's move.
         </effectDescription>
 
@@ -1164,22 +1109,16 @@
         <name>Rocket launcher</name>
 
         <effectDescription>
-            <name>
-                Basic effect
-            </name>
+            <name>Basic effect</name>
             Deal 2 damage to 1 target you can see tht is not on your square. Then you may move the target 1 sqaure.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Rocket jump
-            </name>
+            <name>Rocket jump</name>
             Move 1 or 2 squares. This effect can be used before basic effect.
         </effectDescription>
         <effectDescription>
-            <name>
-                Fragment warhead
-            </name>
+            <name>Fragment warhead</name>
             During the basic effect, deal 1 damage to every player on your target's original square-including the target, even if yu move it.
         </effectDescription>
         <price>
@@ -1313,16 +1252,12 @@
         <name>Railgun</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Choose a cardinal direction and 1 target in that direction. Deal 3 damage to it. You can attack through walls.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Piercing mode
-            </name>
+            <name>Piercing mode</name>
             Choose a cardinal direction and 1 or 2 target in that direction. Deal 2 damage to each. You can attack through walls.
         </effectDescription>
 
@@ -1404,22 +1339,16 @@
     <weapon>
         <name>Cyberblade</name>
         <effectDescription>
-            <name>
-                Basic effect
-            </name>
+            <name>Basic effect</name>
             Deal 2 damage to 1 target on your square.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Shadowstep
-            </name>
+            <name>Shadowstep</name>
             Move 1 square before or after the basic effect.
         </effectDescription>
         <effectDescription>
-            <name>
-                Slice and dice
-            </name>
+            <name>Slice and dice</name>
             deal 2 damage to a different target on your square. The shadowstep mau be used before or after this effect.
         </effectDescription>
         <price>
@@ -1507,17 +1436,13 @@
         <name>ZX-2</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Deal 1 damage and 2 marks to 1 target you can see.
 
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Scanner mode
-            </name>
+            <name>Scanner mode</name>
             Choose up to 3 targets you can see and del 1 marks to each.
         </effectDescription>
 
@@ -1579,16 +1504,12 @@
         <name>Shotgun</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Deal 3 damage to 1 target on your square. If you want, you may then move the target 1 square.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Long barrel mode
-            </name>
+            <name>Long barrel mode</name>
             Deal 2 damage to 1 target on any square exactly one move away.
         </effectDescription>
 
@@ -1669,15 +1590,11 @@
         <name>Power glove</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Choose 1 target on any square exactly 1 move away. Move onto that square and give the target 1 damage and 2 marks.
         </effectDescription>
         <effectDescription>
-            <name>
-                Rocket fist mode
-            </name>
+            <name>Rocket fist mode</name>
             Choose 1 target on any square exactly 1 move away. Move onto that square. You may deal 2 damage to 1 target there. If you want, you may move 1 more square in that same direction. You may deal 2 damage to 1 target there, as well.
         </effectDescription>
 
@@ -1808,16 +1725,12 @@
         <name>Shockwave</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Chose up to 3 target on different squares, each exactly 1 move away. Deal 1 damage to each other target.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Tsunami mode
-            </name>
+            <name>Tsunami mode</name>
             Deal 1 damage to all target that are exactly 1 move away.
         </effectDescription>
 
@@ -1872,16 +1785,12 @@
         <name>Sledgehammer</name>
 
         <effectDescription>
-            <name>
-                Basic mode
-            </name>
+            <name>Basic mode</name>
             Deal 2 damage to 1 target on your square.
         </effectDescription>
 
         <effectDescription>
-            <name>
-                Pulverize mode
-            </name>
+            <name>Pulverize mode</name>
             Deal 3 damage to 1 target  on your square, then move that target 0,1 or 2 squares in one direction.
         </effectDescription>
 

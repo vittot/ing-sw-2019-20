@@ -4,6 +4,8 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
+import game.model.effects.SimpleEffect;
+import game.model.effects.SquareDamageEffect;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +44,7 @@ public class ClientTextView implements View {
     }
 
     public char readChar(){
-        String string = fromKeyBoard.next();
+        String string = fromKeyBoard.nextLine();
         return string.charAt(0);
     }
 
@@ -92,7 +94,7 @@ public class ClientTextView implements View {
         int n;
         List<ClientMessage> reloadRequests = new ArrayList<>();
         do {
-               showWeapons(weaponsToReload,0,false);
+               showWeapons(weaponsToReload,0,false, true);
             do {
                 writeText("Insert the id of a weapon you want to reload or -1 to terminate the reload phase:");
                 n = readInt();
@@ -176,10 +178,10 @@ public class ClientTextView implements View {
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
         int n;
         writeText("Choose which of your weapons you want to use:");
-        showWeapons(myWeapons,0,true);
+        showWeapons(myWeapons,0,true, false);
         do{
             n = readInt();
-        }while (n<1 || n>=myWeapons.size());
+        }while (n<1 || n>myWeapons.size());
         controller.getClient().sendMessage(new ChooseWeaponToShootResponse(myWeapons.get(n-1)));
 
     }
@@ -187,41 +189,46 @@ public class ClientTextView implements View {
     @Override
     public void chooseFirstEffect(FullEffect baseEff, FullEffect altEff) {
         int n;
+        List<FullEffect> effects = new ArrayList<>();
+        List<CardPower> toUse = null;
+        effects.add(baseEff);
+        effects.add(altEff);
         writeText("Choose the base effect you want to apply:");
-        writeText("1. "+baseEff.getName());
-        writeText("   Description: "+baseEff.getDescription());
-        writeText("2. "+altEff.getName());
-        writeText("   Description: "+altEff.getDescription());
+        showEffects(effects,true);
         do{
             n = readInt();
-        }while(n != 1 || n != 2);
-        controller.getClient().sendMessage(new ChooseFirstEffectResponse(n));
+        }while(n != 1 && n != 2);
+        if(n == 2 && altEff.getPrice() != null)
+            toUse = powerUpSelection();
+        controller.getClient().sendMessage(new ChooseFirstEffectResponse(n,toUse));
     }
 
     @Override
     public void usePlusBeforeBase(FullEffect plusEff) {
         char t;
+        List<FullEffect> effects = new ArrayList<>();
+        effects.add(plusEff);
         writeText("Do you want to use this plus effect before than your weapon base effect?");
-        writeText("Name: "+plusEff.getName());
-        writeText("Description: "+plusEff.getDescription());
+        showEffects(effects,false);
         writeText("[Y]es or [N]o?");
         do{
             t = readChar();
         }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
-        controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t));
+        List<CardPower> toUse = powerUpSelection();
+        controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,toUse));
     }
 
     @Override
-    public void usePlusInOrder(List<FullEffect> plusEffects, int i) {
+    public void usePlusInOrder(List<FullEffect> plusEffects) {
         char t;
         writeText("Do you want to apply the plus effect, allow by your weapon, listed here:");
-        writeText("Name: "+plusEffects.get(i).getName());
-        writeText("Description: "+plusEffects.get(i).getDescription());
+        showEffects(Collections.singletonList(plusEffects.get(0)),false);
         writeText("[Y]es or [N]o?");
         do{
             t = readChar();
         }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
-        controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,i,t));
+        List<CardPower> toUse = powerUpSelection();
+        controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,toUse,t));
     }
 
     @Override
@@ -230,11 +237,7 @@ public class ClientTextView implements View {
         int i=1;
         FullEffect toApply = null;
         writeText("Choose the plus effect you want to apply or insert -1 to terminate your action:");
-        for(FullEffect f : plusEffects){
-            writeText(i+"- Name: "+f.getName());
-            writeText("   Description: "+f.getDescription());
-            i++;
-        }
+        showEffects(plusEffects,true);
         do{
             n = readInt();
         }while(n != -1 && (n<1 || n>plusEffects.size()));
@@ -243,7 +246,8 @@ public class ClientTextView implements View {
         else {
             toApply = plusEffects.get(n-1);
             plusEffects.remove(n-1);
-            controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, toApply));
+            List<CardPower> toUse = powerUpSelection();
+            controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, toApply, toUse));
         }
     }
 
@@ -402,41 +406,83 @@ public class ClientTextView implements View {
      * Choose a specified number of targets from the proposed
      * @param possibleTarget
      */
-    public void chooseTargetPhase(List<Target> possibleTarget){
+    public void chooseTargetPhase(List<Target> possibleTarget, SimpleEffect currSimpleEffect){
+        ClientContext.get().setCurrentEffect(currSimpleEffect);
         int maxE = ClientContext.get().getCurrentEffect().getMaxEnemy();
         int minE = ClientContext.get().getCurrentEffect().getMinEnemy();
         int i = 0;
         int k= 12;
 
         List <Target> choosenTarget = new ArrayList<>();
-        writeText("Scegli tra "+minE+"e "+maxE+" dei seguenti target: (write the number)");
+        writeText("Choose between "+minE+" and "+maxE+" targets to apply your attack: (write the number)");
         writeText(i +" to exit" );
         i++;
         for (Target tg : possibleTarget){
             writeText(i +" player: "+tg.returnName());
             i++;
         }
-        for(i = 0; i <= maxE && k>0 ; ){
+        for(i = 0; i < maxE && k>0 ; ){
             k = readInt();
             if(k < possibleTarget.size() && k > 0){
-                if(choosenTarget.contains(k)){
+                if(choosenTarget.contains(possibleTarget.get(k-1))){
                     writeText("Player already selected");
                 }else {
-                    choosenTarget.add(possibleTarget.get(k));
+                    choosenTarget.add(possibleTarget.get(k-1));
                     i++;
                 }
             }
             else if(k == 0){
                 if(choosenTarget.size()>=minE)
                     writeText("Selection Completed!");
-                else
+                else {
                     k = 12;
+                    writeText("You haven't selected enough targets!");
+                }
             }
             else{
                 writeText("Not enough target");
             }
         }
         controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
+    }
+
+    public void chooseTargetPhase(List<Square> possibleTarget, SquareDamageEffect currSimpleEffect){
+        ClientContext.get().setCurrentEffect(currSimpleEffect);
+        int max = ClientContext.get().getCurrentEffect().getMaxEnemy();
+        int min = ClientContext.get().getCurrentEffect().getMinEnemy();
+        List <Square> choosenSquare = new ArrayList<>();
+        int i = 0;
+        int k= 12;
+        writeText("Choose between "+min+" and "+max+" squares to apply your attack: (write the number)");
+        writeText(i +" to exit" );
+        i++;
+        for (Square tg : possibleTarget){
+            writeText(i +" Square -> X: "+tg.getX()+", Y: "+tg.getY());
+            i++;
+        }
+        for(i = 0; i <= max && k>0 ; ){
+            k = readInt();
+            if(k < possibleTarget.size() && k > 0){
+                if(choosenSquare.contains(possibleTarget.get(k-1))){
+                    writeText("Square already selected");
+                }else {
+                    choosenSquare.add(possibleTarget.get(k-1));
+                    i++;
+                }
+            }
+            else if(k == 0){
+                if(choosenSquare.size()>=min)
+                    writeText("Selection Completed!");
+                else {
+                    k = 12;
+                    writeText("You haven't selected enough squares!");
+                }
+            }
+            else{
+                writeText("Not enough square");
+            }
+        }
+        controller.getClient().sendMessage(new ChooseSquareToShootResponse(choosenSquare));
     }
 
     /**
@@ -527,9 +573,11 @@ public class ClientTextView implements View {
     @Override
     public void damageNotification(int idShooter, int dmg, int idHitted){
         if(idHitted == ClientContext.get().getMyID())
-            writeText("Player "+idShooter+" dealt "+dmg+" damage to you");
+            writeText("Player "+ClientContext.get().getMap().getPlayerById(idShooter).getNickName()+" dealt "+dmg+" damage to you");
         else if(idShooter != ClientContext.get().getMyID())
-            writeText("Player "+idShooter+" dealt "+dmg+" to player "+idHitted);
+            writeText("Player "+ClientContext.get().getMap().getPlayerById(idShooter).getNickName()+" dealt "+dmg+" damage to player "+ClientContext.get().getMap().getPlayerById(idHitted).getNickName());
+        else
+            writeText("You dealt "+dmg+" damage to player "+ClientContext.get().getMap().getPlayerById(idHitted).getNickName());
     }
 
     /**
@@ -722,8 +770,10 @@ public class ClientTextView implements View {
     public void notifyMarks(int marks, int idHitten, int idShooter) {
         if(idHitten == ClientContext.get().getMyID())
             writeText("You have received "+marks+" marks from "+ClientContext.get().getMap().getPlayerById(idShooter).getNickName()+"!");
-        else
+        else if(idShooter != ClientContext.get().getMyID())
             writeText("Player "+ClientContext.get().getMap().getPlayerById(idHitten).getNickName()+" has received "+marks+" marks from "+ClientContext.get().getMap().getPlayerById(idShooter).getNickName()+"!");
+        else
+            writeText("You give "+marks+" marks to "+ClientContext.get().getMap().getPlayerById(idHitten).getNickName()+"!");
     }
 
     /**
@@ -883,7 +933,7 @@ public class ClientTextView implements View {
                 if(sq.getWeapons() != null) {
                     writeText("In position X= " + sq.getX() + "  Y= " + sq.getY() + " there are:");
                     for(CardWeapon cw : sq.getWeapons()){
-                        printWeapon(cw,0);
+                        printWeapon(cw,0,true);
                     }
                 }
             }
@@ -896,7 +946,7 @@ public class ClientTextView implements View {
         String death = "\u2620";
         Player p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         writeText("Your weapon: ");
-        showWeapons(p.getWeapons(),0, false);
+        showWeapons(p.getWeapons(),0, false, false);
 
         writeText("Your munition");
         for(Color c : p.getAmmo()){
@@ -948,13 +998,12 @@ public class ClientTextView implements View {
         int choiceWD = -1;
         CardWeapon wG;
         CardWeapon wD = null;
-        String input;
         char t = 'Y';
         List<CardPower> toUse;
         Player myP = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         //Choose which weapon to grab
         writeText("Choose one weapon to grab between the possible: ");
-            showWeapons(weapons,1, true);
+            showWeapons(weapons,1, true, true);
         do{
             choiceWG = readInt();
         }while(choiceWG>weapons.size() || choiceWG<=0);
@@ -963,8 +1012,7 @@ public class ClientTextView implements View {
         if(myP.getWeapons().size()==3) {
             writeText("You already have 3 weapons, do you want to discard one of them to grab the new one ([Y]es, [N]o)?");
             do {
-                input = readText();
-                t = input.charAt(0);
+                t = readChar();
             } while (t != 'Y' || t != 'N' || t != 'y' || t != 'n');
             if (t == 'Y' || t == 'y') {
                 i = 1;
@@ -985,15 +1033,13 @@ public class ClientTextView implements View {
 
     private List<CardPower> powerUpSelection()
     {
-        String input;
         List<CardPower> toUse = null;
         char t;
         int i;
         Player myP = ClientContext.get().getMyPlayer();
         writeText("Do you want to use some of your power-up to pay ([Y]es, [N]o)?");
         do{
-            input = readText();
-            t = input.charAt(0);
+            t = readChar();
         }while(t != 'Y' && t != 'N' && t != 'y' && t != 'n');
         if(t == 'Y' || t == 'y')
         {
@@ -1022,16 +1068,18 @@ public class ClientTextView implements View {
      * print a weapon and is cost
      * @param cw, p
      */
-    public void printWeapon(CardWeapon cw, int p)
+    public void printWeapon(CardWeapon cw, int p, boolean showCost)
     {
         writeText(cw.getName());
-        System.out.print("       Cost: ");
-        if(cw.getPrice().size() == 1 && p==1)
-            System.out.print("Free");
-        else
-            for(Color c : cw.getPrice().subList(p,cw.getPrice().size()))
-                System.out.print(checkAmmoColor(c) + "■" + ANSI_RESET);
-        System.out.println("");
+        if (showCost) {
+            System.out.print("       Cost: ");
+            if (cw.getPrice().size() == 1)
+                System.out.print("Free");
+            else
+                for (Color c : cw.getPrice().subList(p, cw.getPrice().size()))
+                    System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
+            System.out.println("");
+        }
     }
 
     /**
@@ -1042,21 +1090,55 @@ public class ClientTextView implements View {
      * @param p
      * @param numeric
      */
-    public void showWeapons(List<CardWeapon> cws, int p, boolean numeric) {
+    public void showWeapons(List<CardWeapon> cws, int p, boolean numeric, boolean showCost) {
         int i = 1;
         if(numeric){
             for (CardWeapon cw : cws){
                 System.out.print(i + " ");
                 i++;
-                printWeapon(cw,p);
+                printWeapon(cw,p,showCost);
             }
         }
         else {
             for (CardWeapon cw : cws) {
-                printWeapon(cw, p);
+                printWeapon(cw, p,showCost);
             }
         }
 
 
+    }
+
+    private void showEffects(List<FullEffect> effects, boolean numeric){
+        FullEffect actual = null;
+        if(numeric) {
+            for (int i = 1; i <= effects.size(); i++) {
+                actual = effects.get(i - 1);
+                writeText(i + ". Name: " + actual.getName());
+                writeText("   Description: " + actual.getDescription());
+                System.out.print("   Cost: ");
+                if (actual.getPrice() != null) {
+                    for (Color c : actual.getPrice())
+                        System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
+                }
+                else
+                    System.out.print("FREE");
+                System.out.println();
+            }
+        }
+        else {
+            for (int i = 1; i <= effects.size(); i++) {
+                actual = effects.get(i - 1);
+                writeText("Name: " + actual.getName());
+                writeText("Description: " + actual.getDescription());
+                System.out.print("  Cost: ");
+                if (actual.getPrice() != null) {
+                    for (Color c : actual.getPrice())
+                        System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
+                }
+                else
+                    System.out.print("FREE");
+                System.out.println();
+            }
+        }
     }
 }

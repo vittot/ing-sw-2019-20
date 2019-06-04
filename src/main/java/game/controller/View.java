@@ -2,6 +2,7 @@ package game.controller;
 
 import game.model.*;
 import game.model.effects.FullEffect;
+import game.model.effects.SimpleEffect;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ public interface View {
 
     void chooseSquarePhase(List<Square> possiblePositions);
 
-    void chooseTargetPhase(List<Target> possibleTargets);
+    void chooseTargetPhase(List<Target> possibleTargets, SimpleEffect currSimpleEffect);
 
     void chooseTurnActionPhase();
 
@@ -85,7 +86,7 @@ public interface View {
 
     void usePlusBeforeBase(FullEffect plusEff);
 
-    void usePlusInOrder(List<FullEffect> plusEffects, int i);
+    void usePlusInOrder(List<FullEffect> plusEffects);
 
     void choosePlusEffect(List<FullEffect> plusEffects);
 

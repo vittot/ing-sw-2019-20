@@ -4,6 +4,7 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
 import game.model.Square;
+import game.model.exceptions.MapOutOfLimitException;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class ChooseSquareResponse implements ClientMessage {
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) {
+    public ServerMessage handle(ClientMessageHandler handler) throws MapOutOfLimitException {
         return handler.handle(this);
     }
 }

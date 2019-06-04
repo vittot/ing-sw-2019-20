@@ -127,7 +127,7 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(ChooseTargetRequest serverMsg) {
-        clientView.chooseTargetPhase(serverMsg.getPossibleTargets());
+        clientView.chooseTargetPhase(serverMsg.getPossibleTargets(),serverMsg.getCurrSimpleEffect());
     }
 
     /**
@@ -201,7 +201,6 @@ public class ClientController implements ServerMessageHandler {
         Player shooter = ClientContext.get().getMap().getPlayerById(serverMsg.getShooterId());
         ClientContext.get().getMap().getPlayerById(serverMsg.getHit()).addDamage(shooter, serverMsg.getDamage());
         clientView.damageNotification(serverMsg.getShooterId(),serverMsg.getDamage(),serverMsg.getHit());
-
     }
 
     @Override
@@ -294,8 +293,9 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(PickUpWeaponResponse serverMsg) {
+        Player me = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         try {
-            ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).pickUpWeapon(serverMsg.getCw(),serverMsg.getCwToWaste(),serverMsg.getCp());
+            me.pickUpWeapon(serverMsg.getCw(),serverMsg.getCwToWaste(),serverMsg.getCp());
         } catch (InsufficientAmmoException e) {
             clientView.insufficientAmmoNotification();
         } catch (NoCardWeaponSpaceException e) {
@@ -433,9 +433,10 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyRespawn notifyRespawn) {
-
-        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyRespawn.getpId()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(notifyRespawn.getpId()));
-
+        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyRespawn.getpId()).findFirst().orElse(null);
+        if(p == null){
+            p = ClientContext.get().getMap().getPlayerById(notifyRespawn.getpId());
+        }
         try {
             ClientContext.get().getMap().movePlayer(p,notifyRespawn.getX(),notifyRespawn.getY());
         } catch (MapOutOfLimitException e) {
@@ -541,7 +542,7 @@ public class ClientController implements ServerMessageHandler {
 
     @Override
     public void handle(UsePlusByOrderRequest usePlusByOrderRequest) {
-        clientView.usePlusInOrder(usePlusByOrderRequest.getPlusEffects(),usePlusByOrderRequest.getI());
+        clientView.usePlusInOrder(usePlusByOrderRequest.getPlusEffects());
     }
 
     @Override
@@ -554,6 +555,13 @@ public class ClientController implements ServerMessageHandler {
         if(currWeapon != null) {
             currWeapon.setLoaded(false);
         }
+    }
+
+    @Override
+    public void handle(RemoveSpawnPowerUp removeSpawnPowerUp) {
+        Player me = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
+        if(me.getCardPower().contains(removeSpawnPowerUp.getPowerup()))
+            me.getCardPower().remove(removeSpawnPowerUp.getPowerup());
     }
 
     @Override

@@ -1,11 +1,13 @@
 package game.controller.commands;
 
+import game.model.exceptions.InsufficientAmmoException;
+import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardAmmoAvailableException;
 
 import java.io.Serializable;
 
 public interface ClientMessage extends Serializable {
-     ServerMessage handle(ClientMessageHandler handler) throws NoCardAmmoAvailableException;
+     ServerMessage handle(ClientMessageHandler handler) throws NoCardAmmoAvailableException, InsufficientAmmoException, MapOutOfLimitException;
       /*
         raccogli ammo -> power up
         raccogli arma
