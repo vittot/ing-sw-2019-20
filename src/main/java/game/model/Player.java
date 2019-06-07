@@ -468,7 +468,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
      * @param effect
      * @return
      */
-    public boolean canUsetWeaponEffect(FullEffect effect){
+    public boolean canUseWeaponEffect(FullEffect effect){
         List<Color> priceTmp;
         priceTmp = new ArrayList<>(effect.getPrice());
         return controlPayment(priceTmp);

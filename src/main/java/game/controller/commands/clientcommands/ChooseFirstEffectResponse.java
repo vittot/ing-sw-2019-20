@@ -7,6 +7,7 @@ import game.model.CardPower;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.NoCardAmmoAvailableException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseFirstEffectResponse implements ClientMessage {
@@ -29,6 +30,8 @@ public class ChooseFirstEffectResponse implements ClientMessage {
     }
 
     public List<CardPower> getToUse() {
-        return toUse;
+        if(toUse != null)
+            return toUse;
+        return new ArrayList<>();
     }
 }

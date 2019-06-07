@@ -338,22 +338,26 @@ public class Game {
         plusBefore = (weapon.getChild("plusBeforeBase").getText().trim().equals("true"));
         plusOrder = (weapon.getChild("plusOrder").getText().trim().equals("true"));
         insertDescription(effect, effectal, effectop, desc, names);
-        insertPrice(effect,effectal,effectop,price,priceal,priceop);
+        insertPrice(effectal,effectop,priceal,priceop);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
         wp.setId(this.id);
         this.deckWeapon.add(wp);
         Collections.shuffle(this.deckWeapon);
     }
 
-    private void insertPrice(FullEffect effect, FullEffect effectal, List<FullEffect> effectop, List price, List<Color> priceal, List<List<Color>> priceop) {
-        effect.setPrice(price);
+    private void insertPrice(FullEffect effectal, List<FullEffect> effectop, List<Color> priceal, List<List<Color>> priceop) {
+        //effect.setPrice(price);
         if(effectal!=null)
             effectal.setPrice(priceal);
         if(effectop==null)
             return;
         int i = 0;
         for(FullEffect fe : effectop){
-            fe.setPrice(priceop.get(i));
+            if(!priceop.isEmpty())
+                fe.setPrice(priceop.get(i));
+            else
+                fe.setPrice(null);
+            i++;
         }
     }
 
@@ -521,8 +525,9 @@ public class Game {
      */
     public List<FullEffect> takeEffectopz(Element weapon){
         List<FullEffect> effect = new ArrayList<FullEffect>();
-        FullEffect temp = new FullEffect();
+        FullEffect temp = null;
         for(Element ef : weapon.getChildren("optionalEffect")) {
+            temp = new FullEffect();
             for(Element efo : ef.getChildren()) {
                 try {
                     if (efo.getName().equals("areaDamageEffect")) temp.addSimpleEffect(createEquivalentAreaEffect(efo));
@@ -611,10 +616,14 @@ public class Game {
 
     public List<List<Color>> takePriceOpz(Element weapon){
         List<List<Color>> pricetot = new ArrayList<List<Color>>();
-        List<Color> price = new ArrayList<Color>();
+        List<Color> price = null;
+        Color c;
         for(int i = 0; i < weapon.getChildren("optionalPrice").size() ; i ++){
+            price = new ArrayList<Color>();
             for (Element pr : weapon.getChildren("optionalPrice").get(i).getChildren("ammo")){
-                price.add(createEquivalentAmmo(pr.getText().trim()));
+                c = createEquivalentAmmo(pr.getText().trim());
+                if(c!=Color.ANY)
+                    price.add(c);
             }
             pricetot.add(price);
         }

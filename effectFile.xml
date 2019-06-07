@@ -372,10 +372,10 @@
 
         <price>
             <ammo>
-                Blue
+                blue
             </ammo>
             <ammo>
-                Blue
+                blue
             </ammo>
             <ammo>
                 yellow
@@ -1198,7 +1198,7 @@
                 <differentTarget>anyone</differentTarget>
             </movementEffect>
         </optionalEffect>
-        <alternativeEffect>
+        <optionalEffect>
             <beforeBase>false</beforeBase>
             <squareDamageEffect>
                 <minEnemy>1</minEnemy>
@@ -1240,7 +1240,7 @@
                 <sameDirection>false</sameDirection>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
-        </alternativeEffect>
+        </optionalEffect>
         <plusBeforeBase>
             true
         </plusBeforeBase>

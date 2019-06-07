@@ -8,6 +8,7 @@ import game.model.effects.FullEffect;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.NoCardAmmoAvailableException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UsePlusEffectResponse implements ClientMessage {
@@ -31,6 +32,8 @@ public class UsePlusEffectResponse implements ClientMessage {
     }
 
     public List<CardPower> getToUse() {
+        if(toUse == null)
+            return new ArrayList<>();
         return toUse;
     }
 

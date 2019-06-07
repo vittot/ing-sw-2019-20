@@ -1,5 +1,7 @@
 package game.model.effects;
 
+import game.controller.ServerController;
+import game.controller.commands.ServerMessage;
 import game.model.Player;
 import game.model.Target;
 

@@ -150,4 +150,6 @@ public class SquareDamageEffect extends SimpleEffect {
     public int hashCode() {
         return Objects.hash(damage, marks, lastTargetSquare, sameDirection);
     }
+
+
 }

@@ -390,7 +390,7 @@ public class ClientTextView implements View {
         int posX;
         int posY;
         do{
-            writeText("Choose a square for complete your move: ");
+            writeText("Choose a square to complete your move: ");
             for(Square sq : possibleSquare){
                 writeText("X :" + sq.getX() + " Y : " + sq.getY());
             }
@@ -458,7 +458,7 @@ public class ClientTextView implements View {
         List <Square> choosenSquare = new ArrayList<>();
         int i = 0;
         int k= 12;
-        writeText("Choose between "+min+" and "+max+" squares to apply your attack: (write the number)");
+        writeText("Choose between "+min+" and "+max+" squares to apply your action: (write the number)");
         writeText(i +" to exit" );
         i++;
         for (Square tg : possibleTarget){
