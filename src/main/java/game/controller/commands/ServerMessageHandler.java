@@ -58,6 +58,6 @@ public interface ServerMessageHandler {
     void handle(NotifyPlayerExitedWaitingRoom notifyPlayerExitedWaitingRoom);
     void handle(NotifyPlayerJoinedWaitingRoom notifyPlayerJoinedWaitingRoom);
     void handle(RemoveSpawnPowerUp removeSpawnPowerUp);
-    void handle(NotifyWeaponRefill notifyWeaponRefill) throws MapOutOfLimitException;
-    void handle(NotifyAmmoRefill notifyAmmoRefill) throws MapOutOfLimitException;
+    void handle(NotifyWeaponRefill notifyWeaponRefill);
+    void handle(NotifyAmmoRefill notifyAmmoRefill);
 }

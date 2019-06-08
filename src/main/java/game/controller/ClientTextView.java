@@ -991,7 +991,7 @@ public class ClientTextView implements View {
         CardWeapon wG;
         CardWeapon wD = null;
         char t = 'Y';
-        List<CardPower> toUse;
+        List<CardPower> toUse = null;
         Player myP = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         //Choose which weapon to grab
         writeText("Choose one weapon to grab between the possible: ");
@@ -1016,8 +1016,9 @@ public class ClientTextView implements View {
                 }while (choiceWD <1 || choiceWD>3);
             }
         }
-        //Selection of power-up to pay
-        toUse = powerUpSelection();
+        //Selection of power-up to pay (if there is anything to pay)
+        if(wG.getPrice().size() > 1)
+            toUse = powerUpSelection();
         if (choiceWD != -1)
             wD = myP.getWeapons().get(choiceWD-1);
         controller.getClient().sendMessage(new PickUpWeaponRequest(wG,toUse, wD));
@@ -1057,7 +1058,7 @@ public class ClientTextView implements View {
     }
 
     /**
-     * print a weapon and is cost
+     * print a weapon and its cost
      * @param cw, p
      */
     public void printWeapon(CardWeapon cw, int p, boolean showCost)

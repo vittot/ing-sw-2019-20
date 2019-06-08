@@ -96,6 +96,16 @@ public class RMIClientHandler extends UnicastRemoteObject implements ClientHandl
 
     }
 
+    @Override
+    public void onReplaceWeapon(CardWeapon cw, Square s) {
+
+    }
+
+    @Override
+    public void onReplaceAmmo(CardAmmo ca, Square s) {
+
+    }
+
 
     //TODO: methods analogous to the socket Requests
 }

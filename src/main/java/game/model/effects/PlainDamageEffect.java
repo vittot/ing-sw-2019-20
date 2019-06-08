@@ -1,5 +1,6 @@
 package game.model.effects;
 
+import game.controller.EffectHandler;
 import game.controller.ServerController;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.servercommands.ChooseTargetRequest;
@@ -190,5 +191,10 @@ public class PlainDamageEffect extends SimpleEffect {
         if(searchTarget(p) == null)
             return false;
         return true;
+    }
+
+    @Override
+    public ServerMessage handle(EffectHandler h) {
+        return h.handle(this);
     }
 }

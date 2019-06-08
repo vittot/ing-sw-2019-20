@@ -580,19 +580,32 @@ public class ClientController implements ServerMessageHandler {
     }
 
     @Override
-    public void handle(NotifyWeaponRefill notifyWeaponRefill) throws MapOutOfLimitException {
+    public void handle(NotifyWeaponRefill notifyWeaponRefill){
         CardWeapon cw = notifyWeaponRefill.getCw();
         Square position = notifyWeaponRefill.getPosition();
         if(ClientContext.get().getMap() != null)
-            ClientContext.get().getMap().getSquare(position.getX(),position.getY()).addWeapon(Collections.singletonList(cw));
+        {
+            try{
+                ClientContext.get().getMap().getSquare(position.getX(),position.getY()).addWeapon(Collections.singletonList(cw));
+            }catch(MapOutOfLimitException e)
+            {
+                System.out.println("ERROR: tried to refill outside of game map");
+            }
+        }
+
     }
 
     @Override
-    public void handle(NotifyAmmoRefill notifyAmmoRefill) throws MapOutOfLimitException {
+    public void handle(NotifyAmmoRefill notifyAmmoRefill){
         CardAmmo ca = notifyAmmoRefill.getCa();
         Square position = notifyAmmoRefill.getPosition();
         if(ClientContext.get().getMap() != null)
-            ClientContext.get().getMap().getSquare(position.getX(),position.getY()).setCardAmmo(ca);
+            try{
+                ClientContext.get().getMap().getSquare(position.getX(),position.getY()).setCardAmmo(ca);
+            }catch(MapOutOfLimitException e)
+            {
+                System.out.println("ERROR: tried to refill outside of game map");
+            }
     }
 
     @Override

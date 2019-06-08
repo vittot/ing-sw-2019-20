@@ -1,5 +1,7 @@
 package game.model.effects;
 
+import game.controller.EffectHandler;
+import game.controller.commands.ServerMessage;
 import game.model.*;
 
 import java.util.ArrayList;
@@ -94,6 +96,11 @@ public class AreaDamageEffect extends SimpleEffect {
         if(searchTarget(p) == null)
             return false;
         return true;
+    }
+
+    @Override
+    public ServerMessage handle(EffectHandler h) {
+        return h.handle(this);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package game.model.effects;
 
+import game.controller.EffectHandler;
+import game.controller.commands.ServerMessage;
 import game.model.Direction;
 import game.model.Player;
 import game.model.Square;
@@ -133,6 +135,11 @@ public class SquareDamageEffect extends SimpleEffect {
     @Override
     public boolean checkEffect(SimpleEffect effect, Player p) {
         return searchTarget(p)==null;
+    }
+
+    @Override
+    public ServerMessage handle(EffectHandler h) {
+        return h.handle(this);
     }
 
     @Override

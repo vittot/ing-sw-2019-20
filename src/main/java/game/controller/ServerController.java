@@ -259,7 +259,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             //apply without asking nothing if it is not necessary
             s.applyEffect((Player) selectableTarget.get(0), Collections.singletonList(selectableSquares.get(0)));
             if (currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
-                return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+                return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
             else
                 return terminateFullEffect();
         }
@@ -783,7 +783,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
         baseDone = true; //TODO: check
 
-        return handleEffect(currSimpleEffect);
+        return currSimpleEffect.handle(this);
 
     }
 
@@ -880,7 +880,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         currFullEffect = baseEff;
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
         baseDone = true;
-        return handleEffect(currSimpleEffect);
+        return currSimpleEffect.handle(this);
         //return managePlusEffectChoice();
     }
 
@@ -922,7 +922,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         }
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
         baseDone = true;
-        return handleEffect(currSimpleEffect);
+        return currSimpleEffect.handle(this);
     }
 
     @Override
@@ -939,7 +939,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 //TODO: ??
                 return new InsufficientAmmoResponse();
             }
-            return handleEffect(currSimpleEffect);
+            return currSimpleEffect.handle(this);
         }
         return firstEffect();
     }
@@ -973,7 +973,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 //TODO: ??
                 return new InsufficientAmmoResponse();
             }
-            return handleEffect(currSimpleEffect);
+            return currSimpleEffect.handle(this);
         }
         else
             return terminateFullEffect();
@@ -982,7 +982,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     private ServerMessage terminateFullEffect() {
         if(currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
-            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+            return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
         clientHandler.sendMessage(new ShootActionResponse(selectedWeapon,ammoToPay,powerUpToPay));
         return checkShootActionEnd();
     }
@@ -998,7 +998,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             //TODO: ??
             return new InsufficientAmmoResponse();
         }
-        return handleEffect(currSimpleEffect);
+        return currSimpleEffect.handle(this);
     }
 
     @Override
@@ -1023,38 +1023,17 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             return checkShootActionEnd();
         else
             nSimpleEffect++;
-        if(currSimpleEffect instanceof MovementEffect){
-            MovementEffect ef = (MovementEffect) currSimpleEffect;
-            if(!ef.isMoveShooter())
-            {
-                selectableTarget = e.searchTarget(currPlayer);
-                if(selectableTarget.isEmpty())
-                    return new InvalidWeaponResponse();
-                if(selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
-                    return new ChooseTargetRequest(selectableTarget, currSimpleEffect);
-            }
-            else{
-                selectableTarget = Collections.singletonList(currPlayer);
-            }
 
-            selectableSquares = ef.selectPosition(currPlayer);
-            if(selectableSquares.isEmpty())
-                return new InvalidWeaponResponse();
-            if(selectableSquares.size() > 1)
-                return new ChooseSquareRequest(selectableSquares);
-            e.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
-        }
-        else {
-            selectableTarget = e.searchTarget(currPlayer);
-            if (selectableTarget.isEmpty())
-                return new InvalidWeaponResponse();
+        selectableTarget = e.searchTarget(currPlayer);
+        if (selectableTarget.isEmpty())
+            return new InvalidWeaponResponse();
 
-            if (selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
-                return new ChooseTargetRequest(selectableTarget, currSimpleEffect);
+        if (selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
+            return new ChooseTargetRequest(selectableTarget, currSimpleEffect);
 
-            //apply without asking nothing if it is not necessary
-            e.applyEffect(currPlayer, selectableTarget);
-        }
+        //apply without asking nothing if it is not necessary
+        e.applyEffect(currPlayer, selectableTarget);
+
         return terminateFullEffect();
     }
 
@@ -1070,12 +1049,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     {
         currSimpleEffect = e;
         if(nSimpleEffect == currFullEffect.getSimpleEffects().size())
-        {
-            nSimpleEffect=0;
-            //setNextFullEffect();
-        }
+            return checkShootActionEnd();
         else
             nSimpleEffect++;
+
 
         if(!e.isMoveShooter())
         {
@@ -1089,19 +1066,14 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             selectableTarget = Collections.singletonList(currPlayer);
         }
 
-
         selectableSquares = e.selectPosition(currPlayer);
         if(selectableSquares.isEmpty())
             return new InvalidWeaponResponse();
         if(selectableSquares.size() > 1)
             return new ChooseSquareRequest(selectableSquares);
-
-        //apply without asking nothing if it is not necessary
         e.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
-        if(currFullEffect != null)
-            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
 
-        return new OperationCompletedResponse();
+        return terminateFullEffect();
     }
 
     /*
@@ -1191,6 +1163,11 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(RoomDamageEffect e) {
+        return handleOtherEffect(e);
+    }
+
+    @Override
+    public ServerMessage handle(AreaDamageEffect e) {
         return handleOtherEffect(e);
     }
 }
