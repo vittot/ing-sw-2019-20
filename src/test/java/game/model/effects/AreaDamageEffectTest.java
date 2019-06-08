@@ -66,7 +66,7 @@ class AreaDamageEffectTest {
      * Search for visible targets (used by most weapons)
      */
     @Test
-    void searchVisibleTargets() throws MapOutOfLimitException {
+    void searchVisibleTargets() {
         effect = new AreaDamageEffect(1,3,1,1,TargetVisibility.VISIBLE,3,1,2);
         List<Target> targets = effect.searchTarget(game.getPlayer(4));
         List<Target> expTargets = new ArrayList<>();
@@ -81,7 +81,7 @@ class AreaDamageEffectTest {
      * Apply damage to a square and so to a specific range of players in it
      */
     @Test
-    void applyDamage() throws MapOutOfLimitException {
+    void applyDamage() {
         List<Target> targets = new ArrayList<>();
         targets.add(game.getPlayer(1));
         targets.add(game.getPlayer(2));

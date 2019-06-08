@@ -3,6 +3,8 @@ package game.controller;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,6 +13,7 @@ import java.util.concurrent.Executors;
  */
 public class GameServer {
     private ServerSocket serverSocket;
+    private RMIListener rmiListener;
     private ExecutorService pool;
     private boolean close;
 
@@ -25,6 +28,9 @@ public class GameServer {
         close = false;
         System.out.println("GameServer listening on port 5000");
         //TODO bind on registy for RMI
+        rmiListener = new RMIListener();
+        Registry registry = LocateRegistry.createRegistry(1099);
+        registry.rebind("rmiListener",rmiListener);
     }
 
     /**

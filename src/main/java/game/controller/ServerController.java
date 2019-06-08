@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ServerController implements ClientMessageHandler, PlayerObserver {
+public class ServerController implements ClientMessageHandler, PlayerObserver, EffectHandler {
     // reference to the Networking layer
-    private SocketClientHandler clientHandler;
+    private ClientHandler clientHandler;
 
     // reference to the Model
     private Game model;
@@ -46,7 +46,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     private String nickname;
 
 
-    public ServerController(SocketClientHandler clientHandler) {
+    public ServerController(ClientHandler clientHandler) {
 
         this.clientHandler = clientHandler;
         this.state = ServerState.JUST_LOGGED;
@@ -54,7 +54,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
 
     public ServerController(){ }
 
-    public SocketClientHandler getClientHandler() {
+    public ClientHandler getClientHandler() {
         return clientHandler;
     }
 
@@ -136,8 +136,15 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     }
 
     @Override
-    public ServerMessage handle(ChooseSquareResponse clientMsg) throws MapOutOfLimitException {
-        Square selectedSquare = model.getMap().getSquare(clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
+    public ServerMessage handle(ChooseSquareResponse clientMsg) {
+        Square selectedSquare;
+        try{
+            selectedSquare = model.getMap().getSquare(clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
+        }catch(MapOutOfLimitException e)
+        {
+            //TODO: ??
+            return new InvalidTargetResponse();
+        }
         boolean correctSquare = false;
         for(Square s : selectableSquares)
             if(s.equals(selectedSquare))
@@ -313,7 +320,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
 
     }
     @Override
-    public ServerMessage handle(GrabActionRequest clientMsg) throws NoCardAmmoAvailableException {
+    public ServerMessage handle(GrabActionRequest clientMsg) {
         List<CardWeapon> possibleToGrab = new ArrayList<>();
         if (currPlayer.getPosition().isRespawn()) {
             if (currPlayer.getPosition().getWeapons() != null) {
@@ -332,7 +339,14 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
             if (currPlayer.getPosition().getCardAmmo() != null) {
                 CardAmmo toGrab = currPlayer.getPosition().getCardAmmo();
                 List<Color> listA = new ArrayList<>(toGrab.getAmmo());
-                List<CardPower> listCp = new ArrayList<>(currPlayer.pickUpAmmo());
+                List<CardPower> listCp;
+                try {
+                    listCp = new ArrayList<>(currPlayer.pickUpAmmo());
+                }catch(NoCardAmmoAvailableException e)
+                {
+                    //TODO: send an error message?
+                    return new InvalidGrabPositionResponse();
+                }
                 state = ServerState.HANDLING_GRAB;
                 clientHandler.sendMessage(new PickUpAmmoResponse(listA,listCp));
                 if(model.getCurrentTurn().getNumOfActions()>0){
@@ -440,10 +454,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                     for(CardWeapon cw : weaponsToReload)
                         if(!currPlayer.canReloadWeapon(cw))
                             weaponsToReload.remove(cw);
-                    if (weaponsToReload != null) {
-                        state = ServerState.WAITING_RELOAD;
-                        return new ReloadWeaponAsk(weaponsToReload);
-                    }
+                if (weaponsToReload != null) {
+                    state = ServerState.WAITING_RELOAD;
+                    return new ReloadWeaponAsk(weaponsToReload);
+                }
             }
             endTurnManagement();
             //if(model.getnPlayerToBeRespawned() == 0)
@@ -597,7 +611,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         else
             return new InvalidActionResponse();
         /*CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
-
         if( (clientMsg.getBaseEffect() != null && clientMsg.getAltEffect() != null))
             return new InvalidWeaponResponse();
         if(clientMsg.getBaseEffect() != null && !clientMsg.getBaseEffect().equals(w.getBaseEffect()))
@@ -614,20 +627,17 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                 if(!clientMsg.getPlusEffects().get(i).equals(w.getPlusEffects().get(i)))
                     return new InvalidWeaponResponse();
         }
-
         List<Color> totalAmmo = new ArrayList<>();
         for(FullEffect fe : clientMsg.getPlusEffects())
             totalAmmo.addAll(fe.getPrice());
         if(clientMsg.getAltEffect() != null)
             totalAmmo.addAll(clientMsg.getAltEffect().getPrice());
-
         try{
             currPlayer.pay(totalAmmo,clientMsg.getPaymentWithPowerUp());
         }catch (InsufficientAmmoException ex)
         {
             return new InvalidWeaponResponse();
         }
-
         selectedWeapon = w;
         selectedPlusEffects = clientMsg.getPlusEffects();
         nSimpleEffect = 0;
@@ -642,7 +652,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         {
             baseDone = true;
             currFullEffect = baseAltEffect;
-
         }
         return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));*/
     }
@@ -900,11 +909,17 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     }
 
     @Override
-    public ServerMessage handle(ChooseFirstEffectResponse chooseFirstEffectResponse) throws InsufficientAmmoException {
+    public ServerMessage handle(ChooseFirstEffectResponse chooseFirstEffectResponse) {
         if(chooseFirstEffectResponse.getN() == 1)
             currFullEffect = selectedWeapon.getBaseEffect();
         else {
-            addFinalPayment(currFullEffect.getPrice(),chooseFirstEffectResponse.getToUse());
+            try {
+                addFinalPayment(currFullEffect.getPrice(), chooseFirstEffectResponse.getToUse());
+            }catch(InsufficientAmmoException e)
+            {
+                //TODO: ??
+                return new InsufficientAmmoResponse();
+            }
             currFullEffect = selectedWeapon.getAltEffect();
         }
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
@@ -914,12 +929,18 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     }
 
     @Override
-    public ServerMessage handle(UsePlusBeforeResponse usePlusBeforeResponse) throws InsufficientAmmoException {
+    public ServerMessage handle(UsePlusBeforeResponse usePlusBeforeResponse) {
         if(usePlusBeforeResponse.getT() == 'Y' || usePlusBeforeResponse.getT() == 'y') {
             plusBeforeBase = usePlusBeforeResponse.getPlusEff();
             currFullEffect = plusBeforeBase;
             currSimpleEffect = currFullEffect.getSimpleEffect(0);
-            addFinalPayment(currFullEffect.getPrice(),usePlusBeforeResponse.getToUse());
+            try{
+                addFinalPayment(currFullEffect.getPrice(),usePlusBeforeResponse.getToUse());
+            }catch(InsufficientAmmoException e)
+            {
+                //TODO: ??
+                return new InsufficientAmmoResponse();
+            }
             return handleEffect(currSimpleEffect);
         }
         return firstEffect();
@@ -942,12 +963,18 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     }
 
     @Override
-    public ServerMessage handle(UseOrderPlusResponse useOrderPlusResponse) throws InsufficientAmmoException {
+    public ServerMessage handle(UseOrderPlusResponse useOrderPlusResponse){
         if(useOrderPlusResponse.getT() == 'Y' || useOrderPlusResponse.getT() == 'y') {
             remainingPlusEffects = remainingPlusEffects.subList(1,remainingPlusEffects.size());
             currFullEffect = useOrderPlusResponse.getPlusEffects().get(0);
             currSimpleEffect = currFullEffect.getSimpleEffect(0);
-            addFinalPayment(currFullEffect.getPrice(),useOrderPlusResponse.getToUse());
+            try{
+                addFinalPayment(currFullEffect.getPrice(),useOrderPlusResponse.getToUse());
+            }catch(InsufficientAmmoException e)
+            {
+                //TODO: ??
+                return new InsufficientAmmoResponse();
+            }
             return handleEffect(currSimpleEffect);
         }
         else
@@ -964,11 +991,16 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     }
 
     @Override
-    public ServerMessage handle(UsePlusEffectResponse usePlusEffectResponse) throws InsufficientAmmoException {
+    public ServerMessage handle(UsePlusEffectResponse usePlusEffectResponse) {
         remainingPlusEffects = new ArrayList<>(usePlusEffectResponse.getPlusRemained());
         currFullEffect = usePlusEffectResponse.getEffectToApply();
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
-        addFinalPayment(currFullEffect.getPrice(),usePlusEffectResponse.getToUse());
+        try {
+            addFinalPayment(currFullEffect.getPrice(), usePlusEffectResponse.getToUse());
+        }catch(InsufficientAmmoException e){
+            //TODO: ??
+            return new InsufficientAmmoResponse();
+        }
         return handleEffect(currSimpleEffect);
     }
 
@@ -986,7 +1018,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
      * It's overloaded for MovementEffect
      * @return
      */
-    private ServerMessage handleEffect(SimpleEffect e)
+    private ServerMessage handleOtherEffect(SimpleEffect e)
     {
         currSimpleEffect = e;
         if(nSimpleEffect == currFullEffect.getSimpleEffects().size())
@@ -1021,7 +1053,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
      * When fullEffects are terminated it return a confirm message
      * @return
      */
-    private ServerMessage handleEffect(MovementEffect e)
+    private ServerMessage handleMovementEffect(MovementEffect e)
     {
         currSimpleEffect = e;
         if(nSimpleEffect == currFullEffect.getSimpleEffects().size())
@@ -1130,4 +1162,23 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     }
 
 
+    @Override
+    public ServerMessage handle(MovementEffect e) {
+        return handleMovementEffect(e);
+    }
+
+    @Override
+    public ServerMessage handle(PlainDamageEffect e) {
+        return handleOtherEffect(e);
+    }
+
+    @Override
+    public ServerMessage handle(SquareDamageEffect e) {
+        return handleOtherEffect(e);
+    }
+
+    @Override
+    public ServerMessage handle(RoomDamageEffect e) {
+        return handleOtherEffect(e);
+    }
 }

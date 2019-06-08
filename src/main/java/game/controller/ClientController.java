@@ -19,7 +19,6 @@ import static javafx.application.Platform.runLater;
 
 public class ClientController implements ServerMessageHandler {
     private final Client client;
-    private Thread receiver;
     private View clientView;
     private List<Action> availableActions;
     private ClientState state;
@@ -63,24 +62,10 @@ public class ClientController implements ServerMessageHandler {
     /**
      * Start the listener thread for ServerMessages
      */
-    public void start() {
-
-        receiver = new Thread(
-
-                () -> {
-                    ServerMessage sm;
-                    do{
-                        sm = client.receiveMessage();
-                        try {
-                            sm.handle(this);
-                        } catch (MapOutOfLimitException e) {
-                            e.printStackTrace();
-                        }
-                    }while(sm != null);
-                }
-        );
-        receiver.start();
+    private void start() {
+        client.startListening(this);
     }
+
 
 
     public void run() throws IOException {
@@ -442,8 +427,14 @@ public class ClientController implements ServerMessageHandler {
      * @param notifyGrabCardAmmo
      */
     @Override
-    public void handle(NotifyGrabCardAmmo notifyGrabCardAmmo) throws MapOutOfLimitException {
-        ClientContext.get().getMap().getSquare(notifyGrabCardAmmo.getX(),notifyGrabCardAmmo.getY()).setCardAmmo(null);
+    public void handle(NotifyGrabCardAmmo notifyGrabCardAmmo) {
+        try {
+            ClientContext.get().getMap().getSquare(notifyGrabCardAmmo.getX(), notifyGrabCardAmmo.getY()).setCardAmmo(null);
+        }catch(MapOutOfLimitException e)
+        {
+            clientView.notifyCompletedOperation("ERROR: receive a notification about card ammo grab outside of the map!");
+            return;
+        }
         if(notifyGrabCardAmmo.getpId() != ClientContext.get().getMyID())
             for(Color c : notifyGrabCardAmmo.getAmmos())
                 ClientContext.get().getMap().getPlayerById(notifyGrabCardAmmo.getpId()).addAmmo(c);

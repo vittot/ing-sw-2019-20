@@ -8,7 +8,7 @@ import game.model.exceptions.NoCardAmmoAvailableException;
 public class GrabActionRequest implements ClientMessage {
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) throws NoCardAmmoAvailableException {
+    public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);
     }
 }

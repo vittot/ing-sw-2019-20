@@ -35,7 +35,7 @@ public class UsePlusEffectResponse implements ClientMessage {
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) throws NoCardAmmoAvailableException, InsufficientAmmoException {
+    public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);
     }
 }

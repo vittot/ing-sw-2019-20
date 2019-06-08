@@ -2,6 +2,8 @@ package game.controller;
 
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerMessageHandler;
+import game.model.exceptions.MapOutOfLimitException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,6 +14,7 @@ public class SocketClient implements Client {
     private final String host;
     private final int port;
     private Socket socket;
+    private Thread receiver;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outStream;
 
@@ -32,6 +35,22 @@ public class SocketClient implements Client {
 
     }
 
+    @Override
+    public void startListening(ServerMessageHandler handler)
+    {
+        receiver = new Thread(
+
+                () -> {
+                    ServerMessage sm;
+                    do{
+                        sm = this.receiveMessage();
+                        sm.handle(handler);
+                    }while(sm != null);
+                }
+        );
+        receiver.start();
+    }
+
     /**
      * Send a message to the server
      * @param msg
@@ -46,7 +65,7 @@ public class SocketClient implements Client {
         }
     }
 
-    public ServerMessage receiveMessage() {
+    private ServerMessage receiveMessage() {
         try {
             return (ServerMessage) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e){

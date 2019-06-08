@@ -4,6 +4,8 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.servercommands.*;
 import game.model.*;
+import game.model.effects.FullEffect;
+import game.model.effects.SimpleEffect;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,11 +13,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
-import java.util.SortedSet;
 
-public class SocketClientHandler implements Runnable, GameListener {
+public class SocketClientHandler implements Runnable, ClientHandler {
 
     private Socket socket;
     private final ObjectInputStream inStream;
@@ -24,7 +24,7 @@ public class SocketClientHandler implements Runnable, GameListener {
 
     private ServerController controller;
 
-    public SocketClientHandler(Socket s) throws IOException {
+    SocketClientHandler(Socket s) throws IOException {
         this.socket = s;
         this.outStream = new ObjectOutputStream(s.getOutputStream());
         this.inStream = new ObjectInputStream(s.getInputStream());
@@ -39,6 +39,7 @@ public class SocketClientHandler implements Runnable, GameListener {
      * Send a message to the client
      * @param msg
      */
+    @Override
     public void sendMessage(ServerMessage msg) {
         if(controller.getCurrPlayer() == null || !controller.getCurrPlayer().isSuspended())
             try{
@@ -122,7 +123,7 @@ public class SocketClientHandler implements Runnable, GameListener {
     @Override
     public void onChangeTurn(Player p) {
         sendMessage(new NotifyTurnChanged(p.getId()));
-        
+
     }
 
     /**
@@ -193,4 +194,5 @@ public class SocketClientHandler implements Runnable, GameListener {
             sendMessage(new NotifyPlayerRejoin(player.getId()));
         }
     }
+
 }

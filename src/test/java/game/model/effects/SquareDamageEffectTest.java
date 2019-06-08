@@ -69,7 +69,7 @@ class SquareDamageEffectTest {
      * Search for visible targets (used by most weapons)
      */
     @Test
-    void searchVisibleTargets() throws MapOutOfLimitException {
+    void searchVisibleTargets() throws MapOutOfLimitException{
         effect = new SquareDamageEffect(1,1,1,2,TargetVisibility.VISIBLE,1,1,false,false);
         List<Target> targets = effect.searchTarget(game.getPlayer(4));
         List<Target> expTargets = new ArrayList<>();

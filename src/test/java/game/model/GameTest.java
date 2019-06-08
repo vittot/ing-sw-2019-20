@@ -133,7 +133,7 @@ class GameTest {
     }
 
     @Test
-    void checkMap() throws MapOutOfLimitException {
+    void checkMap() throws MapOutOfLimitException{
         g.setMap(g.readMap(99, "mapFile.xml"));
         GameMap map = new GameMap(99,4,3);
         Edge [] ed = new Edge[4];

@@ -6,13 +6,13 @@ import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardAmmoAvailableException;
 
 public interface ClientMessageHandler {
-    ServerMessage handle (ChooseSquareResponse clientMsg) throws MapOutOfLimitException;
+    ServerMessage handle (ChooseSquareResponse clientMsg);
 
     ServerMessage handle (ChooseTargetResponse clientMsg);
 
     ServerMessage handle (ChooseTurnActionResponse clientMsg);
 
-    ServerMessage handle (GrabActionRequest clientMsg) throws NoCardAmmoAvailableException;
+    ServerMessage handle (GrabActionRequest clientMsg);
 
     ServerMessage handle (MovementActionRequest clientMsg);
 
@@ -44,13 +44,13 @@ public interface ClientMessageHandler {
 
     ServerMessage handle(ChooseWeaponToShootResponse chooseWeaponToShootResponse);
 
-    ServerMessage handle(ChooseFirstEffectResponse chooseFirstEffectResponse) throws InsufficientAmmoException;
+    ServerMessage handle(ChooseFirstEffectResponse chooseFirstEffectResponse);
 
-    ServerMessage handle(UsePlusBeforeResponse usePlusBeforeResponse) throws InsufficientAmmoException;
+    ServerMessage handle(UsePlusBeforeResponse usePlusBeforeResponse);
 
-    ServerMessage handle(UseOrderPlusResponse useOrderPlusResponse) throws InsufficientAmmoException;
+    ServerMessage handle(UseOrderPlusResponse useOrderPlusResponse);
 
-    ServerMessage handle(UsePlusEffectResponse usePlusEffectResponse) throws InsufficientAmmoException;
+    ServerMessage handle(UsePlusEffectResponse usePlusEffectResponse);
 
     ServerMessage handle(TerminateShootAction terminateShootAction);
 

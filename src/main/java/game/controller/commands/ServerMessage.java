@@ -5,7 +5,7 @@ import game.model.exceptions.MapOutOfLimitException;
 import java.io.Serializable;
 
 public interface ServerMessage extends Serializable {
-    void handle(ServerMessageHandler handler) throws MapOutOfLimitException;
+    void handle(ServerMessageHandler handler); //throws MapOutOfLimitException;
     /*
         Scegli major azione(M/S/R)
         Scegli minor action.list

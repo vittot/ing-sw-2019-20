@@ -340,7 +340,7 @@ public class Square implements Target, Serializable {
      * @throws MapOutOfLimitException if the movement put any Player outside of the GameMap
      */
     @Override
-    public void move(int numSquare, Direction dir) throws MapOutOfLimitException {
+    public void move(int numSquare, Direction dir) throws MapOutOfLimitException{
         for (Player p : players) {
             p.move(numSquare, dir);
         }

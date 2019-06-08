@@ -34,7 +34,7 @@ public class UsePlusBeforeResponse implements ClientMessage {
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) throws NoCardAmmoAvailableException {
+    public ServerMessage handle(ClientMessageHandler handler) {
         return null;
     }
 }
