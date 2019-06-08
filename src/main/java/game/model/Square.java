@@ -411,4 +411,11 @@ public class Square implements Target, Serializable {
         return result;
     }*/
 
+    @Override
+    public String toString() {
+        return "Square{" +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

@@ -193,4 +193,14 @@ public class SocketClientHandler implements Runnable, GameListener {
             sendMessage(new NotifyPlayerRejoin(player.getId()));
         }
     }
+
+    @Override
+    public void onReplaceWeapon(CardWeapon cw, Square s) {
+        sendMessage(new NotifyWeaponRefill(cw,s));
+    }
+
+    @Override
+    public void onReplaceAmmo(CardAmmo ca, Square s) {
+        sendMessage(new NotifyAmmoRefill(ca,s));
+    }
 }

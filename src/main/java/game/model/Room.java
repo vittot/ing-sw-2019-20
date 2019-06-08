@@ -72,4 +72,12 @@ public class Room implements Target, Serializable {
     public String returnName() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "color=" + color +
+                ", map=" + map +
+                '}';
+    }
 }

@@ -610,6 +610,15 @@ public class Player implements Target, Serializable, Comparable<Player> {
     }
 
     @Override
+    public String toString() {
+        return "Player{" +
+                ", id=" + id +
+                ", nickName='" + nickName +
+                "color=" + color +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

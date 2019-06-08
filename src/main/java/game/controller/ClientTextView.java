@@ -4,6 +4,7 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
+import game.model.effects.MovementEffect;
 import game.model.effects.SimpleEffect;
 import game.model.effects.SquareDamageEffect;
 
@@ -417,77 +418,35 @@ public class ClientTextView implements View {
         int minE = ClientContext.get().getCurrentEffect().getMinEnemy();
         int i = 0;
         int k= 12;
-
-        List <Target> choosenTarget = new ArrayList<>();
-        writeText("Choose between "+minE+" and "+maxE+" targets to apply your attack: (write the number)");
-        writeText(i +" to exit" );
+        List<Target> choosenTarget = new ArrayList<>();
+        writeText("Choose between " + minE + " and " + maxE + " targets to apply your attack: (write the number)");
+        writeText(i + " to exit");
         i++;
-        for (Target tg : possibleTarget){
-            writeText(i +" player: "+tg.returnName());
+        for (Target tg : possibleTarget) {
+            writeText(i + ". " + tg.toString());
             i++;
         }
-        for(i = 0; i < maxE && k>0 ; ){
+        for (i = 0; i < maxE && k > 0; ) {
             k = readInt();
-            if(k < possibleTarget.size() && k > 0){
-                if(choosenTarget.contains(possibleTarget.get(k-1))){
-                    writeText("Player already selected");
-                }else {
-                    choosenTarget.add(possibleTarget.get(k-1));
+            if (k < possibleTarget.size() && k > 0) {
+                if (choosenTarget.contains(possibleTarget.get(k - 1))) {
+                    writeText("Target already selected");
+                } else {
+                    choosenTarget.add(possibleTarget.get(k - 1));
                     i++;
                 }
-            }
-            else if(k == 0){
-                if(choosenTarget.size()>=minE)
+            } else if (k == 0) {
+                if (choosenTarget.size() >= minE)
                     writeText("Selection Completed!");
                 else {
                     k = 12;
                     writeText("You haven't selected enough targets!");
                 }
-            }
-            else{
+            } else {
                 writeText("Not enough target");
             }
         }
         controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
-    }
-
-    public void chooseTargetPhase(List<Square> possibleTarget, SquareDamageEffect currSimpleEffect){
-        ClientContext.get().setCurrentEffect(currSimpleEffect);
-        int max = ClientContext.get().getCurrentEffect().getMaxEnemy();
-        int min = ClientContext.get().getCurrentEffect().getMinEnemy();
-        List <Square> choosenSquare = new ArrayList<>();
-        int i = 0;
-        int k= 12;
-        writeText("Choose between "+min+" and "+max+" squares to apply your action: (write the number)");
-        writeText(i +" to exit" );
-        i++;
-        for (Square tg : possibleTarget){
-            writeText(i +" Square -> X: "+tg.getX()+", Y: "+tg.getY());
-            i++;
-        }
-        for(i = 0; i <= max && k>0 ; ){
-            k = readInt();
-            if(k < possibleTarget.size() && k > 0){
-                if(choosenSquare.contains(possibleTarget.get(k-1))){
-                    writeText("Square already selected");
-                }else {
-                    choosenSquare.add(possibleTarget.get(k-1));
-                    i++;
-                }
-            }
-            else if(k == 0){
-                if(choosenSquare.size()>=min)
-                    writeText("Selection Completed!");
-                else {
-                    k = 12;
-                    writeText("You haven't selected enough squares!");
-                }
-            }
-            else{
-                writeText("Not enough square");
-            }
-        }
-        controller.getClient().sendMessage(new ChooseSquareToShootResponse(choosenSquare));
     }
 
     /**
@@ -497,11 +456,27 @@ public class ClientTextView implements View {
         Action choosenAction;
         String action;
         do{
-            writeText("Choose the action you want to make between {MOVEMENT, GRAB, SHOOT}: ");
+            writeText("Choose the action you want to make between {MOVEMENT, GRAB, SHOOT} (write info to see the details of the game, write power to use power-up cards): ");
             action = readText();
             action = action.toUpperCase();
             try {
-                choosenAction = Action.valueOf(action);
+                if(action.equals("INFO")){
+                    showMap(ClientContext.get().getMap().getGrid());
+                    showMyPlayerInformation();
+                    showPlayerPosition();
+                    choosenAction = null;
+                }
+                else if(action.equals("POWER"))
+                {
+                    List<CardPower> powerList = ClientContext.get().getMyPlayer().getCardPower().stream().filter(c -> !c.isUseWhenAttacking() && !c.isUseWhenDamaged()).collect(Collectors.toList());
+                    if(powerList.isEmpty())
+                        writeText("There are no power-up cards available for use in this moment!");
+                    else
+                        controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerList)));
+                    choosenAction = null;
+                }
+                else
+                    choosenAction = Action.valueOf(action);
             }
             catch (IllegalArgumentException | NullPointerException e) {
                 choosenAction = null;
@@ -951,25 +926,36 @@ public class ClientTextView implements View {
     private void showMyPlayerInformation() {
         String death = "\u2620";
         Player p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
-        writeText("Your weapon: ");
+        writeText(checkPlayerColor(p.getColor()) + "You are in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + ANSI_RESET);
+        writeText(checkPlayerColor(p.getColor())+"Your weapon: "+ANSI_RESET);
         showWeapons(p.getWeapons(),0, false, false);
 
-        writeText("Your munition");
+        writeText(checkPlayerColor(p.getColor())+"Your munition: "+ANSI_RESET);
         for(Color c : p.getAmmo()){
             System.out.print(checkAmmoColor(c)+"■"+ANSI_RESET);
+        }
+        if(p.getDamage().size()==0)
+            System.out.println(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
+        else{
+            System.out.print(checkPlayerColor(p.getColor())+">> Your damage: "+ANSI_RESET);
+            for(PlayerColor c : p.getDamage()) {
+                System.out.print(checkPlayerColor(c) + "¤" + ANSI_RESET);
+            }
         }
         System.out.println("");
     }
 
     private void showPlayerPosition() {
-        System.out.println("");
         for(Player p : ClientContext.get().getMap().getAllPlayers()) {
             if (p.getId() != ClientContext.get().getMyID()){
+                System.out.println("");
                 writeText(checkPlayerColor(p.getColor()) + "Player " + p.getId() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
                 if(p.getDamage().size()==0)
-                    System.out.println("0 damage");
+                    writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
+                else
+                    System.out.print(checkPlayerColor(p.getColor())+">> Damage: "+ANSI_RESET);
                 for(PlayerColor d : p.getDamage()) {
-                    System.out.println(checkPlayerColor(d) + "¤" + ANSI_RESET);
+                    System.out.print(checkPlayerColor(d) + "¤" + ANSI_RESET);
                 }
             }
         }

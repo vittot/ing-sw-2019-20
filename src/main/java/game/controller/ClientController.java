@@ -12,6 +12,7 @@ import game.model.exceptions.NoCardWeaponSpaceException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -585,6 +586,22 @@ public class ClientController implements ServerMessageHandler {
         Player me = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         if(me.getCardPower().contains(removeSpawnPowerUp.getPowerup()))
             me.getCardPower().remove(removeSpawnPowerUp.getPowerup());
+    }
+
+    @Override
+    public void handle(NotifyWeaponRefill notifyWeaponRefill) throws MapOutOfLimitException {
+        CardWeapon cw = notifyWeaponRefill.getCw();
+        Square position = notifyWeaponRefill.getPosition();
+        if(ClientContext.get().getMap() != null)
+            ClientContext.get().getMap().getSquare(position.getX(),position.getY()).addWeapon(Collections.singletonList(cw));
+    }
+
+    @Override
+    public void handle(NotifyAmmoRefill notifyAmmoRefill) throws MapOutOfLimitException {
+        CardAmmo ca = notifyAmmoRefill.getCa();
+        Square position = notifyAmmoRefill.getPosition();
+        if(ClientContext.get().getMap() != null)
+            ClientContext.get().getMap().getSquare(position.getX(),position.getY()).setCardAmmo(ca);
     }
 
     @Override

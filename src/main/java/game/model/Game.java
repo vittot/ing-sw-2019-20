@@ -353,7 +353,7 @@ public class Game {
             return;
         int i = 0;
         for(FullEffect fe : effectop){
-            if(!priceop.isEmpty())
+            if(!priceop.isEmpty() && i<priceop.size())
                 fe.setPrice(priceop.get(i));
             else
                 fe.setPrice(null);
@@ -923,11 +923,16 @@ public class Game {
      */
     public void refillMap()
     {
+        CardWeapon cw;
+        CardAmmo ca;
         List<Square> spawnpoints = map.getSpawnpoints();
         for(Square s : spawnpoints)
         {
-            while(s.getWeapons().size() < GameMap.WEAPON_PER_SQUARE && !deckWeapon.isEmpty())
-                s.addWeapon(Collections.singletonList(deckWeapon.remove(0)));
+            while(s.getWeapons().size() < GameMap.WEAPON_PER_SQUARE && !deckWeapon.isEmpty()) {
+                cw = deckWeapon.remove(0);
+                s.addWeapon(Collections.singletonList(cw));
+                notifyReplaceWeapon(cw, s);
+            }
         }
 
         List<Square> otherSquares = map.getNormalSquares();
@@ -938,10 +943,20 @@ public class Game {
                 //the ammo cards are all in the ammoDeck and in the ammoWaste deck
                 if(deckAmmo.isEmpty())
                     replaceAmmoDeck();
-                s.setCardAmmo(deckAmmo.remove(0));
+                ca = deckAmmo.remove(0);
+                s.setCardAmmo(ca);
+                notifyReplaceAmmo(ca, s);
             }
         }
 
+    }
+
+    private void notifyReplaceAmmo(CardAmmo ca, Square s) {
+        gameObservers.forEach(o -> o.onReplaceAmmo(ca,s));
+    }
+
+    private void notifyReplaceWeapon(CardWeapon cw, Square spawnPoint) {
+        gameObservers.forEach(o -> o.onReplaceWeapon(cw,spawnPoint));
     }
 
     /**

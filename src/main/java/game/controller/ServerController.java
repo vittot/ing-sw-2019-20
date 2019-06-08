@@ -122,7 +122,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         for(Square t : model.getMap().getAllSquares())
             if(selectedTargets.contains(t))
                 toApplyEffect.addAll(t.getPlayers());
-        return handleTargetSelection(toApplyEffect,currSimpleEffect);
+        return handleTargetSelection(toApplyEffect);
     }
 
 
@@ -164,6 +164,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     void endTurnManagement()
     {
         //state
+        model.refillMap();
         List<Player> toBeRespawned = model.changeTurn();
         toBeRespawned.forEach(p -> p.notifyRespawn());
         if(model.getnPlayerToBeRespawned() == 0)
@@ -195,7 +196,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         for(Target t : model.getPlayers())
             if(selectedTargets.contains(t))
                 toApplyEffect.add(t);
-        return handleTargetSelection(toApplyEffect,currSimpleEffect);
+        return handleTargetSelection(toApplyEffect);
     }
 
     /**
@@ -235,13 +236,30 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
     /**
      * Apply a simpleEffect and manage the next simple effect, if there is any
      * @param selectedTarget
-     * @param s
      * @return
      */
-    private ServerMessage handleTargetSelection(List<Target> selectedTarget, SimpleEffect s)
-    {
-        s.applyEffect(currPlayer,selectedTarget);
-        return terminateFullEffect();
+    private ServerMessage handleTargetSelection(List<Target> selectedTarget) {
+        if (currSimpleEffect instanceof MovementEffect) {
+            MovementEffect s = (MovementEffect) currSimpleEffect;
+            toBeMoved = (Player) selectedTarget.get(0);
+            List<Square> selectableSquares = s.selectPosition(currPlayer);
+
+            if (selectableSquares.isEmpty())
+                return new InvalidWeaponResponse();
+            if (selectableSquares.size() > 1)
+                return new ChooseSquareRequest(selectableSquares);
+
+            //apply without asking nothing if it is not necessary
+            s.applyEffect((Player) selectableTarget.get(0), Collections.singletonList(selectableSquares.get(0)));
+            if (currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
+                return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+            else
+                return terminateFullEffect();
+        }
+        else {
+            currSimpleEffect.applyEffect(currPlayer, selectedTarget);
+            return terminateFullEffect();
+        }
     }
 
     private ServerMessage checkShootActionEnd(){
@@ -256,31 +274,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
         if(remainingPlusEffects != null)
             remainingPlusEffects.clear();
         return checkTurnEnd();
-    }
-
-    /**
-     * Ask for the position selection for a MovementEffect, if necessary, otherwise it applies the effect and proceed to the next simple effect, if there is any
-     * @param selectedTarget
-     * @param s
-     * @return
-     */
-    private ServerMessage handleTargetSelection(List<Target> selectedTarget, MovementEffect s)
-    {
-        toBeMoved = (Player)selectedTarget.get(0);
-        List<Square> selectableSquares = s.selectPosition(currPlayer);
-
-        if(selectableSquares.isEmpty())
-            return new InvalidWeaponResponse();
-        if(selectableSquares.size() > 1)
-            return new ChooseSquareRequest(selectableSquares);
-
-        //apply without asking nothing if it is not necessary
-        s.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
-        if(currFullEffect != null)
-            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
-
-        return new OperationCompletedResponse();
-
     }
 
     @Override
@@ -450,8 +443,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
                 state = ServerState.WAITING_ACTION;
                 return new ChooseTurnActionRequest();
             }
-            else
+            else {
+                //TODO notify ClientContext clients
                 return new OperationCompletedResponse("Wait for you next turn!");
+            }
         }
     }
 
@@ -991,57 +986,40 @@ public class ServerController implements ClientMessageHandler, PlayerObserver {
             return checkShootActionEnd();
         else
             nSimpleEffect++;
-        selectableTarget  = e.searchTarget(currPlayer);
-        if(selectableTarget.isEmpty())
-            return new InvalidWeaponResponse();
+        if(currSimpleEffect instanceof MovementEffect){
+            MovementEffect ef = (MovementEffect) currSimpleEffect;
+            if(!ef.isMoveShooter())
+            {
+                selectableTarget = e.searchTarget(currPlayer);
+                if(selectableTarget.isEmpty())
+                    return new InvalidWeaponResponse();
+                if(selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
+                    return new ChooseTargetRequest(selectableTarget, currSimpleEffect);
+            }
+            else{
+                selectableTarget = Collections.singletonList(currPlayer);
+            }
 
-        if(selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
-            return new ChooseTargetRequest(selectableTarget,currSimpleEffect);
-
-        //apply without asking nothing if it is not necessary
-        e.applyEffect(currPlayer,selectableTarget);
-        return terminateFullEffect();
-    }
-
-    /**
-     * Ask the user for the targets of the next MovementEffect, if there is the need of a choice
-     * If the choice is not needed, it asks for the square where the target has to be moved, if it is needed
-     * If no choice is needed it passes to the next SingleEffect
-     * When simpleEffects are terminated it passes to the next FullEffect
-     * When fullEffects are terminated it return a confirm message
-     * @return
-     */
-    private ServerMessage handleEffect(MovementEffect e)
-    {
-        currSimpleEffect = e;
-        if(nSimpleEffect == currFullEffect.getSimpleEffects().size())
-            return checkShootActionEnd();
-        else
-            nSimpleEffect++;
-
-        if(!e.isMoveShooter())
-        {
-            selectableTarget = e.searchTarget(currPlayer);
-            if(selectableTarget.isEmpty())
+            selectableSquares = ef.selectPosition(currPlayer);
+            if(selectableSquares.isEmpty())
                 return new InvalidWeaponResponse();
-            if(selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
+            if(selectableSquares.size() > 1)
+                return new ChooseSquareRequest(selectableSquares);
+            e.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
+        }
+        else {
+            selectableTarget = e.searchTarget(currPlayer);
+            if (selectableTarget.isEmpty())
+                return new InvalidWeaponResponse();
+
+            if (selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
                 return new ChooseTargetRequest(selectableTarget, currSimpleEffect);
-        }
-        else{
-            selectableTarget = Collections.singletonList(currPlayer);
-        }
 
-        selectableSquares = e.selectPosition(currPlayer);
-        if(selectableSquares.isEmpty())
-            return new InvalidWeaponResponse();
-        if(selectableSquares.size() > 1)
-            return new ChooseSquareRequest(selectableSquares);
-
-        //apply without asking nothing if it is not necessary
-        e.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
+            //apply without asking nothing if it is not necessary
+            e.applyEffect(currPlayer, selectableTarget);
+        }
         return terminateFullEffect();
     }
-
 
     /*
      * Sets the next FullEffect in the list of requested effects, when they are finished it becomes null
