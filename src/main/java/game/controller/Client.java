@@ -2,14 +2,14 @@ package game.controller;
 
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerMessageHandler;
 
 public interface Client {
 
-    public void sendMessage(ClientMessage msg);
-    ServerMessage receiveMessage();
+    void sendMessage(ClientMessage msg);
+    void startListening(ServerMessageHandler handler);
+    void init();
 
-    //TODO: check if these make sense also in RMI:
-    public void init();
+    //TODO: check if this make sense also in RMI:
     public void close();
-
 }

@@ -35,7 +35,7 @@ public interface ServerMessageHandler {
     void handle(InvalidMessageResponse invalidMessageResponse);
     void handle(NotifyTurnChanged notifyTurnChanged);
     void handle(NotifyMarks notifyMarks);
-    void handle(NotifyGrabCardAmmo notifyGrabCardAmmo) throws MapOutOfLimitException;
+    void handle(NotifyGrabCardAmmo notifyGrabCardAmmo);
     void handle(NotifyRespawn notifyRespawn);
     void handle(AvailableMapsListResponse availableMapsListResponse);
     void handle(JoinWaitingRoomResponse joinWaitingRoomResponse);

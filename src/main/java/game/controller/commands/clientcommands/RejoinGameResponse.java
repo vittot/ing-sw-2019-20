@@ -24,7 +24,7 @@ public class RejoinGameResponse implements ClientMessage {
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) throws NoCardAmmoAvailableException {
+    public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);
     }
 }

@@ -23,7 +23,7 @@ public class ChooseSquareToShootResponse implements ClientMessage {
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) throws NoCardAmmoAvailableException, InsufficientAmmoException, MapOutOfLimitException {
+    public ServerMessage handle(ClientMessageHandler handler){
         return handler.handle(this);
     }
 }

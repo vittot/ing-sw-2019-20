@@ -21,7 +21,7 @@ public class UsePlusEffectRequest implements ServerMessage {
 
 
     @Override
-    public void handle(ServerMessageHandler handler) throws MapOutOfLimitException {
+    public void handle(ServerMessageHandler handler) {
         handler.handle(this);
     }
 }
