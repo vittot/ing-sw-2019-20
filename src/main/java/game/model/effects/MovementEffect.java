@@ -1,5 +1,7 @@
 package game.model.effects;
 
+import game.controller.EffectHandler;
+import game.controller.commands.ServerMessage;
 import game.model.*;
 
 import java.util.ArrayList;
@@ -201,6 +203,11 @@ public class MovementEffect extends SimpleEffect {
     @Override
     public boolean checkEffect(SimpleEffect effect, Player p) {
         return false;
+    }
+
+    @Override
+    public ServerMessage handle(EffectHandler h) {
+        return h.handle(this);
     }
 
     @Override

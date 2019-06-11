@@ -18,4 +18,6 @@ public interface GameListener {
     void onPowerUpUse(Player p, CardPower c);
     void onPlayerSuspend(Player p);
     void onPlayerRejoined(Player player);
+    void onReplaceWeapon(CardWeapon c, Square s);
+    void onReplaceAmmo(CardAmmo c, Square s);
 }

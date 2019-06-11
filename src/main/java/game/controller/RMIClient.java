@@ -4,19 +4,31 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
 
-import javax.sql.StatementEvent;
+import java.io.Serializable;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
-public class RMIClient implements Client {
+public class RMIClient extends UnicastRemoteObject implements Client, RemoteClient {
 
     private transient ServerMessageHandler controller;
+    private transient IRMIClientHandler rmiClientHandler;
+
+    public RMIClient() throws RemoteException{
+        super();
+    }
 
     @Override
     public void sendMessage(ClientMessage msg) {
-
+        try {
+            rmiClientHandler.receiveMessage(msg);
+        }
+        catch(RemoteException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -24,9 +36,11 @@ public class RMIClient implements Client {
         this.controller = handler;
     }
 
-    public void receiveMessage(ServerMessage msg) { ;
+    @Override
+    public void receiveMessage(ServerMessage msg) throws RemoteException {
         msg.handle(controller);
     }
+
 
     @Override
     public void init() {
@@ -38,10 +52,13 @@ public class RMIClient implements Client {
             }
             System.out.println("\n");
 
-            RMIListener remoteListener = (RMIListener) registry.lookup("rmiListener");
+            IRMIListener remoteListener = (IRMIListener) registry.lookup("rmiListener");
+            this.rmiClientHandler = remoteListener.getHandler();
+            this.rmiClientHandler.register(this);
 
         }catch(RemoteException | NotBoundException e)
         {
+            e.printStackTrace();
             System.out.println("Remote EXCEPTION or NOT BOUND EXCEPTION");
         }
 
@@ -51,4 +68,5 @@ public class RMIClient implements Client {
     public void close() {
 
     }
+
 }

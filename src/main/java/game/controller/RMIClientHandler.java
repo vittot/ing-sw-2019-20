@@ -1,101 +1,40 @@
 package game.controller;
 
 import game.controller.commands.ClientMessage;
-import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
-import game.model.*;
 
-import java.beans.Transient;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
-import java.util.SortedMap;
 
-public class RMIClientHandler extends UnicastRemoteObject implements ClientHandler {
-    private transient ServerController controller;
-    private transient RMIClient client;
+public class RMIClientHandler extends ClientHandler implements IRMIClientHandler {
+    private transient RemoteClient client;
 
-    public RMIClientHandler() throws RemoteException {
+    RMIClientHandler(GameManager gm) throws RemoteException {
         super();
-        this.controller = new ServerController(this);
+        this.controller = new ServerController(this,gm);
+        UnicastRemoteObject.exportObject(this, 0);
     }
 
     @Override
     public void sendMessage(ServerMessage msg) {
-        client.receiveMessage(msg);
+        try{
+            client.receiveMessage(msg);
+        }catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
     }
 
 
     public void receiveMessage(ClientMessage cmsg)
     {
-        cmsg.handle(controller);
+        ServerMessage answ = cmsg.handle(controller);
+        sendMessage(answ);
     }
 
     @Override
-    public void onChangeTurn(Player p) {
-
+    public void register(RemoteClient client) {
+        this.client = client;
     }
 
-    @Override
-    public void onGameEnd(SortedMap<Player, Integer> gameRanking) {
-
-    }
-
-    @Override
-    public void onDamage(Player damaged, Player attacker, int damage) {
-
-    }
-
-    @Override
-    public void onMarks(Player marked, Player marker, int marks) {
-
-    }
-
-    @Override
-    public void onDeath(Player dead) {
-
-    }
-
-    @Override
-    public void onDeath(Kill kill) {
-
-    }
-
-    @Override
-    public void onGrabWeapon(Player p, CardWeapon cw) {
-
-    }
-
-    @Override
-    public void onGrabCardAmmo(Player p, List<Color> ammo) {
-
-    }
-
-    @Override
-    public void onMove(Player p) {
-
-    }
-
-    @Override
-    public void onRespawn(Player p) {
-
-    }
-
-    @Override
-    public void onPowerUpUse(Player p, CardPower c) {
-
-    }
-
-    @Override
-    public void onPlayerSuspend(Player p) {
-
-    }
-
-    @Override
-    public void onPlayerRejoined(Player player) {
-
-    }
-
-
-    //TODO: methods analogous to the socket Requests
 }

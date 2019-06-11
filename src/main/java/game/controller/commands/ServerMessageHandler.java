@@ -58,4 +58,6 @@ public interface ServerMessageHandler {
     void handle(NotifyPlayerExitedWaitingRoom notifyPlayerExitedWaitingRoom);
     void handle(NotifyPlayerJoinedWaitingRoom notifyPlayerJoinedWaitingRoom);
     void handle(RemoveSpawnPowerUp removeSpawnPowerUp);
+    void handle(NotifyAmmoRefill notifyAmmoRefill);
+    void handle(NotifyWeaponRefill notifyWeaponRefill);
 }

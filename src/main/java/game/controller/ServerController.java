@@ -8,6 +8,7 @@ import game.controller.commands.servercommands.*;
 import game.model.*;
 import game.model.effects.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 public class ServerController implements ClientMessageHandler, PlayerObserver, EffectHandler {
     // reference to the Networking layer
     private ClientHandler clientHandler;
+
+    private final transient GameManager gameManager;
 
     // reference to the Model
     private Game model;
@@ -50,9 +53,19 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
         this.clientHandler = clientHandler;
         this.state = ServerState.JUST_LOGGED;
+        this.gameManager = GameManager.get();
     }
 
-    public ServerController(){ }
+    public ServerController(ClientHandler clientHandler, GameManager gameManager)
+    {
+        this.clientHandler = clientHandler;
+        this.state = ServerState.JUST_LOGGED;
+        this.gameManager = gameManager;
+    }
+
+    public ServerController(){
+        this.gameManager = GameManager.get();
+    }
 
     public ClientHandler getClientHandler() {
         return clientHandler;
@@ -156,7 +169,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
         currSimpleEffect.applyEffect(toBeMoved,Collections.singletonList(selectedSquare));
         if(currFullEffect != null)
-            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+            return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
 
         //return new NotifyMovement(currPlayer.getId(),clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
         if(state  == ServerState.HANDLING_MOVEMENT) {
@@ -286,7 +299,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         //apply without asking nothing if it is not necessary
         s.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
         if(currFullEffect != null)
-            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+            return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
 
         return new OperationCompletedResponse();
 
@@ -674,7 +687,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     @Override
     public ServerMessage handle(GetWaitingRoomsRequest getWaitingRoomsRequest) {
-        return new WaitingRoomsListResponse(GameManager.get().getWaitingRooms());
+        return new WaitingRoomsListResponse(gameManager.getWaitingRooms());
     }
 
     /**
@@ -684,63 +697,57 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     @Override
     public ServerMessage handle(JoinWaitingRoomRequest joinWaitingRoomRequest) {
-        WaitingRoom w = GameManager.get().getWaitingRoom(joinWaitingRoomRequest.getRoomId());
-        int n = 0;
-        if(w != null)
-        {
+        WaitingRoom w = gameManager.getWaitingRoom(joinWaitingRoomRequest.getRoomId());
+
+        if(w != null) {
+            int n;
             n = w.addWaitingPlayer(this, joinWaitingRoomRequest.getNickName());
-            if(n != w.getNumWaitingPlayers())
-            {
-                return new JoinWaitingRoomResponse(n,w);
-            }
-            else{
-                for(ServerController sc : w.getServerControllers())
-                {
+            if (n != w.getNumWaitingPlayers()) {
+                return new JoinWaitingRoomResponse(n, w);
+            } else {
+                clientHandler.sendMessage(new JoinWaitingRoomResponse(n,w));
+                for (ServerController sc : w.getServerControllers()) {
                     sc.getCurrPlayer().setSerializeEverything(true);
-                    if(sc != this){
-
-                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getPlayers(),sc.getModel().getMap()));
-                    }
-                    else{
-                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getMap(),sc.getModel().getPlayers(),n));
+                    if (sc != this) {
+                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getPlayers(), sc.getModel().getMap()));
+                    } else {
+                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getMap(), sc.getModel().getPlayers(), n));
 
                     }
+                    if (model.getCurrentTurn().getCurrentPlayer() != sc.getCurrPlayer())
+                        sc.getClientHandler().sendMessage(new OperationCompletedResponse("Wait your turn.."));
 
                 }
 
-                for(ServerController sc : w.getServerControllers())
-                {
-                    if(sc!=this)
-                    {
-                        if(model.getCurrentTurn().getCurrentPlayer() == sc.getCurrPlayer())
-                        {
+                for (ServerController sc : w.getServerControllers()) {
+                    if (sc != this) {
+                        if (model.getCurrentTurn().getCurrentPlayer() == sc.getCurrPlayer()) {
                             CardPower cp = model.drawPowerUp();
                             sc.getCurrPlayer().addCardPower(cp);
-                            sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
+                            //sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
                             sc.getClientHandler().sendMessage(new RespawnRequest(cp));
                             model.getCurrentTurn().startTimer();
 
-                        }
-                        else
-                            sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!\nWait your turn.."));
+                        } //else
+                            //sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!\nWait your turn.."));
+
                     }
 
 
                 }
 
 
-                if(model.getCurrentTurn().getCurrentPlayer() == getCurrPlayer())
-                {
+                if (model.getCurrentTurn().getCurrentPlayer() == getCurrPlayer()) {
                     CardPower cp = model.drawPowerUp();
                     getCurrPlayer().addCardPower(cp);
                     getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
                     return new RespawnRequest(cp);
                 }
 
-                return new OperationCompletedResponse("Game has started!\nWait your turn..");
+                //return new OperationCompletedResponse("Game has started!\nWait your turn..");
+                return new OperationCompletedResponse("Wait your turn..");
 
             }
-
         }
 
         return new InvalidMessageResponse("The indicated room id does not exist on the Server");
@@ -748,7 +755,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest) {
-        WaitingRoom w = GameManager.get().addWaitingRoom(createWaitingRoomRequest.getMapId(),createWaitingRoomRequest.getNumWaitingPlayers());
+        WaitingRoom w = gameManager.addWaitingRoom(createWaitingRoomRequest.getMapId(),createWaitingRoomRequest.getNumWaitingPlayers());
         int n=w.addWaitingPlayer(this, createWaitingRoomRequest.getCreatorNicknme());
         return new CreateWaitingRoomResponse(n);
     }
@@ -784,25 +791,25 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
         baseDone = true; //TODO: check
 
-        return handleEffect(currSimpleEffect);
+        return currSimpleEffect.handle(this);
 
     }
 
     @Override
     public ServerMessage handle(LoginMessage loginMessage) {
-        if(GameManager.get().getUsersLogged().contains(loginMessage.getNickname()))
+        if(gameManager.getUsersLogged().contains(loginMessage.getNickname()))
             return new UserAlreadyLoggedResponse();
 
         this.nickname = loginMessage.getNickname();
-        if(GameManager.get().getUsersSuspended().contains(loginMessage.getNickname()))
+        if(gameManager.getUsersSuspended().contains(loginMessage.getNickname()))
         {
-            model = GameManager.get().getNameOfSuspendedUser(loginMessage.getNickname());
+            model = gameManager.getNameOfSuspendedUser(loginMessage.getNickname());
             List<String> otherPlayerNames = model.getMap().getAllPlayers().stream().filter(p -> !p.isSuspended()).map(Player::getNickName).collect(Collectors.toList());
 
             return new RejoinGameRequest(otherPlayerNames);
         }
 
-        GameManager.get().addLoggedUser(loginMessage.getNickname());
+        gameManager.addLoggedUser(loginMessage.getNickname());
         return new UserLoggedResponse();
     }
 
@@ -829,12 +836,12 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 this.state = ServerState.WAITING_TURN;
             else
                 this.state = ServerState.WAITING_SPAWN;
-            GameManager.get().rejoinUser(rejoinGameResponse.getUser());
+            gameManager.rejoinUser(rejoinGameResponse.getUser());
             return new RejoinGameConfirm(model.getMap(),model.getPlayers(),id);
         }
         else
         {
-            GameManager.get().addLoggedUser(rejoinGameResponse.getUser());
+            gameManager.addLoggedUser(rejoinGameResponse.getUser());
             return new UserLoggedResponse();
         }
     }
@@ -876,7 +883,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         currFullEffect = baseEff;
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
         baseDone = true;
-        return handleEffect(currSimpleEffect);
+        return currSimpleEffect.handle(this);
         //return managePlusEffectChoice();
     }
 
@@ -924,7 +931,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         }
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
         baseDone = true;
-        return handleEffect(currSimpleEffect);
+        return currSimpleEffect.handle(this);
         //return managePlusEffectChoice();
     }
 
@@ -941,7 +948,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 //TODO: ??
                 return new InsufficientAmmoResponse();
             }
-            return handleEffect(currSimpleEffect);
+            return  currSimpleEffect.handle(this);
         }
         return firstEffect();
     }
@@ -975,7 +982,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 //TODO: ??
                 return new InsufficientAmmoResponse();
             }
-            return handleEffect(currSimpleEffect);
+            return currSimpleEffect.handle(this);
         }
         else
             return terminateFullEffect();
@@ -984,7 +991,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     private ServerMessage terminateFullEffect() {
         if(currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
-            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+            return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
         selectedWeapon.setLoaded(false);
         clientHandler.sendMessage(new ShootActionResponse(selectedWeapon,ammoToPay,powerUpToPay));
         return checkShootActionEnd();
@@ -1001,7 +1008,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             //TODO: ??
             return new InsufficientAmmoResponse();
         }
-        return handleEffect(currSimpleEffect);
+        return currSimpleEffect.handle(this);
     }
 
     @Override
@@ -1086,7 +1093,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         //apply without asking nothing if it is not necessary
         e.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
         if(currFullEffect != null)
-            return handleEffect(currFullEffect.getSimpleEffects().get(nSimpleEffect));
+            return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
 
         return new OperationCompletedResponse();
     }
@@ -1179,6 +1186,11 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(RoomDamageEffect e) {
+        return handleOtherEffect(e);
+    }
+
+    @Override
+    public ServerMessage handle(AreaDamageEffect e) {
         return handleOtherEffect(e);
     }
 }
