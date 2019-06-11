@@ -62,6 +62,12 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
+    public void waitStart() {
+        //TODO (?)
+    }
+
+
+    @Override
     public void start(Stage primaryStage) {
         this.GUI = this;
         this.primaryStage = primaryStage;

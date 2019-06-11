@@ -20,5 +20,5 @@ public class LoginMessage implements ClientMessage {
     @Override
     public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);
-}
+    }
 }

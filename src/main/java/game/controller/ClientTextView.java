@@ -8,6 +8,9 @@ import game.model.effects.MovementEffect;
 import game.model.effects.SimpleEffect;
 import game.model.effects.SquareDamageEffect;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,7 @@ public class ClientTextView implements View {
 
     public ClientTextView(ClientController controller) {
         this.controller = controller;
+        //this.fromKeyBoard = new BufferedReader(new InputStreamReader(System.in));
         this.fromKeyBoard = new Scanner(System.in);
     }
 
@@ -40,12 +44,19 @@ public class ClientTextView implements View {
     }
 
     public String readText(){
-        String string = fromKeyBoard.nextLine();
-        return string;
+        String string = null;
+        //try {
+            string = fromKeyBoard.nextLine();
+            return string;
+        /*} catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }*/
+
     }
 
     public char readChar(){
-        String string = fromKeyBoard.nextLine();
+        String string = readText();
         return string.charAt(0);
     }
 
@@ -54,15 +65,56 @@ public class ClientTextView implements View {
      * @return
      */
     public  int readInt(){
-        try {
-            int save = fromKeyBoard.nextInt();
-            fromKeyBoard.nextLine();
-            return save;
-        }catch (InputMismatchException e){
-            System.out.println("Wrong input, expected a numeber");
-            fromKeyBoard.nextLine();
-            return readInt();
-        }
+
+        String number;
+        int n = 0;
+        boolean retry;
+        do {
+            retry = false;
+            number = readText();
+            try {
+                n = Integer.parseInt(number);
+            } catch (NumberFormatException e) {
+                System.out.println("Wrong input, expected a numeber");
+                retry = true;
+            }
+        }while(retry);
+
+        return n;
+        /*boolean retry;
+        do{
+            try {
+                if(fromKeyBoard.hasNextInt())
+                {   int save = fromKeyBoard.nextInt();
+                    fromKeyBoard.nextLine();
+                    return save;
+                }
+                retry = true;
+                Thread.sleep(10);
+
+            }catch (InputMismatchException e){
+                System.out.println("Wrong input, expected a numeber");
+                fromKeyBoard.nextLine();
+                return readInt();
+            }catch(IndexOutOfBoundsException  | IllegalStateException | InterruptedException e)
+            {
+                retry = true;
+            }
+        }while(true);*/
+    }
+
+    public void run(){
+        /*new Thread(
+
+                () -> {
+                    String s = "";
+                    do{
+                         if(fromKeyBoard.hasNext())
+                            s = readText();
+                    }while(!s.equals("EXIT"));
+
+                }
+        ).start();*/
     }
 
     /**
@@ -157,6 +209,23 @@ public class ClientTextView implements View {
     @Override
     public void setController(ClientController clientController) {
         this.controller = clientController;
+    }
+
+    @Override
+    public void waitStart(){
+
+        Thread t = new Thread( () -> {
+            String s;
+            do {
+                //s = readText();
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (/*!s.equals("exit") &&*/ !controller.isGameStarted());
+        });
+        t.start();
     }
 
     @Override

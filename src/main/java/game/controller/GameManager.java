@@ -4,13 +4,17 @@ import game.model.Game;
 import game.model.GameMap;
 import game.model.Player;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Menage the different games currently running on the Server
  * It's a singleton
  */
-public class GameManager {
+public class GameManager implements Serializable {
     private static GameManager instance;
     private int nextId;
     private List<Game> games;
@@ -36,6 +40,20 @@ public class GameManager {
 
         return instance;
     }
+
+    /*private void writeObject(ObjectOutputStream oos)
+            throws IOException
+    {
+        oos.defaultWriteObject();
+        //oos.writeObject(instance);
+    }
+
+    private void readObject(ObjectInputStream ois)
+            throws ClassNotFoundException, IOException
+    {
+        ois.defaultReadObject();
+        //instance = (GameManager) ois.readObject();
+    }*/
 
     public GameMap getMap(int mapId)
     {
