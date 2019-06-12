@@ -2,10 +2,7 @@ package game.model.effects;
 
 import game.controller.EffectHandler;
 import game.controller.commands.ServerMessage;
-import game.model.Player;
-import game.model.Room;
-import game.model.Square;
-import game.model.Target;
+import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +83,16 @@ public class RoomDamageEffect extends SimpleEffect {
     @Override
     public ServerMessage handle(EffectHandler h) {
         return h.handle(this);
+    }
+
+    @Override
+    public ServerMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
+        List<Target> toApplyEffect = new ArrayList<>();
+        for (Target t : model.getMap().getAllRooms()) {
+            if (targetList.contains(t))
+                toApplyEffect.add(t);
+        }
+        return h.handleTarget(this, toApplyEffect);
     }
 
     @Override

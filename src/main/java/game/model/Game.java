@@ -535,6 +535,7 @@ public class Game {
                     if (efo.getName().equals("plainDamage")) temp.addSimpleEffect(createEquivalentPlainEffect(efo));
                     if (efo.getName().equals("movementEffect")) temp.addSimpleEffect(createEquivalentMovementEffect(efo));
                     if (efo.getName().equals("squareDamageEffect")) temp.addSimpleEffect(createEquivalentSquareEffect(efo));
+                    if (efo.getName().equals("beforebase")) temp.setBeforeBase(efo.getText().trim().equals("true"));
                 } catch (DataConversionException e) {
                     //TODO eccezione
                 }

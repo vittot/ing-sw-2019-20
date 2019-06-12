@@ -104,6 +104,11 @@ public class AreaDamageEffect extends SimpleEffect {
     }
 
     @Override
+    public ServerMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
+        return h.handleTarget(this, targetList);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
