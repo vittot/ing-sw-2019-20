@@ -211,6 +211,16 @@ public class MovementEffect extends SimpleEffect {
     }
 
     @Override
+    public ServerMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
+        List<Target> toApplyEffect = new ArrayList<>();
+        for (Target t : model.getPlayers()) {
+            if (targetList.contains(t))
+                toApplyEffect.add(t);
+        }
+        return h.handleTarget(this, toApplyEffect);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

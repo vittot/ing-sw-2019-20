@@ -6,6 +6,7 @@ import game.controller.commands.ServerMessage;
 import game.model.CardPower;
 import game.model.CardWeapon;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReloadWeaponRequest implements ClientMessage {
@@ -27,6 +28,8 @@ public class ReloadWeaponRequest implements ClientMessage {
     }
 
     public List<CardPower> getPowerups() {
-        return powerups;
+        if(powerups != null)
+            return powerups;
+        return new ArrayList<>();
     }
 }

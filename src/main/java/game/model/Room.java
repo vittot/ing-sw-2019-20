@@ -4,6 +4,7 @@ import game.model.exceptions.MapOutOfLimitException;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class Room implements Target, Serializable {
 
@@ -79,5 +80,19 @@ public class Room implements Target, Serializable {
                 "color=" + color +
                 ", map=" + map +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Room room = (Room) o;
+        return color == room.color &&
+                map.equals(room.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color, map);
     }
 }

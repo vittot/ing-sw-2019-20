@@ -32,8 +32,6 @@ public class UsePlusEffectResponse implements ClientMessage {
     }
 
     public List<CardPower> getToUse() {
-        if(toUse == null)
-            return new ArrayList<>();
         return toUse;
     }
 

@@ -147,7 +147,7 @@ public class ClientTextView implements View {
         int n;
         List<ClientMessage> reloadRequests = new ArrayList<>();
         do {
-               showWeapons(weaponsToReload,0,false, true);
+               showWeapons(weaponsToReload,0,true, true);
             do {
                 writeText("Insert the id of a weapon you want to reload or -1 to terminate the reload phase:");
                 n = readInt();
@@ -156,6 +156,7 @@ public class ClientTextView implements View {
             {
                 List<CardPower> cp = powerUpSelection();
                 reloadRequests.add(new ReloadWeaponRequest(weaponsToReload.get(n-1),cp));
+                weaponsToReload.remove(weaponsToReload.get(n-1));
             }
 
         }while(weaponsToReload.size() > 0 && n!=-1);
@@ -497,7 +498,7 @@ public class ClientTextView implements View {
         }
         for (i = 0; i < maxE && k > 0; ) {
             k = readInt();
-            if (k < possibleTarget.size() && k > 0) {
+            if (k <= possibleTarget.size() && k > 0) {
                 if (choosenTarget.contains(possibleTarget.get(k - 1))) {
                     writeText("Target already selected");
                 } else {
@@ -997,12 +998,24 @@ public class ClientTextView implements View {
         Player p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         writeText(checkPlayerColor(p.getColor()) + "You are in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + ANSI_RESET);
         writeText(checkPlayerColor(p.getColor())+"Your weapon: "+ANSI_RESET);
-        showWeapons(p.getWeapons(),0, false, false);
-
-        writeText(checkPlayerColor(p.getColor())+"Your munition: "+ANSI_RESET);
-        for(Color c : p.getAmmo()){
-            System.out.print(checkAmmoColor(c)+"■"+ANSI_RESET);
+        showWeapons(p.getWeapons(),0, false, true);
+        if(!p.getAmmo().isEmpty()) {
+            writeText(checkPlayerColor(p.getColor()) + "Your munition: " + ANSI_RESET);
+            for (Color c : p.getAmmo()) {
+                System.out.print(checkAmmoColor(c) + "■" + ANSI_RESET);
+            }
+            System.out.println("");
         }
+        else
+            writeText(checkPlayerColor(p.getColor()) + "You haven't available munitions! " + ANSI_RESET);
+        if(!p.getCardPower().isEmpty()) {
+            writeText(checkPlayerColor(p.getColor()) + "Your power-up cards: " + ANSI_RESET);
+            for (CardPower c : p.getCardPower()) {
+                writeText(c.toString());
+            }
+        }
+        else
+            writeText(checkPlayerColor(p.getColor()) + "You haven't available power-up cards! " + ANSI_RESET);
         if(p.getDamage().size()==0)
             System.out.println(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
         else{
@@ -1021,11 +1034,13 @@ public class ClientTextView implements View {
                 writeText(checkPlayerColor(p.getColor()) + "Player " + p.getId() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
                 if(p.getDamage().size()==0)
                     writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
-                else
+                else{
                     System.out.print(checkPlayerColor(p.getColor())+">> Damage: "+ANSI_RESET);
-                for(PlayerColor d : p.getDamage()) {
-                    System.out.print(checkPlayerColor(d) + "¤" + ANSI_RESET);
+                    for(PlayerColor d : p.getDamage()) {
+                        System.out.print(checkPlayerColor(d) + "¤" + ANSI_RESET);
+                    }
                 }
+                System.out.println("");
             }
         }
     }
@@ -1095,7 +1110,7 @@ public class ClientTextView implements View {
 
     private List<CardPower> powerUpSelection()
     {
-        List<CardPower> toUse = null;
+        List<CardPower> toUse = new ArrayList<>();
         char t;
         int i;
         Player myP = ClientContext.get().getMyPlayer();
@@ -1106,10 +1121,9 @@ public class ClientTextView implements View {
         if(t == 'Y' || t == 'y')
         {
             i=1;
-            toUse = new ArrayList<>();
             writeText("Insert the number of the correspondent power-up you want to use separated by comma (ex: 1,3,...):");
             for(CardPower cp : myP.getCardPower()) {
-                writeText(i + "- " + cp.getName() + " [" + cp.getColor() + "]");
+                writeText(i + "- " + cp.toString());
                 i++;
             }
             String selection = readText();
@@ -1132,13 +1146,14 @@ public class ClientTextView implements View {
      */
     public void printWeapon(CardWeapon cw, int p, boolean showCost)
     {
+        List<Color> tmp = cw.getPrice().subList(p, cw.getPrice().size());
         writeText(cw.getName());
         if (showCost) {
             System.out.print("       Cost: ");
-            if (cw.getPrice().size() == 1)
+            if (tmp.size() == 0)
                 System.out.print("Free");
             else
-                for (Color c : cw.getPrice().subList(p, cw.getPrice().size()))
+                for (Color c : tmp)
                     System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
             System.out.println("");
         }
@@ -1179,8 +1194,12 @@ public class ClientTextView implements View {
                 writeText("   Description: " + actual.getDescription());
                 System.out.print("   Cost: ");
                 if (actual.getPrice() != null) {
-                    for (Color c : actual.getPrice())
-                        System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
+                    if(actual.getPrice().get(0) == Color.ANY)
+                        System.out.println("FREE");
+                    else {
+                        for (Color c : actual.getPrice())
+                            System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
+                    }
                 }
                 else
                     System.out.print("FREE");

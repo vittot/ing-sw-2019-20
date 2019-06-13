@@ -442,6 +442,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
             this.weapons.remove(weaponToWaste);
         }
         this.weapons.add(weapon);
+        weapon.setShooter(this);
         this.position.getWeapons().remove(weapon);
         if(game != null)
             game.notifyGrabWeapon(this,weapon);
@@ -486,6 +487,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
     }
 
     public boolean controlPayment(List<Color> price){
+        if(price.get(0) == Color.ANY)
+            return true;
         if(ammo != null && !ammo.isEmpty())
             for(int i = 0; i < ammo.size(); i++)
                 price.remove(ammo.get(i));
@@ -514,7 +517,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
     public void pay(List<Color> ammoToPay, List<CardPower> powerUp) throws InsufficientAmmoException {
         List <Color> tmp = new ArrayList<>(ammoToPay);
         List <CardPower> tmpPU = new ArrayList<>();
-        if(powerUp != null)
+        if(powerUp != null && !powerUp.isEmpty())
             for(int i = 0; i < powerUp.size(); i++){
                 if(tmp.contains(powerUp.get(i).getColor())) {
                     tmp.remove(powerUp.get(i).getColor());
@@ -612,9 +615,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
     @Override
     public String toString() {
         return "Player{" +
-                ", id=" + id +
-                ", nickName='" + nickName +
-                "color=" + color +
+                "id= " + id +
+                ", nickName= '" + nickName +
+                "', color=" + color +
                 '}';
     }
 

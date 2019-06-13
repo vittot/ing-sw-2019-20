@@ -151,11 +151,17 @@ public class PlainDamageEffect extends SimpleEffect {
      */
     public void applyEffect(Player shooter, List<Target> targets){
         List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
+        List<Player> toShoot = new ArrayList<>();
         for(Target t : targets)
+            toShoot.add((Player)t);
+        for(Player t : toShoot)
         {
-            t.addDamage(shooter,damage);
-            t.addThisTurnMarks(shooter,marks);
-            prevTargets.add((Player) t);
+            if(!t.equals(shooter)) {
+                t.addDamage(shooter, damage);
+                t.addThisTurnMarks(shooter, marks);
+                prevTargets.remove(t);
+                prevTargets.add(t);
+            }
         }
         shooter.getActualWeapon().setLastTargetSquare(prevTargets.get(prevTargets.size()-1).getPosition());
     }
@@ -193,5 +199,15 @@ public class PlainDamageEffect extends SimpleEffect {
     @Override
     public ServerMessage handle(EffectHandler h) {
         return h.handle(this);
+    }
+
+    @Override
+    public ServerMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
+        List<Target> toApplyEffect = new ArrayList<>();
+        for (Target t : model.getPlayers()) {
+            if (targetList.contains(t))
+                toApplyEffect.add(t);
+        }
+        return h.handleTarget(this, toApplyEffect);
     }
 }
