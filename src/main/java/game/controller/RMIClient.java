@@ -47,11 +47,6 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
         try{
             Registry registry = LocateRegistry.getRegistry();
 
-            for (String name : registry.list()) {
-                System.out.println("Registry bindings: " + name);
-            }
-            System.out.println("\n");
-
             IRMIListener remoteListener = (IRMIListener) registry.lookup("rmiListener");
             this.rmiClientHandler = remoteListener.getHandler();
             this.rmiClientHandler.register(this);

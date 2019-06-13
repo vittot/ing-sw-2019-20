@@ -5,8 +5,9 @@ import game.controller.commands.ServerMessage;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.rmi.server.Unreferenced;
 
-public class RMIClientHandler extends ClientHandler implements IRMIClientHandler {
+public class RMIClientHandler extends ClientHandler implements IRMIClientHandler, Unreferenced {
     private transient RemoteClient client;
 
     RMIClientHandler(GameManager gm) throws RemoteException {
@@ -22,21 +23,26 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
         }catch (RemoteException e)
         {
             e.printStackTrace();
+            clientDisconnected();
         }
     }
 
-
-    public void receiveMessage(ClientMessage cmsg)
+    @Override
+    public void receiveMessage(ClientMessage cmsg) throws RemoteException
     {
         ServerMessage answ = cmsg.handle(controller);
         sendMessage(answ);
     }
 
     @Override
-    public void register(RemoteClient client) {
+    public void register(RemoteClient client) throws RemoteException {
         this.client = client;
+       // UnicastRemoteObject.unexportObject(this, false);
     }
 
+    @Override
+    public void unreferenced() {
+        clientDisconnected();
+    }
 
-    //TODO: methods analogous to the socket Requests
 }

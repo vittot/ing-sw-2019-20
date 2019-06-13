@@ -14,6 +14,23 @@ public abstract class ClientHandler implements GameListener {
 
     public abstract void sendMessage(ServerMessage msg);
 
+    protected void clientDisconnected()
+    {
+        if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED){
+            controller.getModel().removeGameListener(this);
+            controller.getCurrPlayer().suspend(false);
+        }
+        else if(controller.getState() == ServerState.WAITING_FOR_PLAYERS)
+        {
+            controller.leaveWaitingRoom();
+        }
+        else
+        {
+            GameManager.get().removeLoggedUser(controller.getNickname());
+        }
+    }
+
+
     /**
      * Notify that it's the turn of another player
      * @param p
@@ -21,7 +38,6 @@ public abstract class ClientHandler implements GameListener {
     @Override
     public void onChangeTurn(Player p) {
         sendMessage(new NotifyTurnChanged(p.getId()));
-
     }
 
     /**

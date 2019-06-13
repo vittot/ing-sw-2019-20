@@ -754,8 +754,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                     return new RespawnRequest(cp);
                 }
 
-                //return new OperationCompletedResponse("Game has started!\nWait your turn..");
-                return new OperationCompletedResponse("Wait your turn..");
+                return new OperationCompletedResponse("");
 
             }
         }
@@ -946,8 +945,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         }
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
         baseDone = true;
-        return currSimpleEffect.handle(this);
-        //return managePlusEffectChoice();
         return currSimpleEffect.handle(this);
     }
 

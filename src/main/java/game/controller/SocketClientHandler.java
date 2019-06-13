@@ -68,18 +68,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
         }
         catch(SocketException e)
         {
-            if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED){
-                controller.getModel().removeGameListener(this);
-                controller.getCurrPlayer().suspend(false);
-            }
-            else if(controller.getState() == ServerState.WAITING_FOR_PLAYERS)
-            {
-                controller.leaveWaitingRoom();
-            }
-            else
-            {
-                GameManager.get().removeLoggedUser(controller.getNickname());
-            }
+            clientDisconnected();
         }
         catch (Exception e) {
             //TODO: handle exception

@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ClientTextView implements View {
+public class ClientTextView implements  View {
     private static final String ANSI_CYAN = "\u001B[36m";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
@@ -29,13 +29,7 @@ public class ClientTextView implements View {
 
 
 
-    public ClientTextView(){
-
-    }
-
-    public ClientTextView(ClientController controller) {
-        this.controller = controller;
-        //this.fromKeyBoard = new BufferedReader(new InputStreamReader(System.in));
+   public ClientTextView() {
         this.fromKeyBoard = new Scanner(System.in);
     }
 
@@ -230,6 +224,18 @@ public class ClientTextView implements View {
     }
 
     @Override
+    public String chooseConnection() {
+        String choice;
+        writeText("Choose the connection type");
+        writeText("Insert Socket or RMI:");
+        do{
+            choice = fromKeyBoard.nextLine();
+            choice = choice.toUpperCase();
+        }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
+        return choice;
+    }
+
+    @Override
     public void notifyPlayerLeavedWaitingRoom(Player p) {
         writeText("Player " + p.getNickName() + " has leaved the waiting room!");
     }
@@ -359,6 +365,8 @@ public class ClientTextView implements View {
         writeText("Enter the id for the selected waiting room or -1 if you want to create a new waiting room:");
         do{
             nRoom = readInt();
+            if((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1)
+                writeText("Invalid waiting room number!");
         }while((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1);
         if(nRoom != -1)
         {

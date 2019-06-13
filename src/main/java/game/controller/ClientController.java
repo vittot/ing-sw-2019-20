@@ -27,28 +27,12 @@ public class ClientController implements ServerMessageHandler {
     private Scanner in = new Scanner(System.in);
     private boolean gameStarted;
 
-    public ClientController(Client client,String[] args) {
+    public ClientController(Client client, View view) {
         this.client = client;
         this.gameStarted = false;
         String input;
-        do {
-            System.out.println("CLI or GUI?");
-            input = in.nextLine();
-            input = input.toUpperCase();
-        }while(!input.equals("GUI") && !input.equals("CLI"));
-        if(input.equals("GUI")) {
-            //ClientGUIView.main(args);
-            try {
-                clientView = ClientGUIView.getInstance();
-            }catch(InterruptedException e)
-            {
-
-            }
-            clientView.setController(this);
-
-        }else {
-            clientView = new ClientTextView(this);
-        }
+        this.clientView = view;
+        this.clientView.setController(this);
     }
 
     public Client getClient() {

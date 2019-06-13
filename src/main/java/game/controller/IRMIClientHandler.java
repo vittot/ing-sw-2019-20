@@ -5,6 +5,7 @@ import game.controller.commands.ServerMessage;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.server.Unreferenced;
 
 public interface IRMIClientHandler extends Remote {
 

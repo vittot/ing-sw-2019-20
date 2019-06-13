@@ -109,4 +109,6 @@ public interface View {
     void setController(ClientController clientController);
 
     void waitStart();
+
+    String chooseConnection();
 }
