@@ -205,4 +205,10 @@ public class SocketClientHandler implements Runnable, ClientHandler {
         sendMessage(new NotifyAmmoRefill(ca,s));
     }
 
+    @Override
+    public void onPlayerUpdateMarks(Player player) {
+        sendMessage(new UpdateMarks(player));
+    }
+
+
 }

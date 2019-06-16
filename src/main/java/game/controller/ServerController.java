@@ -285,9 +285,11 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             if (!remainingPlusEffects.isEmpty())
                 return managePlusEffectChoice();
         }
-        selectedWeapon.setLoaded(false);
+        if(baseDone)
+            selectedWeapon.setLoaded(false);
         if(remainingPlusEffects != null)
             remainingPlusEffects.clear();
+        clientHandler.sendMessage(new ShootActionResponse(selectedWeapon,ammoToPay,powerUpToPay));
         return checkTurnEnd();
     }
 
@@ -507,7 +509,8 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             return checkTurnEnd();
         }catch(InsufficientAmmoException e)
         {
-            return new InsufficientAmmoResponse();
+            clientHandler.sendMessage(new InsufficientAmmoResponse());
+            return checkTurnEnd();
         }
     }
 
@@ -575,6 +578,11 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         }
     }
 
+    /**
+     * the server receive the shoot action request and ask the player which weapons from the available want to use
+     * @param clientMsg
+     * @return
+     */
     @Override
     public ServerMessage handle(ShootActionRequest clientMsg) {
         List<CardWeapon> myWeapons = null;
@@ -607,8 +615,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             state = ServerState.HANDLING_SHOOT;
             return new ChooseWeaponToShootRequest(myWeapons);
         }
-        else
-            return new InvalidActionResponse();
+        else{
+            clientHandler.sendMessage(new InvalidActionResponse());
+            return checkTurnEnd();
+        }
         /*CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
 
         if( (clientMsg.getBaseEffect() != null && clientMsg.getAltEffect() != null))
@@ -848,6 +858,11 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         }
     }
 
+    /**
+     * the server receive the client choose about which weapon he wants to use and list him which first effect he can apply
+     * @param chooseWeaponToShootResponse
+     * @return
+     */
     @Override
     public ServerMessage handle(ChooseWeaponToShootResponse chooseWeaponToShootResponse) {
         boolean correct = false;
@@ -857,19 +872,21 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 selectedWeapon = cw;
             }
         //verify selected weapon is valid
-        if(!correct)
-            return new InvalidWeaponResponse();
+        if(!correct) {
+            clientHandler.sendMessage(new InvalidWeaponResponse());
+            return checkTurnEnd();
+        }
         currPlayer.setActualWeapon(selectedWeapon);
         if( selectedWeapon == null){
             clientHandler.sendMessage(new InvalidWeaponResponse());
-            return checkShootActionEnd();
+            return checkTurnEnd();
         }
         if( !selectedWeapon.isLoaded()){
             clientHandler.sendMessage(new InvalidWeaponResponse());
-            return checkShootActionEnd();
+            return checkTurnEnd();
         }
         FullEffect plusEff = null;
-        if(selectedWeapon.getPlusEffects() != null) {
+        if(selectedWeapon.getPlusEffects() != null && !selectedWeapon.getPlusEffects().isEmpty()) {
             if(remainingPlusEffects == null)
                 remainingPlusEffects = new ArrayList<>(selectedWeapon.getPlusEffects());
             else
@@ -900,6 +917,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     }
 
     private ServerMessage managePlusEffectChoice() {
+        List<FullEffect> tmp = new ArrayList<>(remainingPlusEffects);
         if (selectedWeapon.getPlusEffects() != null){
             if(plusBeforeBase != null)
                 remainingPlusEffects.remove(plusBeforeBase);
@@ -908,13 +926,15 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 return new UsePlusByOrderRequest(remainingPlusEffects);
             }
             else {
-                for (FullEffect fe : remainingPlusEffects)
+                for (FullEffect fe : tmp)
                     if (!currPlayer.canUseWeaponEffect(fe))
                         remainingPlusEffects.remove(fe);
                 if (!remainingPlusEffects.isEmpty())
                     return new UsePlusEffectRequest(remainingPlusEffects);
-                else
+                else {
+
                     return checkTurnEnd();
+                }
             }
         }
         else
@@ -934,7 +954,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 //TODO: ??
                 return new InsufficientAmmoResponse();
             }
-            currFullEffect = selectedWeapon.getAltEffect();
         }
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
         baseDone = true;
@@ -973,8 +992,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             else
                 powerUpToPay.addAll(toUse);
         }
-        if(currFullEffect.getPrice().get(0) != Color.ANY)
-            currPlayer.pay(currFullEffect.getPrice(),toUse);
+        if(!currFullEffect.getPrice().isEmpty())
+            if(currFullEffect.getPrice().get(0) != Color.ANY)
+                currPlayer.pay(currFullEffect.getPrice(),toUse);
     }
 
     @Override
@@ -1004,7 +1024,6 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     private ServerMessage terminateFullEffect() {
         if(currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
             return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
-        clientHandler.sendMessage(new ShootActionResponse(selectedWeapon,ammoToPay,powerUpToPay));
         return checkShootActionEnd();
     }
 
@@ -1085,21 +1104,23 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             }
             if(selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))
                 return new ChooseTargetRequest(selectableTarget, currSimpleEffect);
+            else
+                toBeMoved = (Player)selectableTarget.get(0);
         }
         else{
-            selectableTarget = Collections.singletonList(currPlayer);
+            toBeMoved = currPlayer;
         }
 
-        selectableSquares = e.selectPosition(currPlayer);
+        selectableSquares = e.selectPosition(toBeMoved);
         if(selectableSquares.isEmpty()){
             clientHandler.sendMessage(new InvalidWeaponResponse());
             return checkShootActionEnd();
         }
         if(selectableSquares.size() > 1)
             return new ChooseSquareRequest(selectableSquares);
-        e.applyEffect((Player)selectableTarget.get(0),Collections.singletonList(selectableSquares.get(0)));
+        e.applyEffect(toBeMoved,Collections.singletonList(selectableSquares.get(0)));
         List<Player> prevTargets = currPlayer.getActualWeapon().getPreviousTargets();
-        prevTargets.add((Player)selectableTarget.get(0));
+        prevTargets.add(toBeMoved);
         return terminateFullEffect();
     }
 

@@ -3,6 +3,7 @@ package game.controller;
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
+import game.model.exceptions.InsufficientAmmoException;
 
 import javax.sql.StatementEvent;
 import java.rmi.NotBoundException;
@@ -24,7 +25,7 @@ public class RMIClient implements Client {
         this.controller = handler;
     }
 
-    public void receiveMessage(ServerMessage msg) { ;
+    public void receiveMessage(ServerMessage msg) {
         msg.handle(controller);
     }
 

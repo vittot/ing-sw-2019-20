@@ -4,6 +4,7 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
 import game.model.*;
+import game.model.exceptions.InsufficientAmmoException;
 
 import java.beans.Transient;
 import java.rmi.RemoteException;
@@ -103,6 +104,11 @@ public class RMIClientHandler extends UnicastRemoteObject implements ClientHandl
 
     @Override
     public void onReplaceAmmo(CardAmmo ca, Square s) {
+
+    }
+
+    @Override
+    public void onPlayerUpdateMarks(Player player) {
 
     }
 

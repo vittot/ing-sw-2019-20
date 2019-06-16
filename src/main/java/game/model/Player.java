@@ -243,12 +243,13 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     @Override
     public void addDamage(Player shooter, int damage) {
-        int num;
-        boolean isRage = false;
-        Kill lastKill=null;
-        List<PlayerColor> marksToBeRemoved = marks.stream().filter(m-> m == shooter.getColor()).collect(Collectors.toList());
-        damage += marksToBeRemoved.size();
-        marks.removeAll(marksToBeRemoved);
+        if(!this.equals(shooter)) {
+            int num;
+            boolean isRage = false;
+            Kill lastKill = null;
+            List<PlayerColor> marksToBeRemoved = marks.stream().filter(m -> m == shooter.getColor()).collect(Collectors.toList());
+            damage += marksToBeRemoved.size();
+            marks.removeAll(marksToBeRemoved);
 
         /*for(int i=0;i<marks.size();i++){
             if(marks.get(i)==shooter.getColor()){
@@ -258,32 +259,30 @@ public class Player implements Target, Serializable, Comparable<Player> {
             }
         }*/
 
-        if(this.damage.size()<11) {
-            for (int i = 0; i < damage; i++)
-                this.damage.add(shooter.getColor());
-            num = this.damage.size();
-            if (num > 10) {
-                this.deaths++;
-                this.isDead = true;
-                shooter.addThisTurnMarks(this, 1); //when the victim of a damage die, the shooter receive a marks from the dead player
-                if (num > 11) {
-                    isRage = true;
-                }
-                game.addKill(shooter, this, isRage);
+            if (this.damage.size() < 11) {
+                for (int i = 0; i < damage; i++)
+                    this.damage.add(shooter.getColor());
+                num = this.damage.size();
+                if (num > 10) {
+                    this.deaths++;
+                    this.isDead = true;
+                    shooter.addThisTurnMarks(this, 1); //when the victim of a damage die, the shooter receive a marks from the dead player
+                    if (num > 11) {
+                        isRage = true;
+                    }
+                    game.addKill(shooter, this, isRage);
 
+                } else if (num > 5)
+                    this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
+                else if (num > 2)
+                    this.adrenaline = AdrenalineLevel.GRABLEVEL;
+            } else if (this.damage.size() == 11 && damage > 0) {
+                lastKill = game.getLastKill(this);
+                lastKill.setRage(true);
             }
-            else if (num > 5)
-                this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
-            else if (num > 2)
-                this.adrenaline = AdrenalineLevel.GRABLEVEL;
+            if (game != null)
+                game.notifyDamage(this, shooter, damage);
         }
-        else if (this.damage.size()==11 && damage>0){
-            lastKill = game.getLastKill(this);
-            lastKill.setRage(true);
-        }
-        if(game != null)
-            game.notifyDamage(this,shooter,damage);
-
     }
 
     /**
@@ -305,7 +304,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
         if(checkMarksNumber(shooter,marks)) {
             for (int i = 0; i < marks; i++)
                 this.thisTurnMarks.add(shooter.getColor());
-            game.notifyMarks(this,shooter,marks);
+            if(game!=null)
+                game.notifyMarks(this,shooter,marks);
         }
 
     }
@@ -369,6 +369,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
     public void updateMarks() {
         this.marks.addAll(thisTurnMarks);
         thisTurnMarks.clear();
+        if(game != null)
+            game.notifyUpdateMarks(this);
     }
 
     /**
@@ -471,8 +473,11 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     public boolean canUseWeaponEffect(FullEffect effect){
         List<Color> priceTmp;
-        priceTmp = new ArrayList<>(effect.getPrice());
-        return controlPayment(priceTmp);
+        if(effect.getPrice() != null){
+            priceTmp = new ArrayList<>(effect.getPrice());
+            return controlPayment(priceTmp);
+        }
+        return true;
     }
 
     /**
@@ -487,25 +492,26 @@ public class Player implements Target, Serializable, Comparable<Player> {
     }
 
     public boolean controlPayment(List<Color> price){
-        if(price.get(0) == Color.ANY)
-            return true;
-        if(ammo != null && !ammo.isEmpty())
-            for(int i = 0; i < ammo.size(); i++)
-                price.remove(ammo.get(i));
-        if(price.isEmpty())
-            return true;
-        else
-        if(cardPower!=null && !cardPower.isEmpty())
-            for(int i = 0; i < cardPower.size(); i++) {
-                price.remove(cardPower.get(i).getColor());
-            }
-        else
-            return false;
-        if(price.isEmpty())
-            return true;
-        else
-            return false;
-
+        if(!price.isEmpty()) {
+            if (price.get(0) == Color.ANY)
+                return true;
+            if (ammo != null && !ammo.isEmpty())
+                for (int i = 0; i < ammo.size(); i++)
+                    price.remove(ammo.get(i));
+            if (price.isEmpty())
+                return true;
+            else if (cardPower != null && !cardPower.isEmpty())
+                for (int i = 0; i < cardPower.size(); i++) {
+                    price.remove(cardPower.get(i).getColor());
+                }
+            else
+                return false;
+            if (price.isEmpty())
+                return true;
+            else
+                return false;
+        }
+        return true;
     }
 
     /**
@@ -515,22 +521,26 @@ public class Player implements Target, Serializable, Comparable<Player> {
      * @throws InsufficientAmmoException
      */
     public void pay(List<Color> ammoToPay, List<CardPower> powerUp) throws InsufficientAmmoException {
-        List <Color> tmp = new ArrayList<>(ammoToPay);
-        List <CardPower> tmpPU = new ArrayList<>();
-        if(powerUp != null && !powerUp.isEmpty())
-            for(int i = 0; i < powerUp.size(); i++){
-                if(tmp.contains(powerUp.get(i).getColor())) {
-                    tmp.remove(powerUp.get(i).getColor());
-                    tmpPU.add(powerUp.get(i));
+        List <Color> tmp = null;
+        List <CardPower> tmpPU = null;
+        if(ammoToPay != null && !ammoToPay.isEmpty() && ammoToPay.get(0)!=Color.ANY) {
+            tmp = new ArrayList<>(ammoToPay);
+            tmpPU = new ArrayList<>();
+            if (powerUp != null && !powerUp.isEmpty())
+                for (int i = 0; i < powerUp.size(); i++) {
+                    if (tmp.contains(powerUp.get(i).getColor())) {
+                        tmp.remove(powerUp.get(i).getColor());
+                        tmpPU.add(powerUp.get(i));
+                    }
                 }
-            }
-        if(!ammo.containsAll(tmp)) throw new InsufficientAmmoException();
-        else {
-            for (Color ammor : tmp) {
-                ammo.remove(ammor);
-            }
-            for (CardPower cp : tmpPU) {
-                cardPower.remove(cp);
+            if (!ammo.containsAll(tmp)) throw new InsufficientAmmoException();
+            else {
+                for (Color ammor : tmp) {
+                    ammo.remove(ammor);
+                }
+                for (CardPower cp : tmpPU) {
+                    cardPower.remove(cp);
+                }
             }
         }
     }

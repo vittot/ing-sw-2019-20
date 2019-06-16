@@ -190,7 +190,7 @@ public class CardWeapon implements Serializable {
             for (int i = 0 ; i < tmpPUPaid.size(); i++)
                 shooter.getCardPower().remove(tmpPUPaid.get(i));
         }
-        if(!tmp.isEmpty())
+        else if(!tmp.isEmpty())
             throw new InsufficientAmmoException();
     }
 

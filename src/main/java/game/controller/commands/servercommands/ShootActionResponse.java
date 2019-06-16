@@ -5,6 +5,7 @@ import game.controller.commands.ServerMessageHandler;
 import game.model.CardPower;
 import game.model.CardWeapon;
 import game.model.Color;
+import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 
 import java.util.List;
@@ -15,10 +16,6 @@ public class ShootActionResponse implements ServerMessage {
     private List<Color> ammoToPay;
     private List<CardPower> poweupToPay;
 
-    public ShootActionResponse(CardWeapon selectedWeapon) {
-        this.selectedWeapon = selectedWeapon;
-    }
-
     public ShootActionResponse(CardWeapon selectedWeapon, List<Color> ammoToPay, List<CardPower> powerUpToPay) {
         this. selectedWeapon = selectedWeapon;
         this.ammoToPay = ammoToPay;
@@ -27,6 +24,14 @@ public class ShootActionResponse implements ServerMessage {
 
     public CardWeapon getSelectedWeapon() {
         return selectedWeapon;
+    }
+
+    public List<Color> getAmmoToPay() {
+        return ammoToPay;
+    }
+
+    public List<CardPower> getPoweupToPay() {
+        return poweupToPay;
     }
 
     @Override

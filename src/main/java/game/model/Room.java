@@ -87,8 +87,7 @@ public class Room implements Target, Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Room room = (Room) o;
-        return color == room.color &&
-                map.equals(room.map);
+        return color == room.color;
     }
 
     @Override
