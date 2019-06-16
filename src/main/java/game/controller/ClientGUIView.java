@@ -21,6 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -42,6 +43,14 @@ public class ClientGUIView extends Application implements View{
     private double screenHeight = Screen.getScreens().get(0).getBounds().getHeight();
     private Label text = new Label("");
     private List<GameMap> availableMaps;
+
+
+    private StackPane map = new StackPane();
+    private List<Rectangle> squares = new ArrayList<>();
+    private List<ImageView> ammos = new ArrayList<>();
+    private List<Circle> players = new ArrayList<>();
+    List<ImageView> powerUp;
+    List<ImageView> weapons;
 
     public ClientGUIView() {
         GUI = this;
@@ -487,25 +496,113 @@ public class ClientGUIView extends Application implements View{
     public void notifyPlayerJoinedWaitingRoom(Player p) {
 
     }
-    private ImageView createImageViewAmmo(CardAmmo ca ){
+    private ImageView createImageViewAmmo(int i ){
         String card = "";
-        if(ca.getCardPower()==1)
-            card = card + "P";
-        for(game.model.Color c : ca.getAmmo()){
-            if(c != null) {
-                card = card + c.toString().substring(6,7);
+        CardAmmo ca;
+        Image ammoI = new Image("graphics/ammo/Empty.png");    // if the square is empty
+        if(ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4] != null) {
+            ca = ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4].getCardAmmo();
+            if (ca.getCardPower() == 1) {
+                card = card + "P";
             }
+            for (game.model.Color c : ca.getAmmo()) {
+                if (c != null) {
+                    card = card + c.toString().substring(6, 7);
+                }
+            }
+            ammoI = new Image ("graphics/ammo/"+card+".png");
         }
-        Image ammoI = new Image ("graphics/ammo/"+card);
         ImageView ammoIV = new ImageView(ammoI);
-        ammoIV.setId("");
+        ammoIV.setId(""+i);
         ammoIV.setFitWidth(screenWidth*2.4/100);
         ammoIV.setPreserveRatio(true);
         return ammoIV;
     }
+    private Color createPlayerColor(PlayerColor color){
+        if(color.equals(PlayerColor.YELLOW))return Color.YELLOW;
+        if(color.equals(PlayerColor.GREEN))return Color.GREEN;
+        if(color.equals(PlayerColor.BLUE))return Color.BLUE;
+        if(color.equals(PlayerColor.PURPLE))return Color.PURPLE;
+        if(color.equals(PlayerColor.GREY))return Color.RED;
+        return Color.TRANSPARENT;
+    }
+    private void refreshPlayerPosition(){
+        double spaceX = 0;
+        double spaceY = 0;
+        for(int i = 1; i< 13 ; i++) {
+            if(ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4] != null) {
+                for (Player pl : ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4].getPlayers()) {
+                    int j = 0;
+                    Circle p = players.stream().filter(player -> pl.getNickName().equals(player.getId())).findFirst().orElse(null);
+                    if(p == null)
+                        System.out.println("Player not found");
+                    StackPane.setAlignment(p,Pos.TOP_LEFT);
+                    StackPane.setMargin(p, new Insets(screenHeight * 29 / 100 + spaceY, 0, 0, screenWidth * 11 / 100 + spaceX + j * 20));
+                }
+                if (i % 4 == 0 && i != 0) {
+                    spaceY = spaceY + screenHeight * 18 / 100;
+                    spaceX = 0;
+                } else {
+                    spaceX = spaceX + screenWidth * 9.5 / 100;
+                }
+            }
+        }
+    }
+    private void createTextNotification(){
+        text.setStyle("-fx-font: 20px Tahoma;");
+        text.setTextFill(Color.WHITE);
+        text.setPrefWidth(screenWidth*52.5/100);
+        text.setMaxHeight(screenHeight*3.25/100);
+        text.setWrapText(true);
+    }
+    private void createMyPlayerCard(){
+        Image w = new Image("graphics/cards/W_back");
+        Image p = new Image("graphics/cards/PW_back");
+        ImageView pu = new ImageView(p);
+        ImageView we = new ImageView(w);
+        powerUp = new ArrayList<>(Arrays.asList(pu,pu,pu));
+        weapons = new ArrayList<>(Arrays.asList(we,we,we));
+        int i = 0;
+        for(ImageView imw : weapons){
+            imw.setFitWidth(screenWidth*6.9/100);
+            imw.setPreserveRatio(true);
+            StackPane.setAlignment(imw,Pos.BOTTOM_RIGHT);
+            StackPane.setMargin(imw,new Insets(0,i,0,0));
+            i = i + (int)(screenHeight*14/100);
+            imw.setOnMouseClicked(this::handleWeaponClick);
+        }
+
+        for(ImageView imw : powerUp){
+            imw.setFitWidth(screenWidth*6.9/100);
+            imw.setPreserveRatio(true);
+            StackPane.setAlignment(imw,Pos.BOTTOM_RIGHT);
+            StackPane.setMargin(imw,new Insets(0,i,0,0));
+            i = i + (int)(screenHeight*14/100);
+            imw.setOnMouseClicked(this::handleWeaponClick);
+        }
+    }
+    private String createPowerUpCard(String name, game.model.Color color){
+        return ""+name+"_"+color.toString().substring(6,7)+".png";
+    }
+    private void refreshMyPlayerCard(){
+        Image cardP;
+        Image cardW;
+        for(int i = 0; i < 3 ; i++){
+            if(ClientContext.get().getMyPlayer().getCardPower().get(i) == null)
+                cardP = new Image("graphics/cards/PW_back.png");
+            else
+                cardP = new Image(createPowerUpCard(ClientContext.get().getMyPlayer().getCardPower().get(i).getName(),ClientContext.get().getMyPlayer().getCardPower().get(i).getColor()));
+            if(ClientContext.get().getMyPlayer().getWeapons().get(i) == null)
+                cardW = new Image("graphics/cards/W_back.png");
+            else
+                cardW = new Image("W_"+ClientContext.get().getMyPlayer().getCardPower().get(i).getId()+".png");
+            powerUp.get(i).setImage(cardP);
+            weapons.get(i).setImage(cardW);
+        }
+    }
+
     private void showMapGame(){
         ImageView mapIV;
-        StackPane map = new StackPane();
 
 
         Image mapI = new Image("graphics/cards/mappa"+ClientContext.get().getMap().getId()+".png");
@@ -514,15 +611,13 @@ public class ClientGUIView extends Application implements View{
         mapIV.setPreserveRatio(true);
 
         //stampa rettangoli invisibili e ammo
-        List<Rectangle> squares = new ArrayList<>();
-        List<ImageView> ammos = new ArrayList<>();
         double spaceX = 0;
         double spaceY = 0;
         for(int i = 1; i < 13; i++){
             Rectangle rec = new Rectangle(130,130,Color.TRANSPARENT);
             rec.setId(""+i);
             squares.add(rec);
-            ImageView ammoIV = createImageViewAmmo(ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4].getCardAmmo());
+            ImageView ammoIV = createImageViewAmmo(i);
             ammos.add(ammoIV);
             map.getChildren().add(rec);
             map.getChildren().add(ammoIV);
@@ -531,6 +626,7 @@ public class ClientGUIView extends Application implements View{
             StackPane.setAlignment(ammoIV,Pos.TOP_LEFT);
             StackPane.setMargin(ammoIV,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
             rec.setOnMouseClicked(this :: handleSquareClick);
+            rec.setDisable(true);
             if(i % 4 == 0 && i != 0){
                 spaceX = 0;
                 spaceY = spaceY + screenHeight*18/100;
@@ -538,7 +634,25 @@ public class ClientGUIView extends Application implements View{
                 spaceX = spaceX + screenWidth*9.5/100;
             }
         }
+        //stampa player fuori dalla mappa, per poi spostarli dove serve
+        for(Player pl : ClientContext.get().getPlayersInWaiting()){
+            Circle c = new Circle(9, createPlayerColor(pl.getColor()));
+            c.setStroke(Color.BLACK);
+            players.add(c);
+            map.getChildren().add(c);
+            c.setId(pl.getNickName());
+            StackPane.setAlignment(c,Pos.TOP_LEFT);
+            StackPane.setMargin(c, new Insets(0,0,1000,0));
+            c.setOnMouseClicked(this::handlePlayerClick);
+            c.setDisable(true);
+        }
+        refreshPlayerPosition();
+        createTextNotification();
+        createMyPlayerCard();
+        refreshMyPlayerCard();
+
     }
+
 
     private void showMap(){
         int mapId = 1;
@@ -547,8 +661,8 @@ public class ClientGUIView extends Application implements View{
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(screenWidth*55/100);
         imageView.setPreserveRatio(true);
-        Image image2 = new Image("graphics/cards/AD_weapons_IT_024.png");
-        Image image7 = new Image("graphics/cards/AD_powerups_IT_024.png");
+        Image image2 = new Image("graphics/cards/W_18.png");
+        Image image7 = new Image("graphics/cards/Teleporter_2.png");
         ImageView im2 = new ImageView(image2);
         im2.setId("Distruttore");
         ImageView im3 = new ImageView(image2);
@@ -588,7 +702,6 @@ public class ClientGUIView extends Application implements View{
 
 
 
-        StackPane map = new StackPane();
         map.setPrefSize(screenWidth,screenHeight);
         map.getChildren().addAll(imageView,im2,im3,im4,im5,im6,im7,imd1,imd2,imd3,imd4,imd5,text);
 
@@ -617,8 +730,8 @@ public class ClientGUIView extends Application implements View{
             StackPane.setMargin(imw,new Insets(i,0,0,0));
             i = i + (int)(screenHeight*18.6/100);
             imw.setOnMouseClicked(this::handleWeaponClick);
-            //javafx.scene.effect.
         }
+        StackPane.setAlignment(imd5,Pos.BOTTOM_LEFT);
         double spaceX = 0;
         for(ImageView weapon : mapWL){
             map.getChildren().add(weapon);
@@ -674,8 +787,11 @@ public class ClientGUIView extends Application implements View{
         double spaceY = 0;
         image = new Image("graphics/ammo/BRR.png");
         for(i = 1; i < 13; i++){
-            Rectangle rec = new Rectangle(130,130,Color.TRANSPARENT);
+            Rectangle rec = new Rectangle(130,130);
+            rec.setFill(Color.TRANSPARENT);
             rec.setId(""+i);
+            rec.setStroke(Color.GREEN);
+            rec.setEffect(new DropShadow(40,Color.GREEN));
             squares.add(rec);
             ImageView am = new ImageView(image);
             am.setId(""+i);
@@ -695,16 +811,8 @@ public class ClientGUIView extends Application implements View{
             }else{
                 spaceX = spaceX + screenWidth*9.5/100;
             }
-        }/*
-        GridPane gp = new GridPane();
-        gp.setMaxSize(500,500);
-        gp.setViewOrder(9);
-        gp.setBackground(new Background(new BackgroundFill(Color.GREENYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
-        Button p = new Button("daiwj");
-        p.setOnMouseClicked(mouseEvent -> gp.setViewOrder(9));
-        gp.getChildren().add(p);
-        map.getChildren().add(gp);
-        StackPane.setAlignment(gp,Pos.TOP_LEFT);*/
+        }
+
         //player stamp
         List<Circle> players = new ArrayList<>();
         spaceX = 0;
@@ -741,6 +849,98 @@ public class ClientGUIView extends Application implements View{
 
             }
         }
+
+        //Stampa gocce Kill
+        spaceY = 0;
+        for(int j = 0; j < 8; j++){
+            Image kill = new Image("graphics/map/YellowTear.png");
+            ImageView kills = new ImageView(kill);
+            kills.setId(""+i);
+            kills.setFitHeight(screenHeight * 3 /100);
+            kills.setPreserveRatio(true);
+            map.getChildren().add(kills);
+            StackPane.setAlignment(kills,Pos.TOP_LEFT);
+            StackPane.setMargin(kills,new Insets(screenHeight * 5 / 100,0,0,screenWidth * 4.8 / 100 + spaceY));
+            spaceY = spaceY + screenWidth * 2.46 / 100;
+        }
+
+
+        //Stampa gocce My Player danno e marchio
+        spaceX = 0;
+        for(int j = 0; j < 12; j++){
+            Image damage = new Image("graphics/map/BlueTear.png");
+            ImageView damages = new ImageView(damage);
+            damages.setId(""+i);
+            damages.setFitHeight(screenHeight * 3 /100);
+            damages.setPreserveRatio(true);
+            map.getChildren().add(damages);
+            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
+            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 6.25 / 100,screenWidth * 3.44 / 100 + spaceX));
+            spaceX = spaceX + screenWidth * 2.25 / 100;
+            if(j > 1 && j != 4)
+                spaceX = spaceX - screenWidth * 0.25 / 100;
+        }
+        spaceX = 0;
+        for(int j = 0; j < 9; j++){
+            Image damage = new Image("graphics/map/PurpleTear.png");
+            ImageView damages = new ImageView(damage);
+            damages.setId(""+i);
+            damages.setFitHeight(screenHeight * 2 /100);
+            damages.setPreserveRatio(true);
+            map.getChildren().add(damages);
+            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
+            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 17.6 / 100 + spaceX));
+            spaceX = spaceX + screenWidth * 1 / 100;
+        }
+
+
+        //Stampa gocce other Player danno e marchio
+        spaceY = 0;
+        for(int k = 0; k < 4 ; k++) {
+            spaceX = 0;
+            for (int j = 0; j < 12; j++) {
+                Image damage = new Image("graphics/map/YellowTear.png");
+                ImageView damages = new ImageView(damage);
+                damages.setId("" + i);
+                damages.setFitHeight(screenHeight * 3 / 100);
+                damages.setPreserveRatio(true);
+                map.getChildren().add(damages);
+                StackPane.setAlignment(damages, Pos.TOP_RIGHT);
+                StackPane.setMargin(damages, new Insets(screenHeight * 6.5 / 100 + spaceY, screenWidth * 32.1 / 100 - spaceX, 0, 0));
+                spaceX = spaceX + screenWidth * 2.25 / 100;
+                if (j > 1 && j != 4)
+                    spaceX = spaceX - screenWidth * 0.25 / 100;
+            }
+            spaceX = 0;
+            for (int j = 0; j < 9; j++) {
+                Image damage = new Image("graphics/map/BlueTear.png");
+                ImageView damages = new ImageView(damage);
+                damages.setId("" + i);
+                damages.setFitHeight(screenHeight * 2 / 100);
+                damages.setPreserveRatio(true);
+                map.getChildren().add(damages);
+                StackPane.setAlignment(damages, Pos.TOP_RIGHT);
+                StackPane.setMargin(damages, new Insets(screenHeight * 0.4 / 100 + spaceY, screenWidth * 18 / 100 - spaceX, 0, 0));
+                spaceX = spaceX + screenWidth * 1 / 100;
+            }
+            spaceY = spaceY + screenHeight * 18.5 / 100;
+        }
+
+        //ammo
+        spaceX = 0;
+        spaceY = 0;
+        for(int j = 0; j < 3 ; j++){
+            for (int k = 0;k < 3 ; k ++){
+                Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.YELLOW);
+                map.getChildren().add(ammo);
+                StackPane.setAlignment(ammo, Pos.BOTTOM_LEFT);
+                StackPane.setMargin(ammo, new Insets(0, 0, screenHeight * 12 / 100 - spaceY, screenWidth * 29 / 100 + spaceX));
+                spaceX = spaceX + screenWidth * 2.5 / 100;
+            }
+            spaceY = spaceY + screenHeight * 3.5 /100;
+            spaceX = 0;
+        }
+
         Image background = new Image("graphics/map/background.png");
         BackgroundImage bi = new BackgroundImage(background,
                 BackgroundRepeat.REPEAT,
@@ -751,7 +951,6 @@ public class ClientGUIView extends Application implements View{
 
         StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
         StackPane.setMargin(text,new Insets(0,0,(screenHeight/(displayY/130)),0));
-        StackPane.setAlignment(imd5,Pos.BOTTOM_LEFT);
         StackPane.setAlignment(imageView,Pos.TOP_LEFT);
         Scene scene = new Scene(map);
         primaryStage.setScene(scene);
