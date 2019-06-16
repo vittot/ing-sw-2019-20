@@ -8,10 +8,13 @@ import game.model.effects.MovementEffect;
 import game.model.effects.SimpleEffect;
 import game.model.effects.SquareDamageEffect;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ClientTextView implements View {
+public class ClientTextView implements  View {
     private static final String ANSI_CYAN = "\u001B[36m";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
@@ -27,7 +30,7 @@ public class ClientTextView implements View {
 
 
     public ClientTextView(){
-
+        this.fromKeyBoard = new Scanner(System.in);
     }
 
     public ClientTextView(ClientController controller) {
@@ -40,15 +43,19 @@ public class ClientTextView implements View {
     }
 
     public String readText(){
-        String string = fromKeyBoard.nextLine();
-        return string;
+        String string = null;
+        //try {
+            string = fromKeyBoard.nextLine();
+            return string;
+        /*} catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }*/
+
     }
 
     public char readChar(){
-        String string;
-        do {
-            string = fromKeyBoard.nextLine();
-        }while(string.isEmpty());
+        String string = readText();
         return string.charAt(0);
     }
 
@@ -57,15 +64,56 @@ public class ClientTextView implements View {
      * @return
      */
     public  int readInt(){
-        try {
-            int save = fromKeyBoard.nextInt();
-            fromKeyBoard.nextLine();
-            return save;
-        }catch (InputMismatchException e){
-            System.out.println("Wrong input, expected a number");
-            fromKeyBoard.nextLine();
-            return readInt();
-        }
+
+        String number;
+        int n = 0;
+        boolean retry;
+        do {
+            retry = false;
+            number = readText();
+            try {
+                n = Integer.parseInt(number);
+            } catch (NumberFormatException e) {
+                System.out.println("Wrong input, expected a numeber");
+                retry = true;
+            }
+        }while(retry);
+
+        return n;
+        /*boolean retry;
+        do{
+            try {
+                if(fromKeyBoard.hasNextInt())
+                {   int save = fromKeyBoard.nextInt();
+                    fromKeyBoard.nextLine();
+                    return save;
+                }
+                retry = true;
+                Thread.sleep(10);
+
+            }catch (InputMismatchException e){
+                System.out.println("Wrong input, expected a numeber");
+                fromKeyBoard.nextLine();
+                return readInt();
+            }catch(IndexOutOfBoundsException  | IllegalStateException | InterruptedException e)
+            {
+                retry = true;
+            }
+        }while(true);*/
+    }
+
+    public void run(){
+        /*new Thread(
+
+                () -> {
+                    String s = "";
+                    do{
+                         if(fromKeyBoard.hasNext())
+                            s = readText();
+                    }while(!s.equals("EXIT"));
+
+                }
+        ).start();*/
     }
 
     /**
@@ -163,6 +211,35 @@ public class ClientTextView implements View {
     @Override
     public void setController(ClientController clientController) {
         this.controller = clientController;
+    }
+
+    @Override
+    public void waitStart(){
+
+        Thread t = new Thread( () -> {
+            String s;
+            do {
+                //s = readText();
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (/*!s.equals("exit") &&*/ !controller.isGameStarted());
+        });
+        t.start();
+    }
+
+    @Override
+    public String chooseConnection() {
+        String choice;
+        writeText("Choose the connection type");
+        writeText("Insert Socket or RMI:");
+        do{
+            choice = fromKeyBoard.nextLine();
+            choice = choice.toUpperCase();
+        }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
+        return choice;
     }
 
     @Override
@@ -301,6 +378,8 @@ public class ClientTextView implements View {
         writeText("Enter the id for the selected waiting room or -1 if you want to create a new waiting room:");
         do{
             nRoom = readInt();
+            if((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1)
+                writeText("Invalid waiting room number!");
         }while((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1);
         if(nRoom != -1)
         {

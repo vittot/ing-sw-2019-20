@@ -107,4 +107,8 @@ public interface View {
     void notifyPlayerJoinedWaitingRoom(Player p);
 
     void setController(ClientController clientController);
+
+    void waitStart();
+
+    String chooseConnection();
 }

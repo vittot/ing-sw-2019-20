@@ -47,14 +47,20 @@ public class ClientGUIView extends Application implements View{
         GUI = this;
     }
 
-    public static ClientGUIView getInstance() throws InterruptedException {
+    public static ClientGUIView getInstance(){
         if(GUI!=null){
             return GUI;
         }
         else{
             (new Thread(() -> launch())).start();
-            while(GUI == null)
-                Thread.sleep(100);
+            while(GUI == null)  //ensures that the gui has been launched before proceeding
+            {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return GUI;
     }
@@ -62,6 +68,26 @@ public class ClientGUIView extends Application implements View{
     public void setController(ClientController controller){
         this.controller = controller;
     }
+
+    @Override
+    public void waitStart() {
+        //TODO (?)
+    }
+
+    @Override
+    public String chooseConnection() {
+        //TODO (now just a copy of textView)
+        String choice;
+        Scanner in = new Scanner(System.in);
+        System.out.println("Choose the connection type");
+        System.out.println("Insert Socket or RMI:");
+        do{
+            choice = in.nextLine();
+            choice = choice.toUpperCase();
+        }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
+        return choice;
+    }
+
 
     @Override
     public void start(Stage primaryStage) {

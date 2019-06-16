@@ -1,10 +1,7 @@
 package game.model.effects;
 
 import game.controller.EffectHandler;
-import game.controller.ServerController;
 import game.controller.commands.ServerMessage;
-import game.controller.commands.servercommands.ChooseTargetRequest;
-import game.controller.commands.servercommands.InvalidWeaponResponse;
 import game.model.*;
 
 import java.util.ArrayList;
