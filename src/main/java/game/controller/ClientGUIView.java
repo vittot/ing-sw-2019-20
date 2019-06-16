@@ -47,10 +47,22 @@ public class ClientGUIView extends Application implements View{
 
     private StackPane map = new StackPane();
     private List<Rectangle> squares = new ArrayList<>();
+    private List<Rectangle> myAmmo = new ArrayList<>();
     private List<ImageView> ammos = new ArrayList<>();
     private List<Circle> players = new ArrayList<>();
-    List<ImageView> powerUp;
-    List<ImageView> weapons;
+    private List<ImageView> playerDashBoard = new ArrayList<>();
+    private List<ImageView> powerUp = new ArrayList<>();
+    private List<ImageView> weapons = new ArrayList<>();
+    private List<ImageView> mapWL = new ArrayList<>();
+    private List<ImageView> mapWR = new ArrayList<>();
+    private List<ImageView> mapWT = new ArrayList<>();
+    private List<List<ImageView>> playerDamage = new ArrayList<>();
+    private List<List<ImageView>> playerMarks = new ArrayList<>();
+    private List<ImageView> myPlayerDamage = new ArrayList<>();
+    private List<ImageView> myPlayerMarks = new ArrayList<>();
+
+    //TODO esiste?
+    private List<ImageView> mapWB;
 
     public ClientGUIView() {
         GUI = this;
@@ -496,7 +508,13 @@ public class ClientGUIView extends Application implements View{
     public void notifyPlayerJoinedWaitingRoom(Player p) {
 
     }
-    private ImageView createImageViewAmmo(int i ){
+
+    /**
+     * Create a Ammo card from a Ammo in map, build a String with initials of Color
+     * @param i
+     * @return
+     */
+    private Image createAmmoCard(int i){
         String card = "";
         CardAmmo ca;
         Image ammoI = new Image("graphics/ammo/Empty.png");    // if the square is empty
@@ -512,12 +530,27 @@ public class ClientGUIView extends Application implements View{
             }
             ammoI = new Image ("graphics/ammo/"+card+".png");
         }
-        ImageView ammoIV = new ImageView(ammoI);
+        return ammoI;
+    }
+
+    /**
+     * create ImageView with the relative ammo inside from a Square position in the map
+     * @param i
+     * @return
+     */
+    private ImageView createImageViewAmmo(int i ){
+        ImageView ammoIV = new ImageView(createAmmoCard(i));
         ammoIV.setId(""+i);
         ammoIV.setFitWidth(screenWidth*2.4/100);
         ammoIV.setPreserveRatio(true);
         return ammoIV;
     }
+
+    /**
+     * Create the relative Paint color from a Player color
+     * @param color
+     * @return
+     */
     private Color createPlayerColor(PlayerColor color){
         if(color.equals(PlayerColor.YELLOW))return Color.YELLOW;
         if(color.equals(PlayerColor.GREEN))return Color.GREEN;
@@ -526,6 +559,10 @@ public class ClientGUIView extends Application implements View{
         if(color.equals(PlayerColor.GREY))return Color.RED;
         return Color.TRANSPARENT;
     }
+
+    /**
+     * Reposition the player Circle in the right position
+     */
     private void refreshPlayerPosition(){
         double spaceX = 0;
         double spaceY = 0;
@@ -548,6 +585,10 @@ public class ClientGUIView extends Application implements View{
             }
         }
     }
+
+    /**
+     * create a text view in the map
+     */
     private void createTextNotification(){
         text.setStyle("-fx-font: 20px Tahoma;");
         text.setTextFill(Color.WHITE);
@@ -555,6 +596,11 @@ public class ClientGUIView extends Application implements View{
         text.setMaxHeight(screenHeight*3.25/100);
         text.setWrapText(true);
     }
+
+    /**
+     * Create my player Power-up and Weapon card position in the screen
+     * Set the back of the card from default
+     */
     private void createMyPlayerCard(){
         Image w = new Image("graphics/cards/W_back");
         Image p = new Image("graphics/cards/PW_back");
@@ -581,27 +627,30 @@ public class ClientGUIView extends Application implements View{
             imw.setOnMouseClicked(this::handleWeaponClick);
         }
     }
+
+    /**
+     * Create a power up from his name and color (name_color initial)
+     * @param name
+     * @param color
+     * @return
+     */
     private String createPowerUpCard(String name, game.model.Color color){
         return ""+name+"_"+color.toString().substring(6,7)+".png";
     }
-    private void refreshMyPlayerCard(){
-        Image cardP;
-        Image cardW;
-        for(int i = 0; i < 3 ; i++){
-            if(ClientContext.get().getMyPlayer().getCardPower().get(i) == null)
-                cardP = new Image("graphics/cards/PW_back.png");
-            else
-                cardP = new Image(createPowerUpCard(ClientContext.get().getMyPlayer().getCardPower().get(i).getName(),ClientContext.get().getMyPlayer().getCardPower().get(i).getColor()));
-            if(ClientContext.get().getMyPlayer().getWeapons().get(i) == null)
-                cardW = new Image("graphics/cards/W_back.png");
-            else
-                cardW = new Image("W_"+ClientContext.get().getMyPlayer().getCardPower().get(i).getId()+".png");
-            powerUp.get(i).setImage(cardP);
-            weapons.get(i).setImage(cardW);
-        }
+
+    /**
+     * Return the weapon picture name from his Id
+     * @param i
+     * @return
+     */
+    private String createWeaponCard(int i){
+        return "W_"+ClientContext.get().getMyPlayer().getCardPower().get(i).getId()+".png";
     }
 
-    private void showMapGame(){
+    /**
+     * create the map space with the relative square, ammo space and weapon to grab
+     */
+    private void createMapSquareAmmo(){
         ImageView mapIV;
 
 
@@ -634,6 +683,87 @@ public class ClientGUIView extends Application implements View{
                 spaceX = spaceX + screenWidth*9.5/100;
             }
         }
+        //print all the back of the weapon card in the map
+        Image back = new Image ("graphics/card/W_back.png");
+        spaceX = 0;
+        for(int k = 0 ; k < 3 ; k ++){
+            ImageView weapon = new ImageView(back);
+            mapWL.add(weapon);
+            map.getChildren().add(weapon);
+            weapon.setFitWidth(screenWidth*5.12/100);
+            weapon.setId("0");
+            weapon.setPreserveRatio(true);
+            StackPane.setAlignment(weapon,Pos.CENTER_LEFT);
+            weapon.setRotate(270);
+            StackPane.setMargin(weapon,new Insets(screenHeight*12/100 + spaceX,0,0,screenWidth*1.83/100));
+            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
+            weapon.setOnMouseExited(this::handleMouseOutWeapon);
+            spaceX = spaceX - screenHeight*22.4/100;
+        }
+        double spaceT = 0;
+        for(int k = 0; k < 3; k++){
+            ImageView weapon = new ImageView(back);
+            mapWT.add(weapon);
+            map.getChildren().add(weapon);
+            weapon.setFitWidth(screenWidth*5.12/100);
+            weapon.setId("0");
+            weapon.setPreserveRatio(true);
+            StackPane.setAlignment(weapon,Pos.TOP_CENTER);
+            StackPane.setMargin(weapon,new Insets(0,screenWidth*34/100 + spaceT,0,0));
+            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
+            weapon.setOnMouseExited(this::handleMouseOutWeapon);
+            spaceT = spaceT - screenHeight*20/100;
+        }
+
+        double spaceR = 0;
+        for(int k = 0; k < 3 ; k++){
+            ImageView weapon = new ImageView(back);
+            mapWR.add(weapon);
+            map.getChildren().add(weapon);
+            weapon.setFitWidth(screenWidth*5.12/100);
+            weapon.setId("0");
+            weapon.setPreserveRatio(true);
+            StackPane.setAlignment(weapon,Pos.CENTER);
+            weapon.setRotate(90);
+            StackPane.setMargin(weapon,new Insets(screenHeight*43/100 + spaceR,0,0,screenWidth*4/100));
+            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
+            weapon.setOnMouseExited(this::handleMouseOutWeapon);
+            spaceR = spaceR - screenHeight*22.4/100;
+            //weapon.setEffect(new DropShadow(20,Color.GREEN));
+        }
+    }
+
+    /**
+     * Refresh my player power up and weapon
+     */
+    private void refreshMyPlayerCard(){
+        Image cardP;
+        Image cardW;
+        for(int i = 0; i < 3 ; i++) {
+            if (ClientContext.get().getMyPlayer().getCardPower().get(i) == null) {
+                cardP = new Image("graphics/cards/PW_back.png");
+                powerUp.get(i).setId("0");
+            } else {
+                cardP = new Image(createPowerUpCard(ClientContext.get().getMyPlayer().getCardPower().get(i).getName(), ClientContext.get().getMyPlayer().getCardPower().get(i).getColor()));
+                powerUp.get(i).setId("" + ClientContext.get().getMyPlayer().getCardPower().get(i).getId());
+            }
+            if (ClientContext.get().getMyPlayer().getWeapons().get(i) == null){
+                cardW = new Image("graphics/cards/W_back.png");
+                weapons.get(i).setId("0");
+            }
+            else {
+                cardW = new Image(createWeaponCard(ClientContext.get().getMyPlayer().getCardPower().get(i).getId()));
+                weapons.get(i).setId("" + ClientContext.get().getMyPlayer().getWeapons().get(i).getId());
+            }
+            powerUp.get(i).setImage(cardP);
+            weapons.get(i).setImage(cardW);
+        }
+    }
+
+    /**
+     * create player circle out of the map, so the can be moved in when they spawned
+     */
+    private void createPlayerPosition(){
         //stampa player fuori dalla mappa, per poi spostarli dove serve
         for(Player pl : ClientContext.get().getPlayersInWaiting()){
             Circle c = new Circle(9, createPlayerColor(pl.getColor()));
@@ -646,11 +776,201 @@ public class ClientGUIView extends Application implements View{
             c.setOnMouseClicked(this::handlePlayerClick);
             c.setDisable(true);
         }
+    }
+
+    /**
+     * refreah the ammo in the map
+     */
+    private void refreshAmmoCard(){
+        for(ImageView iv : ammos){
+            int i = Integer.parseInt(iv.getId());
+            iv.setImage(createAmmoCard(i));
+        }
+    }
+
+    /**
+     * Add other plaeyer dash board in the screen
+     */
+    private void createPlayerDashBoard(){
+        int i = 0;
+        for(Player p : ClientContext.get().getPlayersInWaiting()){
+            Image dash = new Image (""+p.getColor().name().substring(6)+"Dash.png");
+            ImageView imw = new ImageView(dash);
+            playerDashBoard.add(imw);
+            imw.setId(p.getNickName());
+            imw.setFitWidth(screenWidth*36.6/100);
+            imw.setPreserveRatio(true);
+            if(p.equals(ClientContext.get().getMyPlayer())){
+                StackPane.setAlignment(imw,Pos.BOTTOM_LEFT);
+            }else {
+                StackPane.setAlignment(imw,Pos.TOP_RIGHT);
+                StackPane.setMargin(imw,new Insets(i,0,0,0));
+                i = i + (int)(screenHeight*18.6/100);
+            }
+        }
+    }
+
+    /**
+     * refresh other player damage and marks tear simbol
+     */
+    private void refreshPlayerDamage(){
+        double spaceY = 0;
+        deletePlayerInfo();
+        for(ImageView dash : playerDashBoard) {
+            int j = 0;
+            double spaceX = 0;
+            List<ImageView> infoD = new ArrayList<>();
+            List<ImageView> infoM = new ArrayList<>();
+            Player p = ClientContext.get().getMap().getPlayerById(Integer.parseInt(dash.getId()));
+            for (PlayerColor  c :p.getDamage()) {
+                Image damage = new Image("graphics/map/"+c.name().substring(6)+"Tear.png");
+                ImageView damages = new ImageView(damage);
+                infoD.add(damages);
+                damages.setFitHeight(screenHeight * 3 / 100);
+                damages.setPreserveRatio(true);
+                map.getChildren().add(damages);
+                StackPane.setAlignment(damages, Pos.TOP_RIGHT);
+                StackPane.setMargin(damages, new Insets(screenHeight * 6.5 / 100 + spaceY, screenWidth * 32.1 / 100 - spaceX, 0, 0));
+                spaceX = spaceX + screenWidth * 2.25 / 100;
+                if (j > 1 && j != 4)
+                    spaceX = spaceX - screenWidth * 0.25 / 100;
+                j++;
+            }
+            spaceX = 0;
+            for (PlayerColor  c :p.getMark()) {
+                Image mark = new Image("graphics/map/"+c.name().substring(6)+"Tear.png");
+                ImageView marks = new ImageView(mark);
+                infoM.add(marks);
+                marks.setFitHeight(screenHeight * 2 / 100);
+                marks.setPreserveRatio(true);
+                map.getChildren().add(marks);
+                StackPane.setAlignment(marks, Pos.TOP_RIGHT);
+                StackPane.setMargin(marks, new Insets(screenHeight * 0.4 / 100 + spaceY, screenWidth * 18 / 100 - spaceX, 0, 0));
+                spaceX = spaceX + screenWidth * 1 / 100;
+            }
+            spaceY = spaceY + screenHeight * 18.5 / 100;
+            playerDamage.add(infoD);
+            playerMarks.add(infoM);
+        }
+    }
+
+    /**
+     * delete all tears from other player and clea the Imageview list
+     */
+    private void deletePlayerInfo(){
+        for(List<ImageView> p : playerDamage){
+            for(ImageView v : p ){
+                map.getChildren().remove(v);
+                v.setImage(null);
+            }
+        }
+        for(List<ImageView> p : playerMarks){
+            for(ImageView v : p ){
+                map.getChildren().remove(v);
+                v.setImage(null);
+            }
+        }
+        playerDamage.clear();
+        playerMarks.clear();
+    }
+
+    /**
+     * refresh  my player damage and marks
+     */
+    private void refreshMyPlayerDamage(){
+        double spaceX = 0;
+        int j = 0;
+        deleteMyPlayerDamage();
+        for(PlayerColor p : ClientContext.get().getMyPlayer().getDamage()){
+            Image damage = new Image("graphics/map/"+p.name().substring(6)+"Tear.png");
+            ImageView damages = new ImageView(damage);
+            myPlayerDamage.add(damages);
+            damages.setFitHeight(screenHeight * 3 /100);
+            damages.setPreserveRatio(true);
+            map.getChildren().add(damages);
+            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
+            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 6.25 / 100,screenWidth * 3.44 / 100 + spaceX));
+            spaceX = spaceX + screenWidth * 2.25 / 100;
+            if(j > 1 && j != 4)
+                spaceX = spaceX - screenWidth * 0.25 / 100;
+            j++;
+        }
+        spaceX = 0;
+        for(PlayerColor p : ClientContext.get().getMyPlayer().getMark()){
+            Image damage = new Image("graphics/map/"+p.name().substring(6)+"Tear.png");
+            ImageView damages = new ImageView(damage);
+            myPlayerMarks.add(damages);
+            damages.setFitHeight(screenHeight * 2 /100);
+            damages.setPreserveRatio(true);
+            map.getChildren().add(damages);
+            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
+            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 17.6 / 100 + spaceX));
+            spaceX = spaceX + screenWidth * 1 / 100;
+        }
+    }
+
+    /**
+     * deòlete my player damage and marks
+     */
+    private void deleteMyPlayerDamage(){
+        for(ImageView i : myPlayerDamage){
+            map.getChildren().remove(i);
+            i.setImage(null);
+        }
+        for(ImageView i : myPlayerMarks){
+            map.getChildren().remove(i);
+            i.setImage(null);
+        }
+        myPlayerDamage.clear();
+        myPlayerMarks.clear();
+    }
+
+    /**
+     * refresh ny player ammo
+     */
+    private void refreshMyPlayerAmmo(){
+        //ammo
+        deleteMyPlayerAmmo();
+        double spaceX = 0;
+        double spaceY = 0;
+        int k = 1;
+        for(game.model.Color c :ClientContext.get().getMyPlayer().getAmmo()){
+            Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.valueOf(c.name().substring(6)));
+            map.getChildren().add(ammo);
+            myAmmo.add(ammo);
+            StackPane.setAlignment(ammo, Pos.BOTTOM_LEFT);
+            StackPane.setMargin(ammo, new Insets(0, 0, screenHeight * 12 / 100 - spaceY, screenWidth * 29 / 100 + spaceX));
+            spaceX = spaceX + screenWidth * 2.5 / 100;
+            if(k % 3 == 0) {
+                spaceY = spaceY + screenHeight * 3.5 / 100;
+                spaceX = 0;
+            }
+            k++;
+        }
+    }
+
+    /**
+     * delete my player ammo
+     */
+    private void deleteMyPlayerAmmo(){
+        for(Rectangle r : myAmmo){
+            map.getChildren().remove(r);
+        }
+        myAmmo.clear();
+    }
+
+    private void showMapGame(){
+        createMapSquareAmmo();
+        refreshAmmoCard();
+        createPlayerPosition();
         refreshPlayerPosition();
         createTextNotification();
         createMyPlayerCard();
         refreshMyPlayerCard();
-
+        createPlayerDashBoard();
+        refreshPlayerDamage();
+        refreshMyPlayerDamage();
+        refreshMyPlayerAmmo();
     }
 
 
@@ -662,7 +982,7 @@ public class ClientGUIView extends Application implements View{
         imageView.setFitWidth(screenWidth*55/100);
         imageView.setPreserveRatio(true);
         Image image2 = new Image("graphics/cards/W_18.png");
-        Image image7 = new Image("graphics/cards/Teleporter_2.png");
+        Image image7 = new Image("graphics/cards/Teleporter_R.png");
         ImageView im2 = new ImageView(image2);
         im2.setId("Distruttore");
         ImageView im3 = new ImageView(image2);
@@ -741,7 +1061,7 @@ public class ClientGUIView extends Application implements View{
             StackPane.setAlignment(weapon,Pos.CENTER_LEFT);
             weapon.setRotate(270);
             StackPane.setMargin(weapon,new Insets(screenHeight*12/100 + spaceX,0,0,screenWidth*1.83/100));
-            weapon.setOnMouseClicked(this::handleWeaponClick);
+            weapon.setOnMouseClicked(null);
             weapon.setOnMouseEntered(this::handleMouseOnWeapon);
             weapon.setOnMouseExited(this::handleMouseOutWeapon);
             spaceX = spaceX - screenHeight*22.4/100;
@@ -931,7 +1251,7 @@ public class ClientGUIView extends Application implements View{
         spaceY = 0;
         for(int j = 0; j < 3 ; j++){
             for (int k = 0;k < 3 ; k ++){
-                Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.YELLOW);
+                Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.valueOf("Yellow"));
                 map.getChildren().add(ammo);
                 StackPane.setAlignment(ammo, Pos.BOTTOM_LEFT);
                 StackPane.setMargin(ammo, new Insets(0, 0, screenHeight * 12 / 100 - spaceY, screenWidth * 29 / 100 + spaceX));
