@@ -8,10 +8,13 @@ import game.model.effects.MovementEffect;
 import game.model.effects.SimpleEffect;
 import game.model.effects.SquareDamageEffect;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ClientTextView implements View {
+public class ClientTextView implements  View {
     private static final String ANSI_CYAN = "\u001B[36m";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
@@ -27,7 +30,7 @@ public class ClientTextView implements View {
 
 
     public ClientTextView(){
-
+        this.fromKeyBoard = new Scanner(System.in);
     }
 
     public ClientTextView(ClientController controller) {
@@ -40,12 +43,19 @@ public class ClientTextView implements View {
     }
 
     public String readText(){
-        String string = fromKeyBoard.nextLine();
-        return string;
+        String string = null;
+        //try {
+            string = fromKeyBoard.nextLine();
+            return string;
+        /*} catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }*/
+
     }
 
     public char readChar(){
-        String string = fromKeyBoard.nextLine();
+        String string = readText();
         return string.charAt(0);
     }
 
@@ -54,15 +64,56 @@ public class ClientTextView implements View {
      * @return
      */
     public  int readInt(){
-        try {
-            int save = fromKeyBoard.nextInt();
-            fromKeyBoard.nextLine();
-            return save;
-        }catch (InputMismatchException e){
-            System.out.println("Wrong input, expected a numeber");
-            fromKeyBoard.nextLine();
-            return readInt();
-        }
+
+        String number;
+        int n = 0;
+        boolean retry;
+        do {
+            retry = false;
+            number = readText();
+            try {
+                n = Integer.parseInt(number);
+            } catch (NumberFormatException e) {
+                System.out.println("Wrong input, expected a numeber");
+                retry = true;
+            }
+        }while(retry);
+
+        return n;
+        /*boolean retry;
+        do{
+            try {
+                if(fromKeyBoard.hasNextInt())
+                {   int save = fromKeyBoard.nextInt();
+                    fromKeyBoard.nextLine();
+                    return save;
+                }
+                retry = true;
+                Thread.sleep(10);
+
+            }catch (InputMismatchException e){
+                System.out.println("Wrong input, expected a numeber");
+                fromKeyBoard.nextLine();
+                return readInt();
+            }catch(IndexOutOfBoundsException  | IllegalStateException | InterruptedException e)
+            {
+                retry = true;
+            }
+        }while(true);*/
+    }
+
+    public void run(){
+        /*new Thread(
+
+                () -> {
+                    String s = "";
+                    do{
+                         if(fromKeyBoard.hasNext())
+                            s = readText();
+                    }while(!s.equals("EXIT"));
+
+                }
+        ).start();*/
     }
 
     /**
@@ -94,16 +145,19 @@ public class ClientTextView implements View {
         writeText("Here you will be able to choose what weapon reload from the unloaded ones!");
         int n;
         List<ClientMessage> reloadRequests = new ArrayList<>();
+        List<CardPower> cp = null;
         do {
-               showWeapons(weaponsToReload,0,false, true);
+               showWeapons(weaponsToReload,0,true, true, false);
             do {
                 writeText("Insert the id of a weapon you want to reload or -1 to terminate the reload phase:");
                 n = readInt();
             } while (n != -1 && n < 1 && n > weaponsToReload.size());
             if(n != -1)
             {
-                List<CardPower> cp = powerUpSelection();
+                if(weaponsToReload.get(n-1).getPrice().size() > 1)
+                    cp = powerUpSelection();
                 reloadRequests.add(new ReloadWeaponRequest(weaponsToReload.get(n-1),cp));
+                weaponsToReload.remove(weaponsToReload.get(n-1));
             }
 
         }while(weaponsToReload.size() > 0 && n!=-1);
@@ -160,6 +214,35 @@ public class ClientTextView implements View {
     }
 
     @Override
+    public void waitStart(){
+
+        Thread t = new Thread( () -> {
+            String s;
+            do {
+                //s = readText();
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (/*!s.equals("exit") &&*/ !controller.isGameStarted());
+        });
+        t.start();
+    }
+
+    @Override
+    public String chooseConnection() {
+        String choice;
+        writeText("Choose the connection type");
+        writeText("Insert Socket or RMI:");
+        do{
+            choice = fromKeyBoard.nextLine();
+            choice = choice.toUpperCase();
+        }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
+        return choice;
+    }
+
+    @Override
     public void notifyPlayerLeavedWaitingRoom(Player p) {
         writeText("Player " + p.getNickName() + " has leaved the waiting room!");
     }
@@ -184,7 +267,7 @@ public class ClientTextView implements View {
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
         int n;
         writeText("Choose which of your weapons you want to use:");
-        showWeapons(myWeapons,0,true, false);
+        showWeapons(myWeapons,0,true, false, false);
         do{
             n = readInt();
         }while (n<1 || n>myWeapons.size());
@@ -213,6 +296,7 @@ public class ClientTextView implements View {
     public void usePlusBeforeBase(FullEffect plusEff) {
         char t;
         List<FullEffect> effects = new ArrayList<>();
+        List<CardPower> toUse = null;
         effects.add(plusEff);
         writeText("Do you want to use this plus effect before than your weapon base effect?");
         showEffects(effects,false);
@@ -220,12 +304,14 @@ public class ClientTextView implements View {
         do{
             t = readChar();
         }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
-        List<CardPower> toUse = powerUpSelection();
+        if(plusEff.getPrice() != null && (t == 'y' || t == 'Y'))
+            toUse = powerUpSelection();
         controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,toUse));
     }
 
     @Override
     public void usePlusInOrder(List<FullEffect> plusEffects) {
+        List<CardPower> toUse = null;
         char t;
         writeText("Do you want to apply the plus effect, allow by your weapon, listed here:");
         showEffects(Collections.singletonList(plusEffects.get(0)),false);
@@ -233,12 +319,14 @@ public class ClientTextView implements View {
         do{
             t = readChar();
         }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
-        List<CardPower> toUse = powerUpSelection();
+        if(plusEffects.get(0) != null && (t == 'y' || t == 'Y'))
+            toUse = powerUpSelection();
         controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,toUse,t));
     }
 
     @Override
     public void choosePlusEffect(List<FullEffect> plusEffects) {
+        List<CardPower> toUse = null;
         int n;
         int i=1;
         FullEffect toApply = null;
@@ -252,7 +340,8 @@ public class ClientTextView implements View {
         else {
             toApply = plusEffects.get(n-1);
             plusEffects.remove(n-1);
-            List<CardPower> toUse = powerUpSelection();
+            if(toApply.getPrice() != null)
+                toUse = powerUpSelection();
             controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, toApply, toUse));
         }
     }
@@ -289,6 +378,8 @@ public class ClientTextView implements View {
         writeText("Enter the id for the selected waiting room or -1 if you want to create a new waiting room:");
         do{
             nRoom = readInt();
+            if((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1)
+                writeText("Invalid waiting room number!");
         }while((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1);
         if(nRoom != -1)
         {
@@ -315,7 +406,7 @@ public class ClientTextView implements View {
             nPlayer = readInt();
         }while(nPlayer < 3 || nPlayer > 5);
 
-        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,ClientContext.get().getUser()));
+        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId-1,nPlayer,ClientContext.get().getUser()));
     }
 
     /**
@@ -428,7 +519,7 @@ public class ClientTextView implements View {
         }
         for (i = 0; i < maxE && k > 0; ) {
             k = readInt();
-            if (k < possibleTarget.size() && k > 0) {
+            if (k <= possibleTarget.size() && k > 0) {
                 if (choosenTarget.contains(possibleTarget.get(k - 1))) {
                     writeText("Target already selected");
                 } else {
@@ -754,7 +845,7 @@ public class ClientTextView implements View {
         else if(idShooter != ClientContext.get().getMyID())
             writeText("Player "+ClientContext.get().getMap().getPlayerById(idHitten).getNickName()+" has received "+marks+" marks from "+ClientContext.get().getMap().getPlayerById(idShooter).getNickName()+"!");
         else
-            writeText("You give "+marks+" marks to "+ClientContext.get().getMap().getPlayerById(idHitten).getNickName()+"!");
+            writeText("You give "+marks+" marks to player "+ClientContext.get().getMap().getPlayerById(idHitten).getNickName()+"!");
     }
 
     /**
@@ -914,7 +1005,7 @@ public class ClientTextView implements View {
                 if(sq.getWeapons() != null) {
                     writeText("In position X= " + sq.getX() + "  Y= " + sq.getY() + " there are:");
                     for(CardWeapon cw : sq.getWeapons()){
-                        printWeapon(cw,0,true);
+                        printWeapon(cw,0,true, false);
                     }
                 }
             }
@@ -928,21 +1019,42 @@ public class ClientTextView implements View {
         Player p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         writeText(checkPlayerColor(p.getColor()) + "You are in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + ANSI_RESET);
         writeText(checkPlayerColor(p.getColor())+"Your weapon: "+ANSI_RESET);
-        showWeapons(p.getWeapons(),0, false, false);
-
-        writeText(checkPlayerColor(p.getColor())+"Your munition: "+ANSI_RESET);
-        for(Color c : p.getAmmo()){
-            System.out.print(checkAmmoColor(c)+"■"+ANSI_RESET);
+        showWeapons(p.getWeapons(),0, false, true, true);
+        if(!p.getAmmo().isEmpty()) {
+            writeText(checkPlayerColor(p.getColor()) + "Your munition: " + ANSI_RESET);
+            for (Color c : p.getAmmo()) {
+                System.out.print(checkAmmoColor(c) + "■" + ANSI_RESET);
+            }
+            System.out.println("");
         }
+        else
+            writeText(checkPlayerColor(p.getColor()) + "You haven't available munitions! " + ANSI_RESET);
+        if(!p.getCardPower().isEmpty()) {
+            writeText(checkPlayerColor(p.getColor()) + "Your power-up cards: " + ANSI_RESET);
+            for (CardPower c : p.getCardPower()) {
+                writeText(c.toString());
+            }
+        }
+        else
+            writeText(checkPlayerColor(p.getColor()) + "You haven't available power-up cards! " + ANSI_RESET);
         if(p.getDamage().size()==0)
-            System.out.println(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
+            writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
         else{
             System.out.print(checkPlayerColor(p.getColor())+">> Your damage: "+ANSI_RESET);
             for(PlayerColor c : p.getDamage()) {
                 System.out.print(checkPlayerColor(c) + "¤" + ANSI_RESET);
             }
+            System.out.println("");
         }
-        System.out.println("");
+        if(p.getMark().size()==0)
+            writeText(checkPlayerColor(p.getColor())+"No marks"+ANSI_RESET);
+        else{
+            System.out.print(checkPlayerColor(p.getColor())+">> Your marks: "+ANSI_RESET);
+            for(PlayerColor c : p.getMark()) {
+                System.out.print(checkPlayerColor(c) + "¤" + ANSI_RESET);
+            }
+            System.out.println("");
+        }
     }
 
     private void showPlayerPosition() {
@@ -952,10 +1064,21 @@ public class ClientTextView implements View {
                 writeText(checkPlayerColor(p.getColor()) + "Player " + p.getId() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
                 if(p.getDamage().size()==0)
                     writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
-                else
+                else{
                     System.out.print(checkPlayerColor(p.getColor())+">> Damage: "+ANSI_RESET);
-                for(PlayerColor d : p.getDamage()) {
-                    System.out.print(checkPlayerColor(d) + "¤" + ANSI_RESET);
+                    for(PlayerColor d : p.getDamage()) {
+                        System.out.print(checkPlayerColor(d) + "¤" + ANSI_RESET);
+                    }
+                    System.out.println("");
+                }
+                if(p.getMark().size()==0)
+                    writeText(checkPlayerColor(p.getColor())+"No marks"+ANSI_RESET);
+                else{
+                    System.out.print(checkPlayerColor(p.getColor())+">> Marks: "+ANSI_RESET);
+                    for(PlayerColor c : p.getMark()) {
+                        System.out.print(checkPlayerColor(c) + "¤" + ANSI_RESET);
+                    }
+                    System.out.println("");
                 }
             }
         }
@@ -971,7 +1094,6 @@ public class ClientTextView implements View {
         if(color.equals(PlayerColor.GREEN))return ANSI_GREEN;
         if(color.equals(PlayerColor.BLUE))return ANSI_BLUE;
         if(color.equals(PlayerColor.PURPLE))return ANSI_PURPLE;
-        if(color.equals(PlayerColor.GREY))return ANSI_RED;
         return ANSI_GREY;
     }
 
@@ -995,7 +1117,7 @@ public class ClientTextView implements View {
         Player myP = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
         //Choose which weapon to grab
         writeText("Choose one weapon to grab between the possible: ");
-            showWeapons(weapons,1, true, true);
+            showWeapons(weapons,1, true, true, false);
         do{
             choiceWG = readInt();
         }while(choiceWG>weapons.size() || choiceWG<=0);
@@ -1026,7 +1148,7 @@ public class ClientTextView implements View {
 
     private List<CardPower> powerUpSelection()
     {
-        List<CardPower> toUse = null;
+        List<CardPower> toUse = new ArrayList<>();
         char t;
         int i;
         Player myP = ClientContext.get().getMyPlayer();
@@ -1037,10 +1159,9 @@ public class ClientTextView implements View {
         if(t == 'Y' || t == 'y')
         {
             i=1;
-            toUse = new ArrayList<>();
             writeText("Insert the number of the correspondent power-up you want to use separated by comma (ex: 1,3,...):");
             for(CardPower cp : myP.getCardPower()) {
-                writeText(i + "- " + cp.getName() + " [" + cp.getColor() + "]");
+                writeText(i + "- " + cp.toString());
                 i++;
             }
             String selection = readText();
@@ -1061,15 +1182,19 @@ public class ClientTextView implements View {
      * print a weapon and its cost
      * @param cw, p
      */
-    public void printWeapon(CardWeapon cw, int p, boolean showCost)
+    public void printWeapon(CardWeapon cw, int p, boolean showCost, boolean showLoaded)
     {
-        writeText(cw.getName());
+        List<Color> tmp = cw.getPrice().subList(p, cw.getPrice().size());
+        String string = "";
+        if (showLoaded)
+            string = cw.isLoaded() ? " (loaded)" : " (unloaded)";
+        writeText(cw.getName()+string);
         if (showCost) {
             System.out.print("       Cost: ");
-            if (cw.getPrice().size() == 1)
+            if (tmp.size() == 0)
                 System.out.print("Free");
             else
-                for (Color c : cw.getPrice().subList(p, cw.getPrice().size()))
+                for (Color c : tmp)
                     System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
             System.out.println("");
         }
@@ -1083,18 +1208,18 @@ public class ClientTextView implements View {
      * @param p
      * @param numeric
      */
-    public void showWeapons(List<CardWeapon> cws, int p, boolean numeric, boolean showCost) {
+    public void showWeapons(List<CardWeapon> cws, int p, boolean numeric, boolean showCost, boolean showLoaded) {
         int i = 1;
         if(numeric){
             for (CardWeapon cw : cws){
                 System.out.print(i + " ");
                 i++;
-                printWeapon(cw,p,showCost);
+                printWeapon(cw,p,showCost,showLoaded);
             }
         }
         else {
             for (CardWeapon cw : cws) {
-                printWeapon(cw, p,showCost);
+                printWeapon(cw, p,showCost,showLoaded);
             }
         }
 
@@ -1109,9 +1234,13 @@ public class ClientTextView implements View {
                 writeText(i + ". Name: " + actual.getName());
                 writeText("   Description: " + actual.getDescription());
                 System.out.print("   Cost: ");
-                if (actual.getPrice() != null) {
-                    for (Color c : actual.getPrice())
-                        System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
+                if (actual.getPrice() != null && !actual.getPrice().isEmpty()) {
+                    if(actual.getPrice().get(0) == Color.ANY)
+                        System.out.println("FREE");
+                    else {
+                        for (Color c : actual.getPrice())
+                            System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
+                    }
                 }
                 else
                     System.out.print("FREE");

@@ -2,10 +2,7 @@ package game.model.effects;
 
 import game.controller.EffectHandler;
 import game.controller.commands.ServerMessage;
-import game.model.Direction;
-import game.model.Player;
-import game.model.Square;
-import game.model.Target;
+import game.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +102,8 @@ public class SquareDamageEffect extends SimpleEffect {
 
         List<Target> retList = new ArrayList<>();
         for(Square s: targets)
-            retList.add(s);
+            if(!s.getPlayers().isEmpty())
+                retList.add(s);
 
         return retList;
 
@@ -118,11 +116,13 @@ public class SquareDamageEffect extends SimpleEffect {
      */
     public void applyEffect(Player shooter, List<Target> targets){
         List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
+        Square s;
         for(Target t : targets)
         {
+            s = (Square) t;
             t.addDamage(shooter,damage);
             t.addThisTurnMarks(shooter,marks);
-            prevTargets.add((Player) t);
+            prevTargets.addAll(s.getPlayers());
         }
         shooter.getActualWeapon().setLastTargetSquare(prevTargets.get(prevTargets.size()-1).getPosition());
     }
@@ -140,6 +140,16 @@ public class SquareDamageEffect extends SimpleEffect {
     @Override
     public ServerMessage handle(EffectHandler h) {
         return h.handle(this);
+    }
+
+    @Override
+    public ServerMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
+        List<Target> toApplyEffect = new ArrayList<>();
+        for (Target t : model.getMap().getAllSquares()) {
+            if (targetList.contains(t))
+                toApplyEffect.add(t);
+        }
+        return h.handleTarget(this, toApplyEffect);
     }
 
     @Override

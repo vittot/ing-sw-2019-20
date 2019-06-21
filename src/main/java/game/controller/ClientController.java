@@ -11,6 +11,7 @@ import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardWeaponSpaceException;
 
 import java.io.IOException;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,28 +25,14 @@ public class ClientController implements ServerMessageHandler {
     private List<Action> availableActions;
     private ClientState state;
     private Scanner in = new Scanner(System.in);
+    private boolean gameStarted;
 
-    public ClientController(Client client,String[] args) {
+    public ClientController(Client client, View view) {
         this.client = client;
+        this.gameStarted = false;
         String input;
-        do {
-            System.out.println("CLI or GUI?");
-            input = in.nextLine();
-            input = input.toUpperCase();
-        }while(!input.equals("GUI") && !input.equals("CLI"));
-        if(input.equals("GUI")) {
-            //ClientGUIView.main(args);
-            try {
-                clientView = ClientGUIView.getInstance();
-            }catch(InterruptedException e)
-            {
-
-            }
-            clientView.setController(this);
-
-        }else {
-            clientView = new ClientTextView(this);
-        }
+        this.clientView = view;
+        this.clientView.setController(this);
     }
 
     public Client getClient() {
@@ -71,8 +58,9 @@ public class ClientController implements ServerMessageHandler {
 
     public void run() throws IOException {
         //runLater(() -> clientView.setUserNamePhase());
-        clientView.setUserNamePhase();
         this.start();
+        clientView.setUserNamePhase();
+
 
     }
 
@@ -378,11 +366,13 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyGameStarted serverMsg) {
+        this.gameStarted = true;
         ClientContext.get().setMap(serverMsg.getMap());
 
         if(serverMsg.getId() != 0)
             ClientContext.get().setMyID(serverMsg.getId());
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
+        clientView.notifyCompletedOperation("Game has started!");
 
 
     }
@@ -420,6 +410,8 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyMarks notifyMarks) {
+        Player shooter = ClientContext.get().getMap().getPlayerById(notifyMarks.getShooterId());
+        ClientContext.get().getMap().getPlayerById(notifyMarks.getHitId()).addThisTurnMarks(shooter,notifyMarks.getMarks());
         clientView.notifyMarks(notifyMarks.getMarks(),notifyMarks.getHitId(),notifyMarks.getShooterId());
     }
 
@@ -478,6 +470,7 @@ public class ClientController implements ServerMessageHandler {
         ClientContext.get().setMyID(createWaitingRoomResponse.getId());
         ClientContext.get().setPlayersInWaiting(new ArrayList<>());
         clientView.notifyCompletedOperation("Waiting room correctly created! \n>>Wait for other players...");
+        clientView.waitStart();
     }
 
     @Override
@@ -563,12 +556,19 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(ShootActionResponse shootActionResponse) {
         CardWeapon currWeapon = null;
-        for(CardWeapon cw : ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getWeapons()) {
+        Player me = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
+        for(CardWeapon cw : me.getWeapons()) {
             if (cw.equals(shootActionResponse.getSelectedWeapon()))
                 currWeapon = cw;
         }
         if(currWeapon != null) {
             currWeapon.setLoaded(false);
+        }
+        try {
+            me.pay(shootActionResponse.getAmmoToPay(), shootActionResponse.getPoweupToPay());
+        }
+        catch(InsufficientAmmoException e){
+            e.printStackTrace();
         }
     }
 
@@ -609,6 +609,13 @@ public class ClientController implements ServerMessageHandler {
     }
 
     @Override
+    public void handle(UpdateMarks updateMarks) {
+        Player p = ClientContext.get().getMap().getPlayerById(updateMarks.getP().getId());
+        if(p != null)
+            p.updateMarks();
+    }
+
+    @Override
     public void handle(NotifyPlayerExitedWaitingRoom notifyPlayerExitedWaitingRoom) {
         ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyPlayerExitedWaitingRoom.getPlayerId()).findFirst().ifPresent(clientView::notifyPlayerLeavedWaitingRoom);
 
@@ -626,5 +633,9 @@ public class ClientController implements ServerMessageHandler {
             case WAITING_GRAB_WEAPON:
                 client.sendMessage(new GrabActionRequest());
         }
+    }
+
+    public boolean isGameStarted() {
+        return gameStarted;
     }
 }

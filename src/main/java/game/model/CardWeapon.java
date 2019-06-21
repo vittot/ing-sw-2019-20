@@ -111,6 +111,18 @@ public class CardWeapon implements Serializable {
         this.plusOrder = plusOrder;
     }
 
+    public void setBaseEffect(FullEffect baseEffect) {
+        this.baseEffect = baseEffect;
+    }
+
+    public Player getShooter() {
+        return shooter;
+    }
+
+    public void setShooter(Player shooter) {
+        this.shooter = shooter;
+    }
+
     public List<Player> getPreviousTargets() { return previousTargets; }
 
     public void setPreviousTargets(List<Player> previousTargets) {
@@ -178,7 +190,7 @@ public class CardWeapon implements Serializable {
             for (int i = 0 ; i < tmpPUPaid.size(); i++)
                 shooter.getCardPower().remove(tmpPUPaid.get(i));
         }
-        if(!tmp.isEmpty())
+        else if(!tmp.isEmpty())
             throw new InsufficientAmmoException();
     }
 
