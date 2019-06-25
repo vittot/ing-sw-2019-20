@@ -419,6 +419,8 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyMarks notifyMarks) {
+        Player shooter = ClientContext.get().getMap().getPlayerById(notifyMarks.getShooterId());
+        ClientContext.get().getMap().getPlayerById(notifyMarks.getHitId()).addThisTurnMarks(shooter,notifyMarks.getMarks());
         clientView.notifyMarks(notifyMarks.getMarks(),notifyMarks.getHitId(),notifyMarks.getShooterId());
     }
 
@@ -569,12 +571,19 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(ShootActionResponse shootActionResponse) {
         CardWeapon currWeapon = null;
-        for(CardWeapon cw : ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getWeapons()) {
+        Player me = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
+        for(CardWeapon cw : me.getWeapons()) {
             if (cw.equals(shootActionResponse.getSelectedWeapon()))
                 currWeapon = cw;
         }
         if(currWeapon != null) {
             currWeapon.setLoaded(false);
+        }
+        try {
+            me.pay(shootActionResponse.getAmmoToPay(), shootActionResponse.getPoweupToPay());
+        }
+        catch(InsufficientAmmoException e){
+            e.printStackTrace();
         }
     }
 
@@ -612,6 +621,13 @@ public class ClientController implements ServerMessageHandler {
             {
                 System.out.println("ERROR: tried to refill outside of game map");
             }
+    }
+
+    @Override
+    public void handle(UpdateMarks updateMarks) {
+        Player p = ClientContext.get().getMap().getPlayerById(updateMarks.getP().getId());
+        if(p != null)
+            p.updateMarks();
     }
 
     @Override

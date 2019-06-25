@@ -102,7 +102,7 @@ public class SquareDamageEffect extends SimpleEffect {
 
         List<Target> retList = new ArrayList<>();
         for(Square s: targets)
-            if(!s.getPlayers().isEmpty() /*&& !s.equals(shooterPos)*/) //TODO check this comment
+            if(!s.getPlayers().isEmpty())
                 retList.add(s);
 
         return retList;

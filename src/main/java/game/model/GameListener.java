@@ -20,4 +20,5 @@ public interface GameListener {
     void onPlayerRejoined(Player player);
     void onReplaceWeapon(CardWeapon cw, Square s);
     void onReplaceAmmo(CardAmmo ca, Square s);
+    void onPlayerUpdateMarks(Player player);
 }

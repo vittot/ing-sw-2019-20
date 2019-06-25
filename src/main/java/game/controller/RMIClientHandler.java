@@ -2,6 +2,7 @@ package game.controller;
 
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
+import game.model.Player;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -45,4 +46,8 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
         clientDisconnected();
     }
 
+    @Override
+    public void onPlayerUpdateMarks(Player player) {
+
+    }
 }

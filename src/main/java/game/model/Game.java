@@ -520,7 +520,9 @@ public class Game {
             return Color.RED;
         if(name.equals("yellow"))
             return Color.YELLOW;
-        return Color.ANY;
+        if(name.equals("any"))
+            return Color.ANY;
+        return null;
     }
 
     /**
@@ -540,7 +542,7 @@ public class Game {
                     if (efo.getName().equals("plainDamage")) temp.addSimpleEffect(createEquivalentPlainEffect(efo));
                     if (efo.getName().equals("movementEffect")) temp.addSimpleEffect(createEquivalentMovementEffect(efo));
                     if (efo.getName().equals("squareDamageEffect")) temp.addSimpleEffect(createEquivalentSquareEffect(efo));
-                    if (efo.getName().equals("beforebase")) temp.setBeforeBase(efo.getText().trim().equals("true"));
+                    if (efo.getName().equals("beforeBase")) temp.setBeforeBase(efo.getText().trim().equals("true"));
                 } catch (DataConversionException e) {
                     //TODO eccezione
                 }
@@ -622,14 +624,18 @@ public class Game {
 
     public List<List<Color>> takePriceOpz(Element weapon){
         List<List<Color>> pricetot = new ArrayList<List<Color>>();
-        List<Color> price = null;
+        List<Color> price;
         Color c;
         for(int i = 0; i < weapon.getChildren("optionalPrice").size() ; i ++){
-            price = new ArrayList<Color>();
+            price = null;
             for (Element pr : weapon.getChildren("optionalPrice").get(i).getChildren("ammo")){
-                c = createEquivalentAmmo(pr.getText().trim());
-                if(c!=Color.ANY)
-                    price.add(c);
+                if(createEquivalentAmmo(pr.getText().trim()) != null) {
+                    if(price == null)
+                        price = new ArrayList<Color>();
+                    c = createEquivalentAmmo(pr.getText().trim());
+                    if (c != Color.ANY)
+                        price.add(c);
+                }
             }
             pricetot.add(price);
         }
@@ -643,10 +649,14 @@ public class Game {
         return price;
     }
     public List<Color> takePriceAl(Element weapon){
-        List price = new ArrayList<Color>();
+        List price = null;
         if(weapon.getChild("alternativePrice") != null)
             for (Element pr : weapon.getChild("alternativePrice").getChildren("ammo")){
-                price.add(createEquivalentAmmo(pr.getText().trim()));
+                if(createEquivalentAmmo(pr.getText().trim()) != null) {
+                    if (price == null)
+                        price = new ArrayList<Color>();
+                    price.add(createEquivalentAmmo(pr.getText().trim()));
+                }
             }
         return price;
     }
@@ -1102,5 +1112,9 @@ public class Game {
 
     public long getNumPlayersAlive() {
         return players.stream().filter(p -> !p.isSuspended()).count();
+    }
+
+    public void notifyUpdateMarks(Player player) {
+        gameObservers.forEach(o -> o.onPlayerUpdateMarks(player));
     }
 }

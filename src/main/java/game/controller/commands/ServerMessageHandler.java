@@ -1,6 +1,7 @@
 package game.controller.commands;
 
 import game.controller.commands.servercommands.*;
+import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 
 public interface ServerMessageHandler {
@@ -60,4 +61,5 @@ public interface ServerMessageHandler {
     void handle(RemoveSpawnPowerUp removeSpawnPowerUp);
     void handle(NotifyWeaponRefill notifyWeaponRefill);
     void handle(NotifyAmmoRefill notifyAmmoRefill);
+    void handle(UpdateMarks updateMarks);
 }

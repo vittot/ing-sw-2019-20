@@ -4,6 +4,7 @@ package game.controller;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.servercommands.*;
 import game.model.*;
+import game.model.exceptions.InsufficientAmmoException;
 
 import java.util.List;
 import java.util.SortedMap;

@@ -111,4 +111,10 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
         sendMessage(new NotifyAmmoRefill(ca,s));
     }
 
+    @Override
+    public void onPlayerUpdateMarks(Player player) {
+        sendMessage(new UpdateMarks(player));
+    }
+
+
 }

@@ -43,7 +43,6 @@ public class SocketClient implements Client {
             e.printStackTrace();
         }
 
-
     }
 
     @Override
@@ -87,11 +86,9 @@ public class SocketClient implements Client {
         }
     }
 
-
     private ServerMessage receiveMessage() {
         try {
-            ServerMessage sm = (ServerMessage) inputStream.readObject();
-            return sm;
+            return (ServerMessage) inputStream.readObject();
         } catch (IOException | ClassNotFoundException e){
             return null;
         }
