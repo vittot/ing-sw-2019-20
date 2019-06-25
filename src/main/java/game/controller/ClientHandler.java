@@ -96,10 +96,12 @@ public abstract class ClientHandler implements GameListener {
     }
 
     @Override
-    public void onPlayerSuspend(Player p) {
+    public void onPlayerSuspend(Player p, boolean timeOut) {
         if(!controller.getCurrPlayer().equals(p)){
             sendMessage(new NotifyPlayerSuspend(p.getId()));
         }
+        else if(timeOut)
+            sendMessage(new TimeOutNotify());
     }
 
     @Override

@@ -171,7 +171,25 @@ public class ClientTextView implements  View {
 
     @Override
     public void timeOutPhase() {
+        char choice;
         writeText("You timed out and you have been kicked out!");
+        if(this.controller.getState() != ClientState.GAME_END) {
+            writeText("Do you want to rejoin the game?[Y/N]");
+            do{
+                choice = readChar();
+            }while(choice != 'Y' && choice != 'y' && choice != 'n' && choice != 'N' && controller.getState() != ClientState.GAME_END);
+
+            if(choice == 'Y' || choice == 'y')
+            {
+                if(controller.getState() == ClientState.GAME_END)
+                    writeText("The game is terminated!");
+                else
+                    controller.getClient().sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
+            }
+            else{
+                this.controller.stopListening();
+            }
+        }
     }
 
     @Override
@@ -219,6 +237,8 @@ public class ClientTextView implements  View {
                     e.printStackTrace();
                 }
             } while (/*!s.equals("exit") &&*/ !controller.isGameStarted());
+            //to flush the scanner, it seems to be the unique way
+            fromKeyBoard = new Scanner(System.in);
         });
         t.start();
     }
@@ -227,8 +247,8 @@ public class ClientTextView implements  View {
     public String chooseConnection() {
         String choice;
         writeText("Choose the connection type");
-        writeText("Insert Socket or RMI:");
         do{
+            writeText("Insert Socket or RMI:");
             choice = fromKeyBoard.nextLine();
             choice = choice.toUpperCase();
         }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
@@ -341,7 +361,7 @@ public class ClientTextView implements  View {
         writeText("Available game maps:\n");
         for(GameMap m : availableMaps) {
             writeText("MAP-ID : "+m.getId()+"\n");
-            showMap(m.getGrid());
+            showMap(m);
             System.out.println();
         }
     }
@@ -417,7 +437,7 @@ public class ClientTextView implements  View {
                 }
 
                 if(action.equals("INFO")){
-                    showMap(ClientContext.get().getMap().getGrid());
+                    showMap(ClientContext.get().getMap());
                     showMyPlayerInformation();
                     showPlayerPosition();
                     chosenAction = null;
@@ -463,7 +483,7 @@ public class ClientTextView implements  View {
      * @param possibleSquare
      */
     public  void chooseSquarePhase(List<Square> possibleSquare){
-        showMap(ClientContext.get().getMap().getGrid());
+        showMap(ClientContext.get().getMap());
         Square choosenSquare = null;
         String square;
         int posX;
@@ -539,7 +559,7 @@ public class ClientTextView implements  View {
             action = action.toUpperCase();
             try {
                 if(action.equals("INFO")){
-                    showMap(ClientContext.get().getMap().getGrid());
+                    showMap(ClientContext.get().getMap());
                     showMyPlayerInformation();
                     showPlayerPosition();
                     choosenAction = null;
@@ -742,6 +762,24 @@ public class ClientTextView implements  View {
             i++;
             System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+ranking.get(p) +".");
         }
+        restartGamePhase();
+        
+    }
+
+    private void restartGamePhase() {
+        char choice;
+        writeText("Do you want to play a new game?[Y/N]");
+        do{
+            choice = readChar();
+        }while(choice != 'y' && choice != 'Y' && choice != 'N' && choice != 'n');
+        if(choice == 'Y' || choice == 'y')
+        {
+            controller.startNewGame();
+        }
+        else
+        {
+            controller.stopListening();
+        }
     }
 
     /**
@@ -865,7 +903,7 @@ public class ClientTextView implements  View {
      */
     private CardPower choosePowerUp(List<CardPower> list) {
         int k=0;
-        showMap(ClientContext.get().getMap().getGrid());
+        showMap(ClientContext.get().getMap());
         for(int i=1;i<=list.size();i++)
             System.out.println(i+">>>"+list.get(i-1).toString());
         do{
@@ -874,7 +912,8 @@ public class ClientTextView implements  View {
         return list.get(k-1);
     }
 
-    public void showMap(Square[][] grid) {
+    public void showMap(GameMap map) {
+        Square [][] grid = map.getGrid();
         String col;
         String wallVert = "│";
         String wallHor ="────";
@@ -987,7 +1026,7 @@ public class ClientTextView implements  View {
             }
             System.out.println("");
         }
-        if(ClientContext.get().getMap() != null)
+        if(ClientContext.get().getMap() != null && this.controller.getState() != ClientState.WAITING_START)
             for(Square sq : ClientContext.get().getMap().getSpawnpoints()){
                 if(sq.getWeapons() != null) {
                     writeText("In position X= " + sq.getX() + "  Y= " + sq.getY() + " there are:");
@@ -1228,6 +1267,24 @@ public class ClientTextView implements  View {
                     System.out.print("FREE");
                 System.out.println();
             }
+        }
+    }
+
+    @Override
+    public void notifyConnectionError() {
+        char choice;
+        writeText("There is connection problem with the server! Check your internet connection please");
+        writeText("Do you want to retry the connection?[Y/N]");
+        do{
+            choice = readChar();
+        }while(choice != 'Y' && choice != 'y' && choice != 'n' && choice != 'N');
+
+        if(choice == 'Y' || choice == 'y')
+        {
+            controller.retryConnection();
+        }
+        else{
+            controller.stopListening();
         }
     }
 }

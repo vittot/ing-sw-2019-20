@@ -7,7 +7,7 @@ import game.controller.commands.ServerMessageHandler;
 public interface Client {
 
     void sendMessage(ClientMessage msg);
-    void startListening(ServerMessageHandler handler);
+    void startListening(ClientController handler);
     void init();
 
     //TODO: check if this make sense also in RMI:

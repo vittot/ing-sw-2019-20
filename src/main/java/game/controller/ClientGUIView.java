@@ -77,7 +77,7 @@ public class ClientGUIView extends Application implements View{
     @Override
     public String chooseConnection() {
         //TODO (now just a copy of textView)
-        String choice;
+        /*String choice;
         Scanner in = new Scanner(System.in);
         System.out.println("Choose the connection type");
         System.out.println("Insert Socket or RMI:");
@@ -85,7 +85,13 @@ public class ClientGUIView extends Application implements View{
             choice = in.nextLine();
             choice = choice.toUpperCase();
         }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
-        return choice;
+        return choice;*/
+        return "socket";
+    }
+
+    @Override
+    public void notifyConnectionError() {
+        //TODO
     }
 
 
@@ -698,7 +704,8 @@ public class ClientGUIView extends Application implements View{
         List<ImageView> ammos = new ArrayList<>();
         spaceX = 0;
         double spaceY = 0;
-        image = new Image("graphics/ammo/BRR.png");
+        //image = new Image("graphics/ammo/BRR.png");
+        image = new Image("graphics/ammo/AD_ammo_049.png");
         for(i = 1; i < 13; i++){
             Rectangle rec = new Rectangle(130,130,Color.TRANSPARENT);
             rec.setId(""+i);
@@ -767,13 +774,13 @@ public class ClientGUIView extends Application implements View{
 
             }
         }
-        Image background = new Image("graphics/map/background.png");
+        /*Image background = new Image("graphics/map/background.png");
         BackgroundImage bi = new BackgroundImage(background,
                 BackgroundRepeat.REPEAT,
                 BackgroundRepeat.REPEAT,
                 BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
-        map.setBackground(new Background(bi));
+        map.setBackground(new Background(bi));*/
 
         StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
         StackPane.setMargin(text,new Insets(0,0,(screenHeight/(displayY/130)),0));

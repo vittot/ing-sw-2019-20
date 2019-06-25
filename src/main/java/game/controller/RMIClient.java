@@ -32,7 +32,7 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
     }
 
     @Override
-    public void startListening(ServerMessageHandler handler) {
+    public void startListening(ClientController handler) {
         this.controller = handler;
     }
 

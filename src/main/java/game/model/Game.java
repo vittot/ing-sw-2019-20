@@ -4,6 +4,7 @@ package game.model;
 import java.io.IOException;
 import java.util.List;
 
+import game.controller.GameManager;
 import game.model.effects.*;
 import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
@@ -25,7 +26,7 @@ public class Game {
     private Player fistPlayerToPlay;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
-    public static int TIME_FOR_ACTION = 1000000; //TODO: read from config file
+    public static int TIME_FOR_ACTION = 10000; //TODO: read from config file
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
@@ -64,9 +65,13 @@ public class Game {
         this.fistPlayerToPlay = this.players.get(0);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
-        readMap(mapId, "mapFile.xml");
+        //readMap(mapId, "mapFile.xml");
+        this.map = new GameMap(GameManager.get().getMap(mapId));
         readPowerUpDeck("powerupFile.xml");
         readAmmoDeck("ammoFile.xml");
+        Collections.shuffle(deckAmmo);
+        Collections.shuffle(deckPower);
+        Collections.shuffle(deckWeapon);
         currentTurn = new Turn(this.players.get(0),this);
 
     }
@@ -290,7 +295,7 @@ public class Game {
 
         CardAmmo cardAmmo = new CardAmmo(ammos,cardPower);
         this.deckAmmo.add(cardAmmo);
-        Collections.shuffle(this.deckAmmo);
+        //Collections.shuffle(this.deckAmmo);
     }
 
     /**
@@ -315,7 +320,7 @@ public class Game {
         //TODO: read (and add on power up xml) the useWhenAttacking flag
         CardPower cardPower = new CardPower(id,c,flag,false,effect);
         this.deckPower.add(cardPower);
-        Collections.shuffle(this.deckPower);
+        //Collections.shuffle(this.deckPower);
     }
 
     /**
@@ -342,7 +347,7 @@ public class Game {
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
         wp.setId(this.id);
         this.deckWeapon.add(wp);
-        Collections.shuffle(this.deckWeapon);
+        //Collections.shuffle(this.deckWeapon);
     }
 
     private void insertPrice(FullEffect effectal, List<FullEffect> effectop, List<Color> priceal, List<List<Color>> priceop) {
@@ -1046,9 +1051,10 @@ public class Game {
     /**
      * Notify all players that a player has been suspended from the game
      * @param p - Player suspended
+     * @param timeOut - indicate if the suspension is due to timeout
      */
-    void notifyPlayerSuspended(Player p) {
-        gameObservers.forEach( o -> o.onPlayerSuspend(p));
+    void notifyPlayerSuspended(Player p, boolean timeOut) {
+        gameObservers.forEach( o -> o.onPlayerSuspend(p, timeOut));
     }
 
 
@@ -1074,6 +1080,7 @@ public class Game {
     public void endGame()
     {
         this.ended = true;
+        GameManager.get().endGame(this);
         gameObservers.forEach(o -> o.onGameEnd(getRanking()));
     }
 

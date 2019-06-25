@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -160,7 +161,7 @@ class GameMapTest {
         Player des2 = des.getSquare(1,1).getPlayers().get(0);
         Player des3 = des.getSquare(0,2).getPlayers().get(0);
 
-        assertTrue(des1.getCardPower() == null && des1.getWeapons() == null && equalWeapons(des2.getWeapons(), p2.getWeapons()) && equalPowerUps(des2.getCardPower(),p2.getCardPower()) && des3.getGame() == null);
+        assertTrue(des1.getCardPower() == null && des1.getWeapons().size() == 0 && equalWeapons(des2.getWeapons(), p2.getWeapons()) && equalPowerUps(des2.getCardPower(),p2.getCardPower()) && des3.getGame() == null);
 
     }
 
@@ -188,8 +189,8 @@ class GameMapTest {
     @Test
     public void distanceBtwSquaresTest() throws MapOutOfLimitException {
         this.map = Game.readMap(1,"mapFile.xml");
-        ClientTextView cv = new ClientTextView();
-        cv.showMap(map.getGrid());
+        //ClientTextView cv = new ClientTextView();
+        //cv.showMap(map);
         //lo spawnpoint yellow è in posizione x=3, y=2 (contando da zero le coordinate)
         //lo square in posizione x=2, y=1 dista 2 passi
         //lo square in posizione x=2, y=0 dista 3 passi
@@ -222,5 +223,12 @@ class GameMapTest {
         return true;
     }
 
-
+    /**
+     * Check that the copy constructor create an equal copy of the GameMap
+     */
+    @Test
+    void copyConstructor() {
+        GameMap copy = new GameMap(map);
+        assertEquals(copy,map);
+    }
 }

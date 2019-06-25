@@ -26,7 +26,7 @@ class GameTest {
         Edge[] edges5 = new Edge[]{Edge.DOOR,Edge.OPEN,Edge.OPEN,Edge.WALL};
 
         grid[0][0] = new Square(MapColor.BLUE, false, 0, 0, m, edges1);
-        grid[1][0] = new Square(MapColor.BLUE, false, 0, 1, m, edges2);
+        grid[1][0] = new Square(MapColor.BLUE, true, 0, 1, m, edges2);
         grid[2][0] = new Square(MapColor.RED, true, 0, 2, m, edges3);
         grid[0][1] = new Square(MapColor.BLUE, true, 1, 0, m, edges4);
         grid[1][1] = new Square(MapColor.YELLOW, true, 1, 1, m, edges5);
@@ -74,8 +74,9 @@ class GameTest {
     void checkVictory() {
         Player p1 = g.getPlayers().get(0);
         Player p2 = g.getPlayers().get(1);
+
         CardPower cp = mock(CardPower.class);
-        when(cp.getColor()).thenReturn(Color.BLUE);
+        when(cp.getMapColor()).thenReturn(MapColor.BLUE);
         List<Player> toRespawn;
         //Player p1 kills Player p2
         p2.addDamage(p1,11);

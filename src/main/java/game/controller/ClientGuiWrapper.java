@@ -272,4 +272,9 @@ public class ClientGuiWrapper implements View {
         }*/
         return "Socket";
     }
+
+    @Override
+    public void notifyConnectionError() {
+        //TODO
+    }
 }

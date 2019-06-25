@@ -12,6 +12,7 @@ public class LaunchClient {
         if(interfaceChoice.equals("GUI")) {
             //ClientGUIView.main(args);
             clientView = new ClientGuiWrapper();
+            //clientView = ClientGUIView.getInstance();
         }else {
             clientView = new ClientTextView();
         }
