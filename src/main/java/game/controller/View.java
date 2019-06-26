@@ -5,7 +5,6 @@ import game.model.effects.FullEffect;
 import game.model.effects.SimpleEffect;
 
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 public interface View {

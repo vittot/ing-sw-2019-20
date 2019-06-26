@@ -15,9 +15,11 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
 
     private transient ServerMessageHandler controller;
     private transient IRMIClientHandler rmiClientHandler;
+    private String serverIP;
 
-    public RMIClient() throws RemoteException{
+    public RMIClient(String serverIP) throws RemoteException{
         super();
+        this.serverIP = serverIP;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
     }
 
     @Override
-    public void receiveMessage(ServerMessage msg) throws RemoteException {
+    public synchronized void receiveMessage(ServerMessage msg) throws RemoteException {
         msg.handle(controller);
     }
 
@@ -45,7 +47,7 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
     @Override
     public boolean init() {
         try{
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.getRegistry(serverIP);
 
             IRMIListener remoteListener = (IRMIListener) registry.lookup("rmiListener");
             this.rmiClientHandler = remoteListener.getHandler();

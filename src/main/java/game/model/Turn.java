@@ -76,7 +76,7 @@ public class Turn {
         
         currentPlayer = player;
 
-        if(finalFrezy && player.equals(game.getFistPlayerToPlay())){
+        if(finalFrezy && player.equals(game.getFirstPlayerToPlay())){
             this.afterFirstPlayer = true;
         }
         if(afterFirstPlayer)
