@@ -123,8 +123,8 @@ public class ClientGUIView extends Application implements View{
 
         primaryStage.setScene(sc);
         primaryStage.show();
-        b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI"));
-        b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET"));
+        b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI","localhost"));
+        b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET","localhost"));
         /*
         String choice;
         Scanner in = new Scanner(System.in);
@@ -159,6 +159,11 @@ public class ClientGUIView extends Application implements View{
         primaryStage.setWidth(500);
         primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
+    }
+
+    @Override
+    public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
+
     }
 
     @Override
