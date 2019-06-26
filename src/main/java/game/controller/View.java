@@ -110,7 +110,7 @@ public interface View {
 
     void waitStart();
 
-    String chooseConnection();
+    void chooseConnection();
 
     void notifyConnectionError();
 }

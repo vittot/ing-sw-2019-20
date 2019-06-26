@@ -1,5 +1,6 @@
 package game.controller;
 
+import game.LaunchClient;
 import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
@@ -251,7 +252,7 @@ public class ClientTextView implements  View {
     }
 
     @Override
-    public String chooseConnection() {
+    public void chooseConnection() {
         String choice;
         writeText("Choose the connection type");
         do{
@@ -259,7 +260,7 @@ public class ClientTextView implements  View {
             choice = fromKeyBoard.nextLine();
             choice = choice.toUpperCase();
         }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
-        return choice;
+        LaunchClient.startConnection(choice);
     }
 
     @Override
