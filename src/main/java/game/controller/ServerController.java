@@ -820,6 +820,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                     CardPower cp = model.drawPowerUp();
                     getCurrPlayer().addCardPower(cp);
                     getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
+                    model.getCurrentTurn().startTimer();
                     return new RespawnRequest(cp);
                 }
 

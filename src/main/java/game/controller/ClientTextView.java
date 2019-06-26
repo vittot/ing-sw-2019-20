@@ -426,7 +426,7 @@ public class ClientTextView implements  View {
             nPlayer = readInt();
         }while(nPlayer < 3 || nPlayer > 5);
 
-        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId-1,nPlayer,ClientContext.get().getUser()));
+        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,ClientContext.get().getUser()));
     }
 
     /**
