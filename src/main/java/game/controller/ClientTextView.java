@@ -327,7 +327,7 @@ public class ClientTextView implements  View {
     public void chooseFirstEffect(FullEffect baseEff, FullEffect altEff) {
         int n;
         List<FullEffect> effects = new ArrayList<>();
-        List<CardPower> toUse = null;
+        List<CardPower> toUse = new ArrayList<>();
         effects.add(baseEff);
         effects.add(altEff);
         writeText("Choose the base effect you want to apply:");
@@ -344,7 +344,7 @@ public class ClientTextView implements  View {
     public void usePlusBeforeBase(FullEffect plusEff) {
         char t;
         List<FullEffect> effects = new ArrayList<>();
-        List<CardPower> toUse = null;
+        List<CardPower> toUse = new ArrayList<>();
         effects.add(plusEff);
         writeText("Do you want to use this plus effect before than your weapon base effect?");
         showEffects(effects,false);
@@ -359,7 +359,7 @@ public class ClientTextView implements  View {
 
     @Override
     public void usePlusInOrder(List<FullEffect> plusEffects) {
-        List<CardPower> toUse = null;
+        List<CardPower> toUse = new ArrayList<>();
         char t;
         writeText("Do you want to apply the plus effect, allow by your weapon, listed here:");
         showEffects(Collections.singletonList(plusEffects.get(0)),false);
@@ -374,7 +374,7 @@ public class ClientTextView implements  View {
 
     @Override
     public void choosePlusEffect(List<FullEffect> plusEffects) {
-        List<CardPower> toUse = null;
+        List<CardPower> toUse = new ArrayList<>();
         int n;
         int i=1;
         FullEffect toApply = null;

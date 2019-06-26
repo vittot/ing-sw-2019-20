@@ -243,7 +243,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     @Override
     public void addDamage(Player shooter, int damage) {
-        if(!this.equals(shooter)) {
+        if(!this.equals(shooter) && damage > 0) {
             int num;
             boolean isRage = false;
             Kill lastKill = null;
@@ -301,7 +301,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     @Override
     public void addThisTurnMarks(Player shooter, int marks) {
-        if(checkMarksNumber(shooter,marks)) {
+        if(checkMarksNumber(shooter,marks) && shooter.getId() != this.id && marks > 0) {
             for (int i = 0; i < marks; i++)
                 this.thisTurnMarks.add(shooter.getColor());
             if(game!=null)

@@ -26,7 +26,7 @@ public class Game {
     private Player fistPlayerToPlay;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
-    public static int TIME_FOR_ACTION = 10000; //TODO: read from config file
+    public static int TIME_FOR_ACTION = 999999999; //TODO: read from config file
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;

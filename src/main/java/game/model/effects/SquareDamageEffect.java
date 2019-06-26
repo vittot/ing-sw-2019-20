@@ -99,12 +99,16 @@ public class SquareDamageEffect extends SimpleEffect {
                     break;
             }
         }
-
-        List<Target> retList = new ArrayList<>();
-        for(Square s: targets)
-            if(!s.getPlayers().isEmpty())
-                retList.add(s);
-
+        List<Target> retList;
+        //control that allow to consider also square where there isn't any player
+        if(damage == 0 && marks == 0)
+            retList = new ArrayList<>(targets);
+        else {
+            retList = new ArrayList<>();
+            for (Square s : targets)
+                if (!s.getPlayers().isEmpty())
+                    retList.add(s);
+        }
         return retList;
 
     }
@@ -114,18 +118,22 @@ public class SquareDamageEffect extends SimpleEffect {
      * @param shooter
      * @param targets choosen targets
      */
-    public void applyEffect(Player shooter, List<Target> targets){
+    public void applyEffect(Player shooter, List<Target> targets) {
         List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
         Square s;
-        for(Target t : targets)
-        {
+        for (Target t : targets) {
             s = (Square) t;
-            t.addDamage(shooter,damage);
-            t.addThisTurnMarks(shooter,marks);
+            t.addDamage(shooter, damage);
+            t.addThisTurnMarks(shooter, marks);
             prevTargets.addAll(s.getPlayers());
         }
-        shooter.getActualWeapon().setLastTargetSquare(prevTargets.get(prevTargets.size()-1).getPosition());
-        shooter.getActualWeapon().setLastDirection(GameMap.getDirection(shooter.getPosition(),shooter.getActualWeapon().getLastTarget().getPosition()));
+        if (prevTargets.size() == 0) {
+            shooter.getActualWeapon().setLastTargetSquare((Square) targets.get(0));
+            shooter.getActualWeapon().setLastDirection(GameMap.getDirection(shooter.getPosition(), (Square) targets.get(0)));
+        } else {
+            shooter.getActualWeapon().setLastTargetSquare(prevTargets.get(prevTargets.size() - 1).getPosition());
+            shooter.getActualWeapon().setLastDirection(GameMap.getDirection(shooter.getPosition(), shooter.getActualWeapon().getLastTarget().getPosition()));
+        }
     }
 
     @Override

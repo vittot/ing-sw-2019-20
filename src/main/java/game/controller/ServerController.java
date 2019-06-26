@@ -1103,11 +1103,13 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             else
                 ammoToPay.addAll(price);
         }
-        if(!toUse.isEmpty()) {
-            if (powerUpToPay == null)
-                powerUpToPay = new ArrayList<>(toUse);
-            else
-                powerUpToPay.addAll(toUse);
+        if(toUse != null) {
+            if (!toUse.isEmpty()) {
+                if (powerUpToPay == null)
+                    powerUpToPay = new ArrayList<>(toUse);
+                else
+                    powerUpToPay.addAll(toUse);
+            }
         }
         if(currFullEffect.getPrice() != null)
             if(!currFullEffect.getPrice().isEmpty())
@@ -1204,7 +1206,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
         selectableTarget = e.searchTarget(currPlayer);
         if (selectableTarget.isEmpty()){
-            clientHandler.sendMessage(new InvalidWeaponResponse());
+            clientHandler.sendMessage(new OperationCompletedResponse("There are no more target to shoot!"));
             return checkShootActionEnd();
         }
         if (selectableTarget.size() > e.getMaxEnemy() || (e.getMinEnemy() < e.getMaxEnemy() && selectableTarget.size() > e.getMinEnemy()))

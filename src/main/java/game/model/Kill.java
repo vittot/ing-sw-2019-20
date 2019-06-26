@@ -1,6 +1,8 @@
 package game.model;
 
-public class Kill {
+import java.io.Serializable;
+
+public class Kill implements Serializable {
     private Player killer;
     private Player victim;
     private boolean isRage;
