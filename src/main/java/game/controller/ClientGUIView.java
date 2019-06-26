@@ -5,6 +5,7 @@ import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
 import game.model.effects.SimpleEffect;
+import game.model.exceptions.MapOutOfLimitException;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -46,6 +47,7 @@ public class ClientGUIView extends Application implements View{
 
 
     private StackPane map = new StackPane();
+    private Scene scene;
     private List<Rectangle> squares = new ArrayList<>();
     private List<Rectangle> myAmmo = new ArrayList<>();
     private List<ImageView> ammos = new ArrayList<>();
@@ -520,21 +522,37 @@ public class ClientGUIView extends Application implements View{
      * @param i
      * @return
      */
-    private Image createAmmoCard(int i){
+    private Image createAmmoCard(int i) {
         String card = "";
+        int x = 0;
+        int y = 0;
         CardAmmo ca;
         Image ammoI = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/ammo/Empty.png"));    // if the square is empty
-        if(ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4] != null) {
-            ca = ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4].getCardAmmo();
-            if (ca.getCardPower() == 1) {
-                card = card + "P";
-            }
-            for (game.model.Color c : ca.getAmmo()) {
-                if (c != null) {
-                    card = card + c.toString().substring(6, 7);
+        if(i ==  1){
+            x = 0;
+            y = 0;
+        }else {
+            x = (i - 1) % 4;
+            y = (i - 1) / 4;
+        }
+        try {
+            if(ClientContext.get().getMap().getGrid()[y][x] != null) {
+                if(!ClientContext.get().getMap().getSquare(x,y).isRespawn()){
+                    ca = ClientContext.get().getMap().getSquare(x,y).getCardAmmo();
+                    if (ca.getCardPower() == 1) {
+                        card = card + "P";
+                    }
+                    for (game.model.Color c : ca.getAmmo()) {
+                        if (c != null) {
+                            card = card + c.toString().substring(0, 1);
+                        }
+                    }
+                    System.out.println("adwd"+card);
+                    ammoI = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/ammo/"+card+".png"));
                 }
             }
-            ammoI = new Image ("graphics/ammo/"+card+".png");
+        } catch (MapOutOfLimitException e) {
+            e.printStackTrace();
         }
         return ammoI;
     }
@@ -545,7 +563,8 @@ public class ClientGUIView extends Application implements View{
      * @return
      */
     private ImageView createImageViewAmmo(int i ){
-        ImageView ammoIV = new ImageView(createAmmoCard(i));
+        ImageView ammoIV = null;
+        ammoIV = new ImageView(createAmmoCard(i));
         ammoIV.setId(""+i);
         ammoIV.setFitWidth(screenWidth*2.4/100);
         ammoIV.setPreserveRatio(true);
@@ -608,8 +627,8 @@ public class ClientGUIView extends Application implements View{
      * Set the back of the card from default
      */
     private void createMyPlayerCard(){
-        Image w = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back"));
-        Image p = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/PW_back"));
+        Image w = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back.png"));
+        Image p = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/PW_back.png"));
         ImageView pu = new ImageView(p);
         ImageView we = new ImageView(w);
         powerUp = new ArrayList<>(Arrays.asList(pu,pu,pu));
@@ -641,7 +660,8 @@ public class ClientGUIView extends Application implements View{
      * @return
      */
     private String createPowerUpCard(String name, game.model.Color color){
-        return ""+name+"_"+color.toString().substring(6,7)+".png";
+        System.out.println(""+name+"_"+color.toString().substring(0,1)+".png");
+        return ""+name+"_"+color.toString().substring(0,1)+".png";
     }
 
     /**
@@ -690,7 +710,7 @@ public class ClientGUIView extends Application implements View{
             }
         }
         //print all the back of the weapon card in the map
-        Image back = new Image ("graphics/card/W_back.png");
+        Image back = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back.png"));
         spaceX = 0;
         for(int k = 0 ; k < 3 ; k ++){
             ImageView weapon = new ImageView(back);
@@ -745,21 +765,22 @@ public class ClientGUIView extends Application implements View{
     private void refreshMyPlayerCard(){
         Image cardP;
         Image cardW;
+        Player myP = ClientContext.get().getMyPlayer();
         for(int i = 0; i < 3 ; i++) {
-            if (ClientContext.get().getMyPlayer().getCardPower().get(i) == null) {
+            if (i >= myP.getCardPower().size()) {
                 cardP = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/PW_back.png"));
                 powerUp.get(i).setId("0");
             } else {
-                cardP = new Image(createPowerUpCard(ClientContext.get().getMyPlayer().getCardPower().get(i).getName(), ClientContext.get().getMyPlayer().getCardPower().get(i).getColor()));
-                powerUp.get(i).setId("" + ClientContext.get().getMyPlayer().getCardPower().get(i).getId());
+                cardP = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/"+createPowerUpCard(myP.getCardPower().get(i).getName(), myP.getCardPower().get(i).getColor())));
+                powerUp.get(i).setId("" + myP.getCardPower().get(i).getId());
             }
-            if (ClientContext.get().getMyPlayer().getWeapons().get(i) == null){
+            if (i >= myP.getWeapons().size()){
                 cardW = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back.png"));
                 weapons.get(i).setId("0");
             }
             else {
-                cardW = new Image(createWeaponCard(ClientContext.get().getMyPlayer().getCardPower().get(i).getId()));
-                weapons.get(i).setId("" + ClientContext.get().getMyPlayer().getWeapons().get(i).getId());
+                cardW = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/"+createWeaponCard(myP.getCardPower().get(i).getId())));
+                weapons.get(i).setId("" + myP.getWeapons().get(i).getId());
             }
             powerUp.get(i).setImage(cardP);
             weapons.get(i).setImage(cardW);
@@ -800,10 +821,11 @@ public class ClientGUIView extends Application implements View{
     private void createPlayerDashBoard(){
         int i = 0;
         for(Player p : ClientContext.get().getPlayersInWaiting()){
-            Image dash = new Image (""+p.getColor().name().substring(6)+"Dash.png");
+            System.out.println(p.getColor().name());
+            Image dash = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.getColor().toString()+"Dash.png"));
             ImageView imw = new ImageView(dash);
             playerDashBoard.add(imw);
-            imw.setId(p.getNickName());
+            imw.setId(""+p.getId());
             imw.setFitWidth(screenWidth*36.6/100);
             imw.setPreserveRatio(true);
             if(p.equals(ClientContext.get().getMyPlayer())){
@@ -829,7 +851,8 @@ public class ClientGUIView extends Application implements View{
             List<ImageView> infoM = new ArrayList<>();
             Player p = ClientContext.get().getMap().getPlayerById(Integer.parseInt(dash.getId()));
             for (PlayerColor  c :p.getDamage()) {
-                Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.name().substring(6)+"Tear.png"));
+                System.out.println(c.name());
+                Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
                 ImageView damages = new ImageView(damage);
                 infoD.add(damages);
                 damages.setFitHeight(screenHeight * 3 / 100);
@@ -844,7 +867,7 @@ public class ClientGUIView extends Application implements View{
             }
             spaceX = 0;
             for (PlayerColor  c :p.getMark()) {
-                Image mark = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.name().substring(6)+"Tear.png"));
+                Image mark = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
                 ImageView marks = new ImageView(mark);
                 infoM.add(marks);
                 marks.setFitHeight(screenHeight * 2 / 100);
@@ -888,7 +911,8 @@ public class ClientGUIView extends Application implements View{
         int j = 0;
         deleteMyPlayerDamage();
         for(PlayerColor p : ClientContext.get().getMyPlayer().getDamage()){
-            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.name().substring(6)+"Tear.png"));
+            System.out.println(p.name());
+            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.toString()+"Tear.png"));
             ImageView damages = new ImageView(damage);
             myPlayerDamage.add(damages);
             damages.setFitHeight(screenHeight * 3 /100);
@@ -903,7 +927,7 @@ public class ClientGUIView extends Application implements View{
         }
         spaceX = 0;
         for(PlayerColor p : ClientContext.get().getMyPlayer().getMark()){
-            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.name().substring(6)+"Tear.png"));
+            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.toString()+"Tear.png"));
             ImageView damages = new ImageView(damage);
             myPlayerMarks.add(damages);
             damages.setFitHeight(screenHeight * 2 /100);
@@ -941,7 +965,8 @@ public class ClientGUIView extends Application implements View{
         double spaceY = 0;
         int k = 1;
         for(game.model.Color c :ClientContext.get().getMyPlayer().getAmmo()){
-            Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.valueOf(c.name().substring(6)));
+            System.out.println(c.name());
+            Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.valueOf(c.toString()));
             map.getChildren().add(ammo);
             myAmmo.add(ammo);
             StackPane.setAlignment(ammo, Pos.BOTTOM_LEFT);
@@ -977,6 +1002,8 @@ public class ClientGUIView extends Application implements View{
         refreshPlayerDamage();
         refreshMyPlayerDamage();
         refreshMyPlayerAmmo();
+        scene = new Scene(map);
+        primaryStage.setScene(scene);
     }
 
 
