@@ -268,14 +268,8 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
-    public String chooseConnection() {
+    public void chooseConnection() {
         runLater(gui::chooseConnection);
-        /*try {
-            wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-        return "Socket";
     }
 
     @Override
