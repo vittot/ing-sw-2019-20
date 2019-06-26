@@ -10,6 +10,8 @@ import java.util.SortedMap;
 
 public interface View {
 
+    void notifyStart();
+
     void setUserNamePhase();
 
     void insufficientAmmoNotification();
@@ -110,7 +112,9 @@ public interface View {
 
     void waitStart();
 
-    String chooseConnection();
+    void chooseConnection();
+
+    void notifyConnectionError();
 
     void chooseCounterAttack(List<CardPower> counterattack, Player shooter);
 }

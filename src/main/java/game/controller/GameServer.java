@@ -24,7 +24,7 @@ public class GameServer {
      */
     public GameServer(int port) throws IOException {
         serverSocket = new ServerSocket(port);
-        pool = Executors.newCachedThreadPool();
+            pool = Executors.newCachedThreadPool();
         close = false;
         System.out.println("GameServer listening on port 5000");
         //TODO bind on registy for RMI

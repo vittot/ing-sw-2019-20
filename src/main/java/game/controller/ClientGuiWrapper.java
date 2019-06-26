@@ -18,6 +18,11 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
+    public void notifyStart() {
+        runLater(gui::notifyStart);
+    }
+
+    @Override
     public void setUserNamePhase() {
         runLater(gui::setUserNamePhase);
     }
@@ -263,13 +268,12 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
-    public String chooseConnection() {
+    public void chooseConnection() {
         runLater(gui::chooseConnection);
-        /*try {
-            wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-        return "Socket";
+    }
+
+    @Override
+    public void notifyConnectionError() {
+        //TODO
     }
 }

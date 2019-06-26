@@ -6,6 +6,7 @@ import game.controller.commands.servercommands.*;
 import game.model.*;
 
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -38,7 +39,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
      */
     @Override
     public void sendMessage(ServerMessage msg) {
-        if(controller.getCurrPlayer() == null || !controller.getCurrPlayer().isSuspended())
+        //if(controller.getCurrPlayer() == null /*|| !controller.getCurrPlayer().isSuspended()*/)
             try{
                 outStream.writeObject(msg);
                 outStream.reset();
@@ -66,7 +67,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             close();
 
         }
-        catch(SocketException e)
+        catch(SocketException | EOFException e)
         {
             clientDisconnected();
         }

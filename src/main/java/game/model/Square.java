@@ -11,16 +11,25 @@ import java.util.stream.Collectors;
 
 public class Square implements Target, Serializable {
     private MapColor color;
-    private Edge[] edges;
+    private Edge[] edges; // up-right-down-left from 0 to 3
     private boolean respawn;
     private List<Player> players;
     private List<CardWeapon> weapons;
     private CardAmmo cardAmmo;
     //Convention: the map starts with (0,0) the left upper corner and ends with (map.dimY-1,map.dimX-1) at the lower right corner
-    private int x;
-    private int y;
+    private int x; //this is the numb of the column (from 0), the 2nd index in the grid matrix
+    private int y; //this is the numb of the row (from 0), the 1st idex in the grid matrix
     private GameMap map;
 
+    /**
+     * Construct an empty square
+     * @param color
+     * @param respawn true if it is a respawn point
+     * @param x Number of column (coherent with the x attribute semantic)
+     * @param y Number of row (coherent with the y attribute semantic)
+     * @param map the map to which it belongs to
+     * @param edges
+     */
     public Square(MapColor color, boolean respawn, int x, int y, GameMap map, Edge[] edges) {
         this.color = color;
         this.edges = edges;

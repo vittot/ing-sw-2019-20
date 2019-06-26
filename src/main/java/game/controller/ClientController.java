@@ -3,6 +3,7 @@ package game.controller;
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
+import game.controller.commands.clientcommands.GetAvailableMapsRequest;
 import game.controller.commands.clientcommands.GrabActionRequest;
 import game.controller.commands.servercommands.*;
 import game.model.*;
@@ -15,7 +16,6 @@ import java.util.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 import static javafx.application.Platform.runLater;
 
@@ -24,15 +24,14 @@ public class ClientController implements ServerMessageHandler {
     private View clientView;
     private List<Action> availableActions;
     private ClientState state;
-    private Scanner in = new Scanner(System.in);
     private boolean gameStarted;
 
     public ClientController(Client client, View view) {
         this.client = client;
         this.gameStarted = false;
-        String input;
         this.clientView = view;
         this.clientView.setController(this);
+        this.state = ClientState.WAITING_START;
     }
 
     public Client getClient() {
@@ -41,6 +40,10 @@ public class ClientController implements ServerMessageHandler {
 
     public ClientState getState() {
         return state;
+    }
+
+    public void setState(ClientState state) {
+        this.state = state;
     }
 
     public List<Action> getAvailableActions() {
@@ -56,8 +59,7 @@ public class ClientController implements ServerMessageHandler {
 
 
 
-    public void run() throws IOException {
-        //runLater(() -> clientView.setUserNamePhase());
+    public void run() {
         this.start();
         clientView.setUserNamePhase();
 
@@ -226,8 +228,13 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(NotifyEndGame serverMsg) {
-        clientView.showRanking(serverMsg.getRanking());
+        if(this.state != ClientState.GAME_END && this.state != ClientState.WAITING_START)
+        {
+            this.state = ClientState.GAME_END;
+            clientView.showRanking(serverMsg.getRanking());
+        }
     }
+
 
     /**
      *
@@ -377,14 +384,13 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyGameStarted serverMsg) {
         this.gameStarted = true;
+        this.state = ClientState.WAITING_SPAWN;
         ClientContext.get().setMap(serverMsg.getMap());
 
         if(serverMsg.getId() != 0)
             ClientContext.get().setMyID(serverMsg.getId());
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
-        clientView.notifyCompletedOperation("Game has started!");
-
-
+        clientView.notifyStart();
     }
 
     /**
@@ -459,6 +465,8 @@ public class ClientController implements ServerMessageHandler {
         } catch (MapOutOfLimitException e) {
             e.printStackTrace();
         }
+        if(p.getId() == ClientContext.get().getMyID())
+            this.state = ClientState.WAITING_ACTION;
 
         clientView.notifyRespawn(notifyRespawn.getpId());
     }
@@ -524,8 +532,12 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyPlayerRejoin notifyPlayerRejoin) {
         Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyPlayerRejoin.getPlayerId()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(notifyPlayerRejoin.getPlayerId()));
-        p.setSuspended(false);
-        clientView.notifyPlayerRejoin(p);
+        if(p!=null)
+        {
+            p.setSuspended(false);
+            clientView.notifyPlayerRejoin(p);
+        }
+
     }
 
     @Override
@@ -652,5 +664,34 @@ public class ClientController implements ServerMessageHandler {
 
     public boolean isGameStarted() {
         return gameStarted;
+    }
+
+    /**
+     * Stop listening before closing the application
+     */
+    public void stopListening() {
+        client.close();
+    }
+
+    /**
+     * Called by the newtork layer in case of connection error
+     */
+    public void manageConnectionError() {
+        clientView.notifyConnectionError();
+    }
+
+    /**
+     * Reconnect with the server after a connection error
+     */
+    public void retryConnection() {
+        client.init();
+    }
+
+    /**
+     * Start a new game
+     */
+    public void startNewGame() {
+        state  = ClientState.WAITING_START;
+        client.sendMessage(new GetAvailableMapsRequest());
     }
 }

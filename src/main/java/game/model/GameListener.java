@@ -16,7 +16,7 @@ public interface GameListener {
     void onMove(Player p);
     void onRespawn(Player p);
     void onPowerUpUse(Player p, CardPower c);
-    void onPlayerSuspend(Player p);
+    void onPlayerSuspend(Player p, boolean timeOut);
     void onPlayerRejoined(Player player);
     void onReplaceWeapon(CardWeapon cw, Square s);
     void onReplaceAmmo(CardAmmo ca, Square s);

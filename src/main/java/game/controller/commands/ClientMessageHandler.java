@@ -59,4 +59,6 @@ public interface ClientMessageHandler {
     ServerMessage handle(ChooseSquareToShootResponse chooseSquareToShootResponse);
 
     ServerMessage handle(CounterAttackResponse counterAttackResponse);
+
+    ServerMessage handle(LogoutRequest logoutRequest);
 }

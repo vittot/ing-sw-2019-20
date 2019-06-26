@@ -57,12 +57,13 @@ public class WaitingRoom implements Serializable {
         if(players.size() == numWaitingPlayers){
             Game g = GameManager.get().addGame(mapId,new ArrayList<>(players.values()));
             GameManager.get().removeWaitingRoom(this);
+            g.refillMap();
             for(Map.Entry<ServerController, Player> e: players.entrySet())
             {
                 e.getKey().startGame(g, e.getValue());
                 g.addGameListener(e.getKey().getClientHandler());
             }
-            g.refillMap();
+
         }
         return n+1;
 
