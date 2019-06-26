@@ -3,31 +3,63 @@ package game;
 import game.controller.*;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Scanner;
 
 public class LaunchClient {
+
+    private static View clientView;
+
     public static void main(String[] args) throws IOException {
-        View clientView;
+
         String interfaceChoice = interfaceSelection();
         if(interfaceChoice.equals("GUI")) {
-            //ClientGUIView.main(args);
             clientView = new ClientGuiWrapper();
             //clientView = ClientGUIView.getInstance();
         }else {
             clientView = new ClientTextView();
         }
-        Client client;
-        String connectionChoice = clientView.chooseConnection();
-        if(connectionChoice.equals("RMI"))
-            client = new RMIClient();
-        else
-            client = new SocketClient("localhost",5000);
-        client.init();
-        ClientController controller = new ClientController(client,clientView);
-        controller.run();
+
+        clientView.chooseConnection();
+
 
     }
 
+    /**
+     * Start the connection
+     * @param connectionChoice "SOCKET" (default) or "RMI"
+     */
+    public static void startConnection(String connectionChoice)
+    {
+        Client client = null; //useless assignment, but required for line 53
+        boolean connected;
+        if(connectionChoice.equals("RMI")) {
+            try {
+                client = new RMIClient();
+                connected = client.init();
+            } catch (RemoteException e) {
+                connected = false;
+            }
+        }
+        else {
+            client = new SocketClient("localhost",5000);
+            connected = client.init();
+        }
+
+        if(!connected) {
+            clientView.chooseConnection();
+            return;
+        }
+        ClientController controller = new ClientController(client,clientView);
+        controller.run();
+
+
+    }
+
+    /**
+     * Select the interface (GUI or CLI) from command line
+     * @return
+     */
     private static String interfaceSelection()
     {
         String input;

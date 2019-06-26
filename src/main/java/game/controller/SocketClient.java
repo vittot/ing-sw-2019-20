@@ -27,7 +27,7 @@ public class SocketClient implements Client {
         this.executor = Executors.newCachedThreadPool();
     }
 
-    public void init() {
+    public boolean init() {
         try{
             //socket = new Socket(host, port);
             if(socket != null && socket.isConnected())
@@ -37,10 +37,11 @@ public class SocketClient implements Client {
             outStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
             this.stop = false;
+            return true;
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            return false;
         }
 
     }

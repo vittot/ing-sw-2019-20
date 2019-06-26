@@ -43,18 +43,20 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
 
 
     @Override
-    public void init() {
+    public boolean init() {
         try{
             Registry registry = LocateRegistry.getRegistry();
 
             IRMIListener remoteListener = (IRMIListener) registry.lookup("rmiListener");
             this.rmiClientHandler = remoteListener.getHandler();
             this.rmiClientHandler.register(this);
+            return true;
 
         }catch(RemoteException | NotBoundException e)
         {
             e.printStackTrace();
             System.out.println("Remote EXCEPTION or NOT BOUND EXCEPTION");
+            return false;
         }
 
     }
