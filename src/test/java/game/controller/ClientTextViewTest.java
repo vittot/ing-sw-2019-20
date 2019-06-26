@@ -43,6 +43,6 @@ class ClientTextViewTest {
         map.getGrid()[0][2].setCardAmmo(ca);
         map.getGrid()[0][2].addPlayer(p1);
         map.getGrid()[0][2].addPlayer(p2);
-        cli.showMap(map.getGrid());
+        //cli.showMap(map);
     }
 }

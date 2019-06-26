@@ -74,8 +74,9 @@ class SquareDamageEffectTest {
         List<Target> targets = effect.searchTarget(game.getPlayer(4));
         List<Target> expTargets = new ArrayList<>();
         expTargets.add( game.getMap().getSquare(0,0) );
-        expTargets.add( game.getMap().getSquare(0,2) );
-        expTargets.add( game.getMap().getSquare(1,0) );
+        //there are excluded because they do not contain any player:
+        /*expTargets.add( game.getMap().getSquare(0,2) );
+        expTargets.add( game.getMap().getSquare(1,0) );*/
 
         assertTrue(expTargets.containsAll(targets) && targets.containsAll(expTargets));
     }
@@ -87,8 +88,13 @@ class SquareDamageEffectTest {
     void searchFromTheLastTarget() throws MapOutOfLimitException {
         when(game.getPlayer(1).getActualWeapon().getLastTargetSquare()).thenReturn(game.getPlayer(2).getPosition());
         effect = new SquareDamageEffect(1,1,0,1,TargetVisibility.VISIBLE,1,1,true,false);
+
+        game.getPlayer(4).move(game.getMap().getSquare(1,0));
+        game.getPlayer(3).move(game.getMap().getSquare(1,1));
+
         List<Target> targets = effect.searchTarget(game.getPlayer(1));
         List<Target> expTargets = new ArrayList<>();
+
         expTargets.add( game.getMap().getSquare(1,0) );
         expTargets.add( game.getMap().getSquare(1,1) );
 

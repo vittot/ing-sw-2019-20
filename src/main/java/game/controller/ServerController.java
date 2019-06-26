@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ServerController implements ClientMessageHandler, PlayerObserver, EffectHandler {
-    // reference to the Networking layer
+
     private ClientHandler clientHandler;
 
     private final transient GameManager gameManager;
@@ -107,6 +107,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     }
 
     public ServerMessage handle(CheckValidWeaponRequst clientMsg){
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         List<CardWeapon> cardWeapon = new ArrayList<>();
         for(CardWeapon cw : currPlayer.getWeapons()){
             if(cw.checkweapon(clientMsg.getPlayer())){
@@ -119,6 +122,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(ChooseSquareToShootResponse chooseSquareToShootResponse) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         List<Square> selectedTargets = chooseSquareToShootResponse.getChoosenSquare();
         List<Target> toApplyEffect = null;
         if(!selectableTarget.containsAll(selectedTargets)) {
@@ -139,6 +145,12 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         return currSimpleEffect.handleTargetSelection(this, toApplyEffect, model);
     }
 
+    @Override
+    public ServerMessage handle(LogoutRequest logoutRequest) {
+        GameManager.get().removeLoggedUser(logoutRequest.getUsername());
+        return new OperationCompletedResponse("Logged out successfully!");
+    }
+
 
     public Player getCurrPlayer() {
         return currPlayer;
@@ -150,6 +162,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(ChooseSquareResponse clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         Square selectedSquare;
         try{
             selectedSquare = model.getMap().getSquare(clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
@@ -191,7 +206,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         //state
         model.refillMap();
         List<Player> toBeRespawned = model.changeTurn();
-        toBeRespawned.forEach(p -> p.notifyRespawn());
+        toBeRespawned.forEach(Player::notifyRespawn);
         if(model.getnPlayerToBeRespawned() == 0)
             model.getCurrentTurn().newTurn(false); //TODO: check final frezy
     }
@@ -204,6 +219,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     @Override
     public ServerMessage handle(ChooseTargetResponse clientMsg)
     {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         if(!clientMsg.getSelectedTargets().isEmpty()) {
             List<Target> selectedTargets = clientMsg.getSelectedTargets();
             List<Target> toApplyEffect = null;
@@ -259,6 +277,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     }
 
     private ServerMessage handleTargetSelectionMovement(List<Target> selectedTarget) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         MovementEffect s = (MovementEffect) currSimpleEffect;
         toBeMoved = (Player) selectedTarget.get(0);
         selectableSquares = s.selectPosition(toBeMoved);
@@ -287,11 +308,17 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      * @return
      */
     private ServerMessage handleTargetSelection(List<Target> selectedTarget) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         currSimpleEffect.applyEffect(currPlayer, selectedTarget);
         return terminateFullEffect();
     }
 
     private ServerMessage checkShootActionEnd(){
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         nSimpleEffect = 0;
         if(!baseDone)
             return firstEffect();
@@ -309,6 +336,8 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(ChooseTurnActionResponse clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
         try {
             Action action = clientMsg.getTypeOfAction();
             if (Action.checkAction(action)) {
@@ -334,8 +363,20 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         }
 
     }
+
+    /**
+     * Check if the game is already ended
+     * @return
+     */
+    private boolean checkIfEnded() {
+        return (this.state == ServerState.GAME_ENDED);
+    }
+
     @Override
     public ServerMessage handle(GrabActionRequest clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         List<CardWeapon> possibleToGrab = new ArrayList<>();
         if (currPlayer.getPosition().isRespawn()) {
             if (currPlayer.getPosition().getWeapons() != null) {
@@ -379,6 +420,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(MovementActionRequest clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         if(model.getCurrentTurn().applyStep(Action.MOVEMENT)){
             currSimpleEffect = new MovementEffect();
             avaialableActionSteps = model.getCurrentTurn().getActionList();
@@ -394,6 +438,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(PickUpAmmoRequest clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB)){
             clientHandler.sendMessage(new InvalidStepResponse());
             return checkTurnEnd();
@@ -414,6 +461,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     @Override
     public ServerMessage handle(PickUpWeaponRequest clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         boolean correct = false;
         int count=0;
         List<CardPower> tmp = null;
@@ -498,6 +548,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     @Override
     public ServerMessage handle(ReloadWeaponRequest clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
         int count = 0;
         List<CardPower> tmp;
@@ -553,6 +606,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     */
     @Override
     public ServerMessage handle(RespawnResponse clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         if (currPlayer.isDead() || state == ServerState.WAITING_SPAWN) {
             if (currPlayer.getCardPower().contains(clientMsg.getPowerUp())) {
                 currPlayer.respawn(clientMsg.getPowerUp());
@@ -599,6 +655,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     @Override
     public ServerMessage handle(ShootActionRequest clientMsg) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         List<CardWeapon> myWeapons = null;
         List<CardWeapon> tmp = null;
         baseDone = false;
@@ -761,6 +820,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                     CardPower cp = model.drawPowerUp();
                     getCurrPlayer().addCardPower(cp);
                     getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
+                    model.getCurrentTurn().startTimer();
                     return new RespawnRequest(cp);
                 }
 
@@ -781,6 +841,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(EndTurnRequest endTurnRequest) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         if(model.getCurrentTurn().getCurrentPlayer() != currPlayer)
             return new OperationCompletedResponse("Not your turn!");
         if(model.getCurrentTurn().getNumOfMovs() > 0 && model.getCurrentTurn().getCurrentAction().equals(Action.MOVEMENT))
@@ -791,11 +854,14 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(GetAvailableMapsRequest getAvailableMapsRequest) {
-        return new AvailableMapsListResponse(Game.getAvailableMaps());
+        return new AvailableMapsListResponse(GameManager.get().getAvailableMaps());
     }
 
     @Override
     public ServerMessage handle(ChoosePowerUpResponse choosePowerUpResponse) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         List<CardPower> avPowerUp = currPlayer.getCardPower();
         CardPower cp = choosePowerUpResponse.getCardPower();
         if(state == ServerState.WAITING_ACTION)
@@ -839,6 +905,8 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     @Override
     public ServerMessage handle(RejoinGameResponse rejoinGameResponse) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
         boolean rejoin = rejoinGameResponse.isRejoin();
         if(rejoin)
         {
@@ -872,6 +940,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     @Override
     public ServerMessage handle(ChooseWeaponToShootResponse chooseWeaponToShootResponse) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         boolean correct = false;
         for(CardWeapon cw : currPlayer.getWeapons())
             if(cw.equals(chooseWeaponToShootResponse.getSelectedWeapon())) {
@@ -950,6 +1021,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(ChooseFirstEffectResponse chooseFirstEffectResponse) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         if(chooseFirstEffectResponse.getN() == 1)
             currFullEffect = selectedWeapon.getBaseEffect();
         else {
@@ -969,6 +1043,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(UsePlusBeforeResponse usePlusBeforeResponse) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         if(usePlusBeforeResponse.getT() == 'Y' || usePlusBeforeResponse.getT() == 'y') {
             plusBeforeBase = usePlusBeforeResponse.getPlusEff();
             currFullEffect = plusBeforeBase;
@@ -1006,6 +1083,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(UseOrderPlusResponse useOrderPlusResponse){
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         if(useOrderPlusResponse.getT() == 'Y' || useOrderPlusResponse.getT() == 'y') {
             /*if(remainingPlusEffects.size()>1)
                 remainingPlusEffects = remainingPlusEffects.subList(1,remainingPlusEffects.size());
@@ -1036,6 +1116,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(UsePlusEffectResponse usePlusEffectResponse) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         remainingPlusEffects = new ArrayList<>(usePlusEffectResponse.getPlusRemained());
         currFullEffect = usePlusEffectResponse.getEffectToApply();
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
@@ -1050,6 +1133,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     @Override
     public ServerMessage handle(TerminateShootAction terminateShootAction) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         remainingPlusEffects.clear();
         return checkShootActionEnd();
     }
@@ -1065,6 +1151,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     private ServerMessage handleOtherEffect(SimpleEffect e)
     {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         currSimpleEffect = e;
         if(nSimpleEffect == currFullEffect.getSimpleEffects().size())
             return checkShootActionEnd();
@@ -1095,6 +1184,9 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
      */
     private ServerMessage handleMovementEffect(MovementEffect e)
     {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+
         currSimpleEffect = e;
         if(nSimpleEffect == currFullEffect.getSimpleEffects().size())
             return checkShootActionEnd();
@@ -1181,10 +1273,14 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     @Override
     public void onSuspend(boolean timeOut) {
 
+        if(model.isEnded())
+            this.state = ServerState.GAME_ENDED;
+        /*if(timeOut)
+            clientHandler.sendMessage(new TimeOutNotify());*/
         if(model.getCurrentTurn().getCurrentPlayer().equals(this.currPlayer) && !model.isEnded())
             endTurnManagement();
-        if(timeOut)
-            clientHandler.sendMessage(new TimeOutNotify());
+
+
     }
 
     void notifyPlayerExitedFromWaitingRoom(int pId){

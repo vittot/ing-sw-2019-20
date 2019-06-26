@@ -126,7 +126,8 @@ public class ClientGUIView extends Application implements View{
         return "SOCKET";
     }
 
-    public void connectionFailed (){
+    @Override
+    public void notifyConnectionError() {
         StackPane sp = new StackPane();
         Scene scene = new Scene(sp);
         Text text = new Text("Connection Lost:");

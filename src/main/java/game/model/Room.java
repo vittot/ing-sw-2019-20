@@ -92,6 +92,6 @@ public class Room implements Target, Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(color, map);
+        return Objects.hash(color);
     }
 }

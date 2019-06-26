@@ -57,7 +57,11 @@ public class GameManager implements Serializable {
 
     public GameMap getMap(int mapId)
     {
-        return availableMaps.get(mapId);
+        return availableMaps.stream().filter(m->m.getId() == mapId).findFirst().orElse(null);
+    }
+
+    public List<GameMap> getAvailableMaps() {
+        return availableMaps;
     }
 
     public void addLoggedUser(String user)
@@ -69,6 +73,21 @@ public class GameManager implements Serializable {
     {
         usersLogged.remove(player.getNickName());
         usersSuspended.put(player.getNickName(),player.getGame());
+    }
+
+    /**
+     * Remove all users suspended from an ended game
+     * @param g
+     */
+    public void endGame(Game g)
+    {
+        games.remove(g);
+        List<String> usersSuspendedToBeRemove = new ArrayList<>();
+        for(Map.Entry<String, Game> e : usersSuspended.entrySet())
+            if(e.getValue() == g)
+                usersSuspendedToBeRemove.add(e.getKey());
+        for(String s : usersSuspendedToBeRemove)
+            usersSuspended.remove(s);
     }
 
     /**
@@ -97,7 +116,6 @@ public class GameManager implements Serializable {
      */
     public Game addGame(int mapId, List<Player> players){
         Game g = new Game(nextId, mapId, 8,players);
-        g.setMap(getMap(mapId));
         nextId++;
         games.add(g);
         return g;

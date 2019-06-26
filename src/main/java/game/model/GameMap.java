@@ -16,6 +16,49 @@ public class GameMap implements Serializable {
     private List<Room> rooms;
     private String description;
 
+    /**
+     * Construct an empty GameMap with just the dimensions set
+     * @param id
+     * @param dimX
+     * @param dimY
+     */
+    public GameMap(int id, int dimX, int dimY)
+    {
+        this.id = id;
+        this.dimX = dimX;
+        this.dimY = dimY;
+        rooms = new ArrayList<>();
+        for(MapColor c : MapColor.values())
+            rooms.add(new Room(c,this));
+    }
+
+    /**
+     * Copy constructor which maintain the structure of the original GameMap, without players, ammos, weapons
+     * @param original
+     */
+    public GameMap(GameMap original)
+    {
+        this(original.id,original.dimX,original.dimY);
+        this.description = original.description;
+        this.grid = new Square[dimY][dimX];
+        int i;
+        int j;
+        Square orSquare;
+        for(i=0;i<dimX;i++)
+        {
+            for(j=0;j<dimY;j++) {
+                try{
+                    orSquare = original.getSquare(i,j);
+                    this.grid[j][i] = new Square(orSquare.getColor(),orSquare.isRespawn(),i,j,this,orSquare.getEdges());
+                }catch(MapOutOfLimitException e)
+                {
+                    this.grid[j][i] = null;
+                }
+
+            }
+        }
+    }
+
     public String getDescription() {
         return description;
     }
@@ -58,16 +101,6 @@ public class GameMap implements Serializable {
 
     public void setDimY(int dimY) {
         this.dimY = dimY;
-    }
-
-    public GameMap(int id, int dimX, int dimY)
-    {
-        this.id = id;
-        this.dimX = dimX;
-        this.dimY = dimY;
-        rooms = new ArrayList<>();
-        for(MapColor c : MapColor.values())
-            rooms.add(new Room(c,this));
     }
 
     /**
@@ -265,5 +298,25 @@ public class GameMap implements Serializable {
         Square s = getSquare(x,y);
         s.addPlayer(p);
         p.setPosition(s);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameMap gameMap = (GameMap) o;
+        //Arrays.deepEquals is needed for correct equality of multidimensional arrays, based on content
+        return id == gameMap.id &&
+                dimX == gameMap.dimX &&
+                dimY == gameMap.dimY &&
+                Arrays.deepEquals(grid, gameMap.grid) &&
+                Objects.equals(description, gameMap.description);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(id, dimX, dimY, rooms, description);
+        result = 31 * result + Arrays.hashCode(grid);
+        return result;
     }
 }

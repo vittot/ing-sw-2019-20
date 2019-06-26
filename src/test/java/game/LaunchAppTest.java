@@ -52,7 +52,7 @@ class LaunchAppTest {
 
     @Test
     public void launchGame() throws IOException, InterruptedException {
-        server.start();
+        /*server.start();
         c1.start();
         c2.start();
         c3.start();
@@ -60,7 +60,7 @@ class LaunchAppTest {
         server.join();
         c1.join();
         c2.join();
-        c3.join();
+        c3.join();*/
     }
 
 }

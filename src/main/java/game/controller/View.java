@@ -113,4 +113,6 @@ public interface View {
     void waitStart();
 
     String chooseConnection();
+
+    void notifyConnectionError();
 }
