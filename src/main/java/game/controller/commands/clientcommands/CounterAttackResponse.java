@@ -4,26 +4,21 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
 import game.model.CardPower;
-import game.model.Color;
+import game.model.Player;
 
-public class ChoosePowerUpResponse implements ClientMessage {
+public class CounterAttackResponse implements ClientMessage {
+
     private CardPower cardPower;
-    private Color ammoToPay;
+    private Player toShoot;
     private boolean confirm;
 
-    public ChoosePowerUpResponse(CardPower cardPower) {
+    public CounterAttackResponse(CardPower cardPower, Player toShoot) {
         this.cardPower = cardPower;
-        this.ammoToPay = Color.ANY;
+        this.toShoot = toShoot;
         this.confirm = true;
     }
 
-    public ChoosePowerUpResponse(CardPower cardPower, Color ammoToPay) {
-        this.cardPower = cardPower;
-        this.ammoToPay = ammoToPay;
-        this.confirm = true;
-    }
-
-    public ChoosePowerUpResponse() {
+    public CounterAttackResponse() {
         this.confirm = false;
     }
 
@@ -31,8 +26,8 @@ public class ChoosePowerUpResponse implements ClientMessage {
         return cardPower;
     }
 
-    public Color getAmmoToPay() {
-        return ammoToPay;
+    public Player getToShoot() {
+        return toShoot;
     }
 
     public boolean isConfirm() {

@@ -15,10 +15,10 @@ public class CardPower implements Serializable {
     private boolean useWhenAttacking;
     private FullEffect effect;
 
-    public CardPower(int id, /*String name, String description,*/ Color color, boolean useWhenDamaged, boolean useWhenAttacking, FullEffect effect) {
+    public CardPower(int id, String name, String description, Color color, boolean useWhenDamaged, boolean useWhenAttacking, FullEffect effect) {
         this.id = id;
-        //this.name = name;
-        //this.description = description;
+        this.name = name;
+        this.description = description;
         this.color = color;
         this.useWhenDamaged = useWhenDamaged;
         this.useWhenAttacking = useWhenAttacking;

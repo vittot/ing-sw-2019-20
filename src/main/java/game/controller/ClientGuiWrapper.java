@@ -270,11 +270,6 @@ public class ClientGuiWrapper implements View {
     @Override
     public void chooseConnection() {
         runLater(gui::chooseConnection);
-        /*try {
-            wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override

@@ -326,7 +326,7 @@
                 <maxEnemy>0</maxEnemy>
                 <minDist>0</minDist>
                 <maxDist>0</maxDist>
-                <minMove>1</minMove>
+                <minMove>0</minMove>
                 <maxMove>2</maxMove>
                 <targetVisib>Visible</targetVisib>
                 <moveShooter>true</moveShooter>

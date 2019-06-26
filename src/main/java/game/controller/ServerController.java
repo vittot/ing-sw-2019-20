@@ -47,6 +47,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     private int numberOfTurnActionMade;
     private WaitingRoom waitingRoom;
     private String nickname;
+    private boolean canUsePlusPower;
 
 
     public ServerController(ClientHandler clientHandler) {
@@ -143,6 +144,19 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             if(selectedTargets.contains(t))
                 toApplyEffect.addAll(t.getPlayers());
         return currSimpleEffect.handleTargetSelection(this, toApplyEffect, model);
+    }
+
+    @Override
+    public ServerMessage handle(CounterAttackResponse counterAttackResponse) {
+        if(counterAttackResponse.isConfirm()){
+            if(getCurrPlayer().getCardPower().contains(counterAttackResponse.getCardPower())) {
+                model.getPlayer(counterAttackResponse.getToShoot().getId()).addThisTurnMarks(getCurrPlayer(), 1);
+                getCurrPlayer().removePowerUp(Collections.singletonList(counterAttackResponse.getCardPower()));
+                return new ChoosePowerUpUsed(counterAttackResponse.getCardPower());
+            }
+            return new InvalidPowerUpResponse();
+        }
+        return new OperationCompletedResponse("");
     }
 
     @Override
@@ -312,6 +326,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             return new NotifyEndGame(model.getRanking());
 
         currSimpleEffect.applyEffect(currPlayer, selectedTarget);
+        canUsePlusPower = true;
         return terminateFullEffect();
     }
 
@@ -330,6 +345,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             selectedWeapon.setLoaded(false);
         if(remainingPlusEffects != null)
             remainingPlusEffects.clear();
+        selectedWeapon.getPreviousTargets().clear();
         clientHandler.sendMessage(new ShootActionResponse(selectedWeapon,ammoToPay,powerUpToPay));
         return checkTurnEnd();
     }
@@ -662,6 +678,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         List<CardWeapon> tmp = null;
         baseDone = false;
         isOrdered = false;
+        canUsePlusPower = false;
         plusBeforeBase = null;
         nSimpleEffect = 0;
         FullEffect tmpEff;
@@ -861,23 +878,33 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     public ServerMessage handle(ChoosePowerUpResponse choosePowerUpResponse) {
         if(checkIfEnded())
             return new NotifyEndGame(model.getRanking());
+        if(choosePowerUpResponse.isConfirm()) {
+            state = ServerState.WAITING_POWER_USAGE;
+            List<CardPower> avPowerUp = currPlayer.getCardPower();
+            CardPower cp = choosePowerUpResponse.getCardPower();
+            if(state == ServerState.WAITING_ACTION)
+                avPowerUp = avPowerUp.stream().filter(c -> !c.isUseWhenDamaged() && !c.isUseWhenAttacking()).collect(Collectors.toList());
 
-        List<CardPower> avPowerUp = currPlayer.getCardPower();
-        CardPower cp = choosePowerUpResponse.getCardPower();
-        if(state == ServerState.WAITING_ACTION)
-            avPowerUp = avPowerUp.stream().filter(c -> !c.isUseWhenDamaged() && !c.isUseWhenAttacking()).collect(Collectors.toList());
+            if (!avPowerUp.contains(cp)) {
+                clientHandler.sendMessage(new InvalidPowerUpResponse());
+                return checkTurnEnd();
+            }
 
-        if(!avPowerUp.contains(cp))
-            return new InvalidPowerUpResponse();
+            currFullEffect = cp.getEffect();
+            currSimpleEffect = currFullEffect.getSimpleEffects().get(0);
+            nSimpleEffect = 0;
 
-        currFullEffect = cp.getEffect();
-        currSimpleEffect = currFullEffect.getSimpleEffects().get(0);
-        nSimpleEffect = 0;
-
-        baseDone = true; //TODO: check
-
-        return currSimpleEffect.handle(this);
-
+            //baseDone = true; //TODO: check
+            if(choosePowerUpResponse.getAmmoToPay() != Color.ANY) {
+                try {
+                    addFinalPayment(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()), new ArrayList<>());
+                } catch (InsufficientAmmoException e) {
+                    e.printStackTrace();
+                }
+            }
+            return currSimpleEffect.handle(this);
+        }
+        return terminateFullEffect();
     }
 
     @Override
@@ -1076,9 +1103,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             else
                 powerUpToPay.addAll(toUse);
         }
-        if(!currFullEffect.getPrice().isEmpty())
-            if(currFullEffect.getPrice().get(0) != Color.ANY)
-                currPlayer.pay(currFullEffect.getPrice(),toUse);
+        if(currFullEffect.getPrice() != null)
+            if(!currFullEffect.getPrice().isEmpty())
+                if(currFullEffect.getPrice().get(0) != Color.ANY)
+                    currPlayer.pay(currFullEffect.getPrice(),toUse);
     }
 
     @Override
@@ -1111,6 +1139,14 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     private ServerMessage terminateFullEffect() {
         if(currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
             return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
+        if(state != ServerState.WAITING_POWER_USAGE) {
+            List<CardPower> powers = controlPowerUpDamage();
+            if (!powers.isEmpty()) {
+                return new AfterDamagePowerUpRequest(powers, selectableTarget);
+            }
+        }
+        else
+            state = ServerState.HANDLING_SHOOT;
         return checkShootActionEnd();
     }
 
@@ -1171,7 +1207,16 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         //apply without asking nothing if it is not necessary
         e.applyEffect(currPlayer, selectableTarget);
 
+        canUsePlusPower = true;
         return terminateFullEffect();
+    }
+
+    private List<CardPower> controlPowerUpDamage() {
+        List<CardPower> list = new ArrayList<>();
+        for(CardPower cp : currPlayer.getCardPower())
+            if(cp.getName().equalsIgnoreCase("Targeting scope"))
+                list.add(cp);
+        return list;
     }
 
     /**

@@ -170,7 +170,7 @@ class GameTest {
         SimpleEffect ef1 = new MovementEffect(1,1,0,12,0,12,TargetVisibility.EVERYWHERE,true,TargetVisibility.EVERYWHERE,false,false,false,false,DifferentTarget.ANYONE);
         FullEffect eff = new FullEffect(Collections.singletonList(ef1),"Teleporter","Play this card in any moment of your turn, move your figure and set it down on any square.",price,false);
 
-        CardPower cp = new CardPower(24,Color.YELLOW,false,false,eff);
+        CardPower cp = new CardPower(24,"name","desc",Color.YELLOW,false,false,eff);
         g.readPowerUpDeck("powerupFile.xml");
 
         assertTrue(g.getDeckPower().size() == 24 && g.getDeckPower().get(23).equals(cp));

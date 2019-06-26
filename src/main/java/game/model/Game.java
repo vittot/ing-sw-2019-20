@@ -318,7 +318,7 @@ public class Game {
         int id = this.deckPower.size() + 1;
 
         //TODO: read (and add on power up xml) the useWhenAttacking flag
-        CardPower cardPower = new CardPower(id,c,flag,false,effect);
+        CardPower cardPower = new CardPower(id,name,desc,c,flag,false,effect);
         this.deckPower.add(cardPower);
         //Collections.shuffle(this.deckPower);
     }
