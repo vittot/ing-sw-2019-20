@@ -196,8 +196,18 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(NotifyDamageResponse serverMsg) {
         Player shooter = ClientContext.get().getMap().getPlayerById(serverMsg.getShooterId());
-        ClientContext.get().getMap().getPlayerById(serverMsg.getHit()).addDamage(shooter, serverMsg.getDamage());
+        Player hitten = ClientContext.get().getMap().getPlayerById(serverMsg.getHit());
+        List<CardPower> counterattack = null;
+        hitten.addDamage(shooter, serverMsg.getDamage());
         clientView.damageNotification(serverMsg.getShooterId(),serverMsg.getDamage(),serverMsg.getHit());
+        if(hitten.getId() == ClientContext.get().getMyID()) {
+            counterattack = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower());
+            for (CardPower cp : ClientContext.get().getMyPlayer().getCardPower())
+                if (!cp.getName().equalsIgnoreCase("Tagback Grenade"))
+                    counterattack.remove(cp);
+            if (!counterattack.isEmpty())
+                clientView.chooseCounterAttack(counterattack, shooter);
+        }
     }
 
     @Override
@@ -613,6 +623,11 @@ public class ClientController implements ServerMessageHandler {
         Player p = ClientContext.get().getMap().getPlayerById(updateMarks.getP().getId());
         if(p != null)
             p.updateMarks();
+    }
+
+    @Override
+    public void handle(ChoosePowerUpUsed choosePowerUpUsed) {
+        ClientContext.get().getMyPlayer().removePowerUp(Collections.singletonList(choosePowerUpUsed.getCardPower()));
     }
 
     @Override

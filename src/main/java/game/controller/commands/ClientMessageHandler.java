@@ -57,4 +57,6 @@ public interface ClientMessageHandler {
     ServerMessage handle(CheckValidWeaponRequst clientMsg);
 
     ServerMessage handle(ChooseSquareToShootResponse chooseSquareToShootResponse);
+
+    ServerMessage handle(CounterAttackResponse counterAttackResponse);
 }

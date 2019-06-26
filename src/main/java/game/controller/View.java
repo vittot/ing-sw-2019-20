@@ -111,4 +111,6 @@ public interface View {
     void waitStart();
 
     String chooseConnection();
+
+    void chooseCounterAttack(List<CardPower> counterattack, Player shooter);
 }

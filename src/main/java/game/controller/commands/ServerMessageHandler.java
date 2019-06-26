@@ -62,4 +62,5 @@ public interface ServerMessageHandler {
     void handle(NotifyWeaponRefill notifyWeaponRefill);
     void handle(NotifyAmmoRefill notifyAmmoRefill);
     void handle(UpdateMarks updateMarks);
+    void handle(ChoosePowerUpUsed choosePowerUpUsed);
 }
