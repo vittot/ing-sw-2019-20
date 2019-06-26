@@ -9,6 +9,7 @@ import game.model.exceptions.MapOutOfLimitException;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,11 +18,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -47,7 +50,7 @@ public class ClientGUIView extends Application implements View{
 
 
     private StackPane map = new StackPane();
-    private Scene scene;
+    private Scene scene = new Scene(map);
     private List<Rectangle> squares = new ArrayList<>();
     private List<Rectangle> myAmmo = new ArrayList<>();
     private List<ImageView> ammos = new ArrayList<>();
@@ -64,8 +67,6 @@ public class ClientGUIView extends Application implements View{
     private List<ImageView> myPlayerMarks = new ArrayList<>();
     private Label text = new Label("");
 
-    //TODO esiste?
-    private List<ImageView> mapWB;
     public ClientGUIView() {
         GUI = this;
     }
@@ -101,7 +102,7 @@ public class ClientGUIView extends Application implements View{
     public void chooseConnection() {
 
         StackPane sp = new StackPane();
-        Scene sc = new Scene(sp);
+        Scene sc = new Scene(sp,500,300);
         Label text = new Label("Choose the connection type:");
         Button b1 = new Button("RMI");
         Button b2 = new Button("Socket");
@@ -113,6 +114,7 @@ public class ClientGUIView extends Application implements View{
         StackPane.setMargin(b2,new Insets(0,0,0,150));
 
         primaryStage.setScene(sc);
+        primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
         b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI"));
         b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET"));
@@ -153,9 +155,14 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
+    public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
+
+    }
+
+    @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        showMap();
+        //showMap();
     }
 
 
@@ -315,7 +322,12 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void choosePowerUpToRespawn(List<CardPower> cardPower) {
-
+        text.setText("Your turn: respawn");
+        refreshMyPlayerCard();
+        for(ImageView im : powerUp){
+            im.setEffect(new DropShadow(20,Color.GREEN));
+            im.setOnMouseClicked(this::handleRespawnSquare);
+        }
     }
 
     @Override
@@ -591,9 +603,18 @@ public class ClientGUIView extends Application implements View{
     private void refreshPlayerPosition(){
         double spaceX = 0;
         double spaceY = 0;
+        int x = 0;
+        int y = 0;
         for(int i = 1; i< 13 ; i++) {
-            if(ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4] != null) {
-                for (Player pl : ClientContext.get().getMap().getGrid()[(i-1)/4][(i-1)%4].getPlayers()) {
+            if(i ==  1){
+                x = 0;
+                y = 0;
+            }else {
+                x = (i - 1) % 4;
+                y = (i - 1) / 4;
+            }
+            if(ClientContext.get().getMap().getGrid()[y][x] != null) {
+                for (Player pl : ClientContext.get().getMap().getGrid()[y][x].getPlayers()) {
                     int j = 0;
                     Circle p = players.stream().filter(player -> pl.getNickName().equals(player.getId())).findFirst().orElse(null);
                     if(p == null)
@@ -620,6 +641,9 @@ public class ClientGUIView extends Application implements View{
         text.setPrefWidth(screenWidth*52.5/100);
         text.setMaxHeight(screenHeight*3.25/100);
         text.setWrapText(true);
+        map.getChildren().add(text);
+        StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
+        StackPane.setMargin(text,new Insets(0,0,(screenHeight/(displayY/130)),0));
     }
 
     /**
@@ -629,27 +653,33 @@ public class ClientGUIView extends Application implements View{
     private void createMyPlayerCard(){
         Image w = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back.png"));
         Image p = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/PW_back.png"));
-        ImageView pu = new ImageView(p);
-        ImageView we = new ImageView(w);
-        powerUp = new ArrayList<>(Arrays.asList(pu,pu,pu));
-        weapons = new ArrayList<>(Arrays.asList(we,we,we));
+        ImageView pu0 = new ImageView(p);
+        ImageView pu1 = new ImageView(p);
+        ImageView pu2 = new ImageView(p);
+        ImageView we1 = new ImageView(w);
+        ImageView we2 = new ImageView(w);
+        ImageView we0 = new ImageView(w);
+        powerUp = new ArrayList<>(Arrays.asList(pu0,pu1,pu2));
+        weapons = new ArrayList<>(Arrays.asList(we0,we1,we2));
         int i = 0;
         for(ImageView imw : weapons){
+            map.getChildren().add(imw);
             imw.setFitWidth(screenWidth*6.9/100);
             imw.setPreserveRatio(true);
             StackPane.setAlignment(imw,Pos.BOTTOM_RIGHT);
             StackPane.setMargin(imw,new Insets(0,i,0,0));
             i = i + (int)(screenHeight*14/100);
-            imw.setOnMouseClicked(this::handleWeaponClick);
+            System.out.println(i);
         }
 
         for(ImageView imw : powerUp){
+            map.getChildren().add(imw);
             imw.setFitWidth(screenWidth*6.9/100);
             imw.setPreserveRatio(true);
             StackPane.setAlignment(imw,Pos.BOTTOM_RIGHT);
             StackPane.setMargin(imw,new Insets(0,i,0,0));
             i = i + (int)(screenHeight*14/100);
-            imw.setOnMouseClicked(this::handleWeaponClick);
+            System.out.println(i);
         }
     }
 
@@ -659,9 +689,8 @@ public class ClientGUIView extends Application implements View{
      * @param color
      * @return
      */
-    private String createPowerUpCard(String name, game.model.Color color){
-        System.out.println(""+name+"_"+color.toString().substring(0,1)+".png");
-        return ""+name+"_"+color.toString().substring(0,1)+".png";
+    private Image createPowerUpCard(String name, game.model.Color color){
+        return new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/"+name+"_"+color.toString().substring(0,1)+".png"));
     }
 
     /**
@@ -669,8 +698,8 @@ public class ClientGUIView extends Application implements View{
      * @param i
      * @return
      */
-    private String createWeaponCard(int i){
-        return "W_"+ClientContext.get().getMyPlayer().getCardPower().get(i).getId()+".png";
+    private Image createWeaponCard(int i){
+        return new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_"+i+".png"));
     }
 
     /**
@@ -684,6 +713,15 @@ public class ClientGUIView extends Application implements View{
         mapIV = new ImageView(mapI);
         mapIV.setFitWidth(screenWidth*55/100);
         mapIV.setPreserveRatio(true);
+        StackPane.setAlignment(mapIV,Pos.TOP_LEFT);
+        map.getChildren().add(mapIV);
+        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.png"));
+        BackgroundImage bi = new BackgroundImage(background,
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        map.setBackground(new Background(bi));
 
         //stampa rettangoli invisibili e ammo
         double spaceX = 0;
@@ -694,14 +732,15 @@ public class ClientGUIView extends Application implements View{
             squares.add(rec);
             ImageView ammoIV = createImageViewAmmo(i);
             ammos.add(ammoIV);
-            map.getChildren().add(rec);
-            map.getChildren().add(ammoIV);
+            map.getChildren().addAll(rec,ammoIV);
             StackPane.setAlignment(rec,Pos.TOP_LEFT);
             StackPane.setMargin(rec,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
             StackPane.setAlignment(ammoIV,Pos.TOP_LEFT);
             StackPane.setMargin(ammoIV,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
             rec.setOnMouseClicked(this :: handleSquareClick);
             rec.setDisable(true);
+            rec.setStroke(Color.GREEN);
+            rec.setStrokeWidth(7);
             if(i % 4 == 0 && i != 0){
                 spaceX = 0;
                 spaceY = spaceY + screenHeight*18/100;
@@ -717,7 +756,7 @@ public class ClientGUIView extends Application implements View{
             mapWL.add(weapon);
             map.getChildren().add(weapon);
             weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("0");
+            weapon.setId("1");
             weapon.setPreserveRatio(true);
             StackPane.setAlignment(weapon,Pos.CENTER_LEFT);
             weapon.setRotate(270);
@@ -732,7 +771,7 @@ public class ClientGUIView extends Application implements View{
             mapWT.add(weapon);
             map.getChildren().add(weapon);
             weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("0");
+            weapon.setId("2");
             weapon.setPreserveRatio(true);
             StackPane.setAlignment(weapon,Pos.TOP_CENTER);
             StackPane.setMargin(weapon,new Insets(0,screenWidth*34/100 + spaceT,0,0));
@@ -747,7 +786,7 @@ public class ClientGUIView extends Application implements View{
             mapWR.add(weapon);
             map.getChildren().add(weapon);
             weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("0");
+            weapon.setId("3");
             weapon.setPreserveRatio(true);
             StackPane.setAlignment(weapon,Pos.CENTER);
             weapon.setRotate(90);
@@ -771,7 +810,7 @@ public class ClientGUIView extends Application implements View{
                 cardP = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/PW_back.png"));
                 powerUp.get(i).setId("0");
             } else {
-                cardP = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/"+createPowerUpCard(myP.getCardPower().get(i).getName(), myP.getCardPower().get(i).getColor())));
+                cardP = createPowerUpCard(myP.getCardPower().get(i).getName(), myP.getCardPower().get(i).getColor());
                 powerUp.get(i).setId("" + myP.getCardPower().get(i).getId());
             }
             if (i >= myP.getWeapons().size()){
@@ -779,7 +818,7 @@ public class ClientGUIView extends Application implements View{
                 weapons.get(i).setId("0");
             }
             else {
-                cardW = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/"+createWeaponCard(myP.getCardPower().get(i).getId())));
+                cardW = createWeaponCard(myP.getCardPower().get(i).getId());
                 weapons.get(i).setId("" + myP.getWeapons().get(i).getId());
             }
             powerUp.get(i).setImage(cardP);
@@ -824,6 +863,7 @@ public class ClientGUIView extends Application implements View{
             System.out.println(p.getColor().name());
             Image dash = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.getColor().toString()+"Dash.png"));
             ImageView imw = new ImageView(dash);
+            map.getChildren().add(imw);
             playerDashBoard.add(imw);
             imw.setId(""+p.getId());
             imw.setFitWidth(screenWidth*36.6/100);
@@ -850,6 +890,8 @@ public class ClientGUIView extends Application implements View{
             List<ImageView> infoD = new ArrayList<>();
             List<ImageView> infoM = new ArrayList<>();
             Player p = ClientContext.get().getMap().getPlayerById(Integer.parseInt(dash.getId()));
+            if(p == null)
+                p = ClientContext.get().getPlayersInWaiting().stream().filter(play->play.getId() == Integer.parseInt(dash.getId())).findFirst().orElse(null);
             for (PlayerColor  c :p.getDamage()) {
                 System.out.println(c.name());
                 Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
@@ -989,9 +1031,41 @@ public class ClientGUIView extends Application implements View{
         }
         myAmmo.clear();
     }
+    private void refreshWeaponCard(){
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        for(Square q : ClientContext.get().getMap().getSpawnpoints()){
+            if(q.getX() == 0 ){
+                for (CardWeapon w : q.getWeapons()) {
+                    mapWL.get(x).setImage(createWeaponCard(w.getId()));
+                    x++;
+                }
+            }else
+                if(q.getX() == 3){
+                    for (CardWeapon w : q.getWeapons()) {
+                        mapWR.get(z).setImage(createWeaponCard(w.getId()));
+                        z++;
+                    }
+                }
+                else {
+                    for (CardWeapon w : q.getWeapons()) {
+                        mapWT.get(y).setImage(createWeaponCard(w.getId()));
+                        y++;
+                    }
+                }
+
+        }
+    }
 
     private void showMapGame(){
+        primaryStage.setScene(scene);
+        primaryStage.setFullScreen(true);
+        //primaryStage.setAlwaysOnTop(true);
+        primaryStage.show();
+
         createMapSquareAmmo();
+        refreshWeaponCard();
         refreshAmmoCard();
         createPlayerPosition();
         refreshPlayerPosition();
@@ -1002,11 +1076,10 @@ public class ClientGUIView extends Application implements View{
         refreshPlayerDamage();
         refreshMyPlayerDamage();
         refreshMyPlayerAmmo();
-        scene = new Scene(map);
-        primaryStage.setScene(scene);
+        text.setText("Wait Your Turn:");
     }
 
-
+    /*
     private void showMap(){
         int mapId = 1;
         Image image = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/mappa1.png"));
@@ -1310,7 +1383,7 @@ public class ClientGUIView extends Application implements View{
         primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
     }
-
+*/
     //TODO mettere javaDoc
     private void handlePlayerClick(MouseEvent e){
         text.setText("Player "+((Circle)e.getSource()).getId());
@@ -1394,5 +1467,11 @@ public class ClientGUIView extends Application implements View{
         }
         ((ImageView)e.getSource()).setFitWidth(screenWidth*5.12/100);
         ((ImageView)e.getSource()).setPreserveRatio(true);
+    }
+
+    private void handleRespawnSquare(MouseEvent e){
+        CardPower p = ClientContext.get().getMyPlayer().getCardPower().stream().filter(l->l.getId() == Integer.parseInt(((ImageView)e.getSource()).getId())).findFirst().orElse(null);
+        controller.getClient().sendMessage(new RespawnResponse((p)));
+        text.setText("Nice");
     }
 }

@@ -276,4 +276,9 @@ public class ClientGuiWrapper implements View {
     public void notifyConnectionError() {
         //TODO
     }
+
+    @Override
+    public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
+
+    }
 }

@@ -345,7 +345,7 @@ public class Game {
         insertDescription(effect, effectal, effectop, desc, names);
         insertPrice(effectal,effectop,priceal,priceop);
         CardWeapon wp = new CardWeapon(name, price, effect, effectop, effectal, plusBefore, plusOrder);
-        wp.setId(this.id);
+        wp.setId(id);
         this.deckWeapon.add(wp);
         //Collections.shuffle(this.deckWeapon);
     }
