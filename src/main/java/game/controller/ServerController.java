@@ -197,6 +197,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             return checkTurnEnd();
         }
 
+        Square start = toBeMoved.getPosition();
         currSimpleEffect.applyEffect(toBeMoved,Collections.singletonList(selectedSquare));
 
         //return new NotifyMovement(currPlayer.getId(),clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
@@ -210,6 +211,8 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         else {
             List<Player> prevTargets = currPlayer.getActualWeapon().getPreviousTargets();
             prevTargets.add(toBeMoved);
+            Square dest = toBeMoved.getPosition();
+            currPlayer.getActualWeapon().setLastDirection(GameMap.getDirection(start,dest));
             return terminateFullEffect();
         }
 
@@ -297,7 +300,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         MovementEffect s = (MovementEffect) currSimpleEffect;
         toBeMoved = (Player) selectedTarget.get(0);
         selectableSquares = s.selectPosition(toBeMoved);
-
+        Square before = toBeMoved.getPosition();
         if (selectableSquares.isEmpty()){
             clientHandler.sendMessage(new InvalidWeaponResponse());
             return checkShootActionEnd();
@@ -307,9 +310,12 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             return new ChooseSquareRequest(selectableSquares);
 
         //apply without asking nothing if it is not necessary
+
         s.applyEffect(toBeMoved, Collections.singletonList(selectableSquares.get(0)));
         List<Player> prevTargets = currPlayer.getActualWeapon().getPreviousTargets();
+        Square after = toBeMoved.getPosition();
         prevTargets.add(toBeMoved);
+        currPlayer.getActualWeapon().setLastDirection(GameMap.getDirection(before,after));
         if (currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
             return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
         else
@@ -1262,9 +1268,12 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         }
         if(selectableSquares.size() > 1)
             return new ChooseSquareRequest(selectableSquares);
+        Square start = toBeMoved.getPosition();
         e.applyEffect(toBeMoved,Collections.singletonList(selectableSquares.get(0)));
         List<Player> prevTargets = currPlayer.getActualWeapon().getPreviousTargets();
         prevTargets.add(toBeMoved);
+        Square dest = toBeMoved.getPosition();
+        currPlayer.getActualWeapon().setLastDirection(GameMap.getDirection(start,dest));
         return terminateFullEffect();
     }
 

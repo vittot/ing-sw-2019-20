@@ -4,7 +4,7 @@ public enum Direction{
     UP,
     DOWN,
     LEFT,
-    RIGHT;
+    RIGHT, ERROR;
 
     public static Direction getDirection(int var){
         switch(var){

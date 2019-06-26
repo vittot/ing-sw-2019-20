@@ -151,6 +151,11 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
+    public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
+
+    }
+
+    @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         showMap();

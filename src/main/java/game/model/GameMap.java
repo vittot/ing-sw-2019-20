@@ -300,6 +300,22 @@ public class GameMap implements Serializable {
         p.setPosition(s);
     }
 
+    public static Direction getDirection(Square start, Square destination){
+        if(start.getX() == destination.getX()){
+            if(start.getY() > destination.getY())
+                return Direction.UP;
+            else if(start.getY() < destination.getY())
+                return Direction.DOWN;
+        }
+        else if(start.getY() == destination.getY()){
+            if(start.getX() > destination.getX())
+                return Direction.LEFT;
+            else if(start.getX() < destination.getX())
+                return Direction.RIGHT;
+        }
+        return Direction.ERROR;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

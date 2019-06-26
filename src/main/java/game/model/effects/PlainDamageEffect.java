@@ -164,6 +164,7 @@ public class PlainDamageEffect extends SimpleEffect {
             }
         }
         shooter.getActualWeapon().setLastTargetSquare(prevTargets.get(prevTargets.size()-1).getPosition());
+        shooter.getActualWeapon().setLastDirection(GameMap.getDirection(shooter.getPosition(),shooter.getActualWeapon().getLastTarget().getPosition()));
     }
 
     @Override
