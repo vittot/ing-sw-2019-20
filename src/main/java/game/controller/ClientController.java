@@ -17,14 +17,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static javafx.application.Platform.runLater;
-
 public class ClientController implements ServerMessageHandler {
     private final Client client;
     private View clientView;
     private List<Action> availableActions;
     private ClientState state;
     private boolean gameStarted;
+    private boolean gameEnded;
 
     public ClientController(Client client, View view) {
         this.client = client;
@@ -32,6 +31,7 @@ public class ClientController implements ServerMessageHandler {
         this.clientView = view;
         this.clientView.setController(this);
         this.state = ClientState.WAITING_START;
+        this.gameEnded = false;
     }
 
     public Client getClient() {
@@ -373,7 +373,7 @@ public class ClientController implements ServerMessageHandler {
      * @param serverMsg
      */
     @Override
-    public void handle (AfterDamagePowerUpRequest serverMsg){
+    public void handle(AfterDamagePowerUpRequest serverMsg){
         clientView.choosePowerUpToUse(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).getCardPower());
     }
 
@@ -684,7 +684,8 @@ public class ClientController implements ServerMessageHandler {
      * Reconnect with the server after a connection error
      */
     public void retryConnection() {
-        client.init();
+        if(!client.init())
+            clientView.notifyConnectionError();
     }
 
     /**

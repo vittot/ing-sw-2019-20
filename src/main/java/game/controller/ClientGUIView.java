@@ -106,7 +106,11 @@ public class ClientGUIView extends Application implements View{
         Label text = new Label("Choose the connection type:");
         Button b1 = new Button("RMI");
         Button b2 = new Button("Socket");
-        sp.getChildren().addAll(text,b1,b2);
+
+        TextField ipTextField = new TextField();
+        ipTextField.setPromptText("Server IP");
+
+        //sp.getChildren().addAll(text,b1,b2,ipTextField);
         StackPane.setAlignment(text,Pos.TOP_CENTER);
         StackPane.setAlignment(b1,Pos.CENTER);
         StackPane.setAlignment(b2,Pos.CENTER);
@@ -116,8 +120,8 @@ public class ClientGUIView extends Application implements View{
         primaryStage.setScene(sc);
         primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
-        b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI"));
-        b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET"));
+        b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI","localhost"));
+        b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET","localhost"));
         /*
         String choice;
         Scanner in = new Scanner(System.in);
