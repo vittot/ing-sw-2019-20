@@ -1,7 +1,3 @@
-target/generated-sources
-target/generated-sources
-target/maven-status
-target/test-classes
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
