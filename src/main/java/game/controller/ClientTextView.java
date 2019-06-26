@@ -792,23 +792,11 @@ public class ClientTextView implements  View {
         controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(list)));
     }
 
-    /*
-     *
-     *
-     *
-    @Override
-    public int notifyStart(CardPower[] powerups) {
-        int choice;
-        writeText("Game has started!");
-        writeText("Choose one of this two powerups to spawn on the map:");
-        writeText("1)\n" + powerups[0].toString());
-        writeText("2)\n" + powerups[1].toString());
-        do{
-            choice = readInt();
-        }while(choice != 1 && choice != 2);
 
-        return choice;
-    }*/
+    @Override
+    public void notifyStart() {
+        writeText("Game has started!");
+    }
 
     /**
      *

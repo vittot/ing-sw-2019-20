@@ -18,6 +18,11 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
+    public void notifyStart() {
+        runLater(gui::notifyStart);
+    }
+
+    @Override
     public void setUserNamePhase() {
         runLater(gui::setUserNamePhase);
     }

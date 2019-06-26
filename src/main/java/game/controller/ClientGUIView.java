@@ -1,11 +1,11 @@
 package game.controller;
 
+import game.LaunchClient;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
 import game.model.effects.SimpleEffect;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -21,13 +21,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 
@@ -41,7 +39,6 @@ public class ClientGUIView extends Application implements View{
     private double displayY = 768;
     private double screenWidth = Screen.getScreens().get(0).getBounds().getWidth();
     private double screenHeight = Screen.getScreens().get(0).getBounds().getHeight();
-    private Label text = new Label("");
     private List<GameMap> availableMaps;
 
 
@@ -60,6 +57,7 @@ public class ClientGUIView extends Application implements View{
     private List<List<ImageView>> playerMarks = new ArrayList<>();
     private List<ImageView> myPlayerDamage = new ArrayList<>();
     private List<ImageView> myPlayerMarks = new ArrayList<>();
+    private Label text = new Label("");
 
     //TODO esiste?
     private List<ImageView> mapWB;
@@ -97,7 +95,24 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public String chooseConnection() {
-        //TODO (now just a copy of textView)
+
+        StackPane sp = new StackPane();
+        Scene sc = new Scene(sp);
+        Label text = new Label("Choose the connection type:");
+        Button b1 = new Button("RMI");
+        Button b2 = new Button("Socket");
+        sp.getChildren().addAll(text,b1,b2);
+        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        StackPane.setAlignment(b1,Pos.CENTER);
+        StackPane.setAlignment(b2,Pos.CENTER);
+        StackPane.setMargin(b1,new Insets(0,150,0,0));
+        StackPane.setMargin(b2,new Insets(0,0,0,150));
+
+        primaryStage.setScene(sc);
+        primaryStage.show();
+        //b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI"));
+        //b2.setOnAction(actionEvent -> LaunchClient.startConection("SOCKET"));
+        /*
         String choice;
         Scanner in = new Scanner(System.in);
         System.out.println("Choose the connection type");
@@ -107,31 +122,41 @@ public class ClientGUIView extends Application implements View{
             choice = choice.toUpperCase();
         }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
         return choice;
+         */
+        return "SOCKET";
     }
 
+    public void connectionFailed (){
+        StackPane sp = new StackPane();
+        Scene scene = new Scene(sp);
+        Text text = new Text("Connection Lost:");
+        Button btn = new Button("Retry");
+        Button bt1 = new Button("Close");
+        sp.getChildren().addAll(btn,bt1, text);
+        StackPane.setAlignment(btn,Pos.CENTER);
+        StackPane.setAlignment(bt1,Pos.CENTER);
+        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        StackPane.setMargin(text, new Insets(100,0,0,0));
+        StackPane.setMargin(bt1, new Insets(0,0,0,100));
+        StackPane.setMargin(btn, new Insets(0,100,0,0));
+        bt1.setOnAction(actionEvent -> this.setUserNamePhase());
+        bt1.setOnAction(actionEvent -> primaryStage.close());
+        primaryStage.setScene(scene);
+        primaryStage.setHeight(300);
+        primaryStage.setWidth(500);
+        primaryStage.setAlwaysOnTop(true);
+        primaryStage.show();
+    }
 
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        showMap();
+        //showMap();
     }
 
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    private void handlePlayerClick(MouseEvent e){
-        text.setText("Player "+((Circle)e.getSource()).getId());
-    }
-
-    private void handleSquareClick(MouseEvent e){
-        int i = Integer.parseInt(((Rectangle)e.getSource()).getId());
-        text.setText("You selected square in: " + (i-1)/4 + ", " + (i-1)%4);
-    }
-
-    private void handleWeaponClick(MouseEvent e){
-        text.setText("You select "+((ImageView)e.getSource()).getId());
     }
 
     private void callRoomCreate(String s ){
@@ -144,6 +169,12 @@ public class ClientGUIView extends Application implements View{
         if(s == "map4") mapId = 4;
         System.out.println(mapId);
         controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,user));
+    }
+
+    @Override
+    public void notifyStart() {
+        System.out.println("ALFIH");
+        showMapGame();
     }
 
     @Override
@@ -370,59 +401,6 @@ public class ClientGUIView extends Application implements View{
         }
         primaryStage.setScene(chooseR);
         primaryStage.show();
-    }
-    //TODO mettere javaDoc
-    private void handleJoinRoom(RadioButton rb){
-        int id=0;
-        if(rb.getId().equals("1"))
-            id = 1;
-        if(rb.getId().equals("2"))
-            id = 2;
-        if(rb.getId().equals("3"))
-            id = 3;
-        if(rb.getId().equals("4"))
-            id = 4;
-        System.out.println("id"+id+" user:"+user);
-        controller.getClient().sendMessage(new JoinWaitingRoomRequest(id, user));
-    }
-
-    private void handleNewRoom(ActionEvent e){
-
-        int mapId = 1, nPlayer;
-        StackPane sp = new StackPane();
-        sp.setPrefSize(500,300);
-        Scene room = new Scene(sp);
-
-        Label text = new Label("Choose map id");
-        Label error = new Label("");
-        ChoiceBox mapc = new ChoiceBox();
-        mapc.getItems().add("map1");
-        mapc.getItems().add("map2");
-        mapc.getItems().add("map3");
-        mapc.getItems().add("map4");
-        nPlayer = 5;
-        Button submit = new Button("Create Room");
-
-
-        ObservableList list = sp.getChildren();
-        list.addAll(text,mapc, submit,error);
-        StackPane.setAlignment(text,Pos.TOP_CENTER);
-        StackPane.setMargin(text,new Insets(25,0,0,0));
-        StackPane.setAlignment(mapc,Pos.CENTER_LEFT);
-        StackPane.setMargin(mapc,new Insets(0,0,0,50));
-        StackPane.setAlignment(submit,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(submit,new Insets(0,50,25,0));
-        StackPane.setAlignment(error,Pos.BOTTOM_LEFT);
-
-        primaryStage.setScene(room);
-        primaryStage.show();
-
-        submit.setOnAction(actionEvent -> {
-            if(mapc.getValue() != null)
-                callRoomCreate(mapc.getValue().toString());
-            else
-                error.setText("Invalid Map choise");
-        });
     }
 
     @Override
@@ -1303,6 +1281,69 @@ public class ClientGUIView extends Application implements View{
         primaryStage.setFullScreen(true);
         primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
+    }
+
+    //TODO mettere javaDoc
+    private void handlePlayerClick(MouseEvent e){
+        text.setText("Player "+((Circle)e.getSource()).getId());
+    }
+    private void handleSquareClick(MouseEvent e){
+        int i = Integer.parseInt(((Rectangle)e.getSource()).getId());
+        text.setText("You selected square in: " + (i-1)/4 + ", " + (i-1)%4);
+    }
+    private void handleWeaponClick(MouseEvent e){
+        text.setText("You select "+((ImageView)e.getSource()).getId());
+    }
+    private void handleJoinRoom(RadioButton rb){
+        int id=0;
+        if(rb.getId().equals("1"))
+            id = 1;
+        if(rb.getId().equals("2"))
+            id = 2;
+        if(rb.getId().equals("3"))
+            id = 3;
+        if(rb.getId().equals("4"))
+            id = 4;
+        System.out.println("id"+id+" user:"+user);
+        controller.getClient().sendMessage(new JoinWaitingRoomRequest(id, user));
+    }
+    private void handleNewRoom(ActionEvent e){
+
+        int mapId = 1, nPlayer;
+        StackPane sp = new StackPane();
+        sp.setPrefSize(500,300);
+        Scene room = new Scene(sp);
+
+        Label text = new Label("Choose map id");
+        Label error = new Label("");
+        ChoiceBox mapc = new ChoiceBox();
+        mapc.getItems().add("map1");
+        mapc.getItems().add("map2");
+        mapc.getItems().add("map3");
+        mapc.getItems().add("map4");
+        nPlayer = 5;
+        Button submit = new Button("Create Room");
+
+
+        ObservableList list = sp.getChildren();
+        list.addAll(text,mapc, submit,error);
+        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        StackPane.setMargin(text,new Insets(25,0,0,0));
+        StackPane.setAlignment(mapc,Pos.CENTER_LEFT);
+        StackPane.setMargin(mapc,new Insets(0,0,0,50));
+        StackPane.setAlignment(submit,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(submit,new Insets(0,50,25,0));
+        StackPane.setAlignment(error,Pos.BOTTOM_LEFT);
+
+        primaryStage.setScene(room);
+        primaryStage.show();
+
+        submit.setOnAction(actionEvent -> {
+            if(mapc.getValue() != null)
+                callRoomCreate(mapc.getValue().toString());
+            else
+                error.setText("Invalid Map choise");
+        });
     }
     private void handleMouseOnWeapon(MouseEvent e){
         ((ImageView)e.getSource()).setViewOrder(-1);

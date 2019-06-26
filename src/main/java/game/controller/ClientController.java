@@ -372,9 +372,7 @@ public class ClientController implements ServerMessageHandler {
         if(serverMsg.getId() != 0)
             ClientContext.get().setMyID(serverMsg.getId());
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
-        clientView.notifyCompletedOperation("Game has started!");
-
-
+        clientView.notifyStart();
     }
 
     /**

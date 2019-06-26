@@ -10,6 +10,8 @@ import java.util.SortedMap;
 
 public interface View {
 
+    void notifyStart();
+
     void setUserNamePhase();
 
     void insufficientAmmoNotification();
