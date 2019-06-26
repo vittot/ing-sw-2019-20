@@ -264,6 +264,33 @@ public class ClientTextView implements  View {
     }
 
     @Override
+    public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
+        char c;
+        int n = 1;
+        writeText("Do you want to counterattack "+checkPlayerColor(shooter.getColor())+shooter.getNickName()+ANSI_RESET+"?");
+        writeText("Insert [Y]es or [N]o");
+        do {
+            c = readChar();
+        }while(c != 'Y' && c != 'y' && c != 'N' && c != 'n');
+        if(c == 'Y' || c == 'y'){
+            if(counterattack.size() > 1){
+                writeText("Choose one of your power-up cards to complete the operation:");
+                for(CardPower cp : counterattack) {
+                    writeText(n + ". " + cp.toString());
+                    n++;
+                }
+                do{
+                    n = readInt();
+                }while(n <= 0 && n > counterattack.size());
+            }
+            controller.getClient().sendMessage(new CounterAttackResponse(counterattack.get(n-1),shooter));
+        }
+        else
+            controller.getClient().sendMessage(new CounterAttackResponse());
+
+    }
+
+    @Override
     public void notifyPlayerLeavedWaitingRoom(Player p) {
         writeText("Player " + p.getNickName() + " has leaved the waiting room!");
     }
@@ -464,8 +491,11 @@ public class ClientTextView implements  View {
                     {
                         writeText("There are no power-up cards available for use in this moment!");             action = "";
                     }
-                    else
+                    else {
+                        powerUpsAvailable = powerUpSelection();
                         controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerUpsAvailable)));
+                    }
+
                 }
 
                 chosenAction = Action.valueOf(action);
@@ -827,8 +857,36 @@ public class ClientTextView implements  View {
      */
     @Override
     public void choosePowerUpToUse(List<CardPower> list){
-        System.out.println("Choose which power-up card you want to use after that the damages of your attack have been applied:");
-        controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(list)));
+        char c;
+        int n = 1, t=1;
+        writeText("Do you want to use a Tagback Grenade to apply an additional damage to one of your previous target?");
+        writeText("Insert [Y]es or [N]o");
+        do {
+            c = readChar();
+        }while(c != 'Y' && c != 'y' && c != 'N' && c != 'n');
+        if(c == 'Y' || c == 'y'){
+            if(list.size() > 1){
+                System.out.println("Choose which power-up card you want to use after that the damages of your attack have been applied:");
+                for(CardPower cp : list) {
+                    writeText(n + ". " + cp.toString());
+                    n++;
+                }
+                do{
+                    n = readInt();
+                }while(n <= 0 && n > list.size());
+            }
+            System.out.println("Choose which ammo you want to pay:");
+            for(Color co : ClientContext.get().getMyPlayer().getAmmo()) {
+                writeText(n + ". " + co.toString());
+                t++;
+            }
+            do{
+                t = readInt();
+            }while(t <= 0 && t > list.size());
+            controller.getClient().sendMessage(new ChoosePowerUpResponse(list.get(n-1),ClientContext.get().getMyPlayer().getAmmo().get(t-1)));
+        }
+        else
+            controller.getClient().sendMessage(new ChoosePowerUpResponse());
     }
 
 

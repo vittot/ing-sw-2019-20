@@ -7,6 +7,7 @@ import game.model.CardPower;
 import game.model.effects.FullEffect;
 import game.model.exceptions.NoCardAmmoAvailableException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UsePlusBeforeResponse implements ClientMessage {
@@ -30,11 +31,13 @@ public class UsePlusBeforeResponse implements ClientMessage {
     }
 
     public List<CardPower> getToUse() {
-        return toUse;
+        if(toUse != null)
+            return toUse;
+        return new ArrayList<>();
     }
 
     @Override
     public ServerMessage handle(ClientMessageHandler handler) {
-        return null;
+        return handler.handle(this);
     }
 }
