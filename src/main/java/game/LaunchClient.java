@@ -28,21 +28,22 @@ public class LaunchClient {
     /**
      * Start the connection
      * @param connectionChoice "SOCKET" (default) or "RMI"
+     * @param serverIP
      */
-    public static void startConnection(String connectionChoice)
+    public static void startConnection(String connectionChoice, String serverIP)
     {
         Client client = null; //useless assignment, but required for line 53
         boolean connected;
         if(connectionChoice.equals("RMI")) {
             try {
-                client = new RMIClient();
+                client = new RMIClient(serverIP);
                 connected = client.init();
             } catch (RemoteException e) {
                 connected = false;
             }
         }
         else {
-            client = new SocketClient("localhost",5000);
+            client = new SocketClient(serverIP,5000);
             connected = client.init();
         }
 

@@ -94,14 +94,23 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
-    public String chooseConnection() {
+    public void chooseConnection() {
 
-        StackPane sp = new StackPane();
-        Scene sc = new Scene(sp);
+        GridPane grid = new GridPane();
+        Scene sc = new Scene(grid);
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
         Label text = new Label("Choose the connection type:");
         Button b1 = new Button("RMI");
         Button b2 = new Button("Socket");
-        sp.getChildren().addAll(text,b1,b2);
+
+        TextField ipTextField = new TextField();
+        ipTextField.setPromptText("Server IP");
+
+        //sp.getChildren().addAll(text,b1,b2,ipTextField);
         StackPane.setAlignment(text,Pos.TOP_CENTER);
         StackPane.setAlignment(b1,Pos.CENTER);
         StackPane.setAlignment(b2,Pos.CENTER);
@@ -110,8 +119,8 @@ public class ClientGUIView extends Application implements View{
 
         primaryStage.setScene(sc);
         primaryStage.show();
-        //b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI"));
-        //b2.setOnAction(actionEvent -> LaunchClient.startConection("SOCKET"));
+        b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI",ipTextField.getText()));
+        b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET",ipTextField.getText()));
         /*
         String choice;
         Scanner in = new Scanner(System.in);
@@ -123,7 +132,6 @@ public class ClientGUIView extends Application implements View{
         }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
         return choice;
          */
-        return "SOCKET";
     }
 
     @Override
@@ -659,7 +667,7 @@ public class ClientGUIView extends Application implements View{
         ImageView mapIV;
 
 
-        Image mapI = new Image("graphics/cards/mappa"+ClientContext.get().getMap().getId()+".png");
+        Image mapI = new Image("graphics/map/mappa"+ClientContext.get().getMap().getId()+".png");
         mapIV = new ImageView(mapI);
         mapIV.setFitWidth(screenWidth*55/100);
         mapIV.setPreserveRatio(true);

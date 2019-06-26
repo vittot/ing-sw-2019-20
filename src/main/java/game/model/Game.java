@@ -23,10 +23,10 @@ public class Game {
     private List<CardPower> powerWaste;
     private List<CardAmmo> ammoWaste;
     private List<Kill> killBoard;
-    private Player fistPlayerToPlay;
+    private Player firstPlayerToPlay;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
-    public static int TIME_FOR_ACTION = 10000; //TODO: read from config file
+    public static int TIME_FOR_ACTION = 60000000; //TODO: read from config file
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
@@ -62,7 +62,7 @@ public class Game {
         this.id = id;
         this.players = players;
         currentTurn = new Turn(this.players.get(0),this);
-        this.fistPlayerToPlay = this.players.get(0);
+        this.firstPlayerToPlay = this.players.get(0);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
         //readMap(mapId, "mapFile.xml");
@@ -76,8 +76,8 @@ public class Game {
 
     }
 
-    public Player getFistPlayerToPlay() {
-        return fistPlayerToPlay;
+    public Player getFirstPlayerToPlay() {
+        return firstPlayerToPlay;
     }
 
     public Game(List<Player> players, GameMap map, int killBoardSize) {
@@ -130,7 +130,7 @@ public class Game {
         Document document = null;
         try
         {
-            document = builder.build(fileName);
+            document = builder.build(ClassLoader.getSystemClassLoader().getResourceAsStream("XML/" + fileName));
             Element root = document.getRootElement();
             for (Element tmpMap : root.getChildren("map")){
                 if(tmpMap.getAttribute("id").getIntValue() == id){
@@ -208,7 +208,7 @@ public class Game {
         int id=1;
         try
         {
-            document = builder.build(fileName);
+            document = builder.build(ClassLoader.getSystemClassLoader().getResourceAsStream("XML/" + fileName));
             Element root = document.getRootElement();
             for (Element weapon : root.getChildren("weapon")){
                 addWeapon(weapon,id);
@@ -236,7 +236,7 @@ public class Game {
         Document document = null;
         try
         {
-            document = builder.build(fileName);
+            document = builder.build(ClassLoader.getSystemClassLoader().getResourceAsStream("XML/" + fileName));
             Element root = document.getRootElement();
             for (Element cardAmmo : root.getChildren("ammo"))
                 addAmmoCard(cardAmmo);
@@ -262,7 +262,7 @@ public class Game {
         Document document = null;
         try
         {
-            document = builder.build(fileName);
+            document = builder.build(ClassLoader.getSystemClassLoader().getResourceAsStream("XML/" + fileName));
             Element root = document.getRootElement();
             for (Element powerup : root.getChildren("powerUp")){
                 addPowerUp(powerup);

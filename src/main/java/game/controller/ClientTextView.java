@@ -253,14 +253,16 @@ public class ClientTextView implements  View {
 
     @Override
     public void chooseConnection() {
-        String choice;
+        String choice, ip;
         writeText("Choose the connection type");
         do{
             writeText("Insert Socket or RMI:");
             choice = fromKeyBoard.nextLine();
             choice = choice.toUpperCase();
         }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
-        LaunchClient.startConnection(choice);
+        writeText("Insert the server IP (or localhost):");
+        ip = fromKeyBoard.nextLine();
+        LaunchClient.startConnection(choice,ip);
     }
 
     @Override

@@ -69,10 +69,16 @@ public class GameManager implements Serializable {
         usersLogged.add(user);
     }
 
+    /**
+     * Suspend the player
+     * @param player
+     */
     public void suspendPlayer(Player player)
     {
-        usersLogged.remove(player.getNickName());
-        usersSuspended.put(player.getNickName(),player.getGame());
+        if(usersLogged.contains(player.getNickName()))
+        {   usersLogged.remove(player.getNickName());
+            usersSuspended.put(player.getNickName(),player.getGame());
+        }
     }
 
     /**

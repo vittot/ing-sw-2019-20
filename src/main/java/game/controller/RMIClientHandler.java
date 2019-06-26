@@ -7,25 +7,34 @@ import game.model.Player;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.server.Unreferenced;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RMIClientHandler extends ClientHandler implements IRMIClientHandler, Unreferenced {
     private transient RemoteClient client;
+    private ExecutorService threadPool;
 
     RMIClientHandler(GameManager gm) throws RemoteException {
         super();
+        threadPool = Executors.newSingleThreadScheduledExecutor();
         this.controller = new ServerController(this,gm);
         UnicastRemoteObject.exportObject(this, 0);
     }
 
     @Override
     public void sendMessage(ServerMessage msg) {
-        try{
-            client.receiveMessage(msg);
-        }catch (RemoteException e)
-        {
-            e.printStackTrace();
-            clientDisconnected();
-        }
+
+            threadPool.submit(() ->
+                    {
+                        try{
+                            client.receiveMessage(msg);
+                        }catch (RemoteException e){
+                            clientDisconnected();
+                        }
+                    }
+
+            );
+
     }
 
     @Override
