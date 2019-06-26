@@ -1,43 +1,43 @@
 <ammoList>
     <ammo>
-        <color>blue</color>
-        <color>blue</color>
         <color>yellow</color>
+        <color>blue</color>
+        <color>blue</color>
         <powerup>0</powerup>
     </ammo>
 
     <ammo>
-        <color>blue</color>
-        <color>blue</color>
         <color>yellow</color>
+        <color>blue</color>
+        <color>blue</color>
         <powerup>0</powerup>
     </ammo>
 
     <ammo>
-        <color>blue</color>
-        <color>blue</color>
         <color>yellow</color>
+        <color>blue</color>
+        <color>blue</color>
         <powerup>0</powerup>
     </ammo>
 
     <ammo>
-        <color>red</color>
-        <color>red</color>
         <color>yellow</color>
+        <color>red</color>
+        <color>red</color>
         <powerup>0</powerup>
     </ammo>
 
     <ammo>
-        <color>red</color>
-        <color>red</color>
         <color>yellow</color>
+        <color>red</color>
+        <color>red</color>
         <powerup>0</powerup>
     </ammo>
 
     <ammo>
-        <color>red</color>
-        <color>red</color>
         <color>yellow</color>
+        <color>red</color>
+        <color>red</color>
         <powerup>0</powerup>
     </ammo>
 
@@ -63,23 +63,23 @@
     </ammo>
 
     <ammo>
-        <color>red</color>
-        <color>red</color>
         <color>blue</color>
+        <color>red</color>
+        <color>red</color>
         <powerup>0</powerup>
     </ammo>
 
     <ammo>
-        <color>red</color>
-        <color>red</color>
         <color>blue</color>
+        <color>red</color>
+        <color>red</color>
         <powerup>0</powerup>
     </ammo>
 
     <ammo>
-        <color>red</color>
-        <color>red</color>
         <color>blue</color>
+        <color>red</color>
+        <color>red</color>
         <powerup>0</powerup>
     </ammo>
 
@@ -168,57 +168,57 @@
     </ammo>
 
     <ammo>
+        <color>yellow</color>
         <color>red</color>
-        <color>yellow</color>
         <color></color>
         <powerup>1</powerup>
     </ammo>
 
     <ammo>
+        <color>yellow</color>
         <color>red</color>
-        <color>yellow</color>
         <color></color>
         <powerup>1</powerup>
     </ammo>
 
     <ammo>
+        <color>yellow</color>
         <color>red</color>
-        <color>yellow</color>
         <color></color>
         <powerup>1</powerup>
     </ammo>
 
     <ammo>
+        <color>yellow</color>
         <color>red</color>
-        <color>yellow</color>
         <color></color>
         <powerup>1</powerup>
     </ammo>
 
     <ammo>
-        <color>blue</color>
         <color>yellow</color>
+        <color>blue</color>
         <color></color>
         <powerup>1</powerup>
     </ammo>
 
     <ammo>
-        <color>blue</color>
         <color>yellow</color>
+        <color>blue</color>
         <color></color>
         <powerup>1</powerup>
     </ammo>
 
     <ammo>
-        <color>blue</color>
         <color>yellow</color>
+        <color>blue</color>
         <color></color>
         <powerup>1</powerup>
     </ammo>
 
     <ammo>
-        <color>blue</color>
         <color>yellow</color>
+        <color>blue</color>
         <color></color>
         <powerup>1</powerup>
     </ammo>
