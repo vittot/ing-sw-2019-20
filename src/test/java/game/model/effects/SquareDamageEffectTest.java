@@ -52,7 +52,10 @@ class SquareDamageEffectTest {
         p1.setActualWeapon(w);
         p4.setActualWeapon(w);
         p5.setActualWeapon(w);
-        when(w.getPreviousTargets()).thenReturn(new ArrayList<>());
+        List<Player> prevTarget = new ArrayList<>();
+        prevTarget.add(p2);
+        when(w.getPreviousTargets()).thenReturn(prevTarget);
+        when(w.getLastTarget()).thenReturn(p2);
 
         map.getGrid()[0][0].addPlayer(p1);
         map.getGrid()[1][1].addPlayer(p2);
