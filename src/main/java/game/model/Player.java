@@ -428,7 +428,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
      * @throws InsufficientAmmoException
      * @throws NoCardWeaponSpaceException
      */
-    public void pickUpWeapon(CardWeapon weapon,CardWeapon weaponToWaste, List<CardPower> powerUp) throws InsufficientAmmoException, NoCardWeaponSpaceException {
+    public void pickUpWeapon(CardWeapon weapon, CardWeapon weaponToWaste, List<CardPower> powerUp) throws InsufficientAmmoException, NoCardWeaponSpaceException {
         List <Color> tmp = new ArrayList<>(weapon.getPrice());
         List <CardPower> tmpPU = new ArrayList<>();
         if(this.weapons.size()== 3)
@@ -447,7 +447,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
         weapon.setShooter(this);
         this.position.getWeapons().remove(weapon);
         if(game != null)
-            game.notifyGrabWeapon(this,weapon);
+            game.notifyGrabWeapon(this,weapon, weaponToWaste);
 
     }
 
@@ -514,6 +514,21 @@ public class Player implements Target, Serializable, Comparable<Player> {
         return true;
     }
 
+    public boolean mustUsePowerUpsToPay(List<Color> price) {
+        if (!price.isEmpty() && price != null) {
+            if (price.get(0) == Color.ANY)
+                return true;
+            if (ammo != null && !ammo.isEmpty())
+                for (int i = 0; i < ammo.size(); i++)
+                    price.remove(ammo.get(i));
+            if (price.isEmpty())
+                return false;
+            else
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Pay a cost with ammo and eventually powerups
      * @param ammoToPay
@@ -560,6 +575,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 powerups = new ArrayList<>();
                 for(int i=0; i<position.getCardAmmo().getCardPower(); i++)
                     powerups.add(game.drawPowerUp());
+                cardPower.addAll(powerups);
             }
             game.notifyGrabCardAmmo(this,ammos);
             position.setCardAmmo(null);

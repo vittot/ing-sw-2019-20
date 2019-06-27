@@ -224,7 +224,7 @@
             <maxDist>12</maxDist>
             <minMove>1</minMove>
             <maxMove>1</maxMove>
-            <targetVisib>Everwehre</targetVisib>
+            <targetVisib>Everywhere</targetVisib>
             <moveShooter>false</moveShooter>
             <targetVisibAfter>Everywhere</targetVisibAfter>
             <myPos>false</myPos>
@@ -280,7 +280,7 @@
                 <maxDist>12</maxDist>
                 <minMove>1</minMove>
                 <maxMove>1</maxMove>
-                <targetVisib>Everwehre</targetVisib>
+                <targetVisib>Everywhere</targetVisib>
                 <moveShooter>false</moveShooter>
                 <targetVisibAfter>Everywhere</targetVisibAfter>
                 <myPos>false</myPos>
@@ -336,7 +336,7 @@
                 <maxDist>12</maxDist>
                 <minMove>1</minMove>
                 <maxMove>1</maxMove>
-                <targetVisib>Everwehre</targetVisib>
+                <targetVisib>Everywhere</targetVisib>
                 <moveShooter>false</moveShooter>
                 <targetVisibAfter>Everywhere</targetVisibAfter>
                 <myPos>false</myPos>
@@ -392,7 +392,7 @@
                 <maxDist>12</maxDist>
                 <minMove>1</minMove>
                 <maxMove>1</maxMove>
-                <targetVisib>Everwehre</targetVisib>
+                <targetVisib>Everywhere</targetVisib>
                 <moveShooter>false</moveShooter>
                 <targetVisibAfter>Everywhere</targetVisibAfter>
                 <myPos>false</myPos>
@@ -448,7 +448,7 @@
                 <maxDist>12</maxDist>
                 <minMove>1</minMove>
                 <maxMove>1</maxMove>
-                <targetVisib>Everwehre</targetVisib>
+                <targetVisib>Everywhere</targetVisib>
                 <moveShooter>false</moveShooter>
                 <targetVisibAfter>Everywhere</targetVisibAfter>
                 <myPos>false</myPos>
@@ -504,7 +504,7 @@
                 <maxDist>12</maxDist>
                 <minMove>1</minMove>
                 <maxMove>1</maxMove>
-                <targetVisib>Everwehre</targetVisib>
+                <targetVisib>Everywhere</targetVisib>
                 <moveShooter>false</moveShooter>
                 <targetVisibAfter>Everywhere</targetVisibAfter>
                 <myPos>false</myPos>

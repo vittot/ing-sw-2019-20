@@ -95,8 +95,15 @@ public class MovementEffect extends SimpleEffect {
      */
     public List<Target> searchTarget (Player shooter) {
         List<Player> targets = new ArrayList<>();
-        List<Player> prevTargets = shooter.getActualWeapon().getPreviousTargets();
-        Square shooterPos = shooter.getPosition();
+        List<Player> prevTargets = null;
+        if(shooter.getActualWeapon() != null)
+            if(shooter.getActualWeapon().getPreviousTargets() != null)
+                prevTargets = shooter.getActualWeapon().getPreviousTargets();
+        Square shooterPos;
+        if(chainMove)
+            shooterPos = shooter.getActualWeapon().getLastTargetSquare();
+        else
+            shooterPos = shooter.getPosition();
         if(moveShooter) {
             targets.add(shooter);
         }

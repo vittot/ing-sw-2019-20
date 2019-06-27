@@ -62,18 +62,13 @@ public abstract class ClientHandler implements GameListener {
     }
 
     @Override
-    public void onDeath(Player dead) {
-        //TODO remove this or the next one
-    }
-
-    @Override
     public void onDeath(Kill kill) {
         sendMessage(new NotifyDeathResponse(kill));
     }
 
     @Override
-    public void onGrabWeapon(Player p, CardWeapon cw) {
-        sendMessage(new NotifyGrabWeapon(p.getId(),cw,p.getPosition().getX(),p.getPosition().getY()));
+    public void onGrabWeapon(Player p, CardWeapon cw, CardWeapon cww) {
+        sendMessage(new NotifyGrabWeapon(p.getId(),cw,p.getPosition().getX(),p.getPosition().getY(),cww));
     }
 
     @Override
