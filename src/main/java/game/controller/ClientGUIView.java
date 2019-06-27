@@ -101,27 +101,43 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void chooseConnection() {
 
-        StackPane sp = new StackPane();
-        Scene sc = new Scene(sp,500,300);
-        Label text = new Label("Choose the connection type:");
+        GridPane gp = new GridPane();
+        Scene sc = new Scene(gp,200,150);
+        Label text = new Label("Connection setup");
+        text.setMaxWidth(Double.MAX_VALUE);
+        text.setAlignment(Pos.CENTER);
+
         Button b1 = new Button("RMI");
         Button b2 = new Button("Socket");
 
         TextField ipTextField = new TextField();
-        ipTextField.setPromptText("Server IP");
+        ipTextField.setText("localhost");
+        Label serverIPLabel = new Label("Server IP");
 
-        //sp.getChildren().addAll(text,b1,b2,ipTextField);
+        /*sp.getChildren().addAll(text,b1,b2,ipTextField);
         StackPane.setAlignment(text,Pos.TOP_CENTER);
         StackPane.setAlignment(b1,Pos.CENTER);
         StackPane.setAlignment(b2,Pos.CENTER);
         StackPane.setMargin(b1,new Insets(0,150,0,0));
-        StackPane.setMargin(b2,new Insets(0,0,0,150));
+        StackPane.setMargin(b2,new Insets(0,0,0,150));*/
+        gp.setAlignment(Pos.CENTER);
+        gp.setHgap(8);
+        gp.setVgap(8);
+        gp.setPadding(new Insets(5, 5, 5, 5));
+        gp.add(text,0,0,3,1);
+        gp.add(serverIPLabel,0,1);
+        gp.add(ipTextField,1,1,2,1);
+        gp.add(b1,1,2);
+        gp.add(b2,2,2);
+
 
         primaryStage.setScene(sc);
         primaryStage.setAlwaysOnTop(true);
+        primaryStage.setTitle("Adrenalina Connection Setup");
         primaryStage.show();
-        b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI","localhost"));
-        b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET","localhost"));
+
+        b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI",ipTextField.getText()));
+        b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET",ipTextField.getText()));
         /*
         String choice;
         Scanner in = new Scanner(System.in);
