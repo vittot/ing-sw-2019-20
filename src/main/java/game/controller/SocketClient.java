@@ -26,7 +26,7 @@ public class SocketClient implements Client, ServerMessageHandler {
     public SocketClient(String host, int port) {
         this.host = host;
         this.port = port;
-        this.executor = Executors.newSingleThreadScheduledExecutor();
+        this.executor = Executors.newSingleThreadExecutor();
     }
 
     public boolean init() {
@@ -63,7 +63,7 @@ public class SocketClient implements Client, ServerMessageHandler {
                         {
                             /*final ServerMessage smR = sm;
                             executor.submit( ()-> smR.handle(this) );*/
-                            System.out.println("RECEIVED " + sm.toString());
+                            //System.out.println("RECEIVED " + sm.toString());
                             sm.handle(this);
                         }
 
@@ -102,7 +102,7 @@ public class SocketClient implements Client, ServerMessageHandler {
 
     @Override
     public void handle(ServerGameMessage msg) {
-        System.out.println("HANDLING " + msg);
+        //System.out.println("HANDLING " + msg);
         executor.submit(()-> msg.handle(controller));
     }
 
