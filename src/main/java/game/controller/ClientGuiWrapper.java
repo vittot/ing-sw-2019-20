@@ -94,12 +94,12 @@ public class ClientGuiWrapper implements View {
 
     @Override
     public void notifyDeath(Kill kill) {
-        runLater(()->notifyDeath(kill));
+        runLater(()->gui.notifyDeath(kill));
     }
 
     @Override
     public void grabWeaponNotification(int pID, String name, int x, int y) {
-        runLater(()->grabWeaponNotification(pID,name,x,y));
+        runLater(()->gui.grabWeaponNotification(pID,name,x,y));
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ClientGuiWrapper implements View {
 
     @Override
     public void showRanking(SortedMap<Player, Integer> ranking) {
-        runLater(()->showRanking(ranking));
+        runLater(()->gui.showRanking(ranking));
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ClientGuiWrapper implements View {
 
     @Override
     public void notifyTurnChanged(int pID) {
-        runLater(()->notifyTurnChanged(pID));
+        runLater(()->gui.notifyTurnChanged(pID));
     }
 
     @Override
@@ -284,6 +284,6 @@ public class ClientGuiWrapper implements View {
 
     @Override
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
-
+        runLater( () ->gui.chooseCounterAttack(counterattack,shooter));
     }
 }

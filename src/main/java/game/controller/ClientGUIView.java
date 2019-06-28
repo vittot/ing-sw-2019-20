@@ -10,7 +10,6 @@ import game.model.exceptions.MapOutOfLimitException;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,21 +18,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 
@@ -348,7 +342,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void invalidActionNotification() {
-
+        text.setText("Invalid action!");
     }
 
     @Override
@@ -427,7 +421,7 @@ public class ClientGUIView extends Application implements View{
         refreshMyPlayerCard();
         for(ImageView im : powerUp){
             if(!im.getId().equals("0")){
-                im.setEffect(new DropShadow(20,Color.GREEN));
+                im.setEffect(new DropShadow(35,Color.GREEN));
                 im.setOnMouseClicked(this::handleRespawnSquare);
             }
         }
@@ -461,6 +455,10 @@ public class ClientGUIView extends Application implements View{
         List<CheckBox> powerUp = new ArrayList<>();
         List<CardPower> choosenPW = new ArrayList<>();
         sp.setPrefSize(700,900);
+        Label text = new Label("Choose which power up you wanna use to pay");
+        sp.getChildren().add(text);
+        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        StackPane.setMargin(text,new Insets(20, 0,0,0));
         int j = 0;
         for(CardPower cp : cardPower){
             CheckBox cb = new CheckBox(cp.getName());
@@ -472,6 +470,8 @@ public class ClientGUIView extends Application implements View{
             j = j + 150;
         }
         Button submit = new Button("Submit");
+        sp.getChildren().add(submit);
+        StackPane.setAlignment(submit, Pos.BOTTOM_RIGHT);
         submit.setOnMouseClicked(mouseEvent -> {
             for(CheckBox c : powerUp){
                 if(c.isSelected()){
@@ -496,6 +496,8 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyTurnChanged(int pID) {
+        refreshWeaponCard();
+        refreshAmmoCard();
         if(pID == ClientContext.get().getMyID())
             text.setText("Your turn, Good Luck!");
         else {
@@ -538,19 +540,28 @@ public class ClientGUIView extends Application implements View{
             refreshMyPlayerCard();
         refreshPlayerPosition();
     }
-
+    private void activateWeapon(List<CardWeapon> weapons, ImageView iv){
+        int id = Integer.parseInt(iv.getId().substring(2));
+        if(id != 0) {
+            if (weapons.stream().anyMatch(w -> w.getId() == id)) {
+                System.out.println("Activate "+id);
+                iv.setOnMouseClicked(this::handleWeaponClick);
+                iv.setEffect(new DropShadow(35, Color.GREEN));
+            }
+        }
+    }
     @Override
     public void chooseWeaponToGrab(List<CardWeapon> weapons) {
-        state = ClientState.WAITING_GRAB_WEAPON;
+        state = ClientState.CHOOSEWEAPONTOGRAB;
         weaponToGrab = weapons;
         for(ImageView iv : mapWT){
-            int id = Integer.parseInt(iv.getId().substring(2));
-            if(id != 0) {
-                if (weapons.stream().anyMatch(w -> w.getId() == id)) {
-                    iv.setOnMouseClicked(this::handleWeaponClick);
-                    iv.setEffect(new DropShadow(7, Color.GREEN));
-                }
-            }
+            activateWeapon(weapons,iv);
+        }
+        for(ImageView iv : mapWR){
+            activateWeapon(weapons,iv);
+        }
+        for(ImageView iv : mapWL){
+            activateWeapon(weapons,iv);
         }
     }
 
@@ -616,7 +627,14 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
+        state = ClientState.CHOOSEWEAPONTOSHOOT;
+        for(ImageView iv : weapons){
+            if(myWeapons.stream().anyMatch(mw->mw.getId() == Integer.parseInt(iv.getId()))){
+                iv.setEffect(new DropShadow(35,Color.GREEN));
+                iv.setOnMouseClicked(this::handleWeaponClick);
+            }
 
+        }
     }
 
     @Override
@@ -879,6 +897,8 @@ public class ClientGUIView extends Application implements View{
      * @return
      */
     private Image createWeaponCard(int i){
+        if(i == 0)
+            return new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back.png"));
         return new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_"+i+".png"));
     }
 
@@ -1260,7 +1280,7 @@ public class ClientGUIView extends Application implements View{
         for(Square q : ClientContext.get().getMap().getSpawnpoints()){
             if(q.getX() == 0 ){
                 for (int x = 0 ; x < 3 ; x++) {
-                    if(q.getWeapons().get(x) != null){
+                    if(x < q.getWeapons().size()){
                         mapWL.get(x).setImage(createWeaponCard(q.getWeapons().get(x).getId()));
                         mapWL.get(x).setId("1_"+q.getWeapons().get(x).getId());
                     }
@@ -1272,7 +1292,7 @@ public class ClientGUIView extends Application implements View{
             }else
                 if(q.getX() == 3){
                     for (int z = 0 ; z < 3 ; z++) {
-                        if(q.getWeapons().get(z) != null){
+                        if(z < q.getWeapons().size()){
                             mapWR.get(z).setImage(createWeaponCard(q.getWeapons().get(z).getId()));
                             mapWR.get(z).setId("3_"+q.getWeapons().get(z).getId());
                         }
@@ -1284,7 +1304,7 @@ public class ClientGUIView extends Application implements View{
                 }
                 else {
                     for (int y = 0 ; y < 3 ; y++) {
-                        if(q.getWeapons().get(y) != null){
+                        if(y < q.getWeapons().size()){
                             mapWT.get(y).setImage(createWeaponCard(q.getWeapons().get(y).getId()));
                             mapWT.get(y).setId("2_"+q.getWeapons().get(y).getId());
                         }
@@ -1653,26 +1673,32 @@ public class ClientGUIView extends Application implements View{
     }
     private void handleWeaponClick(MouseEvent e){
         int id = Integer.parseInt(((ImageView)e.getSource()).getId().substring(2));
-        if(state.equals(ClientState.CHOOSEWEAPONTOGRAB)){
-            weaponG = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-            disableweapon();
-            if(ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
-                chooseWeaponToWaste();
-            }
-            else {
+        switch (state){
+            case CHOOSEWEAPONTOGRAB:
+                weaponG = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+                if(ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
+                    chooseWeaponToWaste();
+                }
+                else {
+                    choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
+                }
+                disableweapon();
+                break;
+            case CHOOSEWEAPONTOWASTE:
+                weaponW = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
                 choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
-            }
-        }
-        if(state.equals(ClientState.CHOOSEWEAPONTOWASTE)){
-            weaponW = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-            choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
-            disableMyWeapon();
+                disableMyWeapon();
+                break;
+            case CHOOSEWEAPONTOSHOOT:
+                CardWeapon selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter( w -> w.getId() == id).findFirst().orElse(null);
+                controller.getClient().sendMessage(new ChooseWeaponToShootResponse(selected));
+                disableMyWeapon();
         }
     }
     private void chooseWeaponToWaste(){
         state = ClientState.CHOOSEWEAPONTOWASTE;
         for(ImageView iv : weapons){
-            iv.setEffect(new DropShadow(6, Color.GREEN));
+            iv.setEffect(new DropShadow(35, Color.GREEN));
             iv.setOnMouseClicked(this::handleWeaponClick);
         }
     }

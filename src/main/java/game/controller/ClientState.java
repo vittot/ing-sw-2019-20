@@ -5,6 +5,7 @@ public enum ClientState {                   //Used from GUI
     CHOOSEWEAPONTOGRAB,
     CHOOSESTEP,
     CHOOSEACTIOIN,
+    CHOOSEWEAPONTOSHOOT,
     WAITING_GRAB_WEAPON,                    //Used from Client Context
     WAITING_GRAB_AMMO,
     WAITING_SHOOT,
