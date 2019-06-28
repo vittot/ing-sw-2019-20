@@ -17,11 +17,12 @@ public class NotifyGrabWeapon implements ServerMessage {
     private int y;
     private CardWeapon wWaste;
 
-    public NotifyGrabWeapon(int p, CardWeapon cw, int x, int y) {
+    public NotifyGrabWeapon(int p, CardWeapon cw, int x, int y, CardWeapon wWaste) {
         this.p = p;
         this.cw = cw;
         this.x = x;
         this.y = y;
+        this.wWaste = wWaste;
     }
 
     public CardWeapon getwWaste() {

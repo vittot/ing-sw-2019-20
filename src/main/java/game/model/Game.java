@@ -1003,9 +1003,9 @@ public class Game {
         gameObservers.forEach(o -> o.onDeath(kill));
     }
 
-    void notifyGrabWeapon(Player p, CardWeapon cw)
+    void notifyGrabWeapon(Player p, CardWeapon cw, CardWeapon cww)
     {
-        gameObservers.forEach(o -> o.onGrabWeapon(p,cw));
+        gameObservers.forEach(o -> o.onGrabWeapon(p,cw, cww));
     }
 
 

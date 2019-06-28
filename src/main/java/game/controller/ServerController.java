@@ -210,6 +210,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 return checkTurnEnd();
             }
         }
+        else if(state == ServerState.WAITING_POWER_USAGE){
+
+            return checkTurnEnd();
+        }
         else {
             List<Player> prevTargets = currPlayer.getActualWeapon().getPreviousTargets();
             prevTargets.add(toBeMoved);
@@ -911,11 +915,13 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             //baseDone = true; //TODO: check
             if(choosePowerUpResponse.getAmmoToPay() != Color.ANY) {
                 try {
-                    addFinalPayment(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()), new ArrayList<>());
+                    currPlayer.pay(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()),new ArrayList<>());
                 } catch (InsufficientAmmoException e) {
                     e.printStackTrace();
                 }
             }
+            clientHandler.sendMessage(new ChoosePowerUpUsed(cp));
+            avPowerUp.remove(cp);
             return currSimpleEffect.handle(this);
         }
         return terminateFullEffect();

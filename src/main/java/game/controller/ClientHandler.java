@@ -68,8 +68,8 @@ public abstract class ClientHandler implements GameListener {
     }
 
     @Override
-    public void onGrabWeapon(Player p, CardWeapon cw) {
-        sendMessage(new NotifyGrabWeapon(p.getId(),cw,p.getPosition().getX(),p.getPosition().getY()));
+    public void onGrabWeapon(Player p, CardWeapon cw, CardWeapon cww) {
+        sendMessage(new NotifyGrabWeapon(p.getId(),cw,p.getPosition().getX(),p.getPosition().getY(),cww));
     }
 
     @Override
