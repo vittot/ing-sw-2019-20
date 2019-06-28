@@ -17,7 +17,7 @@ public abstract class ClientHandler implements GameListener {
 
     protected void clientDisconnected()
     {
-        if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED){
+        if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED && controller.getState() != ServerState.GAME_ENDED){
             controller.getModel().removeGameListener(this);
             controller.getCurrPlayer().suspend(false);
         }
@@ -48,6 +48,7 @@ public abstract class ClientHandler implements GameListener {
     @Override
     public void onGameEnd(SortedMap<Player,Integer> ranking) {
 
+        this.controller.setState(ServerState.GAME_ENDED);
         sendMessage(new NotifyEndGame(ranking));
     }
 
@@ -59,11 +60,6 @@ public abstract class ClientHandler implements GameListener {
     @Override
     public void onMarks(Player marked, Player marker, int marks) {
         sendMessage(new NotifyMarks(marker.getId(), marked.getId(), marks));
-    }
-
-    @Override
-    public void onDeath(Player dead) {
-        //TODO remove this or the next one
     }
 
     @Override

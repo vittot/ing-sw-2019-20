@@ -4,7 +4,7 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.ServerMessageHandler;
 
-import java.io.Serializable;
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -29,6 +29,7 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
         }
         catch(RemoteException e)
         {
+            System.out.println("ECCEZIONE IN SEND MESSAGE"); //TODO: call retry connection method
             e.printStackTrace();
         }
     }
@@ -56,8 +57,6 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
 
         }catch(RemoteException | NotBoundException e)
         {
-            e.printStackTrace();
-            System.out.println("Remote EXCEPTION or NOT BOUND EXCEPTION");
             return false;
         }
 
@@ -65,7 +64,8 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
 
     @Override
     public void close() {
-
+        rmiClientHandler = null;
+        System.exit(0); //necessary to close the rmi background thread
     }
 
 }

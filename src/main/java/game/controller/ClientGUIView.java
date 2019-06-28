@@ -132,7 +132,7 @@ public class ClientGUIView extends Application implements View{
 
 
         primaryStage.setScene(sc);
-        primaryStage.setAlwaysOnTop(true);
+        //primaryStage.setAlwaysOnTop(true);
         primaryStage.setTitle("Adrenalina Connection Setup");
         primaryStage.show();
 
@@ -172,6 +172,15 @@ public class ClientGUIView extends Application implements View{
         primaryStage.setWidth(500);
         primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
+    }
+
+    @Override
+    public void connectionFailed() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Connection error");
+        alert.setHeaderText(null);
+        alert.setContentText("ERROR: Unable to connect, check your connection and the server ip!");
+        alert.showAndWait();
     }
 
     @Override

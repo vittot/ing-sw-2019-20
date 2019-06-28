@@ -9,7 +9,6 @@ public interface GameListener {
     void onGameEnd(SortedMap<Player,Integer> gameRanking);
     void onDamage(Player damaged, Player attacker, int damage);
     void onMarks(Player marked, Player marker, int marks);
-    void onDeath(Player dead);
     void onDeath(Kill kill);
     void onGrabWeapon(Player p, CardWeapon cw);
     void onGrabCardAmmo(Player p, List<Color> ammo);

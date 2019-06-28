@@ -2,13 +2,11 @@ package game.controller;
 
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
-import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.*;
 import game.controller.commands.servercommands.*;
 import game.model.*;
 import game.model.effects.*;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -74,6 +72,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
 
     public ServerState getState() {
         return state;
+    }
+
+    public void setState(ServerState state) {
+        this.state = state;
     }
 
     public WaitingRoom getWaitingRoom() {
@@ -340,7 +342,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
         if(checkIfEnded())
             return new NotifyEndGame(model.getRanking());
 
-        nSimpleEffect = 0;
+
         if(!baseDone)
             return firstEffect();
         else if(remainingPlusEffects != null) {
@@ -353,6 +355,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             remainingPlusEffects.clear();
         selectedWeapon.getPreviousTargets().clear();
         clientHandler.sendMessage(new ShootActionResponse(selectedWeapon,ammoToPay,powerUpToPay));
+        nSimpleEffect = 0;
         return checkTurnEnd();
     }
 
@@ -558,6 +561,11 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
                 return new OperationCompletedResponse("Wait for you next turn!");
             }
         }
+    }
+
+    @Override
+    public ServerMessage handle(EndTurnRequest endTurnRequest) {
+        return checkTurnEnd();
     }
 
     /**
@@ -863,7 +871,7 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
     }
 
     @Override
-    public ServerMessage handle(EndTurnRequest endTurnRequest) {
+    public ServerMessage handle(EndActionRequest endActionRequest) {
         if(checkIfEnded())
             return new NotifyEndGame(model.getRanking());
 
@@ -1139,8 +1147,10 @@ public class ServerController implements ClientMessageHandler, PlayerObserver, E
             }
             return currSimpleEffect.handle(this);
         }
-        else
+        else{
+            remainingPlusEffects.clear();
             return terminateFullEffect();
+        }
 
     }
 

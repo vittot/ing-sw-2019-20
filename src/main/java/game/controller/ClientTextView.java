@@ -5,13 +5,8 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
-import game.model.effects.MovementEffect;
 import game.model.effects.SimpleEffect;
-import game.model.effects.SquareDamageEffect;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -163,7 +158,10 @@ public class ClientTextView implements  View {
 
         }while(weaponsToReload.size() > 0 && n!=-1);
 
-        controller.sendMessages(reloadRequests);
+        if(n != -1)
+            controller.sendMessages(reloadRequests);
+        else
+            controller.getClient().sendMessage(new EndActionRequest());
 
     }
 
@@ -475,7 +473,7 @@ public class ClientTextView implements  View {
             action = action.toUpperCase();
             try {
                 if(action.equals("EXIT")){
-                    controller.getClient().sendMessage(new EndTurnRequest());
+                    controller.getClient().sendMessage(new EndActionRequest());
                     return;
                 }
 
@@ -1125,6 +1123,8 @@ public class ClientTextView implements  View {
         }
         else
             writeText(checkPlayerColor(p.getColor()) + "You haven't available power-up cards! " + ANSI_RESET);
+
+        writeText("You have:"+ANSI_RESET);
         if(p.getDamage().size()==0)
             writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
         else{
@@ -1149,7 +1149,7 @@ public class ClientTextView implements  View {
         for(Player p : ClientContext.get().getMap().getAllPlayers()) {
             if (p.getId() != ClientContext.get().getMyID()){
                 System.out.println("");
-                writeText(checkPlayerColor(p.getColor()) + "Player " + p.getId() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
+                writeText(checkPlayerColor(p.getColor()) + "Player " + p.getNickName() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
                 if(p.getDamage().size()==0)
                     writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
                 else{
@@ -1286,6 +1286,7 @@ public class ClientTextView implements  View {
                     System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
             System.out.println("");
         }
+
     }
 
     /**
@@ -1368,5 +1369,10 @@ public class ClientTextView implements  View {
         else{
             controller.stopListening();
         }
+    }
+
+    @Override
+    public void connectionFailed() {
+        writeText("ERROR: Unable to connect, check your connection and the server ip!");
     }
 }
