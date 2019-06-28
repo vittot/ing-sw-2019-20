@@ -1,7 +1,7 @@
 package game.controller;
 
-import game.controller.commands.ClientMessage;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ClientGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.GetAvailableMapsRequest;
 import game.controller.commands.clientcommands.GrabActionRequest;
@@ -11,13 +11,11 @@ import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardWeaponSpaceException;
 
-import java.io.IOException;
-import java.util.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ClientController implements ServerMessageHandler {
+public class ClientController implements ServerGameMessageHandler {
     private final Client client;
     private View clientView;
     private List<Action> availableActions;
@@ -70,9 +68,9 @@ public class ClientController implements ServerMessageHandler {
      * Send a series of messages to server
      * @param messages
      */
-    public void sendMessages(List<ClientMessage> messages)
+    public void sendMessages(List<ClientGameMessage> messages)
     {
-        for(ClientMessage m : messages)
+        for(ClientGameMessage m : messages)
             client.sendMessage(m);
     }
 

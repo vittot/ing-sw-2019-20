@@ -1,9 +1,10 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 
-public class NotifyRespawn implements ServerMessage {
+public class NotifyRespawn implements ServerGameMessage {
 
     private int pId;
     private int x;
@@ -25,6 +26,11 @@ public class NotifyRespawn implements ServerMessage {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

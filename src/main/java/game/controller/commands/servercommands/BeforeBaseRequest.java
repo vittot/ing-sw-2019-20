@@ -1,11 +1,11 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.effects.FullEffect;
-import game.model.exceptions.MapOutOfLimitException;
 
-public class BeforeBaseRequest implements ServerMessage {
+public class BeforeBaseRequest implements ServerGameMessage {
 
     private FullEffect plusEff;
 
@@ -15,6 +15,11 @@ public class BeforeBaseRequest implements ServerMessage {
 
     public FullEffect getPlusEff() {
         return plusEff;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

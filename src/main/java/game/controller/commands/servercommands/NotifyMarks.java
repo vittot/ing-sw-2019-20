@@ -1,10 +1,10 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
-import game.model.Player;
 
-public class NotifyMarks implements ServerMessage {
+public class NotifyMarks implements ServerGameMessage {
 
     private int shooterId;
     private int hitId;
@@ -26,6 +26,11 @@ public class NotifyMarks implements ServerMessage {
 
     public int getMarks() {
         return marks;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

@@ -1,19 +1,18 @@
 package game.controller;
 
-import game.controller.commands.ClientMessage;
-import game.controller.commands.ServerMessage;
-import game.controller.commands.ServerMessageHandler;
+import game.controller.commands.*;
+import game.controller.commands.clientcommands.PongMessage;
+import game.controller.commands.servercommands.PingMessage;
 
-import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-public class RMIClient extends UnicastRemoteObject implements Client, RemoteClient {
+public class RMIClient extends UnicastRemoteObject implements Client, RemoteClient,ServerMessageHandler {
 
-    private transient ServerMessageHandler controller;
+    private transient ServerGameMessageHandler controller;
     private transient IRMIClientHandler rmiClientHandler;
     private String serverIP;
 
@@ -40,10 +39,19 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
     }
 
     @Override
-    public synchronized void receiveMessage(ServerMessage msg) throws RemoteException {
+    public void receiveMessage(ServerMessage msg) throws RemoteException {
+        msg.handle(this);
+    }
+
+    @Override
+    public synchronized void handle(ServerGameMessage msg) {
         msg.handle(controller);
     }
 
+    @Override
+    public void handle(PingMessage msg) {
+        sendMessage(new PongMessage());
+    }
 
     @Override
     public boolean init() {

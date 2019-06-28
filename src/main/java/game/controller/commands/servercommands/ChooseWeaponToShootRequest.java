@@ -1,13 +1,13 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.CardWeapon;
-import game.model.exceptions.MapOutOfLimitException;
 
 import java.util.List;
 
-public class ChooseWeaponToShootRequest implements ServerMessage {
+public class ChooseWeaponToShootRequest implements ServerGameMessage {
 
     private List<CardWeapon> myWeapons;
 
@@ -20,7 +20,12 @@ public class ChooseWeaponToShootRequest implements ServerMessage {
     }
 
     @Override
-    public void handle(ServerMessageHandler handler)  {
+    public void handle(ServerGameMessageHandler handler)  {
+        handler.handle(this);
+    }
+
+    @Override
+    public void handle(ServerMessageHandler handler) {
         handler.handle(this);
     }
 }

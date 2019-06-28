@@ -1,7 +1,7 @@
 package game.model.effects;
 
 import game.controller.EffectHandler;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
 import game.model.Game;
 import game.model.Player;
 import game.model.Target;
@@ -80,7 +80,7 @@ public abstract class SimpleEffect implements Serializable {
 
     public abstract boolean checkEffect(SimpleEffect effect, Player p);
 
-    public abstract ServerMessage handle(EffectHandler h);
+    public abstract ServerGameMessage handle(EffectHandler h);
 
-    public abstract ServerMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model);
+    public abstract ServerGameMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model);
 }

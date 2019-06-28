@@ -1,9 +1,10 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 
-public class NotifyTurnChanged implements ServerMessage {
+public class NotifyTurnChanged implements ServerGameMessage {
 
     private int currPlayerId;
 
@@ -13,6 +14,11 @@ public class NotifyTurnChanged implements ServerMessage {
 
     public int getCurrPlayerId() {
         return currPlayerId;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

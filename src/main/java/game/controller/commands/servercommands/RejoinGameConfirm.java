@@ -1,14 +1,14 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.GameMap;
 import game.model.Player;
-import game.model.exceptions.MapOutOfLimitException;
 
 import java.util.List;
 
-public class RejoinGameConfirm implements ServerMessage {
+public class RejoinGameConfirm implements ServerGameMessage {
 
     private GameMap map;
     private List<Player> players;
@@ -30,6 +30,11 @@ public class RejoinGameConfirm implements ServerMessage {
 
     public List<Player> getPlayers() {
         return players;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

@@ -1,10 +1,11 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.CardPower;
 
-public class ChoosePowerUpUsed implements ServerMessage {
+public class ChoosePowerUpUsed implements ServerGameMessage {
 
     private CardPower cardPower;
 
@@ -14,6 +15,11 @@ public class ChoosePowerUpUsed implements ServerMessage {
 
     public CardPower getCardPower() {
         return cardPower;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

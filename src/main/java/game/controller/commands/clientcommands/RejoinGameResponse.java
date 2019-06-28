@@ -1,11 +1,11 @@
 package game.controller.commands.clientcommands;
 
-import game.controller.commands.ClientMessage;
+import game.controller.commands.ClientGameMessage;
+import game.controller.commands.ClientGameMessageHandler;
 import game.controller.commands.ClientMessageHandler;
-import game.controller.commands.ServerMessage;
-import game.model.exceptions.NoCardAmmoAvailableException;
+import game.controller.commands.ServerGameMessage;
 
-public class RejoinGameResponse implements ClientMessage {
+public class RejoinGameResponse implements ClientGameMessage {
 
     private boolean rejoin;
     private String user;
@@ -24,7 +24,12 @@ public class RejoinGameResponse implements ClientMessage {
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) {
+    public ServerGameMessage handle(ClientGameMessageHandler handler) {
         return handler.handle(this);
+    }
+
+    @Override
+    public void handle(ClientMessageHandler handler) {
+        handler.handle(this);
     }
 }

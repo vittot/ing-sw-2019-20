@@ -1,7 +1,7 @@
 package game.controller;
 
 import game.LaunchClient;
-import game.controller.commands.ClientMessage;
+import game.controller.commands.ClientGameMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
@@ -144,7 +144,7 @@ public class ClientTextView implements  View {
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
         writeText("Here you will be able to choose what weapon reload from the unloaded ones!");
         int n;
-        List<ClientMessage> reloadRequests = new ArrayList<>();
+        List<ClientGameMessage> reloadRequests = new ArrayList<>();
         List<CardPower> cp = null;
         do {
                showWeapons(weaponsToReload,0,true, true, false);

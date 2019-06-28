@@ -1,7 +1,7 @@
 package game.controller;
 
-import game.controller.commands.ClientMessage;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.*;
+import game.controller.commands.clientcommands.PongMessage;
 import game.controller.commands.servercommands.*;
 import game.model.*;
 
@@ -12,10 +12,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.List;
 
 
-public class SocketClientHandler extends ClientHandler implements Runnable {
+public class SocketClientHandler extends ClientHandler implements Runnable, ClientMessageHandler {
 
     private Socket socket;
     private final ObjectInputStream inStream;
@@ -38,7 +37,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
      * @param msg
      */
     @Override
-    public void sendMessage(ServerMessage msg) {
+    public synchronized void sendMessage(ServerMessage msg) {
         //if(controller.getCurrPlayer() == null /*|| !controller.getCurrPlayer().isSuspended()*/)
             try{
                 outStream.writeObject(msg);
@@ -55,14 +54,11 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
      */
     @Override
     public void run() {
-
+        startPing(PING_INTERVAL);
         try {
             do {
-                ClientMessage inMsg = (ClientMessage)inStream.readObject();
-                ServerMessage outMsg = inMsg.handle(controller);
-                sendMessage(outMsg);
-                if(controller.getCurrPlayer() != null)
-                    controller.getCurrPlayer().setSerializeEverything(false); //it is not always necessary
+                ClientMessage inMsg = (ClientMessage) inStream.readObject();
+                inMsg.handle(this);
             } while (!stop);
             close();
 
@@ -77,6 +73,20 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
         }
 
 
+    }
+
+    @Override
+    public void handle(ClientGameMessage inMsg) {
+        ServerGameMessage outMsg = inMsg.handle(controller);
+        sendMessage(outMsg);
+        if(controller.getCurrPlayer() != null)
+            controller.getCurrPlayer().setSerializeEverything(false); //it is not always necessary
+    }
+
+    @Override
+    public synchronized void handle(PongMessage msg) {
+        pingTimer.cancel();
+        nPingLost = 0;
     }
 
     /**

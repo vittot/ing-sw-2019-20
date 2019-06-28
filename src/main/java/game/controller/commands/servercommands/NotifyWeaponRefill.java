@@ -1,12 +1,12 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.CardWeapon;
 import game.model.Square;
-import game.model.exceptions.MapOutOfLimitException;
 
-public class NotifyWeaponRefill implements ServerMessage {
+public class NotifyWeaponRefill implements ServerGameMessage {
 
     private CardWeapon cw;
     private Square position;
@@ -22,6 +22,11 @@ public class NotifyWeaponRefill implements ServerMessage {
 
     public Square getPosition() {
         return position;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

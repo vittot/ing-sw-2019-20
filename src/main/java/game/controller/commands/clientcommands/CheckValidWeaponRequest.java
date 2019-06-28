@@ -3,21 +3,18 @@ package game.controller.commands.clientcommands;
 import game.controller.commands.ClientGameMessage;
 import game.controller.commands.ClientGameMessageHandler;
 import game.controller.commands.ClientMessageHandler;
-import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerGameMessage;
-import game.model.Square;
+import game.model.Player;
 
-public class ChooseSquareResponse implements ClientGameMessage {
+public class CheckValidWeaponRequest implements ClientGameMessage {
+    private Player player;
 
-
-    private Square selectedSquare;
-
-    public ChooseSquareResponse(Square selectedSquare) {
-        this.selectedSquare=selectedSquare;
+    public CheckValidWeaponRequest(Player player) {
+        this.player = player;
     }
 
-    public Square getSelectedSquare() {
-        return selectedSquare;
+    public Player getPlayer() {
+        return player;
     }
 
     @Override
@@ -29,4 +26,6 @@ public class ChooseSquareResponse implements ClientGameMessage {
     public void handle(ClientMessageHandler handler) {
         handler.handle(this);
     }
+
+
 }

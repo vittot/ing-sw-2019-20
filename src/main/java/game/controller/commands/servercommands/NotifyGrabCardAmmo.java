@@ -1,15 +1,13 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
-import game.model.CardPower;
 import game.model.Color;
-import game.model.Player;
-import game.model.exceptions.MapOutOfLimitException;
 
 import java.util.List;
 
-public class NotifyGrabCardAmmo implements ServerMessage {
+public class NotifyGrabCardAmmo implements ServerGameMessage {
 
     private int pId;
     private int x;
@@ -38,6 +36,11 @@ public class NotifyGrabCardAmmo implements ServerMessage {
 
     public List<Color> getAmmos() {
         return ammos;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

@@ -1,7 +1,8 @@
 package game.controller;
 
-import game.controller.commands.ClientMessage;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.*;
+import game.controller.commands.clientcommands.PongMessage;
+import game.controller.commands.servercommands.PingMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,7 +12,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SocketClient implements Client {
+public class SocketClient implements Client, ServerMessageHandler {
     private final String host;
     private final int port;
     private Socket socket;
@@ -20,6 +21,7 @@ public class SocketClient implements Client {
     private ObjectOutputStream outStream;
     private ExecutorService executor;
     private boolean stop;
+    private ServerGameMessageHandler controller;
 
     public SocketClient(String host, int port) {
         this.host = host;
@@ -50,6 +52,7 @@ public class SocketClient implements Client {
     public void startListening(ClientController handler)
     {
 
+        this.controller = handler;
         receiver = new Thread(
 
                 () -> {
@@ -58,9 +61,8 @@ public class SocketClient implements Client {
                         sm = this.receiveMessage();
                         if(sm!=null)
                         {
-                            //final ServerMessage sm2 = sm;
-                            //executor.submit(()->sm2.handle(handler));
-                            sm.handle(handler);
+                            final ServerMessage smR = sm;
+                            executor.submit( ()-> smR.handle(this) );
                         }
 
                     }while(sm != null);
@@ -94,6 +96,16 @@ public class SocketClient implements Client {
         } catch (IOException | ClassNotFoundException e){
             return null;
         }
+    }
+
+    @Override
+    public void handle(ServerGameMessage msg) {
+        msg.handle(controller);
+    }
+
+    @Override
+    public void handle(PingMessage msg) {
+        sendMessage(new PongMessage());
     }
 
     public void close() {

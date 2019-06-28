@@ -1,11 +1,12 @@
 package game.controller;
 
+import game.controller.commands.ClientGameMessage;
 import game.controller.commands.ClientMessage;
+import game.controller.commands.ServerGameMessage;
 import game.controller.commands.ServerMessage;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.Unreferenced;
 
 public interface IRMIClientHandler extends Remote {
 

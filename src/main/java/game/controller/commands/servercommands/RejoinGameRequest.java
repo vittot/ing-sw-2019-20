@@ -1,12 +1,12 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
-import game.model.exceptions.MapOutOfLimitException;
 
 import java.util.List;
 
-public class RejoinGameRequest implements ServerMessage {
+public class RejoinGameRequest implements ServerGameMessage {
 
     private List<String> otherPlayerNames;
 
@@ -16,6 +16,11 @@ public class RejoinGameRequest implements ServerMessage {
 
     public List<String> getOtherPlayerNames() {
         return otherPlayerNames;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

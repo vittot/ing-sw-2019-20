@@ -1,10 +1,10 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
-import game.model.exceptions.MapOutOfLimitException;
 
-public class NotifyPlayerSuspend implements ServerMessage {
+public class NotifyPlayerSuspend implements ServerGameMessage {
 
     private int pId;
 
@@ -14,6 +14,11 @@ public class NotifyPlayerSuspend implements ServerMessage {
 
     public int getpId() {
         return pId;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

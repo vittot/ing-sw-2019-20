@@ -1,12 +1,13 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.*;
 
 import java.util.List;
 
-public class NotifyGameStarted implements ServerMessage {
+public class NotifyGameStarted implements ServerGameMessage {
 
     private GameMap map;
     private List<Player> players;
@@ -33,6 +34,11 @@ public class NotifyGameStarted implements ServerMessage {
 
     public GameMap getMap() {
         return map;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

@@ -1,13 +1,10 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
-import game.model.Player;
-import game.model.Target;
 
-import java.util.List;
-
-public class NotifyDamageResponse implements ServerMessage {
+public class NotifyDamageResponse implements ServerGameMessage {
     private int shooterId;
     private int hitId;
     private int damage;
@@ -28,6 +25,11 @@ public class NotifyDamageResponse implements ServerMessage {
 
     public int getDamage() {
         return damage;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

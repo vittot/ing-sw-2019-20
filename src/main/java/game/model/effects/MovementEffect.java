@@ -1,7 +1,7 @@
 package game.model.effects;
 
 import game.controller.EffectHandler;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
 import game.model.*;
 
 import java.util.ArrayList;
@@ -213,12 +213,12 @@ public class MovementEffect extends SimpleEffect {
     }
 
     @Override
-    public ServerMessage handle(EffectHandler h) {
+    public ServerGameMessage handle(EffectHandler h) {
         return h.handle(this);
     }
 
     @Override
-    public ServerMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
+    public ServerGameMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
         List<Target> toApplyEffect = new ArrayList<>();
         for (Target t : model.getPlayers()) {
             if (targetList.contains(t))
