@@ -116,4 +116,5 @@ public interface View {
     void notifyConnectionError();
 
     void chooseCounterAttack(List<CardPower> counterattack, Player shooter);
+
 }

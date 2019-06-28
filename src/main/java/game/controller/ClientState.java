@@ -1,7 +1,11 @@
 package game.controller;
 
-public enum ClientState {
-    WAITING_GRAB_WEAPON,
+public enum ClientState {                   //Used from GUI
+    CHOOSEWEAPONTOWASTE,
+    CHOOSEWEAPONTOGRAB,
+    CHOOSESTEP,
+    CHOOSEACTIOIN,
+    WAITING_GRAB_WEAPON,                    //Used from Client Context
     WAITING_GRAB_AMMO,
     WAITING_SHOOT,
     WAITING_ACTION,

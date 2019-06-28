@@ -1,5 +1,6 @@
 package game.controller;
 
+import com.sun.javafx.image.IntPixelGetter;
 import game.LaunchClient;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
@@ -65,7 +66,22 @@ public class ClientGUIView extends Application implements View{
     private List<List<ImageView>> playerMarks = new ArrayList<>();
     private List<ImageView> myPlayerDamage = new ArrayList<>();
     private List<ImageView> myPlayerMarks = new ArrayList<>();
+    private List<ImageView> deathsBoard = new ArrayList<>();
+    private Button move = new Button("Movement");
+    private Button grab = new Button("Grab");
+    private Button shoot = new Button("Shoot");
+    private Button exit = new Button("Exit");
+    private Button power = new Button("Power-Up");
     private Label text = new Label("");
+    private ClientState state;
+
+
+
+    private List<Square> possiblePositions;
+    private List<CardWeapon> weaponToGrab;
+    private CardWeapon weaponG;
+    private CardWeapon weaponW;
+
 
     public ClientGUIView() {
         GUI = this;
@@ -87,6 +103,17 @@ public class ClientGUIView extends Application implements View{
             }
         }
         return GUI;
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        //showMap();
+    }
+
+
+    public static void main(String[] args) {
+        launch(args);
     }
 
     public void setController(ClientController controller){
@@ -132,7 +159,7 @@ public class ClientGUIView extends Application implements View{
 
 
         primaryStage.setScene(sc);
-        primaryStage.setAlwaysOnTop(true);
+        //primaryStage.setAlwaysOnTop(true);
         primaryStage.setTitle("Adrenalina Connection Setup");
         primaryStage.show();
 
@@ -170,7 +197,7 @@ public class ClientGUIView extends Application implements View{
         primaryStage.setScene(scene);
         primaryStage.setHeight(300);
         primaryStage.setWidth(500);
-        primaryStage.setAlwaysOnTop(true);
+        //primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
     }
 
@@ -179,32 +206,18 @@ public class ClientGUIView extends Application implements View{
 
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        //showMap();
-    }
-
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     private void callRoomCreate(String s ){
 
-        System.out.println(s);
-        int mapId = 0, nPlayer= 5;
-        if(s == "map1") mapId = 1;
-        if(s == "map2") mapId = 2;
-        if(s == "map3") mapId = 3;
-        if(s == "map4") mapId = 4;
-        System.out.println(mapId);
+        int mapId = 0, nPlayer= 3;
+        if(s == "Map 1") mapId = 1;
+        if(s == "Map 2") mapId = 2;
+        if(s == "Map 3") mapId = 3;
+        if(s == "Map 4") mapId = 4;
         controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,user));
     }
 
     @Override
     public void notifyStart() {
-        System.out.println("ALFIH");
         showMapGame();
     }
 
@@ -243,18 +256,15 @@ public class ClientGUIView extends Application implements View{
         primaryStage.setScene(scene);
         primaryStage.setHeight(300);
         primaryStage.setWidth(500);
-        primaryStage.setAlwaysOnTop(true);
+        //primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
 
         // SetOn Acntion
         btn.setOnAction(e -> {
             if(userTextField.getText() != ""){
                 user = userTextField.getText();
-                System.out.println("user:\t" + userTextField.getText());
-                System.out.println("X :" + primaryStage.getHeight() +" Y "+ primaryStage.getWidth());
                 ClientContext.get().setUser(user);
                 controller.getClient().sendMessage(new LoginMessage(ClientContext.get().getUser()));
-                System.out.println("Login inviato");
             }
         });
 
@@ -262,17 +272,41 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void insufficientAmmoNotification() {
-
+        text.setText("Not enough ammo");
     }
 
     @Override
     public void chooseStepActionPhase() {
-
+        for (Action p : this.controller.getAvailableActions()) {
+        }
+        text.setText("Choose your single step");
+        state = ClientState.CHOOSESTEP;
+        exit.setVisible(true);
+        exit.setDisable(false);
+        if(this.controller.getAvailableActions().contains(Action.MOVEMENT)){
+            move.setVisible(true);
+            move.setDisable(false);
+        }
+        if(this.controller.getAvailableActions().contains(Action.GRAB)){
+            grab.setVisible(true);
+            grab.setDisable(false);
+        }
+        if(this.controller.getAvailableActions().contains(Action.SHOOT)){
+            shoot.setVisible(true);
+            shoot.setDisable(false);
+        }
     }
 
     @Override
     public void chooseSquarePhase(List<Square> possiblePositions) {
-
+        this.possiblePositions = possiblePositions;
+        text.setText("Choose where you want to move");
+        for(Rectangle r : squares){
+            if(possiblePositions.stream().filter(p->Integer.parseInt(r.getId()) == ((p.getX() + 1) + (p.getY() * 4))).count() != 0 ){
+                r.setStroke(Color.GREEN);
+                r.setOnMouseClicked(this::handleSquareClick);
+            }
+        }
     }
 
     @Override
@@ -282,7 +316,15 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void chooseTurnActionPhase() {
-
+        refreshMyPlayerCard();
+        text.setText("Choose your Action ");
+        state = ClientState.CHOOSEACTIOIN;
+        move.setVisible(true);
+        move.setDisable(false);
+        shoot.setVisible(true);
+        shoot.setDisable(false);
+        grab.setVisible(true);
+        grab.setDisable(false);
     }
 
     @Override
@@ -317,27 +359,57 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void damageNotification(int shooterId, int damage, int hit) {
-
+        String nick = ClientContext.get().getMap().getPlayerById(shooterId).getNickName();
+        String hitted = ClientContext.get().getMap().getPlayerById(hit).getNickName();
+        if(shooterId == ClientContext.get().getMyID()){
+            text.setText("You dealt damage");
+            refreshPlayerDamage();
+        }
+        else{
+            if(hit == ClientContext.get().getMyID()){
+                text.setText(nick + " dealt damage to you");
+                refreshMyPlayerDamage();
+            }else{
+                text.setText(nick + " dealt damage to "+ hitted);
+                refreshPlayerDamage();
+            }
+        }
     }
 
     @Override
     public void notifyMovement(int pId, int newX, int newY) {
-
+        String moved = ClientContext.get().getMap().getPlayerById(pId).getNickName();
+        text.setText("Player "+ moved + " moved!");
+        refreshPlayerPosition();
     }
 
     @Override
     public void notifyDeath(Kill kill) {
-
+        text.setText("Player "+kill.getKiller().getNickName() + " killed "+kill.getVictim().getNickName());
+        refreshDeaths();
     }
 
     @Override
     public void grabWeaponNotification(int pID, String name, int x, int y) {
-
+        refreshWeaponCard();
+        if(pID == ClientContext.get().getMyID()){
+            refreshMyPlayerCard();
+            text.setText("You grabbed "+name);
+        }else{
+            String pName = ClientContext.get().getMap().getPlayerById(pID).getNickName();
+            text.setText("Player "+pName+ " grabbed "+ name);
+        }
     }
 
     @Override
     public void powerUpUsageNotification(int id, String name, String description) {
-
+        if(id == ClientContext.get().getMyID()){
+            refreshMyPlayerCard();
+            text.setText("You used "+name);
+        }else{
+            String pName = ClientContext.get().getMap().getPlayerById(id).getNickName();
+            text.setText("Player "+pName+ " used "+ name);
+        }
     }
 
     @Override
@@ -345,63 +417,141 @@ public class ClientGUIView extends Application implements View{
         text.setText("Your turn: respawn");
         refreshMyPlayerCard();
         for(ImageView im : powerUp){
-            im.setEffect(new DropShadow(20,Color.GREEN));
-            im.setOnMouseClicked(this::handleRespawnSquare);
+            if(!im.getId().equals("0")){
+                im.setEffect(new DropShadow(20,Color.GREEN));
+                im.setOnMouseClicked(this::handleRespawnSquare);
+            }
         }
     }
 
     @Override
     public void notifyCompletedOperation(String message) {
-        System.out.println(message);
+        System.out.println("notifyOperationcomeplte");
+        text.setText(message);
+        if(!this.controller.getState().equals(ClientState.WAITING_START)){
+            refreshMyPlayerCard();
+            refreshMyPlayerAmmo();
+        }
     }
 
     @Override
     public void notifyInvalidPowerUP() {
-
+        text.setText("Invalid Power Up");
     }
 
     @Override
     public void notifyInvalidGrabPosition() {
-
+        text.setText("Invalid position, no card ammo here");
     }
 
     @Override
     public void choosePowerUpToUse(List<CardPower> cardPower) {
-
+        StackPane sp = new StackPane();
+        Scene tempScene = new Scene(sp);
+        Stage sg = new Stage();
+        List<CheckBox> powerUp = new ArrayList<>();
+        List<CardPower> choosenPW = new ArrayList<>();
+        sp.setPrefSize(700,900);
+        int j = 0;
+        for(CardPower cp : cardPower){
+            CheckBox cb = new CheckBox(cp.getName());
+            cb.setId(""+cp.getId());
+            sp.getChildren().add(cb);
+            powerUp.add(cb);
+            StackPane.setAlignment(cb,Pos.TOP_LEFT);
+            StackPane.setMargin(cb,new Insets(100 + j , 0,0,40));
+            j = j + 150;
+        }
+        Button submit = new Button("Submit");
+        submit.setOnMouseClicked(mouseEvent -> {
+            for(CheckBox c : powerUp){
+                if(c.isSelected()){
+                    CardPower cp = ClientContext.get().getMyPlayer().getCardPower().stream().filter(pw -> pw.getId() == Integer.parseInt(c.getId())).findFirst().orElse(null);
+                    if(cp != null)
+                        choosenPW.add(cp);
+                }
+            }
+            controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, weaponW));
+            sg.close();
+        });
+        sg.setScene(tempScene);
+        primaryStage.setAlwaysOnTop(false);
+        sg.setAlwaysOnTop(true);
+        sg.show();
     }
 
     @Override
     public void notifyInvalidMessage() {
-
+        text.setText("Invalid choise!");
     }
 
     @Override
     public void notifyTurnChanged(int pID) {
-
+        if(pID == ClientContext.get().getMyID())
+            text.setText("Your turn, Good Luck!");
+        else {
+            Player p = ClientContext.get().getMap().getPlayerById(pID);
+            if( p == null)
+                p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == pID).findFirst().orElse(null);
+            if(p == null)
+                text.setText("Player "+pID+ " turn! Wit your time.");
+            else
+                text.setText("Player "+p.getNickName()+" turn! Wait yout turn.");
+        }
     }
 
     @Override
     public void notifyMarks(int marks, int idHitten, int idShooter) {
-
+        String hitted = ClientContext.get().getMap().getPlayerById(idHitten).getNickName();
+        String shooter = ClientContext.get().getMap().getPlayerById(idShooter).getNickName();
+        if(idHitten == ClientContext.get().getMyID()) {
+            refreshMyPlayerDamage();
+            text.setText("You got hitted by "+ shooter);
+        }
+        else {
+            refreshPlayerDamage();
+            text.setText(hitted+" got hitted by "+ shooter);
+        }
     }
 
     @Override
     public void notifyGrabCardAmmo(int pID) {
-
+        System.out.println("notifyGrabAmmo");
+        if(pID == ClientContext.get().getMyID())
+            refreshMyPlayerAmmo();
+        refreshAmmoCard();
     }
 
     @Override
     public void notifyRespawn(int pID) {
-
+        System.out.println("notifyrespawn");
+        if(pID == ClientContext.get().getMyID())
+            refreshMyPlayerCard();
+        refreshPlayerPosition();
     }
 
     @Override
     public void chooseWeaponToGrab(List<CardWeapon> weapons) {
-
+        state = ClientState.WAITING_GRAB_WEAPON;
+        weaponToGrab = weapons;
+        for(ImageView iv : mapWT){
+            int id = Integer.parseInt(iv.getId().substring(2));
+            if(id != 0) {
+                if (weapons.stream().anyMatch(w -> w.getId() == id)) {
+                    iv.setOnMouseClicked(this::handleWeaponClick);
+                    iv.setEffect(new DropShadow(7, Color.GREEN));
+                }
+            }
+        }
     }
 
     @Override
     public void chooseRoomPhase(List<WaitingRoom> waitingRooms) {
+        StackPane waits = new StackPane();
+        Label textw = new Label("Wait Other Player");
+        waits.getChildren().add(textw);
+        StackPane.setAlignment(textw,Pos.CENTER);
+        Scene wait = new Scene(waits);
         StackPane chooseRoom = new StackPane();
         chooseRoom.setPrefSize(500, 300);
         Scene chooseR = new Scene(chooseRoom);
@@ -433,6 +583,7 @@ public class ClientGUIView extends Application implements View{
             submit.setOnAction(actionEvent -> {
                 if(tg.getSelectedToggle().isSelected())
                     handleJoinRoom((RadioButton)tg.getSelectedToggle());
+                primaryStage.setScene(wait);
             });
         }
         primaryStage.setScene(chooseR);
@@ -502,7 +653,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyPlayerSuspended(Player p) {
-
+        text.setText("Player "+ p.getNickName() + "got suspended!");
     }
 
     @Override
@@ -520,12 +671,11 @@ public class ClientGUIView extends Application implements View{
         StackPane.setAlignment(btn,Pos.BOTTOM_RIGHT);
         Scene scene = new Scene(sp);
         primaryStage.setScene(scene);
-        btn.setOnAction(ac ->{setUserNamePhase();});
+        btn.setOnAction(ac ->setUserNamePhase());
     }
 
     @Override
     public void loginCompletedPhase() {
-        System.out.println("Login Complete");
         controller.getClient().sendMessage(new GetAvailableMapsRequest());
     }
 
@@ -555,6 +705,7 @@ public class ClientGUIView extends Application implements View{
      * @return
      */
     private Image createAmmoCard(int i) {
+        System.out.println(""+ i);
         String card = "";
         int x = 0;
         int y = 0;
@@ -569,7 +720,7 @@ public class ClientGUIView extends Application implements View{
         }
         try {
             if(ClientContext.get().getMap().getGrid()[y][x] != null) {
-                if(!ClientContext.get().getMap().getSquare(x,y).isRespawn()){
+                if(ClientContext.get().getMap().getSquare(x,y).getCardAmmo() != null){                      //!ClientContext.get().getMap().getSquare(x,y).isRespawn() &&
                     ca = ClientContext.get().getMap().getSquare(x,y).getCardAmmo();
                     if (ca.getCardPower() == 1) {
                         card = card + "P";
@@ -579,13 +730,13 @@ public class ClientGUIView extends Application implements View{
                             card = card + c.toString().substring(0, 1);
                         }
                     }
-                    System.out.println("adwd"+card);
                     ammoI = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/ammo/"+card+".png"));
                 }
             }
         } catch (MapOutOfLimitException e) {
             e.printStackTrace();
         }
+        System.out.println(card);
         return ammoI;
     }
 
@@ -613,7 +764,7 @@ public class ClientGUIView extends Application implements View{
         if(color.equals(PlayerColor.GREEN))return Color.GREEN;
         if(color.equals(PlayerColor.BLUE))return Color.BLUE;
         if(color.equals(PlayerColor.PURPLE))return Color.PURPLE;
-        if(color.equals(PlayerColor.GREY))return Color.RED;
+        if(color.equals(PlayerColor.GREY))return Color.GREY;
         return Color.TRANSPARENT;
     }
 
@@ -623,8 +774,8 @@ public class ClientGUIView extends Application implements View{
     private void refreshPlayerPosition(){
         double spaceX = 0;
         double spaceY = 0;
-        int x = 0;
-        int y = 0;
+        int x;
+        int y;
         for(int i = 1; i< 13 ; i++) {
             if(i ==  1){
                 x = 0;
@@ -634,20 +785,22 @@ public class ClientGUIView extends Application implements View{
                 y = (i - 1) / 4;
             }
             if(ClientContext.get().getMap().getGrid()[y][x] != null) {
+                int j = 0;
                 for (Player pl : ClientContext.get().getMap().getGrid()[y][x].getPlayers()) {
-                    int j = 0;
                     Circle p = players.stream().filter(player -> pl.getNickName().equals(player.getId())).findFirst().orElse(null);
-                    if(p == null)
+                    if (p == null)
                         System.out.println("Player not found");
-                    StackPane.setAlignment(p,Pos.TOP_LEFT);
-                    StackPane.setMargin(p, new Insets(screenHeight * 29 / 100 + spaceY, 0, 0, screenWidth * 11 / 100 + spaceX + j * 20));
+                    StackPane.setAlignment(p, Pos.TOP_LEFT);
+                    double xS = spaceX + j * 20;
+                    StackPane.setMargin(p, new Insets(screenHeight * 29 / 100 + spaceY, 0, 0, screenWidth * 11 / 100 + xS));
+                    j++;
                 }
-                if (i % 4 == 0 && i != 0) {
+                }
+                if (x % 3 == 0 && x != 0) {
                     spaceY = spaceY + screenHeight * 18 / 100;
                     spaceX = 0;
                 } else {
                     spaceX = spaceX + screenWidth * 9.5 / 100;
-                }
             }
         }
     }
@@ -689,7 +842,6 @@ public class ClientGUIView extends Application implements View{
             StackPane.setAlignment(imw,Pos.BOTTOM_RIGHT);
             StackPane.setMargin(imw,new Insets(0,i,0,0));
             i = i + (int)(screenHeight*14/100);
-            System.out.println(i);
         }
 
         for(ImageView imw : powerUp){
@@ -699,7 +851,6 @@ public class ClientGUIView extends Application implements View{
             StackPane.setAlignment(imw,Pos.BOTTOM_RIGHT);
             StackPane.setMargin(imw,new Insets(0,i,0,0));
             i = i + (int)(screenHeight*14/100);
-            System.out.println(i);
         }
     }
 
@@ -743,6 +894,33 @@ public class ClientGUIView extends Application implements View{
                 BackgroundSize.DEFAULT);
         map.setBackground(new Background(bi));
 
+        map.getChildren().addAll(move,grab,shoot,exit);
+        StackPane.setMargin(move,new Insets(0,screenWidth * 2 / 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(move,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(grab,new Insets(0,screenWidth * 8 / 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(grab,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(shoot,new Insets(0,screenWidth * 14/ 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(shoot,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(exit,new Insets(0,screenWidth * 20/ 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(exit,Pos.BOTTOM_RIGHT);
+        move.setId("Movement");
+        grab.setId("Grab");
+        shoot.setId("Shoot");
+        exit.setId("Exit");
+        move.setOnMouseClicked(this::handleStepAction);
+        grab.setOnMouseClicked(this::handleStepAction);
+        shoot.setOnMouseClicked(this::handleStepAction);
+        exit.setOnMouseClicked(this::handleStepAction);
+        exit.setDisable(true);
+        move.setDisable(true);
+        grab.setDisable(true);
+        shoot.setDisable(true);
+        exit.setVisible(false);
+        move.setVisible(false);
+        grab.setVisible(false);
+        shoot.setVisible(false);
+
+
         //stampa rettangoli invisibili e ammo
         double spaceX = 0;
         double spaceY = 0;
@@ -757,9 +935,7 @@ public class ClientGUIView extends Application implements View{
             StackPane.setMargin(rec,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
             StackPane.setAlignment(ammoIV,Pos.TOP_LEFT);
             StackPane.setMargin(ammoIV,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
-            rec.setOnMouseClicked(this :: handleSquareClick);
-            rec.setDisable(true);
-            rec.setStroke(Color.GREEN);
+            rec.setStroke(Color.TRANSPARENT);
             rec.setStrokeWidth(7);
             if(i % 4 == 0 && i != 0){
                 spaceX = 0;
@@ -776,7 +952,7 @@ public class ClientGUIView extends Application implements View{
             mapWL.add(weapon);
             map.getChildren().add(weapon);
             weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("1");
+            weapon.setId("1_0");
             weapon.setPreserveRatio(true);
             StackPane.setAlignment(weapon,Pos.CENTER_LEFT);
             weapon.setRotate(270);
@@ -791,7 +967,7 @@ public class ClientGUIView extends Application implements View{
             mapWT.add(weapon);
             map.getChildren().add(weapon);
             weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("2");
+            weapon.setId("2_0");
             weapon.setPreserveRatio(true);
             StackPane.setAlignment(weapon,Pos.TOP_CENTER);
             StackPane.setMargin(weapon,new Insets(0,screenWidth*34/100 + spaceT,0,0));
@@ -806,7 +982,7 @@ public class ClientGUIView extends Application implements View{
             mapWR.add(weapon);
             map.getChildren().add(weapon);
             weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("3");
+            weapon.setId("3_0");
             weapon.setPreserveRatio(true);
             StackPane.setAlignment(weapon,Pos.CENTER);
             weapon.setRotate(90);
@@ -818,6 +994,28 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Refresh the skull board
+     */
+    private void refreshDeaths(){
+        for(ImageView im : deathsBoard){
+            im.setImage(null);
+            map.getChildren().remove(im);
+        }
+        deathsBoard.clear();
+        double spaceY = 0;
+        for(Kill k : ClientContext.get().getKillboard()){
+            Image kill = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+k.getKiller().getColor().toString()+"Tear.png"));
+            ImageView kills = new ImageView(kill);
+            kills.setFitHeight(screenHeight * 3 /100);
+            kills.setPreserveRatio(true);
+            deathsBoard.add(kills);
+            map.getChildren().add(kills);
+            StackPane.setAlignment(kills,Pos.TOP_LEFT);
+            StackPane.setMargin(kills,new Insets(screenHeight * 5 / 100,0,0,screenWidth * 4.8 / 100 + spaceY));
+            spaceY = spaceY + screenWidth * 2.46 / 100;
+        }
+    }
     /**
      * Refresh my player power up and weapon
      */
@@ -858,16 +1056,16 @@ public class ClientGUIView extends Application implements View{
             map.getChildren().add(c);
             c.setId(pl.getNickName());
             StackPane.setAlignment(c,Pos.TOP_LEFT);
-            StackPane.setMargin(c, new Insets(0,0,1000,0));
+            StackPane.setMargin(c, new Insets(-100,0,0,0));
             c.setOnMouseClicked(this::handlePlayerClick);
-            c.setDisable(true);
+            //c.setDisable(true);
         }
     }
 
     /**
      * refreah the ammo in the map
      */
-    private void refreshAmmoCard(){
+    private synchronized void refreshAmmoCard(){
         for(ImageView iv : ammos){
             int i = Integer.parseInt(iv.getId());
             iv.setImage(createAmmoCard(i));
@@ -880,7 +1078,6 @@ public class ClientGUIView extends Application implements View{
     private void createPlayerDashBoard(){
         int i = 0;
         for(Player p : ClientContext.get().getPlayersInWaiting()){
-            System.out.println(p.getColor().name());
             Image dash = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.getColor().toString()+"Dash.png"));
             ImageView imw = new ImageView(dash);
             map.getChildren().add(imw);
@@ -901,7 +1098,7 @@ public class ClientGUIView extends Application implements View{
     /**
      * refresh other player damage and marks tear simbol
      */
-    private void refreshPlayerDamage(){
+    private synchronized void refreshPlayerDamage(){
         double spaceY = 0;
         deletePlayerInfo();
         for(ImageView dash : playerDashBoard) {
@@ -913,7 +1110,6 @@ public class ClientGUIView extends Application implements View{
             if(p == null)
                 p = ClientContext.get().getPlayersInWaiting().stream().filter(play->play.getId() == Integer.parseInt(dash.getId())).findFirst().orElse(null);
             for (PlayerColor  c :p.getDamage()) {
-                System.out.println(c.name());
                 Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
                 ImageView damages = new ImageView(damage);
                 infoD.add(damages);
@@ -968,12 +1164,11 @@ public class ClientGUIView extends Application implements View{
     /**
      * refresh  my player damage and marks
      */
-    private void refreshMyPlayerDamage(){
+    private synchronized void refreshMyPlayerDamage(){
         double spaceX = 0;
         int j = 0;
         deleteMyPlayerDamage();
         for(PlayerColor p : ClientContext.get().getMyPlayer().getDamage()){
-            System.out.println(p.name());
             Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.toString()+"Tear.png"));
             ImageView damages = new ImageView(damage);
             myPlayerDamage.add(damages);
@@ -1020,14 +1215,14 @@ public class ClientGUIView extends Application implements View{
     /**
      * refresh ny player ammo
      */
-    private void refreshMyPlayerAmmo(){
+    private synchronized void  refreshMyPlayerAmmo(){
         //ammo
         deleteMyPlayerAmmo();
         double spaceX = 0;
         double spaceY = 0;
         int k = 1;
         for(game.model.Color c :ClientContext.get().getMyPlayer().getAmmo()){
-            System.out.println(c.name());
+            System.out.println(c.toString());
             Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.valueOf(c.toString()));
             map.getChildren().add(ammo);
             myAmmo.add(ammo);
@@ -1045,33 +1240,49 @@ public class ClientGUIView extends Application implements View{
     /**
      * delete my player ammo
      */
-    private void deleteMyPlayerAmmo(){
-        for(Rectangle r : myAmmo){
+    private void deleteMyPlayerAmmo() {
+        for (Rectangle r : myAmmo) {
+            r.setFill(Color.TRANSPARENT);
             map.getChildren().remove(r);
         }
         myAmmo.clear();
     }
-    private void refreshWeaponCard(){
-        int x = 0;
-        int y = 0;
-        int z = 0;
+    private synchronized void refreshWeaponCard(){
         for(Square q : ClientContext.get().getMap().getSpawnpoints()){
             if(q.getX() == 0 ){
-                for (CardWeapon w : q.getWeapons()) {
-                    mapWL.get(x).setImage(createWeaponCard(w.getId()));
-                    x++;
+                for (int x = 0 ; x < 3 ; x++) {
+                    if(q.getWeapons().get(x) != null){
+                        mapWL.get(x).setImage(createWeaponCard(q.getWeapons().get(x).getId()));
+                        mapWL.get(x).setId("1_"+q.getWeapons().get(x).getId());
+                    }
+                    else{
+                        mapWL.get(x).setImage(createWeaponCard(0));
+                        mapWL.get(x).setId("1_0");
+                    }
                 }
             }else
                 if(q.getX() == 3){
-                    for (CardWeapon w : q.getWeapons()) {
-                        mapWR.get(z).setImage(createWeaponCard(w.getId()));
-                        z++;
+                    for (int z = 0 ; z < 3 ; z++) {
+                        if(q.getWeapons().get(z) != null){
+                            mapWR.get(z).setImage(createWeaponCard(q.getWeapons().get(z).getId()));
+                            mapWR.get(z).setId("3_"+q.getWeapons().get(z).getId());
+                        }
+                        else{
+                            mapWR.get(z).setImage(createWeaponCard(0));
+                            mapWR.get(z).setId("3_0");
+                        }
                     }
                 }
                 else {
-                    for (CardWeapon w : q.getWeapons()) {
-                        mapWT.get(y).setImage(createWeaponCard(w.getId()));
-                        y++;
+                    for (int y = 0 ; y < 3 ; y++) {
+                        if(q.getWeapons().get(y) != null){
+                            mapWT.get(y).setImage(createWeaponCard(q.getWeapons().get(y).getId()));
+                            mapWT.get(y).setId("2_"+q.getWeapons().get(y).getId());
+                        }
+                        else{
+                            mapWT.get(y).setImage(createWeaponCard(0));
+                            mapWT.get(y).setId("2_0");
+                        }
                     }
                 }
 
@@ -1099,9 +1310,10 @@ public class ClientGUIView extends Application implements View{
         text.setText("Wait Your Turn:");
     }
 
-    /*
+/*
     private void showMap(){
         int mapId = 1;
+        StackPane map = new StackPane();
         Image image = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/mappa1.png"));
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(screenWidth*55/100);
@@ -1397,6 +1609,19 @@ public class ClientGUIView extends Application implements View{
         StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
         StackPane.setMargin(text,new Insets(0,0,(screenHeight/(displayY/130)),0));
         StackPane.setAlignment(imageView,Pos.TOP_LEFT);
+
+        Button move = new Button("Movement");
+        Button move1 = new Button("Movement");
+        Button move2 = new Button("Movement");
+        map.getChildren().addAll(move,move1,move2);
+        StackPane.setMargin(move,new Insets(0,screenWidth * 2 / 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(move,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(move1,new Insets(0,screenWidth * 8 / 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(move1,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(move2,new Insets(0,screenWidth * 14/ 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(move2,Pos.BOTTOM_RIGHT);
+
+
         Scene scene = new Scene(map);
         primaryStage.setScene(scene);
         primaryStage.setFullScreen(true);
@@ -1406,15 +1631,43 @@ public class ClientGUIView extends Application implements View{
 */
     //TODO mettere javaDoc
     private void handlePlayerClick(MouseEvent e){
-        text.setText("Player "+((Circle)e.getSource()).getId());
+        text.setText("Player "+((Circle)e.getSource()).getId() + " position: " +((Circle)e.getSource()).getCenterX() + " Y :"+((Circle)e.getSource()).getCenterY() );
     }
     private void handleSquareClick(MouseEvent e){
+        Square choosenSquare;
         int i = Integer.parseInt(((Rectangle)e.getSource()).getId());
         text.setText("You selected square in: " + (i-1)/4 + ", " + (i-1)%4);
+        choosenSquare = possiblePositions.stream().filter( p -> p.getX() == (i-1)%4 && p.getY() == (i-1)/4).findFirst().orElse(null);
+        controller.getClient().sendMessage(new ChooseSquareResponse(choosenSquare));
+        this.possiblePositions = null;
+        disableSquare();
     }
     private void handleWeaponClick(MouseEvent e){
-        text.setText("You select "+((ImageView)e.getSource()).getId());
+        int id = Integer.parseInt(((ImageView)e.getSource()).getId().substring(2));
+        if(state.equals(ClientState.CHOOSEWEAPONTOGRAB)){
+            weaponG = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+            disableweapon();
+            if(ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
+                chooseWeaponToWaste();
+            }
+            else {
+                choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
+            }
+        }
+        if(state.equals(ClientState.CHOOSEWEAPONTOWASTE)){
+            weaponW = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+            choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
+            disableMyWeapon();
+        }
     }
+    private void chooseWeaponToWaste(){
+        state = ClientState.CHOOSEWEAPONTOWASTE;
+        for(ImageView iv : weapons){
+            iv.setEffect(new DropShadow(6, Color.GREEN));
+            iv.setOnMouseClicked(this::handleWeaponClick);
+        }
+    }
+
     private void handleJoinRoom(RadioButton rb){
         int id=0;
         if(rb.getId().equals("1"))
@@ -1425,10 +1678,17 @@ public class ClientGUIView extends Application implements View{
             id = 3;
         if(rb.getId().equals("4"))
             id = 4;
-        System.out.println("id"+id+" user:"+user);
         controller.getClient().sendMessage(new JoinWaitingRoomRequest(id, user));
     }
     private void handleNewRoom(ActionEvent e){
+
+        //Blank pane
+        StackPane waits = new StackPane();
+        Label textw = new Label("Wait Other Player");
+        waits.getChildren().add(textw);
+        StackPane.setAlignment(textw,Pos.CENTER);
+        Scene wait = new Scene(waits);
+
 
         int mapId = 1, nPlayer;
         StackPane sp = new StackPane();
@@ -1438,10 +1698,10 @@ public class ClientGUIView extends Application implements View{
         Label text = new Label("Choose map id");
         Label error = new Label("");
         ChoiceBox mapc = new ChoiceBox();
-        mapc.getItems().add("map1");
-        mapc.getItems().add("map2");
-        mapc.getItems().add("map3");
-        mapc.getItems().add("map4");
+        mapc.getItems().add("Map 1");
+        mapc.getItems().add("Map 2");
+        mapc.getItems().add("Map 3");
+        mapc.getItems().add("Map 4");
         nPlayer = 5;
         Button submit = new Button("Create Room");
 
@@ -1460,8 +1720,10 @@ public class ClientGUIView extends Application implements View{
         primaryStage.show();
 
         submit.setOnAction(actionEvent -> {
-            if(mapc.getValue() != null)
+            if(mapc.getValue() != null){
                 callRoomCreate(mapc.getValue().toString());
+                primaryStage.setScene(wait);
+            }
             else
                 error.setText("Invalid Map choise");
         });
@@ -1474,7 +1736,7 @@ public class ClientGUIView extends Application implements View{
     }
     private void handleMouseOutWeapon(MouseEvent e){
         ((ImageView)e.getSource()).setViewOrder(0);
-        switch (((ImageView)e.getSource()).getId()){
+        switch (((ImageView)e.getSource()).getId().substring(0,1)){
             case "1":
                 ((ImageView)e.getSource()).setRotate(270);
                 break;
@@ -1492,6 +1754,80 @@ public class ClientGUIView extends Application implements View{
     private void handleRespawnSquare(MouseEvent e){
         CardPower p = ClientContext.get().getMyPlayer().getCardPower().stream().filter(l->l.getId() == Integer.parseInt(((ImageView)e.getSource()).getId())).findFirst().orElse(null);
         controller.getClient().sendMessage(new RespawnResponse((p)));
-        text.setText("Nice");
+        disablePowerUp();
+    }
+
+    private void handleStepAction(MouseEvent e){
+        Action chosenAction = Action.valueOf(((Button)e.getSource()).getId().toUpperCase());
+        switch (chosenAction){
+            case MOVEMENT:
+                if(state.equals(ClientState.CHOOSESTEP)) {
+                    controller.getClient().sendMessage(new MovementActionRequest());
+                }
+                else {
+                    controller.getClient().sendMessage(new ChooseTurnActionResponse(Action.MOVEMENT));
+                }
+                break;
+            case SHOOT:
+                if(state.equals(ClientState.CHOOSESTEP))
+                    controller.getClient().sendMessage(new ShootActionRequest());
+                else
+                    controller.getClient().sendMessage(new ChooseTurnActionResponse(Action.SHOOT));
+                break;
+            case GRAB:
+                if(state.equals(ClientState.CHOOSESTEP))
+                    controller.getClient().sendMessage(new GrabActionRequest());
+                else
+                    controller.getClient().sendMessage(new ChooseTurnActionResponse(Action.GRAB));
+                break;
+            case EXIT:
+                controller.getClient().sendMessage(new EndTurnRequest());
+                break;
+        }
+        disableButton();
+    }
+    private void disableButton(){
+        move.setVisible(false);
+        move.setDisable(true);
+        shoot.setVisible(false);
+        shoot.setDisable(true);
+        grab.setVisible(false);
+        grab.setDisable(true);
+        exit.setDisable(true);
+        exit.setVisible(false);
+    }
+    private void disablePowerUp(){
+        for (ImageView iv :powerUp) {
+            iv.setOnMouseClicked(null);
+            iv.setEffect(null);
+        }
+    }
+    private void disableMyWeapon(){
+        for (ImageView iv :weapons) {
+            iv.setOnMouseClicked(null);
+            iv.setEffect(null);
+        }
+    }
+    private void disableweapon(){
+        for (ImageView iv :mapWL) {
+            iv.setOnMouseClicked(null);
+            iv.setEffect(null);
+        }
+        for (ImageView iv :mapWR) {
+            iv.setOnMouseClicked(null);
+            iv.setEffect(null);
+        }
+
+        for (ImageView iv :mapWT) {
+            iv.setOnMouseClicked(null);
+            iv.setEffect(null);
+        }
+
+    }
+    private void disableSquare(){
+        for (Rectangle r :squares) {
+            r.setStroke(Color.TRANSPARENT);
+            r.setOnMouseClicked(null);
+        }
     }
 }
