@@ -211,7 +211,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             }
         }
         else if(state == ServerState.WAITING_POWER_USAGE){
-
+            if(currFullEffect.getSimpleEffects().size() > nSimpleEffect) {
+                Square dest = toBeMoved.getPosition();
+                currPlayer.getActualCardPower().setLastDirection(GameMap.getDirection(start,dest));
+                return terminateFullEffect();
+            }
             return checkTurnEnd();
         }
         else {
@@ -247,7 +251,6 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
         if(!clientMsg.getSelectedTargets().isEmpty()) {
             List<Target> selectedTargets = clientMsg.getSelectedTargets();
-            List<Target> toApplyEffect = null;
             if (!selectableTarget.containsAll(selectedTargets)) {
                 clientHandler.sendMessage(new InvalidTargetResponse());
                 return checkShootActionEnd();
@@ -259,7 +262,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             //in case no target has been selected (and it's allowed) it stops
             if (selectedTargets.isEmpty())
                 return new OperationCompletedResponse("");
-            return currSimpleEffect.handleTargetSelection(this, selectedTargets, model);
+            List<Target> toApplyEffect = new ArrayList<>();
+            for(Target t : selectableTarget)
+                if(selectedTargets.contains(t))
+                    toApplyEffect.add(t);
+            return currSimpleEffect.handleTargetSelection(this, toApplyEffect, model);
         }
         else
             return terminateFullEffect();
@@ -304,13 +311,13 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             return new NotifyEndGame(model.getRanking());
 
         MovementEffect s = (MovementEffect) currSimpleEffect;
-        toBeMoved = (Player) selectedTarget.get(0);
-        selectableSquares = s.selectPosition(toBeMoved);
-        Square before = toBeMoved.getPosition();
         if (selectableSquares.isEmpty()){
             clientHandler.sendMessage(new InvalidWeaponResponse());
             return checkShootActionEnd();
         }
+        toBeMoved = (Player) selectedTarget.get(0);
+        selectableSquares = s.selectPosition(toBeMoved);
+        Square before = toBeMoved.getPosition();
 
         if (selectableSquares.size() > 1)
             return new ChooseSquareRequest(selectableSquares);
@@ -346,7 +353,6 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(checkIfEnded())
             return new NotifyEndGame(model.getRanking());
 
-
         if(!baseDone)
             return firstEffect();
         else if(remainingPlusEffects != null) {
@@ -358,8 +364,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(remainingPlusEffects != null)
             remainingPlusEffects.clear();
         selectedWeapon.getPreviousTargets().clear();
-        clientHandler.sendMessage(new ShootActionResponse(selectedWeapon,ammoToPay,powerUpToPay));
-        nSimpleEffect = 0;
+        clientHandler.sendMessage(new ShootActionResponse(selectedWeapon));
         return checkTurnEnd();
     }
 
@@ -898,6 +903,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             return new NotifyEndGame(model.getRanking());
         if(choosePowerUpResponse.isConfirm()) {
             state = ServerState.WAITING_POWER_USAGE;
+            currPlayer.setActualCardPower(choosePowerUpResponse.getCardPower());
             List<CardPower> avPowerUp = currPlayer.getCardPower();
             CardPower cp = choosePowerUpResponse.getCardPower();
             if(state == ServerState.WAITING_ACTION)
@@ -916,6 +922,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             if(choosePowerUpResponse.getAmmoToPay() != Color.ANY) {
                 try {
                     currPlayer.pay(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()),new ArrayList<>());
+                    clientHandler.sendMessage(new AddPayment(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()),new ArrayList<>()));
                 } catch (InsufficientAmmoException e) {
                     e.printStackTrace();
                 }
@@ -1037,6 +1044,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         currFullEffect = baseEff;
         currSimpleEffect = currFullEffect.getSimpleEffect(0);
         baseDone = true;
+        nSimpleEffect = 0;
         return currSimpleEffect.handle(this);
         //return managePlusEffectChoice();
     }
@@ -1105,6 +1113,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 //TODO: ??
                 return new InsufficientAmmoResponse();
             }
+            nSimpleEffect = 0;
             return  currSimpleEffect.handle(this);
         }
         return firstEffect();
@@ -1151,6 +1160,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 //TODO: ??
                 return new InsufficientAmmoResponse();
             }
+            nSimpleEffect = 0;
             return currSimpleEffect.handle(this);
         }
         else{
@@ -1164,13 +1174,22 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
             return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
         if(state != ServerState.WAITING_POWER_USAGE) {
+            state = ServerState.WAITING_POWER_USAGE;
             List<CardPower> powers = controlPowerUpDamage();
             if (!powers.isEmpty()) {
                 return new AfterDamagePowerUpRequest(powers, selectableTarget);
             }
         }
-        else
-            state = ServerState.HANDLING_SHOOT;
+        state = ServerState.HANDLING_SHOOT;
+        if(ammoToPay != null) {
+            if(powerUpToPay != null) {
+                clientHandler.sendMessage(new AddPayment(ammoToPay, powerUpToPay));
+                powerUpToPay.clear();
+            }
+            else
+                clientHandler.sendMessage(new AddPayment(ammoToPay, new ArrayList<>()));
+            ammoToPay.clear();
+        }
         return checkShootActionEnd();
     }
 
@@ -1188,6 +1207,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             //TODO: ??
             return new InsufficientAmmoResponse();
         }
+        nSimpleEffect = 0;
         return currSimpleEffect.handle(this);
     }
 

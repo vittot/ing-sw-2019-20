@@ -154,8 +154,7 @@ public class ClientTextView implements  View {
             } while (n != -1 && n < 1 && n > weaponsToReload.size());
             if(n != -1)
             {
-                if(weaponsToReload.get(n-1).getPrice().size() > 1)
-                    cp = powerUpSelection(weaponsToReload.get(n-1).getPrice());
+                cp = powerUpSelection(weaponsToReload.get(n-1).getPrice());
                 reloadRequests.add(new ReloadWeaponRequest(weaponsToReload.get(n-1),cp));
                 weaponsToReload.remove(weaponsToReload.get(n-1));
             }
@@ -324,7 +323,6 @@ public class ClientTextView implements  View {
             n = readInt();
         }while (n<1 || n>myWeapons.size());
         controller.getClient().sendMessage(new ChooseWeaponToShootResponse(myWeapons.get(n-1)));
-
     }
 
     @Override
@@ -539,7 +537,8 @@ public class ClientTextView implements  View {
         do{
             writeText("Choose a square to complete your move: ");
             for(Square sq : possibleSquare){
-                writeText("X :" + sq.getX() + " Y : " + sq.getY());
+                if(sq != null)
+                    writeText("X :" + sq.getX() + " Y : " + sq.getY());
             }
             writeText("Write X position: ");
             posX = readInt();
@@ -866,31 +865,35 @@ public class ClientTextView implements  View {
     public void choosePowerUpToUse(List<CardPower> list){
         char c;
         int n = 1, t=1;
-        writeText("Do you want to use a Tagback Grenade to apply an additional damage to one of your previous target?");
-        writeText("Insert [Y]es or [N]o");
-        do {
-            c = readChar();
-        }while(c != 'Y' && c != 'y' && c != 'N' && c != 'n');
-        if(c == 'Y' || c == 'y'){
-            if(list.size() > 1){
-                System.out.println("Choose which power-up card you want to use after that the damages of your attack have been applied:");
-                for(CardPower cp : list) {
-                    writeText(n + ". " + cp.toString());
-                    n++;
+        list = list.stream().filter(x -> x.getName().equals("Targeting scope")).collect(Collectors.toList());
+        if(list.size() > 0) {
+            writeText("Do you want to use a Targeting scope power-up card to apply an additional damage to one of your previous target?");
+            writeText("Insert [Y]es or [N]o");
+            do {
+                c = readChar();
+            } while (c != 'Y' && c != 'y' && c != 'N' && c != 'n');
+            if (c == 'Y' || c == 'y') {
+                if (list.size() > 1) {
+                    System.out.println("Choose which power-up card you want to use after that the damages of your attack have been applied:");
+                    for (CardPower cp : list) {
+                        writeText(n + ". " + cp.toString());
+                        n++;
+                    }
+                    do {
+                        n = readInt();
+                    } while (n <= 0 && n > list.size());
                 }
-                do{
-                    n = readInt();
-                }while(n <= 0 && n > list.size());
-            }
-            System.out.println("Choose which ammo you want to pay:");
-            for(Color co : ClientContext.get().getMyPlayer().getAmmo()) {
-                writeText(n + ". " + co.toString());
-                t++;
-            }
-            do{
-                t = readInt();
-            }while(t <= 0 && t > list.size());
-            controller.getClient().sendMessage(new ChoosePowerUpResponse(list.get(n-1),ClientContext.get().getMyPlayer().getAmmo().get(t-1)));
+                System.out.println("Choose which ammo you want to pay:");
+                for (Color co : ClientContext.get().getMyPlayer().getAmmo()) {
+                    writeText(t + ". " + co.toString());
+                    t++;
+                }
+                do {
+                    t = readInt();
+                } while (t <= 0 && t > list.size());
+                controller.getClient().sendMessage(new ChoosePowerUpResponse(list.get(n - 1), ClientContext.get().getMyPlayer().getAmmo().get(t - 1)));
+            } else
+                controller.getClient().sendMessage(new ChoosePowerUpResponse());
         }
         else
             controller.getClient().sendMessage(new ChoosePowerUpResponse());
@@ -1116,7 +1119,7 @@ public class ClientTextView implements  View {
         if(!p.getAmmo().isEmpty()) {
             writeText(checkPlayerColor(p.getColor()) + "Your munition: " + ANSI_RESET);
             for (Color c : p.getAmmo()) {
-                System.out.print(checkAmmoColor(c) + "■" + ANSI_RESET);
+                System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
             }
             System.out.println("");
         }
