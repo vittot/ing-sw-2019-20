@@ -108,7 +108,7 @@ public class MovementEffect extends SimpleEffect {
             targets.add(shooter);
         }
         else {
-            if (lastTarget) {
+            if (lastTarget && prevTargets != null) {
                 targets = prevTargets.stream().filter(p -> GameMap.distanceBtwSquares(shooterPos, p.getPosition()) <= maxDist && GameMap.distanceBtwSquares(shooterPos, p.getPosition()) >= minDist).collect(Collectors.toList());
             } else {
                 switch (visibility) {
@@ -149,6 +149,7 @@ public class MovementEffect extends SimpleEffect {
      */
     public List<Square> selectPosition(Player shooter){
         List<Square> result = new ArrayList<>(); //it will contain the final result of the method
+        Direction currDirection;
         if(myPos) {
             result.add(shooter.getGame().getCurrentTurn().getCurrentPlayer().getPosition());
             return result;
@@ -161,13 +162,16 @@ public class MovementEffect extends SimpleEffect {
             Square currentPosition = shooter.getPosition();
             Square tmp;
             if(sameDirection) {
-                Direction currDirection = shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().getLastDirection();
+                if(shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon() != null)
+                    currDirection = shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualWeapon().getLastDirection();
+                else
+                    currDirection = shooter.getGame().getCurrentTurn().getCurrentPlayer().getActualCardPower().getLastDirection();
                 tmp = currentPosition;
                 if(minMove==0)
                     result.add(currentPosition);
                 for (int i = 1; i <= maxMove && tmp!=null; i++) {
                     tmp = tmp.getNextSquare(currDirection);
-                    if (minMove <= i && maxMove >= i)
+                    if (minMove <= i && maxMove >= i && tmp != null)
                         result.add(tmp);
                 }
             }

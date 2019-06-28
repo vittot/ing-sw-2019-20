@@ -63,4 +63,5 @@ public interface ServerMessageHandler {
     void handle(NotifyAmmoRefill notifyAmmoRefill);
     void handle(UpdateMarks updateMarks);
     void handle(ChoosePowerUpUsed choosePowerUpUsed);
+    void handle(AddPayment addPayment);
 }

@@ -13,25 +13,13 @@ import java.util.List;
 public class ShootActionResponse implements ServerMessage {
 
     private CardWeapon selectedWeapon;
-    private List<Color> ammoToPay;
-    private List<CardPower> poweupToPay;
 
-    public ShootActionResponse(CardWeapon selectedWeapon, List<Color> ammoToPay, List<CardPower> powerUpToPay) {
+    public ShootActionResponse(CardWeapon selectedWeapon) {
         this. selectedWeapon = selectedWeapon;
-        this.ammoToPay = ammoToPay;
-        this.poweupToPay = powerUpToPay;
     }
 
     public CardWeapon getSelectedWeapon() {
         return selectedWeapon;
-    }
-
-    public List<Color> getAmmoToPay() {
-        return ammoToPay;
-    }
-
-    public List<CardPower> getPoweupToPay() {
-        return poweupToPay;
     }
 
     @Override

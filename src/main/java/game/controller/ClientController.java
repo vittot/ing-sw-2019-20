@@ -595,12 +595,6 @@ public class ClientController implements ServerMessageHandler {
         if(currWeapon != null) {
             currWeapon.setLoaded(false);
         }
-        try {
-            me.pay(shootActionResponse.getAmmoToPay(), shootActionResponse.getPoweupToPay());
-        }
-        catch(InsufficientAmmoException e){
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -649,6 +643,17 @@ public class ClientController implements ServerMessageHandler {
     @Override
     public void handle(ChoosePowerUpUsed choosePowerUpUsed) {
         ClientContext.get().getMyPlayer().removePowerUp(Collections.singletonList(choosePowerUpUsed.getCardPower()));
+    }
+
+    @Override
+    public void handle(AddPayment addPayment) {
+        Player me = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
+        try {
+            me.pay(addPayment.getAmmo(),addPayment.getPowers());
+        }
+        catch(InsufficientAmmoException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
