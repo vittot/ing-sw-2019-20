@@ -44,7 +44,7 @@ public class ClientContext {
     }
 
     public Player getMyPlayer(){
-        if(map.getPlayerById(myID) != null)
+        if(map.getPlayerById(myID) != null)                                                                             //TODO a volte da nullPointer
             return map.getPlayerById(myID);
         return playersInWaiting.stream().filter(player -> player.getId() == myID).findFirst().orElse(null);
     }

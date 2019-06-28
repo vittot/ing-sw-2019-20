@@ -323,7 +323,6 @@ public class ClientTextView implements  View {
             n = readInt();
         }while (n<1 || n>myWeapons.size());
         controller.getClient().sendMessage(new ChooseWeaponToShootResponse(myWeapons.get(n-1)));
-
     }
 
     @Override
