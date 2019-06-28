@@ -202,6 +202,15 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
+    public void connectionFailed() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Connection error");
+        alert.setHeaderText(null);
+        alert.setContentText("ERROR: Unable to connect, check your connection and the server ip!");
+        alert.showAndWait();
+    }
+
+    @Override
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
 
     }

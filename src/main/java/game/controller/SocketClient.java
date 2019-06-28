@@ -83,6 +83,7 @@ public class SocketClient implements Client {
             outStream.reset();
         }catch(IOException e)
         {
+            System.out.println("ECCEZIONE IN SEND MESSAGE"); //TODO: call retry connection method
             e.printStackTrace();
         }
     }

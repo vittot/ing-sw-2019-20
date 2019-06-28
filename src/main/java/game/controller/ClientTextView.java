@@ -5,13 +5,8 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
-import game.model.effects.MovementEffect;
 import game.model.effects.SimpleEffect;
-import game.model.effects.SquareDamageEffect;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,8 +51,12 @@ public class ClientTextView implements  View {
     }
 
     public char readChar(){
-        String string = readText();
-        return string.charAt(0);
+        try {
+            String string = readText();
+            return string.charAt(0);
+        } catch (StringIndexOutOfBoundsException e) {
+            return '!';
+        }
     }
 
     /**
@@ -156,14 +155,17 @@ public class ClientTextView implements  View {
             if(n != -1)
             {
                 if(weaponsToReload.get(n-1).getPrice().size() > 1)
-                    cp = powerUpSelection();
+                    cp = powerUpSelection(weaponsToReload.get(n-1).getPrice());
                 reloadRequests.add(new ReloadWeaponRequest(weaponsToReload.get(n-1),cp));
                 weaponsToReload.remove(weaponsToReload.get(n-1));
             }
 
         }while(weaponsToReload.size() > 0 && n!=-1);
 
-        controller.sendMessages(reloadRequests);
+        if(n != -1)
+            controller.sendMessages(reloadRequests);
+        else
+            controller.getClient().sendMessage(new EndActionRequest());
 
     }
 
@@ -338,7 +340,7 @@ public class ClientTextView implements  View {
             n = readInt();
         }while(n != 1 && n != 2);
         if(n == 2 && altEff.getPrice() != null)
-            toUse = powerUpSelection();
+            toUse = powerUpSelection(altEff.getPrice());
         controller.getClient().sendMessage(new ChooseFirstEffectResponse(n,toUse));
     }
 
@@ -355,7 +357,7 @@ public class ClientTextView implements  View {
             t = readChar();
         }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
         if(plusEff.getPrice() != null && (t == 'y' || t == 'Y'))
-            toUse = powerUpSelection();
+            toUse = powerUpSelection(plusEff.getPrice());
         controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,toUse));
     }
 
@@ -370,7 +372,7 @@ public class ClientTextView implements  View {
             t = readChar();
         }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
         if(plusEffects.get(0) != null && (t == 'y' || t == 'Y'))
-            toUse = powerUpSelection();
+            toUse = powerUpSelection(plusEffects.get(0).getPrice());
         controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,toUse,t));
     }
 
@@ -391,7 +393,7 @@ public class ClientTextView implements  View {
             toApply = plusEffects.get(n-1);
             plusEffects.remove(n-1);
             if(toApply.getPrice() != null)
-                toUse = powerUpSelection();
+                toUse = powerUpSelection(toApply.getPrice());
             controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, toApply, toUse));
         }
     }
@@ -467,7 +469,7 @@ public class ClientTextView implements  View {
         Action chosenAction = null;
         String action;
         do{
-            writeText("The action you have selected preview this ordered single step combination, choose the next: (info for player information/power to use Power-Up/exit to stop action)");
+            writeText("The action you have selected preview this ordered single step combination, choose the next: (info for player information/exit to stop action)");
             for(Action ac : possibleActions){
                 writeText(ac.name());
             }
@@ -475,7 +477,7 @@ public class ClientTextView implements  View {
             action = action.toUpperCase();
             try {
                 if(action.equals("EXIT")){
-                    controller.getClient().sendMessage(new EndTurnRequest());
+                    controller.getClient().sendMessage(new EndActionRequest());
                     return;
                 }
 
@@ -485,7 +487,7 @@ public class ClientTextView implements  View {
                     showPlayerPosition();
                     chosenAction = null;
                 }
-
+                /*
                 if(action.equals("POWER"))
                 {
                     List<CardPower> powerUpsAvailable = ClientContext.get().getMyPlayer().getCardPower().stream().filter(c -> !c.isUseWhenAttacking() && !c.isUseWhenDamaged()).collect(Collectors.toList());
@@ -498,7 +500,7 @@ public class ClientTextView implements  View {
                         controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerUpsAvailable)));
                     }
 
-                }
+                }*/
 
                 chosenAction = Action.valueOf(action);
             }catch ( NullPointerException f){
@@ -506,7 +508,7 @@ public class ClientTextView implements  View {
             }catch (IllegalArgumentException e){
                 chosenAction = null;
             }
-        }while(!action.equals("POWER") && (chosenAction == null || (!possibleActions.contains(chosenAction))));
+        }while(/*!action.equals("POWER") && */(chosenAction == null || (!possibleActions.contains(chosenAction))));
 
         if(chosenAction != null)
             switch (chosenAction){
@@ -613,8 +615,10 @@ public class ClientTextView implements  View {
                 else if(action.equals("POWER"))
                 {
                     List<CardPower> powerList = ClientContext.get().getMyPlayer().getCardPower().stream().filter(c -> !c.isUseWhenAttacking() && !c.isUseWhenDamaged()).collect(Collectors.toList());
-                    if(powerList.isEmpty())
+                    if(powerList.isEmpty()) {
                         writeText("There are no power-up cards available for use in this moment!");
+                        action = "";
+                    }
                     else
                         controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerList)));
                     choosenAction = null;
@@ -626,8 +630,9 @@ public class ClientTextView implements  View {
                 choosenAction = null;
             }
 
-        }while(choosenAction==null);
-        controller.getClient().sendMessage(new ChooseTurnActionResponse(choosenAction));
+        }while(choosenAction==null && !action.equals("POWER"));
+        if(!action.equals("POWER"))
+            controller.getClient().sendMessage(new ChooseTurnActionResponse(choosenAction));
     }
 
     /**
@@ -1125,6 +1130,8 @@ public class ClientTextView implements  View {
         }
         else
             writeText(checkPlayerColor(p.getColor()) + "You haven't available power-up cards! " + ANSI_RESET);
+
+        writeText("You have:"+ANSI_RESET);
         if(p.getDamage().size()==0)
             writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
         else{
@@ -1149,7 +1156,7 @@ public class ClientTextView implements  View {
         for(Player p : ClientContext.get().getMap().getAllPlayers()) {
             if (p.getId() != ClientContext.get().getMyID()){
                 System.out.println("");
-                writeText(checkPlayerColor(p.getColor()) + "Player " + p.getId() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
+                writeText(checkPlayerColor(p.getColor()) + "Player " + p.getNickName() + " is in position x: " + p.getPosition().getX() + ", y: " + p.getPosition().getY() + " with: "+ ANSI_RESET);
                 if(p.getDamage().size()==0)
                     writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
                 else{
@@ -1215,11 +1222,12 @@ public class ClientTextView implements  View {
             writeText("You already have 3 weapons, do you want to discard one of them to grab the new one ([Y]es, [N]o)?");
             do {
                 t = readChar();
-            } while (t != 'Y' || t != 'N' || t != 'y' || t != 'n');
+            } while (t != 'Y' && t != 'N' && t != 'y' && t != 'n');
             if (t == 'Y' || t == 'y') {
                 i = 1;
                 for (CardWeapon cw : myP.getWeapons()) {
                     writeText(i + "- " + cw.getName());
+                    i++;
                 }
                 do{
                     choiceWD = readInt();
@@ -1228,40 +1236,46 @@ public class ClientTextView implements  View {
         }
         //Selection of power-up to pay (if there is anything to pay)
         if(wG.getPrice().size() > 1)
-            toUse = powerUpSelection();
+            toUse = powerUpSelection(wG.getPrice().subList(1,wG.getPrice().size()));
         if (choiceWD != -1)
             wD = myP.getWeapons().get(choiceWD-1);
         controller.getClient().sendMessage(new PickUpWeaponRequest(wG,toUse, wD));
     }
 
-    private List<CardPower> powerUpSelection()
+    private List<CardPower> powerUpSelection(List<Color> price)
     {
-        List<CardPower> toUse = new ArrayList<>();
-        char t;
-        int i;
         Player myP = ClientContext.get().getMyPlayer();
-        writeText("Do you want to use some of your power-up to pay ([Y]es, [N]o)?");
-        do{
-            t = readChar();
-        }while(t != 'Y' && t != 'N' && t != 'y' && t != 'n');
-        if(t == 'Y' || t == 'y')
-        {
-            i=1;
-            writeText("Insert the number of the correspondent power-up you want to use separated by comma (ex: 1,3,...):");
-            for(CardPower cp : myP.getCardPower()) {
-                writeText(i + "- " + cp.toString());
-                i++;
+        List<CardPower> list = new ArrayList<>(myP.getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+        List<CardPower> toUse = new ArrayList<>();
+        boolean mustUse = myP.mustUsePowerUpsToPay(new ArrayList<>(price));
+        if(!list.isEmpty()) {
+            char t = 'Y';
+            int i;
+            if(!mustUse){
+                writeText("Do you want to use some of your power-up to pay ([Y]es, [N]o)?");
+                do {
+                    t = readChar();
+                } while (t != 'Y' && t != 'N' && t != 'y' && t != 'n');
             }
-            String selection = readText();
-            String [] parts = selection.split(",");
-            for(String s : parts)
-            {
-                int id = Integer.parseInt(s);
-                if(id <= myP.getCardPower().size() && id >= 1 )
-                    toUse.add(myP.getCardPower().get(id-1));
+            else
+                writeText("You have to use some of your power-ip cards to complete your payment!");
+            if (t == 'Y' || t == 'y') {
+                i = 1;
+                writeText("Insert the number of the correspondent power-up you want to use separated by comma (ex: 1,3,...):");
+                for (CardPower cp : list) {
+                    if(price.contains(cp.getColor())) {
+                        writeText(i + "- " + cp.toString());
+                        i++;
+                    }
+                }
+                String selection = readText();
+                String[] parts = selection.split(",");
+                for (String s : parts) {
+                    int id = Integer.parseInt(s);
+                    if (id <= list.size() && id >= 1)
+                        toUse.add(list.get(id - 1));
+                }
             }
-
-
         }
         return toUse;
     }
@@ -1286,6 +1300,7 @@ public class ClientTextView implements  View {
                     System.out.print(checkAmmoColor(c) + "■ " + ANSI_RESET);
             System.out.println("");
         }
+
     }
 
     /**
@@ -1368,5 +1383,10 @@ public class ClientTextView implements  View {
         else{
             controller.stopListening();
         }
+    }
+
+    @Override
+    public void connectionFailed() {
+        writeText("ERROR: Unable to connect, check your connection and the server ip!");
     }
 }

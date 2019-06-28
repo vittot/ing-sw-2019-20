@@ -26,7 +26,7 @@ public class Game {
     private Player firstPlayerToPlay;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
-    public static int TIME_FOR_ACTION = 6000000; //TODO: read from config file
+    public static int TIME_FOR_ACTION = 60000000; //TODO: read from config file
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
@@ -1003,9 +1003,9 @@ public class Game {
         gameObservers.forEach(o -> o.onDeath(kill));
     }
 
-    void notifyGrabWeapon(Player p, CardWeapon cw)
+    void notifyGrabWeapon(Player p, CardWeapon cw, CardWeapon cww)
     {
-        gameObservers.forEach(o -> o.onGrabWeapon(p,cw));
+        gameObservers.forEach(o -> o.onGrabWeapon(p,cw, cww));
     }
 
 

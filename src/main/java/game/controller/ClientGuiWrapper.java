@@ -278,6 +278,11 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
+    public void connectionFailed() {
+        runLater( () -> gui.connectionFailed());
+    }
+
+    @Override
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
 
     }

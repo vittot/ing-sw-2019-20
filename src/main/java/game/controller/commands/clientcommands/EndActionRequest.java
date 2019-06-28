@@ -4,8 +4,7 @@ import game.controller.commands.ClientMessage;
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerMessage;
 
-public class EndTurnRequest implements ClientMessage {
-
+public class EndActionRequest implements ClientMessage {
     @Override
     public ServerMessage handle(ClientMessageHandler handler) {
         return handler.handle(this);

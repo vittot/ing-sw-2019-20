@@ -1,9 +1,6 @@
 package game.controller.commands;
 
 import game.controller.commands.clientcommands.*;
-import game.model.exceptions.InsufficientAmmoException;
-import game.model.exceptions.MapOutOfLimitException;
-import game.model.exceptions.NoCardAmmoAvailableException;
 
 public interface ClientMessageHandler {
     ServerMessage handle (ChooseSquareResponse clientMsg);
@@ -32,7 +29,7 @@ public interface ClientMessageHandler {
 
     ServerMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest);
 
-    ServerMessage handle(EndTurnRequest endTurnRequest);
+    ServerMessage handle(EndActionRequest endActionRequest);
 
     ServerMessage handle(GetAvailableMapsRequest getAvailableMapsRequest);
 
@@ -61,4 +58,6 @@ public interface ClientMessageHandler {
     ServerMessage handle(CounterAttackResponse counterAttackResponse);
 
     ServerMessage handle(LogoutRequest logoutRequest);
+
+    ServerMessage handle(EndTurnRequest endTurnRequest);
 }

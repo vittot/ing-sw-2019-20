@@ -48,6 +48,7 @@ public class LaunchClient {
         }
 
         if(!connected) {
+            clientView.connectionFailed();
             clientView.chooseConnection();
             return;
         }

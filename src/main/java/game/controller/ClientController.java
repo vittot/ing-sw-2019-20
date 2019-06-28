@@ -510,9 +510,18 @@ public class ClientController implements ServerMessageHandler {
         clientView.notifyPlayerSuspended(p);
     }
 
+    /**
+     * Notify time out and ask to rejoin the game
+     * @param timeOutNotify
+     */
     @Override
     public void handle(TimeOutNotify timeOutNotify) {
-        clientView.timeOutPhase();
+        if(state != ClientState.TIMED_OUT)
+        {
+            state = ClientState.TIMED_OUT;
+            clientView.timeOutPhase();
+        }
+
     }
 
     @Override
