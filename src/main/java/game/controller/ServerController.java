@@ -1,7 +1,6 @@
 package game.controller;
 
 import game.controller.commands.ClientGameMessageHandler;
-import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerGameMessage;
 import game.controller.commands.clientcommands.*;
 import game.controller.commands.servercommands.*;
@@ -822,7 +821,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             } else {
                 clientHandler.sendMessage(new JoinWaitingRoomResponse(n,w));
                 for (ServerController sc : w.getServerControllers()) {
-                    sc.getCurrPlayer().setSerializeEverything(true);
+                    //TODO: moved in clienthandler sc.getCurrPlayer().setSerializeEverything(true);
                     if (sc != this) {
                         sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getPlayers(), sc.getModel().getMap()));
                     } else {
@@ -964,7 +963,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             if(p!=null){
                 this.currPlayer = p;
                 p.setPlayerObserver(this);
-                p.setSerializeEverything(true);
+                //TODO: moved in clientHandler p.setSerializeEverything(true);
                 id = p.getId();
             }
             if(p.getPosition() != null)

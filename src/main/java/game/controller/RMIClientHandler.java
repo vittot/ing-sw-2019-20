@@ -26,13 +26,18 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
     @Override
     public void sendMessage(ServerMessage msg) {
 
+            final ServerController myController = controller;
             threadPool.submit(() ->
                     {
-                        try{
-                            client.receiveMessage(msg);
-                        }catch (RemoteException e){
-                            clientDisconnected();
-                        }
+                            if(myController.getCurrPlayer() != null)
+                                myController.getCurrPlayer().setSerializeEverything(true);
+                            try {
+                                client.receiveMessage(msg);
+                            }catch(RemoteException e)
+                            {
+                                clientDisconnected();
+                            }
+
                     }
 
             );

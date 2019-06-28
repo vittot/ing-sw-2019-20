@@ -34,14 +34,19 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
 
     /**
      * Send a message to the client
+     * It must be synhcronized to avoid interferences between game messages and ping messages
      * @param msg
      */
     @Override
     public synchronized void sendMessage(ServerMessage msg) {
         //if(controller.getCurrPlayer() == null /*|| !controller.getCurrPlayer().isSuspended()*/)
             try{
+                if(controller.getCurrPlayer() != null)
+                    controller.getCurrPlayer().setSerializeEverything(true);
                 outStream.writeObject(msg);
                 outStream.reset();
+                /*if(controller.getCurrPlayer() != null)
+                    controller.getCurrPlayer().setSerializeEverything(false);*/
             }catch(IOException e)
             {
                 e.printStackTrace();
@@ -79,8 +84,8 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
     public void handle(ClientGameMessage inMsg) {
         ServerGameMessage outMsg = inMsg.handle(controller);
         sendMessage(outMsg);
-        if(controller.getCurrPlayer() != null)
-            controller.getCurrPlayer().setSerializeEverything(false); //it is not always necessary
+        /*if(controller.getCurrPlayer() != null)
+            controller.getCurrPlayer().setSerializeEverything(false); //it is not always necessary*/
     }
 
     @Override

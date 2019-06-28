@@ -217,7 +217,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     public void addCardPower(CardPower cp)
     {
-        this.cardPower.add(cp);
+        CardPower alreadyPresent = this.cardPower.stream().filter(c -> c.getId() == cp.getId()).findFirst().orElse(null);
+        if(alreadyPresent == null)
+            this.cardPower.add(cp);
     }
 
     /**
@@ -570,6 +572,29 @@ public class Player implements Target, Serializable, Comparable<Player> {
         }
         if(position.getCardAmmo()!=null){
             List<Color> ammos = position.getCardAmmo().getAmmo();
+            int nRed = 0, nBlue = 0, nYellow = 0;
+            List<Color> toRemove = new ArrayList<>();
+            for(Color c: ammos)
+            {
+                if(c == Color.BLUE) {
+                    if(nBlue >= 3)
+                        toRemove.add(c);
+                    nBlue++;
+                }
+                else if(c == Color.RED)
+                {
+                    if(nRed >= 3)
+                        toRemove.add(c);
+                    nRed++;
+                }
+                else if(c == Color.YELLOW)
+                {
+                    if(nYellow >= 3)
+                        toRemove.add(c);
+                    nYellow++;
+                }
+            }
+            ammos.removeAll(toRemove);
             ammo.addAll(ammos);
             if(position.getCardAmmo().getCardPower() > 0){
                 powerups = new ArrayList<>();
@@ -609,6 +634,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
             oos.writeObject((Serializable)weapons);
             oos.writeInt(points);
         }
+        serializeEverything = false;
     }
 
     /**
