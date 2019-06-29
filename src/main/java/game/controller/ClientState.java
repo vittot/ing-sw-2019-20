@@ -10,6 +10,7 @@ public enum ClientState {                   //Used from GUI
     CHOOSEFIRSTEFFECT,
     CHOOSEPLUSORDER,
     CHOOSEPLUSEFFECT,
+    CHOOSERELOAD,
     WAITING_GRAB_WEAPON,                    //Used from Client Context
     WAITING_GRAB_AMMO,
     WAITING_SHOOT,

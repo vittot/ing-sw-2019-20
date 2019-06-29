@@ -2,6 +2,7 @@ package game.controller;
 
 
 import game.LaunchClient;
+import game.controller.commands.ClientMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
@@ -22,6 +23,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -45,7 +47,6 @@ public class ClientGUIView extends Application implements View{
     public ClientController controller;
     private String user;
     private Stage primaryStage;
-    private double displayY = 768;
     private double screenWidth = Screen.getScreens().get(0).getBounds().getWidth();
     private double screenHeight = Screen.getScreens().get(0).getBounds().getHeight();
     private List<GameMap> availableMaps;
@@ -86,6 +87,9 @@ public class ClientGUIView extends Application implements View{
     private CardWeapon weaponW;
     private FullEffect plusEff;                                                                                         //used for CHOOSEPLUSEFFECT and CHOOSEPBB
     private List<FullEffect> fullEffectList;                                                                            //used for CHOOSEPLUSEFFECT and CHOOSEPLUSORDER
+    private List<ClientMessage> reloadRequests = new ArrayList<>();
+    private List<CardWeapon> weaponsToReload;
+    private CardWeapon weaponToReload;
     private char t = 'n';
 
 
@@ -354,13 +358,13 @@ public class ClientGUIView extends Application implements View{
         submit.setOnMouseClicked(mouseEvent -> {
             for(CheckBox c : check){
                 if(c.isSelected()){
-                    if(Integer.parseInt(c.getId()) < possibleTargets.size()) {
-                        Target t = possibleTargets.get(Integer.parseInt(c.getId()));
-                        choosenTarget.add(t);
-                    }
+                    System.out.println("Target Selected");
+                    Target t = possibleTargets.get(Integer.parseInt(c.getId()));
+                    choosenTarget.add(t);
+                    System.out.println("Target added ");
                 }
             }
-            if(choosenTarget.size() < maxE && choosenTarget.size() > minE) {
+            if(choosenTarget.size() <= maxE && choosenTarget.size() >= minE) {
                 controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
                 sg.close();
             }
@@ -420,6 +424,9 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void damageNotification(int shooterId, int damage, int hit) {
+        /*String url = getClass().getResource("/graphics/sound/shoot.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();*/
         String nick = ClientContext.get().getMap().getPlayerById(shooterId).getNickName();
         String hitted = ClientContext.get().getMap().getPlayerById(hit).getNickName();
         if(shooterId == ClientContext.get().getMyID()){
@@ -439,6 +446,13 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyMovement(int pId, int newX, int newY) {
+        /*if(pId == ClientContext.get().getMyID()){
+            String url = getClass().getResource("/graphics/sound/move.wav").toExternalForm();
+            AudioClip audio = new AudioClip(url);
+            audio.play();
+        }
+
+         */
         String moved = ClientContext.get().getMap().getPlayerById(pId).getNickName();
         text.setText("Player "+ moved + " moved!");
         refreshPlayerPosition();
@@ -446,6 +460,13 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyDeath(Kill kill) {
+        /*if(kill.getVictim().getId() == ClientContext.get().getMyID()){
+            String url = getClass().getResource("/graphics/sound/death.wav").toExternalForm();
+            AudioClip audio = new AudioClip(url);
+            audio.play();
+        }
+
+         */
         text.setText("Player "+kill.getKiller().getNickName() + " killed "+kill.getVictim().getNickName());
         refreshDeaths();
     }
@@ -457,6 +478,11 @@ public class ClientGUIView extends Application implements View{
             refreshMyPlayerCard();
             refreshMyPlayerAmmo();
             text.setText("You grabbed "+name);
+           /* String url = getClass().getResource("/graphics/sound/grab.wav").toExternalForm();
+            AudioClip audio = new AudioClip(url);
+            audio.play();
+
+            */
         }else{
             String pName = ClientContext.get().getMap().getPlayerById(pID).getNickName();
             text.setText("Player "+pName+ " grabbed "+ name);
@@ -528,10 +554,10 @@ public class ClientGUIView extends Application implements View{
         Scene tempScene = new Scene(sp);
         List<CheckBox> powerUp = new ArrayList<>();
         List<CardPower> choosenPW = new ArrayList<>();
-        Label text = new Label("Choose which power up you wanna use to pay");
-        sp.getChildren().add(text);
-        StackPane.setMargin(text,new Insets(20, 0,0,0));
-        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        Label tex = new Label("Choose which power up you wanna use to pay");
+        sp.getChildren().add(tex);
+        StackPane.setMargin(tex,new Insets(20, 0,0,0));
+        StackPane.setAlignment(tex,Pos.TOP_CENTER);
         sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
         int j = 0;
         for(CardPower cp : cardPower){
@@ -573,6 +599,9 @@ public class ClientGUIView extends Application implements View{
                 case CHOOSEPLUSEFFECT:
                     controller.getClient().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, choosenPW));
                     break;
+                case CHOOSERELOAD:
+                    reloadRequests.add(new ReloadWeaponRequest(weaponToReload,choosenPW));
+                    break;
             }
             sg.close();
         });
@@ -606,6 +635,11 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyMarks(int marks, int idHitten, int idShooter) {
+       /* String url = getClass().getResource("/graphics/sound/shoot.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
+
+        */
         String hitted = ClientContext.get().getMap().getPlayerById(idHitten).getNickName();
         String shooter = ClientContext.get().getMap().getPlayerById(idShooter).getNickName();
         if(idHitten == ClientContext.get().getMyID()) {
@@ -621,8 +655,14 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void notifyGrabCardAmmo(int pID) {
         System.out.println("notifyGrabAmmo");
-        if(pID == ClientContext.get().getMyID())
+        if(pID == ClientContext.get().getMyID()) {
+           /* String url = getClass().getResource("/graphics/sound/grab.wav").toExternalForm();
+            AudioClip audio = new AudioClip(url);
+            audio.play();
+
+            */
             refreshMyPlayerAmmo();
+        }
         refreshAmmoCard();
     }
 
@@ -710,7 +750,29 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
+        state = ClientState.CHOOSERELOAD;
+        text.setText("You want to reload?");
+        this.weaponsToReload = weaponsToReload;
+        no.setVisible(true);
+        yes.setVisible(true);
+        no.setOnMouseClicked(mouseEvent -> {
+            yes.setVisible(false);
+            no.setVisible(false);
+            if(reloadRequests.size() == 0)
+                controller.getClient().sendMessage(new EndActionRequest());
+            else
+                controller.sendMessages(reloadRequests);
+        });
+        yes.setOnMouseClicked(mouseEvent -> {
+            for(ImageView iv : weapons) {
+                if (weaponsToReload.stream().anyMatch(mw -> mw.getId() == Integer.parseInt(iv.getId().substring(2)))) {
+                    iv.setEffect(new DropShadow(35, Color.GREEN));
+                    iv.setOnMouseClicked(this::handleWeaponClick);
+                }
+            }
+        });
     }
+
 
     @Override
     public void showReloadMessage(CardWeapon cW) {
@@ -721,7 +783,7 @@ public class ClientGUIView extends Application implements View{
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
         state = ClientState.CHOOSEWEAPONTOSHOOT;
         for(ImageView iv : weapons){
-            if(myWeapons.stream().anyMatch(mw->mw.getId() == Integer.parseInt(iv.getId()))){
+            if(myWeapons.stream().anyMatch(mw->mw.getId() == Integer.parseInt(iv.getId().substring(2)))){
                 iv.setEffect(new DropShadow(35,Color.GREEN));
                 iv.setOnMouseClicked(this::handleWeaponClick);
             }
@@ -732,7 +794,10 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void chooseFirstEffect(FullEffect baseEff, FullEffect altEff) {
         state = ClientState.CHOOSEFIRSTEFFECT;
-        List<CardPower> list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> altEff.getPrice().contains(n.getColor())).collect(Collectors.toList()));
+        List<CardPower> list = new ArrayList<>();
+        if(altEff.getPrice() == null)
+            list = ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> altEff.getPrice().contains(n.getColor())).collect(Collectors.toList());
+        List<CardPower> price = list;
         text.setText("Want to use Base effect? (No for alternative)");
         yes.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
@@ -742,7 +807,8 @@ public class ClientGUIView extends Application implements View{
         });
         no.setVisible(true);
         no.setOnMouseClicked(mouseEvent -> {
-            choosePowerUpToUse(list);
+            if(price != null)
+                choosePowerUpToUse(price);
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -751,14 +817,17 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void usePlusBeforeBase(FullEffect plusEff) {
-        List<CardPower> list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> plusEff.getPrice().contains(n.getColor())).collect(Collectors.toList()));
+        List<CardPower> price = possibleCardPowerToPay(plusEff);
         state = ClientState.CHOOSEPBB;
         this.plusEff = plusEff;
-
+        text.setText("Do you want to use this plus effect before than your weapon base effect?");
         yes.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
             t = 'y';
-            choosePowerUpToUse(list);
+            if(price != null)
+                choosePowerUpToUse(price);
+            else
+                controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,null));
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -770,16 +839,33 @@ public class ClientGUIView extends Application implements View{
         });
     }
 
+    private List<CardPower> possibleCardPowerToPay (FullEffect fe){
+        List<CardPower> list = new ArrayList<>();
+        if(plusEff.getPrice() == null)
+            list = ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> fe.getPrice().contains(n.getColor())).collect(Collectors.toList());
+        return list;
+    }
+
+    private List<CardPower> possibleCardPowerToPay (List<game.model.Color> price){
+        List<CardPower> list = new ArrayList<>();
+        if(plusEff.getPrice() == null)
+            list = ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList());
+        return list;
+    }
+
     @Override
     public void usePlusInOrder(List<FullEffect> plusEffects) {
         state = ClientState.CHOOSEPLUSORDER;
         fullEffectList = plusEffects;
-        List<CardPower> list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> plusEffects.get(0).getPrice().contains(n.getColor())).collect(Collectors.toList()));
+        List<CardPower> list = possibleCardPowerToPay(plusEffects.get(0));
         text.setText("Do you want to apply the plus effect, allow by your weapon? (in order)");
         yes.setVisible(true);
         no.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
-            choosePowerUpToUse(list);
+            if(list != null)
+                choosePowerUpToUse(list);
+            else
+                controller.getClient().sendMessage(new UseOrderPlusResponse(fullEffectList, null, 'y'));
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -794,11 +880,11 @@ public class ClientGUIView extends Application implements View{
         state = ClientState.CHOOSEPLUSEFFECT;
         StackPane sp = new StackPane();
         Scene tempScene = new Scene(sp);
-        Label text = new Label("Choose wich efferct you want to apply:");
+        Label tex = new Label("Choose wich efferct you want to apply:");
         sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
-        sp.getChildren().add(text);
-        StackPane.setAlignment(text,Pos.TOP_CENTER);
-        StackPane.setMargin(text,new Insets(20, 0,0,0));
+        sp.getChildren().add(tex);
+        StackPane.setAlignment(tex,Pos.TOP_CENTER);
+        StackPane.setMargin(tex,new Insets(20, 0,0,0));
         ToggleGroup tg = new ToggleGroup();
         int j = 0;
         for(FullEffect f : plusEffects){
@@ -833,9 +919,11 @@ public class ClientGUIView extends Application implements View{
                         controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, fe, null));
                     }
                     else{
-                        List<game.model.Color> price = fe.getPrice();
-                        List<CardPower> list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
-                        choosePowerUpToUse(list);
+                        List<CardPower> list = possibleCardPowerToPay(fe);
+                        if(list != null)
+                            choosePowerUpToUse(list);
+                        else
+                            controller.getClient().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, null));
                     }
             }
             sg.close();
@@ -848,11 +936,11 @@ public class ClientGUIView extends Application implements View{
     public void showRanking(SortedMap<Player, Integer> ranking) {
         StackPane sp = new StackPane();
         Scene tempScene = new Scene(sp);
-        Label text = new Label("And The Winner Is:");
+        Label tex = new Label("And The Winner Is:");
         sp.getChildren().add(text);
         sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
-        StackPane.setMargin(text,new Insets(20, 0,0,0));
-        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        StackPane.setMargin(tex,new Insets(20, 0,0,0));
+        StackPane.setAlignment(tex,Pos.TOP_CENTER);
         int j = 1;
         for(Player p : ranking.keySet()){
             Label pos = new Label(p.getNickName() + " got " +j+ "° place with"+ ranking.get(p) + "points");
@@ -1046,7 +1134,7 @@ public class ClientGUIView extends Application implements View{
         StackPane.setMargin(text,new Insets(0,0,(screenHeight * 17.7 / 100),0));
         StackPane.setAlignment(yes,Pos.BOTTOM_LEFT);
         StackPane.setMargin(yes,new Insets(0,0,(screenHeight * 12 / 100),screenWidth * 42 / 100));
-        yes.setVisible(true);
+        yes.setVisible(false);
         StackPane.setAlignment(no,Pos.BOTTOM_LEFT);
         StackPane.setMargin(no,new Insets(0,0,(screenHeight * 12 / 100),screenWidth * 46 / 100));
         no.setVisible(false);
@@ -1268,11 +1356,11 @@ public class ClientGUIView extends Application implements View{
             }
             if (i >= myP.getWeapons().size()){
                 cardW = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back.png"));
-                weapons.get(i).setId("0");
+                weapons.get(i).setId("0_0");
             }
             else {
                 cardW = createWeaponCard(myP.getWeapons().get(i).getId());
-                weapons.get(i).setId("" + myP.getWeapons().get(i).getId());
+                weapons.get(i).setId("0_" + myP.getWeapons().get(i).getId());
             }
             powerUp.get(i).setImage(cardP);
             weapons.get(i).setImage(cardW);
@@ -1344,6 +1432,7 @@ public class ClientGUIView extends Application implements View{
             Player p = ClientContext.get().getMap().getPlayerById(Integer.parseInt(dash.getId()));
             if(p == null)
                 p = ClientContext.get().getPlayersInWaiting().stream().filter(play->play.getId() == Integer.parseInt(dash.getId())).findFirst().orElse(null);
+            System.out.println(p.getNickName()+" Danno "+p.getDamage().size() +" color "+p.getMark().size());
             for (PlayerColor  c :p.getDamage()) {
                 Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
                 ImageView damages = new ImageView(damage);
@@ -1382,14 +1471,14 @@ public class ClientGUIView extends Application implements View{
     private void deletePlayerInfo(){
         for(List<ImageView> p : playerDamage){
             for(ImageView v : p ){
-                map.getChildren().remove(v);
                 v.setImage(null);
+                map.getChildren().remove(v);
             }
         }
         for(List<ImageView> p : playerMarks){
             for(ImageView v : p ){
-                map.getChildren().remove(v);
                 v.setImage(null);
+                map.getChildren().remove(v);
             }
         }
         playerDamage.clear();
@@ -1561,27 +1650,58 @@ public class ClientGUIView extends Application implements View{
     }
 
     private void handleWeaponClick(MouseEvent e){
+        CardWeapon selected;
+        List<game.model.Color> price;
+        List<CardPower> list;
         int id = Integer.parseInt(((ImageView)e.getSource()).getId().substring(2));
-        switch (state){
-            case CHOOSEWEAPONTOGRAB:
+        switch (state) {
+            case CHOOSEWEAPONTOGRAB: {
                 weaponG = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                if(ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
+                if (ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
                     chooseWeaponToWaste();
-                }
-                else {
-                    choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
+                } else {
+                    if (weaponG.getPrice().size() == 1)
+                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                    list = possibleCardPowerToPay(weaponG.getPrice());
+                    if(list != null)
+                        choosePowerUpToUse(list);
+                    else
+                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,null, null));
                 }
                 disableweapon();
                 break;
-            case CHOOSEWEAPONTOWASTE:
+            }
+            case CHOOSEWEAPONTOWASTE: {
                 weaponW = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
+                if (weaponG.getPrice().size() == 1) {
+                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                }
                 disableMyWeapon();
+                price = weaponG.getPrice();
+                list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+                if(list != null)
+                    choosePowerUpToUse(list);
+                else
+                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,null, null));
                 break;
-            case CHOOSEWEAPONTOSHOOT:
-                CardWeapon selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter( w -> w.getId() == id).findFirst().orElse(null);
+                }
+            case CHOOSEWEAPONTOSHOOT: {
+                selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
                 controller.getClient().sendMessage(new ChooseWeaponToShootResponse(selected));
                 disableMyWeapon();
+                break;
+            }
+            case CHOOSERELOAD: {
+                selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+                disableMyWeapon();
+                if (selected != null) {
+                    price = selected.getPrice();
+                    list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+                    choosePowerUpToUse(list);
+                    weaponsToReload.remove(weaponToReload);
+                }
+                break;
+            }
         }
     }
     private void chooseWeaponToWaste(){
