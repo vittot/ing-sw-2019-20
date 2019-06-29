@@ -1,17 +1,15 @@
 package game.controller.commands.clientcommands;
 
-import game.controller.commands.ClientMessage;
+import game.controller.commands.ClientGameMessage;
+import game.controller.commands.ClientGameMessageHandler;
 import game.controller.commands.ClientMessageHandler;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
 import game.model.CardPower;
 import game.model.effects.FullEffect;
-import game.model.exceptions.InsufficientAmmoException;
-import game.model.exceptions.NoCardAmmoAvailableException;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class UsePlusEffectResponse implements ClientMessage {
+public class UsePlusEffectResponse implements ClientGameMessage {
 
     private List<FullEffect> plusRemained;
     private List<CardPower> toUse;
@@ -36,7 +34,12 @@ public class UsePlusEffectResponse implements ClientMessage {
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) {
+    public ServerGameMessage handle(ClientGameMessageHandler handler) {
         return handler.handle(this);
+    }
+
+    @Override
+    public void handle(ClientMessageHandler handler) {
+        handler.handle(this);
     }
 }

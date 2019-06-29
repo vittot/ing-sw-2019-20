@@ -14,6 +14,7 @@ public class CardPower implements Serializable {
     private boolean useWhenDamaged;
     private boolean useWhenAttacking;
     private FullEffect effect;
+    private Direction lastDirection;
 
     public CardPower(int id, String name, String description, Color color, boolean useWhenDamaged, boolean useWhenAttacking, FullEffect effect) {
         this.id = id;
@@ -39,6 +40,14 @@ public class CardPower implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Direction getLastDirection() {
+        return lastDirection;
+    }
+
+    public void setLastDirection(Direction lastDirection) {
+        this.lastDirection = lastDirection;
     }
 
     public String getDescription() {

@@ -1,8 +1,6 @@
 package game.controller;
 
 import game.controller.commands.ClientMessage;
-import game.controller.commands.ServerMessage;
-import game.controller.commands.ServerMessageHandler;
 
 public interface Client {
 

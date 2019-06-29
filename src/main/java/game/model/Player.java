@@ -27,6 +27,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
     private AdrenalineLevel adrenaline;
     private transient List<CardWeapon> weapons;
     private CardWeapon actualWeapon;
+    private CardPower actualCardPower;
     private List<Color> ammo;
     private transient List<CardPower> cardPower;
     private int deaths;
@@ -202,6 +203,14 @@ public class Player implements Target, Serializable, Comparable<Player> {
         return thisTurnMarks;
     }
 
+    public CardPower getActualCardPower() {
+        return actualCardPower;
+    }
+
+    public void setActualCardPower(CardPower actualCardPower) {
+        this.actualCardPower = actualCardPower;
+    }
+
     /**
      * Add a weapon to the player's hand
      * @param cw
@@ -217,7 +226,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     public void addCardPower(CardPower cp)
     {
-        this.cardPower.add(cp);
+        CardPower alreadyPresent = this.cardPower.stream().filter(c -> c.getId() == cp.getId()).findFirst().orElse(null);
+        if(alreadyPresent == null)
+            this.cardPower.add(cp);
     }
 
     /**
@@ -570,6 +581,29 @@ public class Player implements Target, Serializable, Comparable<Player> {
         }
         if(position.getCardAmmo()!=null){
             List<Color> ammos = position.getCardAmmo().getAmmo();
+            int nRed = 0, nBlue = 0, nYellow = 0;
+            List<Color> toRemove = new ArrayList<>();
+            for(Color c: ammos)
+            {
+                if(c == Color.BLUE) {
+                    if(nBlue >= 3)
+                        toRemove.add(c);
+                    nBlue++;
+                }
+                else if(c == Color.RED)
+                {
+                    if(nRed >= 3)
+                        toRemove.add(c);
+                    nRed++;
+                }
+                else if(c == Color.YELLOW)
+                {
+                    if(nYellow >= 3)
+                        toRemove.add(c);
+                    nYellow++;
+                }
+            }
+            ammos.removeAll(toRemove);
             ammo.addAll(ammos);
             if(position.getCardAmmo().getCardPower() > 0){
                 powerups = new ArrayList<>();
@@ -609,6 +643,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
             oos.writeObject((Serializable)weapons);
             oos.writeInt(points);
         }
+        serializeEverything = false;
     }
 
     /**
@@ -653,20 +688,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
         return id == player.id &&
-                color == player.color; /*&&
-                deaths == player.deaths &&
-                points == player.points &&
-                isDead == player.isDead &&
-                Objects.equals(marks, player.marks) &&
-                Objects.equals(thisTurnMarks, player.thisTurnMarks) &&
-                Objects.equals(nickName, player.nickName) &&
-                Objects.equals(damage, player.damage) &&
-                adrenaline == player.adrenaline &&
-                Objects.equals(weapons, player.weapons) &&
-                Objects.equals(actualWeapon, player.actualWeapon) &&
-                Objects.equals(ammo, player.ammo) &&
-                Objects.equals(cardPower, player.cardPower) &&
-                Objects.equals(position, player.position);*/
+                color == player.color;
     }
 
     @Override

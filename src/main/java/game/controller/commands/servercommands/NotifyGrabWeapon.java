@@ -1,16 +1,11 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
-import game.model.Action;
-import game.model.CardAmmo;
 import game.model.CardWeapon;
-import game.model.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class NotifyGrabWeapon implements ServerMessage {
+public class NotifyGrabWeapon implements ServerGameMessage {
     private int p;
     private CardWeapon cw;
     private int x;
@@ -47,6 +42,11 @@ public class NotifyGrabWeapon implements ServerMessage {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

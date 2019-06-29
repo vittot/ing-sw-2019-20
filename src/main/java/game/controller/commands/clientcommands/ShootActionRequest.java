@@ -1,15 +1,16 @@
 package game.controller.commands.clientcommands;
 
-import game.controller.commands.ClientMessage;
+import game.controller.commands.ClientGameMessage;
+import game.controller.commands.ClientGameMessageHandler;
 import game.controller.commands.ClientMessageHandler;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
 import game.model.CardPower;
 import game.model.CardWeapon;
 import game.model.effects.FullEffect;
 
 import java.util.List;
 
-public class ShootActionRequest implements ClientMessage {
+public class ShootActionRequest implements ClientGameMessage {
     private CardWeapon weapon;
     private List<FullEffect> plusEffects;
     private FullEffect baseEffect;
@@ -20,9 +21,9 @@ public class ShootActionRequest implements ClientMessage {
      */
     private boolean plusBeforeBase;
 
-    @Override
-    public ServerMessage handle(ClientMessageHandler handler) {
-        return handler.handle(this);
+     @Override
+    public void handle(ClientMessageHandler handler) {
+        handler.handle(this);
     }
 
     public CardWeapon getWeapon() {
@@ -47,5 +48,10 @@ public class ShootActionRequest implements ClientMessage {
 
     public boolean isPlusBeforeBase() {
         return plusBeforeBase;
+    }
+
+    @Override
+    public ServerGameMessage handle(ClientGameMessageHandler handler) {
+        return handler.handle(this);
     }
 }

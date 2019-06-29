@@ -1,10 +1,11 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.CardPower;
 
-public class NotifyPowerUpUsage implements ServerMessage {
+public class NotifyPowerUpUsage implements ServerGameMessage {
     private int id;
     private CardPower cp;
 
@@ -19,6 +20,11 @@ public class NotifyPowerUpUsage implements ServerMessage {
 
     public CardPower getCp() {
         return cp;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

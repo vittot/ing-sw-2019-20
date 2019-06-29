@@ -1,11 +1,11 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.CardPower;
-import game.model.exceptions.MapOutOfLimitException;
 
-public class RemoveSpawnPowerUp implements ServerMessage {
+public class RemoveSpawnPowerUp implements ServerGameMessage {
 
     private CardPower powerup;
 
@@ -15,6 +15,11 @@ public class RemoveSpawnPowerUp implements ServerMessage {
 
     public CardPower getPowerup() {
         return powerup;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

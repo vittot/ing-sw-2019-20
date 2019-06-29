@@ -1,7 +1,7 @@
 package game.model.effects;
 
 import game.controller.EffectHandler;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
 import game.model.*;
 
 import java.util.ArrayList;
@@ -99,12 +99,12 @@ public class AreaDamageEffect extends SimpleEffect {
     }
 
     @Override
-    public ServerMessage handle(EffectHandler h) {
+    public ServerGameMessage handle(EffectHandler h) {
         return h.handle(this);
     }
 
     @Override
-    public ServerMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
+    public ServerGameMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
         return h.handleTarget(this, targetList);
     }
 

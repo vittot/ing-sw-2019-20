@@ -1,12 +1,13 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.CardWeapon;
 
 import java.util.List;
 
-public class ChooseWeaponToGrabRequest implements ServerMessage{
+public class ChooseWeaponToGrabRequest implements ServerGameMessage {
 
     List<CardWeapon> weapons;
 
@@ -16,6 +17,11 @@ public class ChooseWeaponToGrabRequest implements ServerMessage{
 
     public List<CardWeapon> getWeapons() {
         return weapons;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

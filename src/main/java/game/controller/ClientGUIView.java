@@ -103,7 +103,7 @@ public class ClientGUIView extends Application implements View{
         }
         else{
             (new Thread(() -> launch())).start();
-            while(GUI == null)  //ensures that the gui has been launched before proceeding
+            while(GUI == null || !GUI.isPrimaryStageOn())  //ensures that the gui has been launched before proceeding
             {
                 try {
                     Thread.sleep(100);
@@ -119,6 +119,11 @@ public class ClientGUIView extends Application implements View{
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         //showMap();
+    }
+
+    private boolean isPrimaryStageOn()
+    {
+        return primaryStage != null;
     }
 
 

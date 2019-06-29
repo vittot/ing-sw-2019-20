@@ -1,11 +1,11 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.effects.FullEffect;
-import game.model.exceptions.MapOutOfLimitException;
 
-public class ChooseFirstEffectRequest implements ServerMessage {
+public class ChooseFirstEffectRequest implements ServerGameMessage {
 
     private FullEffect baseEff;
     private FullEffect altEff;
@@ -13,6 +13,11 @@ public class ChooseFirstEffectRequest implements ServerMessage {
     public ChooseFirstEffectRequest(FullEffect baseEff, FullEffect altEff) {
         this.baseEff = baseEff;
         this.altEff = altEff;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

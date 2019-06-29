@@ -1,10 +1,11 @@
 package game.controller.commands.servercommands;
 
 import game.controller.WaitingRoom;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 
-public class JoinWaitingRoomResponse implements ServerMessage {
+public class JoinWaitingRoomResponse implements ServerGameMessage {
     private int id;
     private WaitingRoom waitingRoom;
 
@@ -20,6 +21,11 @@ public class JoinWaitingRoomResponse implements ServerMessage {
 
     public WaitingRoom getWaitingRoom() {
         return waitingRoom;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

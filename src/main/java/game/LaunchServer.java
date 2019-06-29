@@ -12,8 +12,7 @@ import java.util.Scanner;
 public class LaunchServer {
 
     public static void main(String[] args) throws IOException {
-        InetAddress inetAddress = InetAddress.getLocalHost();
-        System.out.println("Java host address" + inetAddress.getHostAddress());
+
         setServerHostname();
 
         Scanner scanner = new Scanner(System.in);
@@ -49,11 +48,23 @@ public class LaunchServer {
         if(localIP == null)
         {
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Unable to find the correct local ip address, please provide it:");
-            localIP = scanner.nextLine();
+            InetAddress inetAddress;
+            try {
+                inetAddress = InetAddress.getLocalHost();
+                System.out.println("Java host address: " + inetAddress.getHostAddress());
+                System.out.println("Unable to verify the correct local ip address, insert Y if it is correct or otherwise insert the correct local ip:");
+                localIP = scanner.nextLine();
+                if(localIP.equalsIgnoreCase("Y"))
+                    localIP = inetAddress.getHostAddress();
+            } catch (UnknownHostException e) {
+                System.out.println("Unable to find the local ip address, please provide it");
+                localIP = scanner.nextLine();
+            }
+
+
         }
         System.setProperty("java.rmi.server.hostname",localIP);
-        System.out.println("Exposed address:" + localIP);
+        System.out.println("Exposed address: " + localIP);
     }
 
     /**
@@ -67,6 +78,8 @@ public class LaunchServer {
         try(final DatagramSocket socket = new DatagramSocket()){
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
             ip = socket.getLocalAddress().getHostAddress();
+            if(ip.equals("0.0.0.0"))
+                return null;
             return ip;
         }catch(Exception e)
         {

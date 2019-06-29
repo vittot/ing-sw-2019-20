@@ -1,12 +1,10 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
-import game.model.Player;
 
-import java.util.List;
-
-public class NotifyMovement implements ServerMessage {
+public class NotifyMovement implements ServerGameMessage {
     private int id;
     private int x;
     private int y;
@@ -27,6 +25,11 @@ public class NotifyMovement implements ServerMessage {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

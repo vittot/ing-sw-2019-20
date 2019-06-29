@@ -1,10 +1,10 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
-import game.model.exceptions.MapOutOfLimitException;
 
-public class NotifyPlayerExitedWaitingRoom implements ServerMessage {
+public class NotifyPlayerExitedWaitingRoom implements ServerGameMessage {
 
     private int playerId;
 
@@ -14,6 +14,11 @@ public class NotifyPlayerExitedWaitingRoom implements ServerMessage {
 
     public int getPlayerId() {
         return playerId;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override

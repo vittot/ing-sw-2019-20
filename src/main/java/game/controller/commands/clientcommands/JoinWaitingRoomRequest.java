@@ -1,10 +1,11 @@
 package game.controller.commands.clientcommands;
 
-import game.controller.commands.ClientMessage;
+import game.controller.commands.ClientGameMessage;
+import game.controller.commands.ClientGameMessageHandler;
 import game.controller.commands.ClientMessageHandler;
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
 
-public class JoinWaitingRoomRequest implements ClientMessage {
+public class JoinWaitingRoomRequest implements ClientGameMessage {
 
     private int roomId;
     private String nickName;
@@ -23,8 +24,13 @@ public class JoinWaitingRoomRequest implements ClientMessage {
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) {
+    public ServerGameMessage handle(ClientGameMessageHandler handler) {
         return handler.handle(this);
+    }
+
+    @Override
+    public void handle(ClientMessageHandler handler) {
+        handler.handle(this);
     }
 
 

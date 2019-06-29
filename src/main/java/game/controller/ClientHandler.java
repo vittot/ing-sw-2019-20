@@ -4,19 +4,26 @@ package game.controller;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.servercommands.*;
 import game.model.*;
-import game.model.exceptions.InsufficientAmmoException;
 
 import java.util.List;
 import java.util.SortedMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class ClientHandler implements GameListener {
 
     protected transient ServerController controller;
+    protected Timer pingTimer;
+    private Timer periodicPingTimer;
+    protected int nPingLost = 0;
+    static final int PING_WAITING_TIME_MS = 1000;
+    static final int PING_INTERVAL = 10000;
 
     public abstract void sendMessage(ServerMessage msg);
 
     protected void clientDisconnected()
     {
+        periodicPingTimer.cancel();
         if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED && controller.getState() != ServerState.GAME_ENDED){
             controller.getModel().removeGameListener(this);
             controller.getCurrPlayer().suspend(false);
@@ -30,6 +37,48 @@ public abstract class ClientHandler implements GameListener {
             GameManager.get().removeLoggedUser(controller.getNickname());
         }
     }
+
+    /**
+     * Start the ping-pong system
+     * @param pingPeriod period between two ping requests, in ms
+     */
+    void startPing(int pingPeriod)
+    {
+        periodicPingTimer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                pingClient(PING_WAITING_TIME_MS);
+            }
+        };
+        periodicPingTimer.scheduleAtFixedRate(task,0,pingPeriod);
+
+    }
+
+    /**
+     * Send a ping message to the client
+     * If it does not receive an answer within waitingTime, it increments the number of lost pings.
+     * When the number of lost pings arrives at 3 it considers the client disconnected
+     * @param waitingTime in ms
+     */
+    synchronized void pingClient(int waitingTime)
+    {
+        pingTimer = new Timer();
+        sendMessage(new PingMessage());
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                nPingLost++;
+                if(nPingLost >= 3)
+                    clientDisconnected();
+            }
+        };
+        pingTimer.schedule(task, waitingTime);
+
+    }
+
+
+
 
 
     /**

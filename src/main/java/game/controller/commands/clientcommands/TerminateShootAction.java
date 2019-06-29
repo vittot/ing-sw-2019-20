@@ -1,17 +1,19 @@
 package game.controller.commands.clientcommands;
 
-import game.controller.commands.ClientMessage;
+import game.controller.commands.ClientGameMessage;
+import game.controller.commands.ClientGameMessageHandler;
 import game.controller.commands.ClientMessageHandler;
-import game.controller.commands.ServerMessage;
-import game.model.exceptions.NoCardAmmoAvailableException;
+import game.controller.commands.ServerGameMessage;
 
-public class TerminateShootAction implements ClientMessage {
+public class TerminateShootAction implements ClientGameMessage {
 
-    public TerminateShootAction() {
+    @Override
+    public ServerGameMessage handle(ClientGameMessageHandler handler) {
+        return handler.handle(this);
     }
 
     @Override
-    public ServerMessage handle(ClientMessageHandler handler) {
-        return handler.handle(this);
+    public void handle(ClientMessageHandler handler) {
+        handler.handle(this);
     }
 }

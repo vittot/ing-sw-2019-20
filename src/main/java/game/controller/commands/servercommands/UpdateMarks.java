@@ -1,10 +1,11 @@
 package game.controller.commands.servercommands;
 
-import game.controller.commands.ServerMessage;
+import game.controller.commands.ServerGameMessage;
+import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.Player;
 
-public class UpdateMarks implements ServerMessage {
+public class UpdateMarks implements ServerGameMessage {
 
     Player p;
 
@@ -14,6 +15,11 @@ public class UpdateMarks implements ServerMessage {
 
     public Player getP() {
         return p;
+    }
+
+    @Override
+    public void handle(ServerGameMessageHandler handler) {
+        handler.handle(this);
     }
 
     @Override
