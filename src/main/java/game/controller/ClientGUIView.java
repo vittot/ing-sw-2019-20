@@ -28,6 +28,7 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -52,6 +53,8 @@ public class ClientGUIView extends Application implements View{
     private double screenHeight = Screen.getScreens().get(0).getBounds().getHeight();
     private List<GameMap> availableMaps;
 
+
+    private final String orangeB = "-fx-background-color: linear-gradient(#ffd65b, #e68400), linear-gradient(#ffef84, #f2ba44), linear-gradient(#ffea6a, #efaa22), linear-gradient(#ffe657 0%, #f8c202 50%, #eea10b 100%), linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0)); -fx-background-radius: 24; -fx-background-insets: 0,1,2,3,0; -fx-text-fill: #654b00; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 7 16 7 16;";
 
     private StackPane map = new StackPane();
     private Scene scene = new Scene(map);
@@ -453,11 +456,9 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void notifyMovement(int pId, int newX, int newY) {
         System.out.println("Notify Movement");
-        if(pId == ClientContext.get().getMyID()){
-            String url = getClass().getResource("/graphics/sound/move.wav").toExternalForm();
-            AudioClip audio = new AudioClip(url);
-            audio.play();
-        }
+        String url = getClass().getResource("/graphics/sound/move.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
         String moved = ClientContext.get().getMap().getPlayerById(pId).getNickName();
         text.setText("Player "+ moved + " moved!");
         refreshPlayerPosition();
@@ -478,13 +479,13 @@ public class ClientGUIView extends Application implements View{
     public void grabWeaponNotification(int pID, String name, int x, int y) {
         System.out.println("Notify grab weapon");
         refreshWeaponCard();
+        String url = getClass().getResource("/graphics/sound/grab.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
         if(pID == ClientContext.get().getMyID()){
             refreshMyPlayerCard();
             refreshMyPlayerAmmo();
             text.setText("You grabbed "+name);
-            String url = getClass().getResource("/graphics/sound/grab.wav").toExternalForm();
-            AudioClip audio = new AudioClip(url);
-            audio.play();
         }else{
             String pName = ClientContext.get().getMap().getPlayerById(pID).getNickName();
             text.setText("Player "+pName+ " grabbed "+ name);
@@ -552,11 +553,20 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void choosePowerUpToUse(List<CardPower> cardPower) {
+        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.jpg"));
+        BackgroundImage bi = new BackgroundImage(background,
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
         StackPane sp = new StackPane();
+        sp.setBackground(new Background(bi));
         Scene tempScene = new Scene(sp);
         List<CheckBox> powerUp = new ArrayList<>();
         List<CardPower> choosenPW = new ArrayList<>();
         Label tex = new Label("Choose which power up you wanna use to pay");
+        tex.setTextFill(Color.WHITE);
+        tex.setFont(Font.font(25));
         sp.getChildren().add(tex);
         StackPane.setMargin(tex,new Insets(20, 0,0,0));
         StackPane.setAlignment(tex,Pos.TOP_CENTER);
@@ -564,7 +574,9 @@ public class ClientGUIView extends Application implements View{
         int j = 0;
         for(CardPower cp : cardPower){
             CheckBox cb = new CheckBox(cp.getName());
+            cb.setTextFill(Color.WHITE);
             cb.setId(""+cp.getId());
+            cb.setFont(Font.font(25));
             sp.getChildren().add(cb);
             powerUp.add(cb);
             StackPane.setAlignment(cb,Pos.TOP_LEFT);
@@ -658,10 +670,10 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void notifyGrabCardAmmo(int pID) {
         System.out.println("notifyGrabAmmo");
+        String url = getClass().getResource("/graphics/sound/grab.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
         if(pID == ClientContext.get().getMyID()) {
-            String url = getClass().getResource("/graphics/sound/grab.wav").toExternalForm();
-            AudioClip audio = new AudioClip(url);
-            audio.play();
             refreshMyPlayerAmmo();
         }
         refreshAmmoCard();
@@ -724,6 +736,7 @@ public class ClientGUIView extends Application implements View{
                 RadioButton rb = new RadioButton("Waiting Room " + w.getId() + ":");
                 rb.setId(""+w.getId());
                 rb.setToggleGroup(tg);
+                rb.setSelected(true);
                 Label text = new Label(w.toString());
                 HBox choice = new HBox(rb,text);
                 infoRoom.getChildren().add(choice);
@@ -1239,12 +1252,16 @@ public class ClientGUIView extends Application implements View{
         map.getChildren().addAll(move,grab,shoot,exit);
         StackPane.setMargin(move,new Insets(0,screenWidth * 2 / 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(move,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(grab,new Insets(0,screenWidth * 8 / 100,screenHeight * 23 / 100,0));
+        StackPane.setMargin(grab,new Insets(0,screenWidth * 10 / 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(grab,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(shoot,new Insets(0,screenWidth * 14/ 100,screenHeight * 23 / 100,0));
+        StackPane.setMargin(shoot,new Insets(0,screenWidth * 15/ 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(shoot,Pos.BOTTOM_RIGHT);
         StackPane.setMargin(exit,new Insets(0,screenWidth * 20/ 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(exit,Pos.BOTTOM_RIGHT);
+        move.setStyle(orangeB);
+        grab.setStyle(orangeB);
+        shoot.setStyle(orangeB);
+        exit.setStyle(orangeB);
         move.setId("Movement");
         grab.setId("Grab");
         shoot.setId("Shoot");
@@ -1765,6 +1782,7 @@ public class ClientGUIView extends Application implements View{
         mapc.getItems().add("Map 2");
         mapc.getItems().add("Map 3");
         mapc.getItems().add("Map 4");
+        mapc.getSelectionModel().selectFirst();
         nPlayer = 5;
         Button submit = new Button("Create Room");
 
