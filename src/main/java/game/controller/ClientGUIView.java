@@ -34,6 +34,7 @@ import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
+import java.security.Key;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,14 +78,14 @@ public class ClientGUIView extends Application implements View{
     private Label text = new Label("");
     private ClientState state;
 
-
     private Stage sg = new Stage();
 
     private List<Square> possiblePositions;
     private List<CardWeapon> weaponToGrab;
     private CardWeapon weaponG;
     private CardWeapon weaponW;
-    private FullEffect plusEff;
+    private FullEffect plusEff;                                                                                         //used for CHOOSEPLUSEFFECT and CHOOSEPBB
+    private List<FullEffect> fullEffectList;                                                                            //used for CHOOSEPLUSEFFECT and CHOOSEPLUSORDER
     private char t = 'n';
 
 
@@ -324,8 +325,52 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
-    public void chooseTargetPhase(List<Target> possibleTargets, SimpleEffect currSimpleEffect) {
-
+    public void chooseTargetPhase(List<Target> possibleTargets) {
+        int maxE = ClientContext.get().getCurrentEffect().getMaxEnemy();
+        int minE = ClientContext.get().getCurrentEffect().getMinEnemy();
+        List<Target> choosenTarget = new ArrayList<>();
+        List<CheckBox> check = new ArrayList<>();
+        StackPane sp = new StackPane();
+        Scene temp = new Scene(sp);
+        Label tex = new Label("Choose between " + minE + " and " + maxE + " targets to apply your attack:");
+        StackPane.setAlignment(tex,Pos.TOP_CENTER);
+        StackPane.setMargin(tex,new Insets(20,0,0,0));
+        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
+        sp.getChildren().add(tex);
+        int j = 0;
+        for(Target p : possibleTargets){
+            CheckBox rb = new CheckBox(p.toString());
+            rb.setId(""+j);
+            check.add(rb);
+            sp.getChildren().add(rb);
+            StackPane.setAlignment(rb,Pos.TOP_LEFT);
+            StackPane.setMargin(rb,new Insets(100 + j * 40,0,0,30));
+            j++;
+        }
+        Button submit = new Button("Submit");
+        sp.getChildren().add(submit);
+        StackPane.setAlignment(submit,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(text,new Insets(0,10,10,0));
+        submit.setOnMouseClicked(mouseEvent -> {
+            for(CheckBox c : check){
+                if(c.isSelected()){
+                    if(Integer.parseInt(c.getId()) < possibleTargets.size()) {
+                        Target t = possibleTargets.get(Integer.parseInt(c.getId()));
+                        choosenTarget.add(t);
+                    }
+                }
+            }
+            if(choosenTarget.size() < maxE && choosenTarget.size() > minE) {
+                controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
+                sg.close();
+            }
+            else{
+                tex.setText("Invalid number of target (from "+minE+" to "+maxE+")");
+                choosenTarget.clear();
+            }
+        });
+        sg.setScene(temp);
+        sg.show();
     }
 
     @Override
@@ -483,11 +528,11 @@ public class ClientGUIView extends Application implements View{
         Scene tempScene = new Scene(sp);
         List<CheckBox> powerUp = new ArrayList<>();
         List<CardPower> choosenPW = new ArrayList<>();
-        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
         Label text = new Label("Choose which power up you wanna use to pay");
         sp.getChildren().add(text);
-        StackPane.setAlignment(text,Pos.TOP_CENTER);
         StackPane.setMargin(text,new Insets(20, 0,0,0));
+        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
         int j = 0;
         for(CardPower cp : cardPower){
             CheckBox cb = new CheckBox(cp.getName());
@@ -509,12 +554,26 @@ public class ClientGUIView extends Application implements View{
                         choosenPW.add(cp);
                 }
             }
-            if(state.equals(ClientState.CHOOSEWEAPONTOWASTE) || state.equals(ClientState.CHOOSEWEAPONTOGRAB))
-                controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, weaponW));
-            if(state.equals(ClientState.CHOOSEPBB))
-                controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,choosenPW));
-            if(state.equals(ClientState.CHOOSEFIRSTEFFECT))
-                controller.getClient().sendMessage(new ChooseFirstEffectResponse(2,choosenPW));
+            switch (state){
+                case CHOOSEWEAPONTOWASTE:
+                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, weaponW));
+                    break;
+                case CHOOSEWEAPONTOGRAB:
+                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, null));
+                    break;
+                case CHOOSEPBB:
+                    controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,choosenPW));
+                    break;
+                case CHOOSEPLUSORDER:
+                    controller.getClient().sendMessage(new UseOrderPlusResponse(fullEffectList, choosenPW, 'y'));
+                    break;
+                case CHOOSEFIRSTEFFECT:
+                    controller.getClient().sendMessage(new ChooseFirstEffectResponse(2,choosenPW));
+                    break;
+                case CHOOSEPLUSEFFECT:
+                    controller.getClient().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, choosenPW));
+                    break;
+            }
             sg.close();
         });
         sg.setScene(tempScene);
@@ -713,29 +772,96 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void usePlusInOrder(List<FullEffect> plusEffects) {
-        /*
-        List<CardPower> toUse = new ArrayList<>();
-        char t;
-        writeText("Do you want to apply the plus effect, allow by your weapon, listed here:");
-        showEffects(Collections.singletonList(plusEffects.get(0)),false);
-        writeText("[Y]es or [N]o?");
-        do{
-            t = readChar();
-        }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
-        if(plusEffects.get(0) != null && (t == 'y' || t == 'Y'))
-            toUse = powerUpSelection(plusEffects.get(0).getPrice());
-        controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,toUse,t));
-        */
+        state = ClientState.CHOOSEPLUSORDER;
+        fullEffectList = plusEffects;
+        List<CardPower> list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> plusEffects.get(0).getPrice().contains(n.getColor())).collect(Collectors.toList()));
+        text.setText("Do you want to apply the plus effect, allow by your weapon? (in order)");
+        yes.setVisible(true);
+        no.setVisible(true);
+        yes.setOnMouseClicked(mouseEvent -> {
+            choosePowerUpToUse(list);
+            yes.setVisible(false);
+            no.setVisible(false);
+        });
+        no.setOnMouseClicked(mouseEvent -> {
+            yes.setVisible(false);
+            no.setVisible(false);
+            controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,null,'n'));
+        });
     }
-
     @Override
     public void choosePlusEffect(List<FullEffect> plusEffects) {
-
+        state = ClientState.CHOOSEPLUSEFFECT;
+        StackPane sp = new StackPane();
+        Scene tempScene = new Scene(sp);
+        Label text = new Label("Choose wich efferct you want to apply:");
+        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
+        sp.getChildren().add(text);
+        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        StackPane.setMargin(text,new Insets(20, 0,0,0));
+        ToggleGroup tg = new ToggleGroup();
+        int j = 0;
+        for(FullEffect f : plusEffects){
+            RadioButton eff = new RadioButton("Effect: "+f.getName());
+            eff.setId(f.getName());
+            eff.setToggleGroup(tg);
+            sp.getChildren().add(eff);
+            StackPane.setAlignment(eff,Pos.TOP_LEFT);
+            StackPane.setMargin(eff,new Insets(100 + j , 0,0,40));
+            j = j + 35;
+        }
+        Button submit = new Button("Submit");
+        sp.getChildren().add(submit);
+        StackPane.setAlignment(submit, Pos.BOTTOM_RIGHT);
+        submit.setOnMouseClicked(mouseEvent -> {
+            if(tg.getSelectedToggle().isSelected()){
+                int i = 0;
+                FullEffect fe = null;
+                for(FullEffect e : plusEffects){
+                    if(e.getName().equals(((RadioButton)tg.getSelectedToggle()).getId())){
+                        fe = e;
+                        plusEffects.remove(i);
+                        plusEff = e;
+                        fullEffectList = plusEffects;
+                    }
+                    i++;
+                }
+                if(fe== null)
+                    controller.getClient().sendMessage(new TerminateShootAction());
+                else
+                    if(fe.getPrice() == null) {
+                        controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, fe, null));
+                    }
+                    else{
+                        List<game.model.Color> price = fe.getPrice();
+                        List<CardPower> list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+                        choosePowerUpToUse(list);
+                    }
+            }
+            sg.close();
+        });
+        sg.setScene(tempScene);
+        sg.show();
     }
 
     @Override
     public void showRanking(SortedMap<Player, Integer> ranking) {
-
+        StackPane sp = new StackPane();
+        Scene tempScene = new Scene(sp);
+        Label text = new Label("And The Winner Is:");
+        sp.getChildren().add(text);
+        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
+        StackPane.setMargin(text,new Insets(20, 0,0,0));
+        StackPane.setAlignment(text,Pos.TOP_CENTER);
+        int j = 1;
+        for(Player p : ranking.keySet()){
+            Label pos = new Label(p.getNickName() + " got " +j+ "° place with"+ ranking.get(p) + "points");
+            sp.getChildren().add(pos);
+            StackPane.setAlignment(pos,Pos.CENTER);
+            StackPane.setMargin(pos,new Insets(j * 30, 0,0,0));
+        }
+        sg.setScene(tempScene);
+        sg.show();
     }
 
     @Override
@@ -1420,325 +1546,6 @@ public class ClientGUIView extends Application implements View{
         text.setText("Wait Your Turn:");
     }
 
-/*
-    private void showMap(){
-        int mapId = 1;
-        StackPane map = new StackPane();
-        Image image = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/mappa1.png"));
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(screenWidth*55/100);
-        imageView.setPreserveRatio(true);
-        Image image2 = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_18.png"));
-        Image image7 = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/Teleporter_R.png"));
-        ImageView im2 = new ImageView(image2);
-        im2.setId("Distruttore");
-        ImageView im3 = new ImageView(image2);
-        im3.setId("THOR");
-        ImageView im4 = new ImageView(image2);
-        im4.setId("Spada Laser");
-        ImageView im5 = new ImageView(image7);
-        im5.setId("Machine Gun");
-        ImageView im6 = new ImageView(image7);
-        im6.setId("Bomba");
-        ImageView im7 = new ImageView(image7);
-        im7.setId("Launch Granede");
-        Image imdg = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/BluDash.png"));
-        Image myp = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/YellowDash.png"));
-        ImageView imd1 = new ImageView(imdg);
-        imd1.setId("Player 2");
-        ImageView imd2 = new ImageView(imdg);
-        imd2.setId("Player 3");
-        ImageView imd3 = new ImageView(imdg);
-        imd3.setId("Player 4");
-        ImageView imd4 = new ImageView(imdg);
-        imd4.setId("Player 5");
-        ImageView imd5 = new ImageView(myp);
-        imd5.setId("MyPlayer");
-
-        imd5.setOnMouseClicked(e -> {
-            System.out.println(((ImageView)e.getSource()).getId());
-        });
-
-
-        text.setStyle("-fx-font: 20px Tahoma;");
-        text.setTextFill(Color.WHITE);
-        text.setPrefWidth(screenWidth*52.5/100);
-        text.setMaxHeight(screenHeight*3.25/100);
-        text.setWrapText(true);
-
-
-
-
-        map.setPrefSize(screenWidth,screenHeight);
-        map.getChildren().addAll(imageView,im2,im3,im4,im5,im6,im7,imd1,imd2,imd3,imd4,imd5,text);
-
-        List<ImageView> im = new ArrayList<>(Arrays.asList(im2,im3,im4,im5,im6,im7));
-        List<ImageView> imd = new ArrayList<>(Arrays.asList(imd1,imd2,imd3,imd4,imd5));
-
-        List<ImageView> mapWR = new ArrayList<>(Arrays.asList(new ImageView(image2),new ImageView(image2),new ImageView(image2)));
-        List<ImageView> mapWT = new ArrayList<>(Arrays.asList(new ImageView(image2),new ImageView(image2),new ImageView(image2)));
-        List<ImageView> mapWL = new ArrayList<>(Arrays.asList(new ImageView(image2),new ImageView(image2),new ImageView(image2)));
-
-        int i = 0;
-        for(ImageView imw : im){
-            imw.setFitWidth(screenWidth*6.9/100);
-            imw.setPreserveRatio(true);
-            StackPane.setAlignment(imw,Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(imw,new Insets(0,i,0,0));
-            i = i + (int)(screenHeight*14/100);
-            imw.setOnMouseClicked(this::handleWeaponClick);
-        }
-
-        i = 0;
-        for(ImageView imw : imd){
-            imw.setFitWidth(screenWidth*36.6/100);
-            imw.setPreserveRatio(true);
-            StackPane.setAlignment(imw,Pos.TOP_RIGHT);
-            StackPane.setMargin(imw,new Insets(i,0,0,0));
-            i = i + (int)(screenHeight*18.6/100);
-            imw.setOnMouseClicked(this::handleWeaponClick);
-        }
-        StackPane.setAlignment(imd5,Pos.BOTTOM_LEFT);
-        double spaceX = 0;
-        for(ImageView weapon : mapWL){
-            map.getChildren().add(weapon);
-            weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("1");
-            weapon.setPreserveRatio(true);
-            StackPane.setAlignment(weapon,Pos.CENTER_LEFT);
-            weapon.setRotate(270);
-            StackPane.setMargin(weapon,new Insets(screenHeight*12/100 + spaceX,0,0,screenWidth*1.83/100));
-            weapon.setOnMouseClicked(null);
-            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
-            weapon.setOnMouseExited(this::handleMouseOutWeapon);
-            spaceX = spaceX - screenHeight*22.4/100;
-            //weapon.setEffect(new DropShadow(20,Color.GREEN));
-        }
-        double spaceT = 0;
-        for(ImageView weapon : mapWT){
-            map.getChildren().add(weapon);
-            weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("2");
-            weapon.setPreserveRatio(true);
-            StackPane.setAlignment(weapon,Pos.TOP_CENTER);
-            StackPane.setMargin(weapon,new Insets(0,screenWidth*34/100 + spaceT,0,0));
-            weapon.setOnMouseClicked(this::handleWeaponClick);
-            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
-            weapon.setOnMouseExited(this::handleMouseOutWeapon);
-            spaceT = spaceT - screenHeight*20/100;
-            //weapon.setEffect(new DropShadow(20,Color.GREEN));
-        }
-
-        double spaceR = 0;
-        for(ImageView weapon : mapWR){
-            map.getChildren().add(weapon);
-            weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("3");
-            weapon.setPreserveRatio(true);
-            StackPane.setAlignment(weapon,Pos.CENTER);
-            weapon.setRotate(90);
-            StackPane.setMargin(weapon,new Insets(screenHeight*43/100 + spaceR,0,0,screenWidth*4/100));
-            weapon.setOnMouseClicked(this::handleWeaponClick);
-            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
-            weapon.setOnMouseExited(this::handleMouseOutWeapon);
-            spaceR = spaceR - screenHeight*22.4/100;
-            //weapon.setEffect(new DropShadow(20,Color.GREEN));
-        }
-
-
-
-        //stampa rettangoli invisibili e ammo
-        List<Rectangle> squares = new ArrayList<>();
-        List<ImageView> ammos = new ArrayList<>();
-        spaceX = 0;
-        double spaceY = 0;
-        image = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/ammo/BRR.png"));
-        for(i = 1; i < 13; i++){
-            Rectangle rec = new Rectangle(130,130);
-            rec.setFill(Color.TRANSPARENT);
-            rec.setId(""+i);
-            rec.setStroke(Color.GREEN);
-            rec.setEffect(new DropShadow(40,Color.GREEN));
-            squares.add(rec);
-            ImageView am = new ImageView(image);
-            am.setId(""+i);
-            ammos.add(am);
-            am.setFitWidth(screenWidth*2.4/100);
-            am.setPreserveRatio(true);
-            map.getChildren().add(rec);
-            map.getChildren().add(am);
-            StackPane.setAlignment(rec,Pos.TOP_LEFT);
-            StackPane.setMargin(rec,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
-            StackPane.setAlignment(am,Pos.TOP_LEFT);
-            StackPane.setMargin(am,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
-            rec.setOnMouseClicked(this :: handleSquareClick);
-            if(i % 4 == 0 && i != 0){
-                spaceX = 0;
-                spaceY = spaceY + screenHeight*18/100;
-            }else{
-                spaceX = spaceX + screenWidth*9.5/100;
-            }
-        }
-
-        //player stamp
-        List<Circle> players = new ArrayList<>();
-        spaceX = 0;
-        spaceY = 0;
-        for(i = 1; i< 13 ; i++) {
-            for (int j = 0; j < 5; j++) {
-                Circle c = new Circle(9, Color.GREENYELLOW);
-                c.setStroke(Color.BLACK);
-                players.add(c);
-                map.getChildren().add(c);
-                c.setId("hwllp");
-                StackPane.setAlignment(c,Pos.TOP_LEFT);
-                StackPane.setMargin(c, new Insets(screenHeight * 29 / 100 + spaceY, 0, 0, screenWidth * 11 / 100 + spaceX + j * 20));
-                c.setOnMouseClicked(mouseEvent -> {
-                    primaryStage.setAlwaysOnTop(false);
-                    Stage sg = new Stage();
-                    StackPane sp = new StackPane();
-                    sp.setPrefSize(500,500);
-                    Button b = new Button("alwdiwd");
-                    sp.getChildren().add(b);
-                    StackPane.setAlignment(b,Pos.CENTER);
-                    Scene sc = new Scene(sp);
-                    sg.setAlwaysOnTop(true);
-                    sg.setScene(sc);
-                    sg.show();
-                });
-                //c.setOnMouseClicked(this::handlePlayerClick);
-            }
-            if (i % 4 == 0 && i != 0) {
-                spaceY = spaceY + screenHeight * 18 / 100;
-                spaceX = 0;
-            } else {
-                spaceX = spaceX + screenWidth * 9.5 / 100;
-
-            }
-        }
-
-        //Stampa gocce Kill
-        spaceY = 0;
-        for(int j = 0; j < 8; j++){
-            Image kill = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/YellowTear.png"));
-            ImageView kills = new ImageView(kill);
-            kills.setId(""+i);
-            kills.setFitHeight(screenHeight * 3 /100);
-            kills.setPreserveRatio(true);
-            map.getChildren().add(kills);
-            StackPane.setAlignment(kills,Pos.TOP_LEFT);
-            StackPane.setMargin(kills,new Insets(screenHeight * 5 / 100,0,0,screenWidth * 4.8 / 100 + spaceY));
-            spaceY = spaceY + screenWidth * 2.46 / 100;
-        }
-
-
-        //Stampa gocce My Player danno e marchio
-        spaceX = 0;
-        for(int j = 0; j < 12; j++){
-            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/BlueTear.png"));
-            ImageView damages = new ImageView(damage);
-            damages.setId(""+i);
-            damages.setFitHeight(screenHeight * 3 /100);
-            damages.setPreserveRatio(true);
-            map.getChildren().add(damages);
-            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
-            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 6.25 / 100,screenWidth * 3.44 / 100 + spaceX));
-            spaceX = spaceX + screenWidth * 2.25 / 100;
-            if(j > 1 && j != 4)
-                spaceX = spaceX - screenWidth * 0.25 / 100;
-        }
-        spaceX = 0;
-        for(int j = 0; j < 9; j++){
-            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/PurpleTear.png"));
-            ImageView damages = new ImageView(damage);
-            damages.setId(""+i);
-            damages.setFitHeight(screenHeight * 2 /100);
-            damages.setPreserveRatio(true);
-            map.getChildren().add(damages);
-            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
-            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 17.6 / 100 + spaceX));
-            spaceX = spaceX + screenWidth * 1 / 100;
-        }
-
-
-        //Stampa gocce other Player danno e marchio
-        spaceY = 0;
-        for(int k = 0; k < 4 ; k++) {
-            spaceX = 0;
-            for (int j = 0; j < 12; j++) {
-                Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/YellowTear.png"));
-                ImageView damages = new ImageView(damage);
-                damages.setId("" + i);
-                damages.setFitHeight(screenHeight * 3 / 100);
-                damages.setPreserveRatio(true);
-                map.getChildren().add(damages);
-                StackPane.setAlignment(damages, Pos.TOP_RIGHT);
-                StackPane.setMargin(damages, new Insets(screenHeight * 6.5 / 100 + spaceY, screenWidth * 32.1 / 100 - spaceX, 0, 0));
-                spaceX = spaceX + screenWidth * 2.25 / 100;
-                if (j > 1 && j != 4)
-                    spaceX = spaceX - screenWidth * 0.25 / 100;
-            }
-            spaceX = 0;
-            for (int j = 0; j < 9; j++) {
-                Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/BlueTear.png"));
-                ImageView damages = new ImageView(damage);
-                damages.setId("" + i);
-                damages.setFitHeight(screenHeight * 2 / 100);
-                damages.setPreserveRatio(true);
-                map.getChildren().add(damages);
-                StackPane.setAlignment(damages, Pos.TOP_RIGHT);
-                StackPane.setMargin(damages, new Insets(screenHeight * 0.4 / 100 + spaceY, screenWidth * 18 / 100 - spaceX, 0, 0));
-                spaceX = spaceX + screenWidth * 1 / 100;
-            }
-            spaceY = spaceY + screenHeight * 18.5 / 100;
-        }
-
-        //ammo
-        spaceX = 0;
-        spaceY = 0;
-        for(int j = 0; j < 3 ; j++){
-            for (int k = 0;k < 3 ; k ++){
-                Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.valueOf("Yellow"));
-                map.getChildren().add(ammo);
-                StackPane.setAlignment(ammo, Pos.BOTTOM_LEFT);
-                StackPane.setMargin(ammo, new Insets(0, 0, screenHeight * 12 / 100 - spaceY, screenWidth * 29 / 100 + spaceX));
-                spaceX = spaceX + screenWidth * 2.5 / 100;
-            }
-            spaceY = spaceY + screenHeight * 3.5 /100;
-            spaceX = 0;
-        }
-
-        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.png"));
-        BackgroundImage bi = new BackgroundImage(background,
-                BackgroundRepeat.REPEAT,
-                BackgroundRepeat.REPEAT,
-                BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-        map.setBackground(new Background(bi));
-
-        StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
-        StackPane.setMargin(text,new Insets(0,0,(screenHeight/(displayY/130)),0));
-        StackPane.setAlignment(imageView,Pos.TOP_LEFT);
-
-        Button move = new Button("Movement");
-        Button move1 = new Button("Movement");
-        Button move2 = new Button("Movement");
-        map.getChildren().addAll(move,move1,move2);
-        StackPane.setMargin(move,new Insets(0,screenWidth * 2 / 100,screenHeight * 23 / 100,0));
-        StackPane.setAlignment(move,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(move1,new Insets(0,screenWidth * 8 / 100,screenHeight * 23 / 100,0));
-        StackPane.setAlignment(move1,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(move2,new Insets(0,screenWidth * 14/ 100,screenHeight * 23 / 100,0));
-        StackPane.setAlignment(move2,Pos.BOTTOM_RIGHT);
-
-
-        Scene scene = new Scene(map);
-        primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
-        primaryStage.setAlwaysOnTop(true);
-        primaryStage.show();
-    }
-*/
     //TODO mettere javaDoc
     private void handlePlayerClick(MouseEvent e){
         text.setText("Player "+((Circle)e.getSource()).getId() + " position: " +((Circle)e.getSource()).getCenterX() + " Y :"+((Circle)e.getSource()).getCenterY() );

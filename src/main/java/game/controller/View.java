@@ -19,7 +19,7 @@ public interface View {
 
     void chooseSquarePhase(List<Square> possiblePositions);
 
-    void chooseTargetPhase(List<Target> possibleTargets, SimpleEffect currSimpleEffect);
+    void chooseTargetPhase(List<Target> possibleTargets);
 
     void chooseTurnActionPhase();
 

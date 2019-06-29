@@ -126,7 +126,8 @@ public class ClientController implements ServerMessageHandler {
      */
     @Override
     public void handle(ChooseTargetRequest serverMsg) {
-        clientView.chooseTargetPhase(serverMsg.getPossibleTargets(),serverMsg.getCurrSimpleEffect());
+        ClientContext.get().setCurrentEffect(serverMsg.getCurrSimpleEffect());
+        clientView.chooseTargetPhase(serverMsg.getPossibleTargets());
     }
 
     /**
