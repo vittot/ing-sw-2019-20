@@ -43,8 +43,8 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
-    public void chooseTargetPhase(List<Target> possibleTargets, SimpleEffect currSimpleEffect) {
-        runLater(()->gui.chooseTargetPhase(possibleTargets,currSimpleEffect));
+    public void chooseTargetPhase(List<Target> possibleTargets) {
+        runLater(()->gui.chooseTargetPhase(possibleTargets));
     }
 
     @Override

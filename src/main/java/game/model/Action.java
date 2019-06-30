@@ -5,6 +5,7 @@ public enum Action {
     SHOOT,
     GRAB,
     RELOAD,
+    POWER,
     EXIT;
 
     public static boolean checkAction(Action action){

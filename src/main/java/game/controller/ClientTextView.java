@@ -162,7 +162,6 @@ public class ClientTextView implements  View {
                 reloadRequests.add(new ReloadWeaponRequest(weaponsToReload.get(n-1),cp));
                 weaponsToReload.remove(weaponsToReload.get(n-1));
             }
-
         }while(weaponsToReload.size() > 0 && n!=-1);
 
         if(n != -1)
@@ -581,8 +580,7 @@ public class ClientTextView implements  View {
      * Choose a specified number of targets from the proposed
      * @param possibleTarget
      */
-    public void chooseTargetPhase(List<Target> possibleTarget, SimpleEffect currSimpleEffect){
-        ClientContext.get().setCurrentEffect(currSimpleEffect);
+    public void chooseTargetPhase(List<Target> possibleTarget){
         int maxE = ClientContext.get().getCurrentEffect().getMaxEnemy();
         int minE = ClientContext.get().getCurrentEffect().getMinEnemy();
         int i = 0;
