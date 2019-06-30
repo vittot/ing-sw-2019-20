@@ -137,7 +137,7 @@ public class GameManager implements Serializable {
     }
 
     /**
-     * Remove a full waiting room (it will become a Game)
+     * Remove a waiting room
      * @param waitingRoom
      */
     public void removeWaitingRoom(WaitingRoom waitingRoom) {

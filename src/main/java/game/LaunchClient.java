@@ -2,6 +2,9 @@ package game;
 
 import game.controller.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
@@ -66,10 +69,20 @@ public class LaunchClient {
     {
         String input;
         Scanner in = new Scanner(System.in);
+        /*File file = new File("input.txt");
+        try {
+            in = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }*/
         do {
-            System.out.println("CLI or GUI?");
+            System.out.println("CLI[C] or GUI[G]?");
             input = in.nextLine();
             input = input.toUpperCase();
+            if(input.equals("G"))
+                input = "GUI";
+            else if(input.equals("C"))
+                input = "CLI";
         }while(!input.equals("GUI") && !input.equals("CLI"));
         return input;
 

@@ -29,7 +29,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
     private CardWeapon actualWeapon;
     private CardPower actualCardPower;
     private List<Color> ammo;
-    private transient List<CardPower> cardPower;
+    private List<CardPower> cardPower;
     private int deaths;
     private transient int points;
     private Square position;
@@ -62,6 +62,33 @@ public class Player implements Target, Serializable, Comparable<Player> {
     {
         this(id,color);
         this.nickName = nick;
+    }
+
+    /**
+     * Copy constructor
+     * @param or
+     */
+    public Player(Player or) {
+        this.color = or.color;
+        this.marks = or.marks;
+        this.thisTurnMarks = or.thisTurnMarks;
+        this.id = or.id;
+        this.nickName = or.nickName;
+        this.damage = or.damage;
+        this.adrenaline = or.adrenaline;
+        this.weapons = or.weapons;
+        this.actualWeapon = or.actualWeapon;
+        this.actualCardPower = or.actualCardPower;
+        this.ammo = or.ammo;
+        this.cardPower = or.cardPower;
+        this.deaths = or.deaths;
+        this.points = or.points;
+        this.position = or.position;
+        this.game = or.game;
+        this.isDead = or.isDead;
+        this.serializeEverything = or.serializeEverything;
+        this.playerObserver = or.playerObserver;
+        this.suspended = or.suspended;
     }
 
     public boolean isSuspended() {
@@ -226,6 +253,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     public void addCardPower(CardPower cp)
     {
+        if(this.cardPower == null)
+            System.out.println("LE CARD POWER SONO NULL, COME DOVREI FARE AD AGGIUNGERLE?!");
         CardPower alreadyPresent = this.cardPower.stream().filter(c -> c.getId() == cp.getId()).findFirst().orElse(null);
         if(alreadyPresent == null)
             this.cardPower.add(cp);
@@ -637,13 +666,13 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
-        if(serializeEverything) {
+        /*if(serializeEverything) {
             //The cast to Serializable is necessary to avoid Sonar bug issues because List does not implement Serializable but all implementations of List (such as ArrayList) in effect implements Serializable
-            oos.writeObject((Serializable)cardPower);
+            //oos.writeObject((Serializable)cardPower);
             oos.writeObject((Serializable)weapons);
             oos.writeInt(points);
         }
-        serializeEverything = false;
+        serializeEverything = false;*/
     }
 
     /**
@@ -653,15 +682,15 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
-        if(serializeEverything)
+        /*if(serializeEverything)
         {
-            cardPower = (List<CardPower>)ois.readObject();
+            //cardPower = (List<CardPower>)ois.readObject();
             weapons = (List<CardWeapon>)ois.readObject();
             points = ois.readInt();
         }
-        else{
+        else{*/
             weapons = new ArrayList<>();
-        }
+        //}
     }
 
     /**

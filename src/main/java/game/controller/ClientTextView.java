@@ -7,6 +7,9 @@ import game.model.*;
 import game.model.effects.FullEffect;
 import game.model.effects.SimpleEffect;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,35 +25,48 @@ public class ClientTextView implements  View {
     private ClientController controller;
     private Scanner fromKeyBoard;
     private List<GameMap> availableMaps;
+    private Thread waitingThread;
 
 
 
     public ClientTextView(){
-        this.fromKeyBoard = new Scanner(System.in);
+       initInput();
     }
 
     public ClientTextView(ClientController controller) {
         this.controller = controller;
-        this.fromKeyBoard = new Scanner(System.in);
+        initInput();
     }
 
-    public void writeText (String text){
+    private void initInput()
+    {
+        this.fromKeyBoard = new Scanner(System.in);
+        /*File file = new File("input.txt");
+        try {
+            fromKeyBoard = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }*/
+    }
+
+    public synchronized void writeText (String text){
         System.out.println(">> " + text);
     }
 
-    public String readText(){
+    public synchronized String readText(){
+        initInput();
         String string = null;
-        //try {
+        try {
             string = fromKeyBoard.nextLine();
             return string;
-        /*} catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
-        }*/
+            return "";
+        }
 
     }
 
-    public char readChar(){
+    public synchronized char readChar(){
         try {
             String string = readText();
             return string.charAt(0);
@@ -63,7 +79,7 @@ public class ClientTextView implements  View {
      * Read an integer from the input stream
      * @return
      */
-    public  int readInt(){
+    public  synchronized int readInt(){
 
         String number;
         int n = 0;
@@ -74,7 +90,7 @@ public class ClientTextView implements  View {
             try {
                 n = Integer.parseInt(number);
             } catch (NumberFormatException e) {
-                System.out.println("Wrong input, expected a numeber");
+                System.out.println("Wrong input, expected a number");
                 retry = true;
             }
         }while(retry);
@@ -102,27 +118,15 @@ public class ClientTextView implements  View {
         }while(true);*/
     }
 
-    public void run(){
-        /*new Thread(
-
-                () -> {
-                    String s = "";
-                    do{
-                         if(fromKeyBoard.hasNext())
-                            s = readText();
-                    }while(!s.equals("EXIT"));
-
-                }
-        ).start();*/
-    }
-
     /**
      * Starting phase during the player enter his username for the game
      */
     public void setUserNamePhase (){
+        Random r  = new Random();
         do {
             writeText("Provide username:");
             ClientContext.get().setUser(readText());
+            //ClientContext.get().setUser("USER" + r.nextInt());
         } while (  ClientContext.get().getUser() == null);
 
         writeText("Wait for login...");
@@ -236,20 +240,21 @@ public class ClientTextView implements  View {
     @Override
     public void waitStart(){
 
-        Thread t = new Thread( () -> {
+        waitingThread = new Thread( () -> {
             String s;
             do {
                 //s = readText();
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                   return;
                 }
             } while (/*!s.equals("exit") &&*/ !controller.isGameStarted());
             //to flush the scanner, it seems to be the unique way
-            fromKeyBoard = new Scanner(System.in);
+            initInput();
         });
-        t.start();
+        waitingThread.setName("WAITING START THREAD");
+        waitingThread.start();
     }
 
     @Override
@@ -257,12 +262,18 @@ public class ClientTextView implements  View {
         String choice, ip;
         writeText("Choose the connection type");
         do{
-            writeText("Insert Socket or RMI:");
+            writeText("Insert Socket[S] or RMI[R]:");
             choice = fromKeyBoard.nextLine();
             choice = choice.toUpperCase();
+            if(choice.equals("S"))
+                choice = "SOCKET";
+            else if(choice.equals("R"))
+                choice = "RMI";
         }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
-        writeText("Insert the server IP (or localhost):");
+        writeText("Insert the server IP (or localhost [L]):");
         ip = fromKeyBoard.nextLine();
+        if(ip.equalsIgnoreCase("L"))
+            ip = "localhost";
         LaunchClient.startConnection(choice,ip);
     }
 
@@ -445,16 +456,18 @@ public class ClientTextView implements  View {
     public void createRoomPhase()
     {
         int mapId, nPlayer;
-        //printAvailableMaps();
-        do{
-            writeText("Enter the id of the map you want to use in your game:");
-            mapId = readInt();
-        }while(mapId < 1 || mapId > availableMaps.size());
 
-        do{
-            writeText("Enter the number of player to start the game [3-5]:");
-            nPlayer = readInt();
-        }while(nPlayer < 3 || nPlayer > 5);
+        synchronized (this) {
+            do {
+                writeText("Enter the id of the map you want to use in your game:");
+                mapId = readInt();
+            } while (mapId < 1 || mapId > availableMaps.size());
+
+            do {
+                writeText("Enter the number of player to start the game [3-5]:");
+                nPlayer = readInt();
+            } while (nPlayer < 3 || nPlayer > 5);
+        }
 
         controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,ClientContext.get().getUser()));
     }
@@ -467,14 +480,17 @@ public class ClientTextView implements  View {
         Action chosenAction = null;
         String action;
         do{
-            writeText("The action you have selected preview this ordered single step combination, choose the next: (info for player information/exit to stop action)");
+            writeText("The action you have selected preview this ordered single step combination, choose the next: (info for player information/exit[e] to stop action)");
             for(Action ac : possibleActions){
                 writeText(ac.name());
             }
             action = readText();
             action = action.toUpperCase();
             try {
-                if(action.equals("EXIT")){
+                if(action.equals("E"))
+                    action = "EXIT";
+
+                if(action.equals("EXIT") && controller.getState() == ClientState.HANDLING_MOVEMENT){
                     controller.getClient().sendMessage(new EndActionRequest());
                     return;
                 }
@@ -500,6 +516,13 @@ public class ClientTextView implements  View {
 
                 }*/
 
+                if(action.equals("M"))
+                    action = "MOVEMENT";
+                else if(action.equals("G"))
+                    action = "GRAB";
+                else if(action.equals("S"))
+                    action = "SHOOT";
+
                 chosenAction = Action.valueOf(action);
             }catch ( NullPointerException f){
                 chosenAction = null;
@@ -519,6 +542,7 @@ public class ClientTextView implements  View {
                     controller.getClient().sendMessage(new ShootActionRequest());
                     break;
                 case MOVEMENT:
+                    controller.setState(ClientState.HANDLING_MOVEMENT);
                     controller.getClient().sendMessage(new MovementActionRequest());
                     break;
             }
@@ -601,7 +625,7 @@ public class ClientTextView implements  View {
         Action choosenAction;
         String action;
         do{
-            writeText("Choose the action you want to make between {MOVEMENT, GRAB, SHOOT} (write info to see the details of the game, write power to use power-up cards): ");
+            writeText("Choose the action you want to make between {MOVEMENT[M], GRAB[G], SHOOT[S]} (write info to see the details of the game, write power to use power-up cards): ");
             action = readText();
             action = action.toUpperCase();
             try {
@@ -622,8 +646,19 @@ public class ClientTextView implements  View {
                         controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerList)));
                     choosenAction = null;
                 }
-                else
+                else if(action.equals("EXIT"))
+                {
+                    choosenAction = null;
+                }
+                else{
+                    if(action.equalsIgnoreCase("M"))
+                        action = "MOVEMENT";
+                    else if(action.equalsIgnoreCase("G"))
+                        action = "GRAB";
+                    else if(action.equalsIgnoreCase("S"))
+                        action = "SHOOT";
                     choosenAction = Action.valueOf(action);
+                }
             }
             catch (IllegalArgumentException | NullPointerException e) {
                 choosenAction = null;
@@ -829,6 +864,7 @@ public class ClientTextView implements  View {
         else
         {
             controller.stopListening();
+            System.exit(0);
         }
     }
 
@@ -978,7 +1014,7 @@ public class ClientTextView implements  View {
             System.out.println(i+">>>"+list.get(i-1).toString());
         do{
             k=readInt();
-        }while(k<1 && k>list.size());
+        }while(k<1 || k>list.size());
         return list.get(k-1);
     }
 
@@ -1384,7 +1420,10 @@ public class ClientTextView implements  View {
             controller.retryConnection();
         }
         else{
+            if(waitingThread != null)
+                waitingThread.interrupt();
             controller.stopListening();
+            System.exit(0);
         }
     }
 

@@ -74,6 +74,7 @@ public class Turn {
      */
     public void newTurn(Player player, boolean finalFrezy){
 
+        stopTimer();
         game.getPlayers().forEach(Player::updateMarks);
         currentPlayer = player;
 
@@ -93,8 +94,8 @@ public class Turn {
         }
         numOfActions = 2;
         numOfMovs = 0;
-        game.notifyTurnChange(currentPlayer);
         startTimer();
+        game.notifyTurnChange(currentPlayer);
     }
 
     public void startTimer()
@@ -103,6 +104,7 @@ public class Turn {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
+                System.out.println("TIMER SCADUTO! " + currentPlayer.getNickName());
                 currentPlayer.suspend(true);
             }
         };
@@ -117,6 +119,7 @@ public class Turn {
     public void stopTimer()
     {
         timer.cancel();
+        System.out.println("TIMER CANCELLED" + currentPlayer.getNickName());
     }
 
     /**
@@ -125,7 +128,8 @@ public class Turn {
      * @return
      */
     public boolean applyStep(Action ac){
-        timer.cancel();
+        //timer.cancel();
+        System.out.println("TIMER CANCELLED" + currentPlayer.getNickName()) ;
         int i = 0;
         currentPlayer.rifleActualWeapon();
         game.getPlayers().forEach(Player::updateMarks);
@@ -134,10 +138,10 @@ public class Turn {
         if(this.actionList.contains(ac)){
             i = actionList.indexOf(ac);
             setActionList(actionList.subList(i+1,actionList.size()));
-            startTimer();
+            //startTimer();
             return true;
         }
-        startTimer();
+        //startTimer();
         return false;
     }
 

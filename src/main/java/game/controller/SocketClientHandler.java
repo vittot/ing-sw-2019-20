@@ -1,17 +1,18 @@
 package game.controller;
 
 import game.controller.commands.*;
+import game.controller.commands.clientcommands.LoginMessage;
 import game.controller.commands.clientcommands.PongMessage;
 import game.controller.commands.servercommands.*;
 import game.model.*;
 
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.Executors;
 
 
 public class SocketClientHandler extends ClientHandler implements Runnable, ClientMessageHandler {
@@ -19,6 +20,9 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
     private Socket socket;
     private final ObjectInputStream inStream;
     private final ObjectOutputStream outStream;
+    private ObjectInputStream inPingStream;
+    private ObjectOutputStream outPingStream;
+    private Socket pingSocket;
     private boolean stop;
 
     SocketClientHandler(Socket s) throws IOException {
@@ -41,13 +45,19 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
     public synchronized void sendMessage(ServerMessage msg) {
         //if(controller.getCurrPlayer() == null /*|| !controller.getCurrPlayer().isSuspended()*/)
             try{
-                if(controller.getCurrPlayer() != null)
-                    controller.getCurrPlayer().setSerializeEverything(true);
+                /*if(controller.getCurrPlayer() != null)
+                    controller.getCurrPlayer().setSerializeEverything(true);*/
                 outStream.writeObject(msg);
+                outStream.flush();
                 outStream.reset();
                 /*if(controller.getCurrPlayer() != null)
                     controller.getCurrPlayer().setSerializeEverything(false);*/
-            }catch(IOException e)
+            }
+            catch(SocketException | SocketTimeoutException e)
+            {
+                clientDisconnected();
+            }
+            catch(IOException e)
             {
                 e.printStackTrace();
             }
@@ -59,6 +69,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
      */
     @Override
     public void run() {
+
         startPing(PING_INTERVAL);
         try {
             do {
@@ -80,18 +91,51 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
 
     }
 
+    public InetAddress getInetAddress()
+    {
+        return socket.getInetAddress();
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+
     @Override
     public void handle(ClientGameMessage inMsg) {
-        ServerGameMessage outMsg = inMsg.handle(controller);
-        sendMessage(outMsg);
+        //new Thread( () ->{
+            ServerGameMessage outMsg = inMsg.handle(controller);
+            sendMessage(outMsg);
+        //}).start();
+
         /*if(controller.getCurrPlayer() != null)
             controller.getCurrPlayer().setSerializeEverything(false); //it is not always necessary*/
     }
 
     @Override
     public synchronized void handle(PongMessage msg) {
-        pingTimer.cancel();
+        //pingTimer.cancel();
+        pingTimer.shutdownNow();
         nPingLost = 0;
+        System.out.println(username + " PONG");
+    }
+
+    @Override
+    public void handle(LoginMessage inMsg) {
+        this.username = inMsg.getNickname();
+        ServerGameMessage outMsg = inMsg.handle(controller);
+        sendMessage(outMsg);
+    }
+
+    /**
+     * Send a ping message
+     * @param msg
+     */
+    @Override
+    public void sendPingMessage(PingMessage msg) {
+
+        System.out.println("PING " + username);
+        sendMessage(msg);
     }
 
     /**
@@ -114,22 +158,5 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
 
         socket.close();
     }
-
-
-    @Override
-    public void onReplaceWeapon(CardWeapon cw, Square s) {
-        sendMessage(new NotifyWeaponRefill(cw,s));
-    }
-
-    @Override
-    public void onReplaceAmmo(CardAmmo ca, Square s) {
-        sendMessage(new NotifyAmmoRefill(ca,s));
-    }
-
-    @Override
-    public void onPlayerUpdateMarks(Player player) {
-        sendMessage(new UpdateMarks(player));
-    }
-
 
 }
