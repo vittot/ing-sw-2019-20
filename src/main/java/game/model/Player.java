@@ -262,14 +262,6 @@ public class Player implements Target, Serializable, Comparable<Player> {
             damage += marksToBeRemoved.size();
             marks.removeAll(marksToBeRemoved);
 
-        /*for(int i=0;i<marks.size();i++){
-            if(marks.get(i)==shooter.getColor()){
-                damage++;
-                marks.remove(i);
-                i--;
-            }
-        }*/
-
             if (this.damage.size() < 11) {
                 for (int i = 0; i < damage; i++)
                     this.damage.add(shooter.getColor());
@@ -571,6 +563,47 @@ public class Player implements Target, Serializable, Comparable<Player> {
         }
     }
 
+    public List<Color> controlGrabAmmo(List<Color> ammos){
+        int nRed = 0, nBlue = 0, nYellow = 0;
+        for(Color a : ammo)
+            switch(a){
+                case BLUE:
+                    nBlue++;
+                    break;
+                case YELLOW:
+                    nYellow++;
+                    break;
+                case RED:
+                    nRed++;
+                    break;
+                default:
+                    break;
+            }
+        List<Color> toRemove = new ArrayList<>();
+        for(Color c: ammos)
+        {
+            if(c == Color.BLUE) {
+                if(nBlue >= 3)
+                    toRemove.add(c);
+                nBlue++;
+            }
+            else if(c == Color.RED)
+            {
+                if(nRed >= 3)
+                    toRemove.add(c);
+                nRed++;
+            }
+            else if(c == Color.YELLOW)
+            {
+                if(nYellow >= 3)
+                    toRemove.add(c);
+                nYellow++;
+            }
+        }
+        ammos.removeAll(toRemove);
+        return ammos;
+    }
+
     /**
      * Pick an ammo from the current Player position
      */
@@ -581,29 +614,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
         }
         if(position.getCardAmmo()!=null){
             List<Color> ammos = position.getCardAmmo().getAmmo();
-            int nRed = 0, nBlue = 0, nYellow = 0;
-            List<Color> toRemove = new ArrayList<>();
-            for(Color c: ammos)
-            {
-                if(c == Color.BLUE) {
-                    if(nBlue >= 3)
-                        toRemove.add(c);
-                    nBlue++;
-                }
-                else if(c == Color.RED)
-                {
-                    if(nRed >= 3)
-                        toRemove.add(c);
-                    nRed++;
-                }
-                else if(c == Color.YELLOW)
-                {
-                    if(nYellow >= 3)
-                        toRemove.add(c);
-                    nYellow++;
-                }
-            }
-            ammos.removeAll(toRemove);
+            ammos = controlGrabAmmo(ammos);
             ammo.addAll(ammos);
             if(position.getCardAmmo().getCardPower() > 0){
                 powerups = new ArrayList<>();

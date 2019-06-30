@@ -70,6 +70,7 @@ public class SocketClient implements Client, ServerMessageHandler {
                     }while(sm != null);
                     if(!stop)
                     {
+                        System.out.println("QUI");
                         handler.manageConnectionError();
                     }
                 }

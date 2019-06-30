@@ -866,7 +866,7 @@ public class ClientTextView implements  View {
         char c;
         int n = 1, t=1;
         list = list.stream().filter(x -> x.getName().equals("Targeting scope")).collect(Collectors.toList());
-        if(list.size() > 0) {
+        if(list.size() > 0 && !ClientContext.get().getMyPlayer().getAmmo().isEmpty()) {
             writeText("Do you want to use a Targeting scope power-up card to apply an additional damage to one of your previous target?");
             writeText("Insert [Y]es or [N]o");
             do {

@@ -646,7 +646,7 @@
                 <marks>0</marks>
                 <lastTarget>true</lastTarget>
                 <differentTarget>Anyone</differentTarget>
-                <chainTarget>false</chainTarget>
+                <chainTarget>true</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
         </baseEffect>
@@ -678,7 +678,7 @@
                 <marks>0</marks>
                 <lastTarget>true</lastTarget>
                 <differentTarget>NoneOfThePrevious</differentTarget>
-                <chainTarget>false</chainTarget>
+                <chainTarget>true</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>
             <movementEffect>

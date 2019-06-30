@@ -17,7 +17,7 @@ public abstract class ClientHandler implements GameListener {
     private Timer periodicPingTimer;
     protected int nPingLost = 0;
     static final int PING_WAITING_TIME_MS = 1000;
-    static final int PING_INTERVAL = 10000;
+    static final int PING_INTERVAL = 100000000;
 
     public abstract void sendMessage(ServerMessage msg);
 
