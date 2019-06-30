@@ -6,6 +6,7 @@ import game.controller.commands.ServerMessageHandler;
 import game.model.GameMap;
 import game.model.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RejoinGameConfirm implements ServerGameMessage {
@@ -15,9 +16,16 @@ public class RejoinGameConfirm implements ServerGameMessage {
     private int pId;
 
     public RejoinGameConfirm(GameMap map, List<Player> players, int pId) {
-        this.map = map;
-        this.players = players;
+        this.map = map.copy();
+        this.players = new ArrayList<>();
+        for(Player p : players)
+        {
+            this.players.add(new Player(p));
+        }
         this.pId = pId;
+        for(Player p : players)
+            if(p.getId() != pId)
+                p.setCardPower(null);
     }
 
     public int getId() {

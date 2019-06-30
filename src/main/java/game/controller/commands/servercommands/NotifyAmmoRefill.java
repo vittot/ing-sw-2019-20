@@ -10,19 +10,25 @@ public class NotifyAmmoRefill implements ServerGameMessage {
 
 
     private CardAmmo ca;
-    private Square position;
+    private int x;
+    private int y;
 
     public NotifyAmmoRefill(CardAmmo ca, Square position) {
         this.ca = ca;
-        this.position = position;
+        this.x = position.getX();
+        this.y = position.getY();
     }
 
     public CardAmmo getCa() {
         return ca;
     }
 
-    public Square getPosition() {
-        return position;
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     @Override

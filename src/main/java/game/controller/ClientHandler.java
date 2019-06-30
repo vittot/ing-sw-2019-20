@@ -9,21 +9,32 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public abstract class ClientHandler implements GameListener {
 
     protected transient ServerController controller;
-    protected Timer pingTimer;
-    private Timer periodicPingTimer;
+    protected ScheduledExecutorService pingTimer;
+    private ScheduledExecutorService periodicPingTimer;
     protected int nPingLost = 0;
-    static final int PING_WAITING_TIME_MS = 1000;
-    static final int PING_INTERVAL = 100000000;
+    static final int PING_WAITING_TIME_MS = 2000;
+    static final int PING_INTERVAL = 20000;
+    protected String username;
 
     public abstract void sendMessage(ServerMessage msg);
+    public abstract void sendPingMessage(PingMessage msg);
 
     protected void clientDisconnected()
     {
-        periodicPingTimer.cancel();
+        /*try {
+            pingTimer.cancel();
+        }catch(IllegalStateException e){} //in case it has already been cancelled
+        try{periodicPingTimer.cancel();}catch(IllegalStateException e){}*/
+        pingTimer.shutdownNow();
+        periodicPingTimer.shutdownNow();
+
         if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED && controller.getState() != ServerState.GAME_ENDED){
             controller.getModel().removeGameListener(this);
             controller.getCurrPlayer().suspend(false);
@@ -44,14 +55,19 @@ public abstract class ClientHandler implements GameListener {
      */
     void startPing(int pingPeriod)
     {
-        periodicPingTimer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
+        //periodicPingTimer = new Timer();
+        periodicPingTimer = Executors.newSingleThreadScheduledExecutor();
+        pingTimer = Executors.newScheduledThreadPool(1);
+        Runnable task = ()-> {
+            try {
                 pingClient(PING_WAITING_TIME_MS);
+            }catch(Exception e){
+                e.printStackTrace();
             }
         };
-        periodicPingTimer.scheduleAtFixedRate(task,0,pingPeriod);
+        //periodicPingTimer.scheduleAtFixedRate(task,0,pingPeriod);
+
+        periodicPingTimer.scheduleAtFixedRate(task,0,pingPeriod, TimeUnit.MILLISECONDS);
 
     }
 
@@ -61,19 +77,24 @@ public abstract class ClientHandler implements GameListener {
      * When the number of lost pings arrives at 3 it considers the client disconnected
      * @param waitingTime in ms
      */
-    synchronized void pingClient(int waitingTime)
+    void pingClient(int waitingTime)
     {
-        pingTimer = new Timer();
-        sendMessage(new PingMessage());
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
+        //pingTimer = new Timer();
+        sendPingMessage(new PingMessage());
+        Runnable task = () -> {
                 nPingLost++;
-                if(nPingLost >= 3)
+                if(nPingLost >= 3){
+                    System.out.println("HO DISCONNESSO PER PERDITA 3 PING");
                     clientDisconnected();
-            }
-        };
-        pingTimer.schedule(task, waitingTime);
+
+                }
+            };
+
+        //pingTimer.schedule(task, waitingTime);
+        synchronized (this){
+            pingTimer = Executors.newScheduledThreadPool(1);
+            pingTimer.schedule(task,waitingTime,TimeUnit.MILLISECONDS);
+        }
 
     }
 
@@ -165,5 +186,10 @@ public abstract class ClientHandler implements GameListener {
     @Override
     public void onReplaceAmmo(CardAmmo ca, Square s) {
         sendMessage(new NotifyAmmoRefill(ca,s));
+    }
+
+    @Override
+    public void onPlayerUpdateMarks(Player player) {
+        sendMessage(new UpdateMarks(player.getId()));
     }
 }

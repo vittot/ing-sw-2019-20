@@ -127,7 +127,11 @@ public class WaitingRoom implements Serializable {
         return rep.toString();
     }
 
-
-
-
+    /**
+     * Return true if the waiting room is empty, false otherwise
+     * @return
+     */
+    public boolean isEmpty() {
+        return players.isEmpty();
+    }
 }

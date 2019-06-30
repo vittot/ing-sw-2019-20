@@ -9,19 +9,25 @@ import game.model.Square;
 public class NotifyWeaponRefill implements ServerGameMessage {
 
     private CardWeapon cw;
-    private Square position;
+    private int x;
+    private int y;
 
     public NotifyWeaponRefill(CardWeapon cw, Square position) {
         this.cw = cw;
-        this.position = position;
+        this.x = position.getX();
+        this.y = position.getY();
     }
 
     public CardWeapon getCw() {
         return cw;
     }
 
-    public Square getPosition() {
-        return position;
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     @Override

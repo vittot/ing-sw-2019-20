@@ -2,11 +2,12 @@ package game.controller;
 
 
 import game.LaunchClient;
+import game.controller.commands.ClientGameMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
-import game.model.effects.SimpleEffect;
 import game.model.exceptions.MapOutOfLimitException;
+import javafx.animation.Animation;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,17 +23,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-
-
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 import java.util.*;
 import java.util.List;
@@ -44,11 +43,12 @@ public class ClientGUIView extends Application implements View{
     public ClientController controller;
     private String user;
     private Stage primaryStage;
-    private double displayY = 768;
     private double screenWidth = Screen.getScreens().get(0).getBounds().getWidth();
     private double screenHeight = Screen.getScreens().get(0).getBounds().getHeight();
     private List<GameMap> availableMaps;
 
+
+    private final String orangeB = "-fx-background-color: linear-gradient(#ffd65b, #e68400), linear-gradient(#ffef84, #f2ba44), linear-gradient(#ffea6a, #efaa22), linear-gradient(#ffe657 0%, #f8c202 50%, #eea10b 100%), linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0)); -fx-background-radius: 24; -fx-background-insets: 0,1,2,3,0; -fx-text-fill: #654b00; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 7 16 7 16;";
 
     private StackPane map = new StackPane();
     private Scene scene = new Scene(map);
@@ -76,16 +76,23 @@ public class ClientGUIView extends Application implements View{
     private Button no = new Button("No");
     private Label text = new Label("");
     private ClientState state;
-
+    private Label textwait;
 
     private Stage sg = new Stage();
+    private AudioClip loginBack;
 
     private List<Square> possiblePositions;
     private List<CardWeapon> weaponToGrab;
     private CardWeapon weaponG;
     private CardWeapon weaponW;
-    private FullEffect plusEff;
+    private FullEffect plusEff;                                                                                         //used for CHOOSEPLUSEFFECT and CHOOSEPBB
+    private List<FullEffect> fullEffectList;                                                                            //used for CHOOSEPLUSEFFECT and CHOOSEPLUSORDER
+    private List<ClientGameMessage> reloadRequests = new ArrayList<>();
+    private List<CardWeapon> weaponsToReload;
+    private CardWeapon weaponToReload;
+    private CardPower scopeSelected;
     private char t = 'n';
+    private Player shooter;
 
 
     public ClientGUIView() {
@@ -138,8 +145,14 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void chooseConnection() {
 
+        String url = getClass().getResource("/graphics/sound/login.wav").toExternalForm();
+        loginBack = new AudioClip(url);
+        loginBack.cycleCountProperty().setValue(Animation.INDEFINITE);
+        loginBack.setVolume(0.6);
+        loginBack.play();
+
         GridPane gp = new GridPane();
-        Scene sc = new Scene(gp,200,150);
+        Scene sc = new Scene(gp,500,300);
         Label text = new Label("Connection setup");
         text.setMaxWidth(Double.MAX_VALUE);
         text.setAlignment(Pos.CENTER);
@@ -150,13 +163,6 @@ public class ClientGUIView extends Application implements View{
         TextField ipTextField = new TextField();
         ipTextField.setText("localhost");
         Label serverIPLabel = new Label("Server IP");
-
-        /*sp.getChildren().addAll(text,b1,b2,ipTextField);
-        StackPane.setAlignment(text,Pos.TOP_CENTER);
-        StackPane.setAlignment(b1,Pos.CENTER);
-        StackPane.setAlignment(b2,Pos.CENTER);
-        StackPane.setMargin(b1,new Insets(0,150,0,0));
-        StackPane.setMargin(b2,new Insets(0,0,0,150));*/
         gp.setAlignment(Pos.CENTER);
         gp.setHgap(8);
         gp.setVgap(8);
@@ -175,17 +181,6 @@ public class ClientGUIView extends Application implements View{
 
         b1.setOnAction(actionEvent -> LaunchClient.startConnection("RMI",ipTextField.getText()));
         b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET",ipTextField.getText()));
-        /*
-        String choice;
-        Scanner in = new Scanner(System.in);
-        System.out.println("Choose the connection type");
-        System.out.println("Insert Socket or RMI:");
-        do{
-            choice = in.nextLine();
-            choice = choice.toUpperCase();
-        }while(!choice.equals("RMI") && !choice.equals("SOCKET"));
-        return choice;
-         */
     }
 
     @Override
@@ -222,7 +217,25 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
-
+        state = ClientState.CHOOSECOUNTER;
+        this.shooter = shooter;
+        text.setText("You want to use counterAttack on "+shooter.getNickName());
+        yes.setVisible(true);
+        no.setVisible(true);
+        yes.setOnMouseClicked(mouseEvent -> {
+            text.setText("Choose wich power Up you want to use");
+            if(counterattack.size() > 1 ){
+                activateCardPower(counterattack);
+            }else
+                controller.getClient().sendMessage(new CounterAttackResponse(counterattack.get(0),shooter));
+            yes.setVisible(false);
+            no.setVisible(false);
+        });
+        no.setOnMouseClicked(mouseEvent -> {
+            controller.getClient().sendMessage(new CounterAttackResponse());
+            yes.setVisible(false);
+            no.setVisible(false);
+        });
     }
 
     private void callRoomCreate(String s ){
@@ -237,6 +250,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyStart() {
+        loginBack.setVolume(0.2);
         showMapGame();
     }
 
@@ -251,10 +265,21 @@ public class ClientGUIView extends Application implements View{
         grid.setPadding(new Insets(25, 25, 25, 25));
 
 
+
+        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background01.jpg"));
+        BackgroundImage bi = new BackgroundImage(background,
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        
+        grid.setBackground(new Background(bi));
+        
         Text text = new Text("WELCOME TO ADRENALINE");
         grid.add(text, 1,0);
 
         Label userName = new Label("User Name:");
+        userName.setTextFill(Color.WHITE);
         grid.add(userName, 1, 1);
 
 
@@ -296,10 +321,10 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void chooseStepActionPhase() {
-        for (Action p : this.controller.getAvailableActions()) {
-        }
         text.setText("Choose your single step");
         state = ClientState.CHOOSESTEP;
+        power.setVisible(true);
+        power.setDisable(false);
         exit.setVisible(true);
         exit.setDisable(false);
         if(this.controller.getAvailableActions().contains(Action.MOVEMENT)){
@@ -329,8 +354,52 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
-    public void chooseTargetPhase(List<Target> possibleTargets, SimpleEffect currSimpleEffect) {
-
+    public void chooseTargetPhase(List<Target> possibleTargets) {
+        int maxE = ClientContext.get().getCurrentEffect().getMaxEnemy();
+        int minE = ClientContext.get().getCurrentEffect().getMinEnemy();
+        List<Target> choosenTarget = new ArrayList<>();
+        List<CheckBox> check = new ArrayList<>();
+        StackPane sp = new StackPane();
+        Scene temp = new Scene(sp);
+        Label tex = new Label("Choose between " + minE + " and " + maxE + " targets to apply your attack:");
+        StackPane.setAlignment(tex,Pos.TOP_CENTER);
+        StackPane.setMargin(tex,new Insets(20,0,0,0));
+        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
+        sp.getChildren().add(tex);
+        int j = 0;
+        for(Target p : possibleTargets){
+            CheckBox rb = new CheckBox(p.toString());
+            rb.setId(""+j);
+            check.add(rb);
+            sp.getChildren().add(rb);
+            StackPane.setAlignment(rb,Pos.TOP_LEFT);
+            StackPane.setMargin(rb,new Insets(100 + j * 40,0,0,30));
+            j++;
+        }
+        Button submit = new Button("Submit");
+        sp.getChildren().add(submit);
+        StackPane.setAlignment(submit,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(text,new Insets(0,10,10,0));
+        submit.setOnMouseClicked(mouseEvent -> {
+            for(CheckBox c : check){
+                if(c.isSelected()){
+                    System.out.println("Target Selected");
+                    Target t = possibleTargets.get(Integer.parseInt(c.getId()));
+                    choosenTarget.add(t);
+                    System.out.println("Target added ");
+                }
+            }
+            if(choosenTarget.size() <= maxE && choosenTarget.size() >= minE) {
+                controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
+                sg.close();
+            }
+            else{
+                tex.setText("Invalid number of target (from "+minE+" to "+maxE+")");
+                choosenTarget.clear();
+            }
+        });
+        sg.setScene(temp);
+        sg.show();
     }
 
     @Override
@@ -346,16 +415,18 @@ public class ClientGUIView extends Application implements View{
         shoot.setDisable(false);
         grab.setVisible(true);
         grab.setDisable(false);
+        power.setVisible(true);
+        power.setDisable(false);
     }
 
     @Override
     public void invalidTargetNotification() {
-
+        text.setText("Invalid terget selected!");
     }
 
     @Override
     public void invalidWeaponNotification() {
-
+        text.setText("Invalid weapon selected!");
     }
 
     @Override
@@ -365,21 +436,24 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void insufficientNumberOfActionNotification() {
-
+        text.setText("You cannot do others actions for this turn!");
     }
 
     @Override
     public void invalidStepNotification() {
-
+        text.setText("The step selected is not valid, you loose the action!! xd!!1!1!!");
     }
 
     @Override
     public void maxNumberOfWeaponNotification() {
-
+        text.setText("You can't grab another weapon!");
     }
 
     @Override
     public void damageNotification(int shooterId, int damage, int hit) {
+        String url = getClass().getResource("/graphics/sound/shoot.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
         String nick = ClientContext.get().getMap().getPlayerById(shooterId).getNickName();
         String hitted = ClientContext.get().getMap().getPlayerById(hit).getNickName();
         if(shooterId == ClientContext.get().getMyID()){
@@ -399,6 +473,10 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyMovement(int pId, int newX, int newY) {
+        System.out.println("Notify Movement");
+        String url = getClass().getResource("/graphics/sound/move.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
         String moved = ClientContext.get().getMap().getPlayerById(pId).getNickName();
         text.setText("Player "+ moved + " moved!");
         refreshPlayerPosition();
@@ -406,13 +484,22 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyDeath(Kill kill) {
+        if(kill.getVictim().getId() == ClientContext.get().getMyID()){
+            String url = getClass().getResource("/graphics/sound/death.wav").toExternalForm();
+            AudioClip audio = new AudioClip(url);
+            audio.play();
+        }
         text.setText("Player "+kill.getKiller().getNickName() + " killed "+kill.getVictim().getNickName());
         refreshDeaths();
     }
 
     @Override
     public void grabWeaponNotification(int pID, String name, int x, int y) {
+        System.out.println("Notify grab weapon");
         refreshWeaponCard();
+        String url = getClass().getResource("/graphics/sound/grab.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
         if(pID == ClientContext.get().getMyID()){
             refreshMyPlayerCard();
             refreshMyPlayerAmmo();
@@ -466,41 +553,64 @@ public class ClientGUIView extends Application implements View{
         text.setText("Invalid position, no card ammo here");
     }
 
-    private boolean mustUsePowerUpsToPay(List<game.model.Color> price) {
-        List<game.model.Color> ammo = ClientContext.get().getMyPlayer().getAmmo();
-        if (!price.isEmpty() && price != null) {
-            if (price.get(0) == game.model.Color.ANY)
-                return true;
-            if (ammo != null && !ammo.isEmpty())
-                for (int i = 0; i < ammo.size(); i++)
-                    price.remove(ammo.get(i));
-            if (price.isEmpty())
-                return false;
-            else
-                return true;
-        }
-        return false;
-    }
 
     @Override
     public void choosePowerUpToUse(List<CardPower> cardPower) {
+        List <CardPower> list = cardPower.stream().filter(x -> x.getName().equals("Targeting scope")).collect(Collectors.toList());
+        int dim = list.size();
+        if(dim > 0 ){
+            text.setText("Do you want to use a Targeting scope power-up card to apply an additional damage to one of your previous target?");
+            yes.setVisible(true);
+            no.setVisible(true);
+            yes.setOnMouseClicked(mouseEvent -> {
+                if(dim > 1){
+                    state = ClientState.CHOOSESCOPE;
+                    text.setText("Choose which power up use :");
+                    activateCardPower(list);
+                }else{
+                    scopeSelected = list.get(0);
+                    activateAmmo();
+                }
+                no.setVisible(false);
+                yes.setVisible(false);
+            });
+            no.setOnMouseClicked(mouseEvent -> {
+                controller.getClient().sendMessage(new ChoosePowerUpResponse());
+                no.setVisible(false);
+                yes.setVisible(false);
+            });
+        }
+
+    }
+    private void choosePowerUpToPay(List<CardPower> cardPower) {
         StackPane sp = new StackPane();
         Scene tempScene = new Scene(sp);
         List<CheckBox> powerUp = new ArrayList<>();
         List<CardPower> choosenPW = new ArrayList<>();
-        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
-        Label text = new Label("Choose which power up you wanna use to pay");
-        sp.getChildren().add(text);
-        StackPane.setAlignment(text,Pos.TOP_CENTER);
-        StackPane.setMargin(text,new Insets(20, 0,0,0));
+        Label tex = new Label("Choose which power up you wanna use to pay");
+        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.jpg"));
+        BackgroundImage bi = new BackgroundImage(background,
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        sp.getChildren().add(tex);
         int j = 0;
+        StackPane.setMargin(tex,new Insets(20, 0,0,0));
+        tex.setFont(Font.font(25));
+        tex.setTextFill(Color.WHITE);
+        sp.setBackground(new Background(bi));
+        StackPane.setAlignment(tex,Pos.TOP_CENTER);
+        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
         for(CardPower cp : cardPower){
             CheckBox cb = new CheckBox(cp.getName());
-            cb.setId(""+cp.getId());
-            sp.getChildren().add(cb);
-            powerUp.add(cb);
             StackPane.setAlignment(cb,Pos.TOP_LEFT);
             StackPane.setMargin(cb,new Insets(100 + j , 0,0,40));
+            sp.getChildren().add(cb);
+            cb.setFont(Font.font(25));
+            cb.setId(""+cp.getId());
+            powerUp.add(cb);
+            cb.setTextFill(Color.WHITE);
             j = j + 35;
         }
         Button submit = new Button("Submit");
@@ -514,12 +624,30 @@ public class ClientGUIView extends Application implements View{
                         choosenPW.add(cp);
                 }
             }
-            if(state.equals(ClientState.CHOOSEWEAPONTOWASTE) || state.equals(ClientState.CHOOSEWEAPONTOGRAB))
-                controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, weaponW));
-            if(state.equals(ClientState.CHOOSEPBB))
-                controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,choosenPW));
-            if(state.equals(ClientState.CHOOSEFIRSTEFFECT))
-                controller.getClient().sendMessage(new ChooseFirstEffectResponse(2,choosenPW));
+            switch (state){
+                case CHOOSEWEAPONTOWASTE:
+                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, weaponW));
+                    break;
+                case CHOOSEWEAPONTOGRAB:
+                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, null));
+                    break;
+                case CHOOSEPBB:
+                    controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,choosenPW));
+                    break;
+                case CHOOSEPLUSORDER:
+                    controller.getClient().sendMessage(new UseOrderPlusResponse(fullEffectList, choosenPW, 'y'));
+                    break;
+                case CHOOSEFIRSTEFFECT:
+                    controller.getClient().sendMessage(new ChooseFirstEffectResponse(2,choosenPW));
+                    break;
+                case CHOOSEPLUSEFFECT:
+                    controller.getClient().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, choosenPW));
+                    break;
+                case CHOOSERELOAD:
+                    reloadRequests.add(new ReloadWeaponRequest(weaponToReload,choosenPW));
+                    reloadWeaponPhase(weaponsToReload);
+                    break;
+            }
             sg.close();
         });
         sg.setScene(tempScene);
@@ -552,6 +680,11 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyMarks(int marks, int idHitten, int idShooter) {
+       /* String url = getClass().getResource("/graphics/sound/shoot.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
+
+        */
         String hitted = ClientContext.get().getMap().getPlayerById(idHitten).getNickName();
         String shooter = ClientContext.get().getMap().getPlayerById(idShooter).getNickName();
         if(idHitten == ClientContext.get().getMyID()) {
@@ -567,17 +700,33 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void notifyGrabCardAmmo(int pID) {
         System.out.println("notifyGrabAmmo");
-        if(pID == ClientContext.get().getMyID())
+        String url = getClass().getResource("/graphics/sound/grab.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
+        if(pID == ClientContext.get().getMyID()) {
             refreshMyPlayerAmmo();
+        }
         refreshAmmoCard();
     }
 
     @Override
     public void notifyRespawn(int pID) {
+        String url = getClass().getResource("/graphics/sound/respawn.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
         System.out.println("notifyrespawn");
         if(pID == ClientContext.get().getMyID())
             refreshMyPlayerCard();
         refreshPlayerPosition();
+    }
+    private void activateCardPower(List<CardPower> list){
+        for(CardPower cp : list){
+            ImageView im = powerUp.stream().filter(c -> Integer.parseInt(c.getId())==cp.getId()).findAny().orElse(null);
+            if(im!= null){
+                im.setEffect(new DropShadow(35,Color.GREEN));
+                im.setOnMouseClicked(this::handlePowerUpClick);
+            }
+        }
     }
     private void activateWeapon(List<CardWeapon> weapons, ImageView iv){
         int id = Integer.parseInt(iv.getId().substring(2));
@@ -606,15 +755,27 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void chooseRoomPhase(List<WaitingRoom> waitingRooms) {
         StackPane waits = new StackPane();
+
+        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background01.jpg"));
+        BackgroundImage bi = new BackgroundImage(background,
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+
+        waits.setBackground(new Background(bi));
         Label textw = new Label("Wait Other Player");
+        textw.setTextFill(Color.WHITE);
         waits.getChildren().add(textw);
         StackPane.setAlignment(textw,Pos.CENTER);
         Scene wait = new Scene(waits);
         StackPane chooseRoom = new StackPane();
+        chooseRoom.setBackground(new Background(bi));
         chooseRoom.setPrefSize(500, 300);
         Scene chooseR = new Scene(chooseRoom);
         if (waitingRooms.isEmpty()) {
             Label text = new Label("No waiting room available");
+            text.setTextFill(Color.WHITE);
             Button bt1 = new Button("Create new Waiting room");
             chooseRoom.getChildren().addAll(text, bt1);
             bt1.setOnAction(this::handleNewRoom);
@@ -624,9 +785,11 @@ public class ClientGUIView extends Application implements View{
             Button bt1 = new Button("Create new Waiting room");
             for (WaitingRoom w : waitingRooms) {
                 RadioButton rb = new RadioButton("Waiting Room " + w.getId() + ":");
+                rb.setTextFill(Color.WHITE);
                 rb.setId(""+w.getId());
                 rb.setToggleGroup(tg);
-                Label text = new Label(w.toString());
+                rb.setSelected(true);
+                Label text = new Label(w.toString().substring(14));
                 HBox choice = new HBox(rb,text);
                 infoRoom.getChildren().add(choice);
             }
@@ -656,18 +819,43 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
+        state = ClientState.CHOOSERELOAD;
+        text.setText("You want to reload?");
+        this.weaponsToReload = weaponsToReload;
+        no.setVisible(true);
+        yes.setVisible(true);
+        no.setOnMouseClicked(mouseEvent -> {
+            yes.setVisible(false);
+            no.setVisible(false);
+            if(reloadRequests.size() == 0)
+                controller.getClient().sendMessage(new EndActionRequest());
+            else
+                controller.sendMessages(reloadRequests);
+        });
+        yes.setOnMouseClicked(mouseEvent -> {
+            for(ImageView iv : weapons) {
+                if (weaponsToReload.stream().anyMatch(mw -> mw.getId() == Integer.parseInt(iv.getId().substring(2)))) {
+                    iv.setEffect(new DropShadow(35, Color.GREEN));
+                    iv.setOnMouseClicked(this::handleWeaponClick);
+                }
+            }
+            yes.setVisible(false);
+            no.setVisible(false);
+            text.setText("choose the weapon you want to reload!");
+        });
     }
+
 
     @Override
     public void showReloadMessage(CardWeapon cW) {
-
+        text.setText("You correctly reload " + cW.getName());
     }
 
     @Override
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
         state = ClientState.CHOOSEWEAPONTOSHOOT;
         for(ImageView iv : weapons){
-            if(myWeapons.stream().anyMatch(mw->mw.getId() == Integer.parseInt(iv.getId()))){
+            if(myWeapons.stream().anyMatch(mw->mw.getId() == Integer.parseInt(iv.getId().substring(2)))){
                 iv.setEffect(new DropShadow(35,Color.GREEN));
                 iv.setOnMouseClicked(this::handleWeaponClick);
             }
@@ -678,7 +866,9 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void chooseFirstEffect(FullEffect baseEff, FullEffect altEff) {
         state = ClientState.CHOOSEFIRSTEFFECT;
-        List<CardPower> list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> altEff.getPrice().contains(n.getColor())).collect(Collectors.toList()));
+        List<CardPower> list;
+        list = possibleCardPowerToPay(altEff);
+        List<CardPower> price = list;
         text.setText("Want to use Base effect? (No for alternative)");
         yes.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
@@ -688,7 +878,8 @@ public class ClientGUIView extends Application implements View{
         });
         no.setVisible(true);
         no.setOnMouseClicked(mouseEvent -> {
-            choosePowerUpToUse(list);
+            if(price != null)
+                choosePowerUpToPay(price);
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -697,14 +888,17 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void usePlusBeforeBase(FullEffect plusEff) {
-        List<CardPower> list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> plusEff.getPrice().contains(n.getColor())).collect(Collectors.toList()));
+        List<CardPower> price = possibleCardPowerToPay(plusEff);
         state = ClientState.CHOOSEPBB;
         this.plusEff = plusEff;
-
+        text.setText("Do you want to use this plus effect before than your weapon base effect?");
         yes.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
             t = 'y';
-            choosePowerUpToUse(list);
+            if(price != null)
+                choosePowerUpToPay(price);
+            else
+                controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,null));
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -716,47 +910,154 @@ public class ClientGUIView extends Application implements View{
         });
     }
 
-    @Override
-    public void usePlusInOrder(List<FullEffect> plusEffects) {
-        /*
-        List<CardPower> toUse = new ArrayList<>();
-        char t;
-        writeText("Do you want to apply the plus effect, allow by your weapon, listed here:");
-        showEffects(Collections.singletonList(plusEffects.get(0)),false);
-        writeText("[Y]es or [N]o?");
-        do{
-            t = readChar();
-        }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
-        if(plusEffects.get(0) != null && (t == 'y' || t == 'Y'))
-            toUse = powerUpSelection(plusEffects.get(0).getPrice());
-        controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,toUse,t));
-        */
+    /**
+     * Return a list of my cardpower that i can use for pay the FullEfect
+     * @param fe
+     * @return
+     */
+    private List<CardPower> possibleCardPowerToPay (FullEffect fe){
+        List<CardPower> list = new ArrayList<>();
+        if(fe.getPrice() != null)
+            list = ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> fe.getPrice().contains(n.getColor())).collect(Collectors.toList());
+        return list;
+    }
+
+    /**
+     * Return a list of my cardpower that i can use for pay the Price
+     * @param price
+     * @return
+     */
+    private List<CardPower> possibleCardPowerToPay (List<game.model.Color> price){
+        List<CardPower> list = new ArrayList<>();
+        if(price != null)
+            list = ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList());
+        return list;
     }
 
     @Override
+    public void usePlusInOrder(List<FullEffect> plusEffects) {
+        state = ClientState.CHOOSEPLUSORDER;
+        fullEffectList = plusEffects;
+        List<CardPower> list = possibleCardPowerToPay(plusEffects.get(0));
+        text.setText("Do you want to apply the plus effect, allow by your weapon? (in order)");
+        yes.setVisible(true);
+        no.setVisible(true);
+        yes.setOnMouseClicked(mouseEvent -> {
+            if(list != null)
+                choosePowerUpToPay(list);
+            else
+                controller.getClient().sendMessage(new UseOrderPlusResponse(fullEffectList, null, 'y'));
+            yes.setVisible(false);
+            no.setVisible(false);
+        });
+        no.setOnMouseClicked(mouseEvent -> {
+            yes.setVisible(false);
+            no.setVisible(false);
+            controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,null,'n'));
+        });
+    }
+    @Override
     public void choosePlusEffect(List<FullEffect> plusEffects) {
-
+        state = ClientState.CHOOSEPLUSEFFECT;
+        StackPane sp = new StackPane();
+        Scene tempScene = new Scene(sp);
+        Label tex = new Label("Choose wich efferct you want to apply:");
+        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
+        sp.getChildren().add(tex);
+        StackPane.setAlignment(tex,Pos.TOP_CENTER);
+        StackPane.setMargin(tex,new Insets(20, 0,0,0));
+        ToggleGroup tg = new ToggleGroup();
+        RadioButton none = new RadioButton("None");
+        none.setId("none");
+        none.setToggleGroup(tg);
+        none.setSelected(true);
+        sp.getChildren().add(none);
+        int j = 1;
+        StackPane.setAlignment(none,Pos.TOP_LEFT);
+        StackPane.setMargin(none,new Insets(100 + j , 0,0,40));
+        j++;
+        for(FullEffect f : plusEffects){
+            RadioButton eff = new RadioButton("Effect: "+f.getName());
+            eff.setId(f.getName());
+            eff.setToggleGroup(tg);
+            sp.getChildren().add(eff);
+            StackPane.setAlignment(eff,Pos.TOP_LEFT);
+            StackPane.setMargin(eff,new Insets(100 + j , 0,0,40));
+            j = j + 35;
+        }
+        Button submit = new Button("Submit");
+        sp.getChildren().add(submit);
+        StackPane.setAlignment(submit, Pos.BOTTOM_RIGHT);
+        submit.setOnMouseClicked(mouseEvent -> {
+            if(((RadioButton)tg.getSelectedToggle()).getId().equals("none")) {
+                controller.getClient().sendMessage(new TerminateShootAction());
+            }
+            else{
+                int i = 0;
+                FullEffect fe = null;
+                for(FullEffect e : plusEffects){
+                    if(e.getName().equals(((RadioButton)tg.getSelectedToggle()).getId())){
+                        fe = e;
+                        plusEffects.remove(i);
+                        plusEff = e;
+                        fullEffectList = plusEffects;
+                    }
+                    i++;
+                }
+                if(fe == null)
+                    controller.getClient().sendMessage(new TerminateShootAction());
+                else
+                    if(fe.getPrice() == null) {
+                        controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, fe, null));
+                    }
+                    else{
+                        List<CardPower> list = possibleCardPowerToPay(fe);
+                        if(list != null)
+                            choosePowerUpToPay(list);
+                        else
+                            controller.getClient().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, null));
+                    }
+            }
+            sg.close();
+        });
+        sg.setScene(tempScene);
+        sg.show();
     }
 
     @Override
     public void showRanking(SortedMap<Player, Integer> ranking) {
-
+        System.out.println("RANK");
+        StackPane sp = new StackPane();
+        Scene tempScene = new Scene(sp);
+        Label tex = new Label("And The Winner Is:");
+        sp.getChildren().add(text);
+        sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
+        StackPane.setMargin(tex,new Insets(20, 0,0,0));
+        StackPane.setAlignment(tex,Pos.TOP_CENTER);
+        int j = 1;
+        for(Player p : ranking.keySet()){
+            Label pos = new Label(p.getNickName() + " got " +j+ "° place with"+ ranking.get(p) + "points");
+            sp.getChildren().add(pos);
+            StackPane.setAlignment(pos,Pos.TOP_CENTER);
+            StackPane.setMargin(pos,new Insets(20 + j * 30, 0,0,0));
+            j++;
+        }
+        sg.setScene(tempScene);
+        sg.show();
     }
 
     @Override
     public void rejoinGamePhase(List<String> otherPlayers) {
-       /* char choice;
-        boolean rejoin;
-        writeText("Hi " + ClientContext.get().getUser() + ", welcome back! We have found on the server a game which is currently running where you where previously playing. This are the players actually connected in this game:");
-        otherPlayers.forEach(this::writeText);
-        do{
-            writeText("Do you want to rejoin this game? [Y/N]:");
-            choice = readChar();
-        }while(choice != 'Y' && choice != 'y' && choice != 'n' && choice != 'N');
+        text.setText("Hello "+ClientContext.get().getMyPlayer().getNickName() + " do you want to rejoin the game?");
 
-        rejoin = choice == 'Y' || choice == 'y';
-        controller.getClient().sendMessage(new RejoinGameResponse(rejoin,ClientContext.get().getUser()));
-        */
+        yes.setVisible(true);
+        no.setVisible(true);
+        yes.setOnMouseClicked(mouseEvent -> {
+            controller.getClient().sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
+            no.setVisible(false);
+            yes.setVisible(false);
+        });
+        no.setOnMouseClicked(mouseEvent -> primaryStage.close());
     }
 
     @Override
@@ -766,7 +1067,26 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void timeOutPhase() {
-
+        text.setText("You timed out and you have been kicked out!");
+        if(this.controller.getState() != ClientState.GAME_END) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            text.setText("Do you want to rejoin the game?[Y/N]");
+            yes.setVisible(true);
+            no.setVisible(true);
+            yes.setOnMouseClicked(mouseEvent -> {
+                if (controller.getState() != ClientState.GAME_END) {
+                    controller.getClient().sendMessage(new RejoinGameResponse(true, ClientContext.get().getUser()));
+                    no.setVisible(false);
+                    yes.setVisible(false);
+                } else
+                    text.setText("Game Finished");
+            });
+            no.setOnMouseClicked(mouseEvent -> this.controller.stopListening());
+        }
     }
 
     @Override
@@ -789,22 +1109,22 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void rejoinGameConfirm() {
-
+        text.setText("You successfully rejoin your previous game! Now wait for your turn..");
     }
 
     @Override
     public void notifyPlayerRejoin(Player p) {
-
+        text.setText("Player " + p.getNickName() + " has rejoined the game!");
     }
 
     @Override
     public void notifyPlayerLeavedWaitingRoom(Player p) {
-
+        textwait.setText(textwait.getText() +"\n Player "+p.getNickName()+" leaved the waiting room.");
     }
 
     @Override
     public void notifyPlayerJoinedWaitingRoom(Player p) {
-
+        textwait.setText(textwait.getText() +"\n Player "+p.getNickName()+" joined the waiting room.");
     }
 
     /**
@@ -916,6 +1236,7 @@ public class ClientGUIView extends Application implements View{
      */
     private void createTextNotification(){
         text.setStyle("-fx-font: 20px Tahoma;");
+        text.setWrapText(true);
         text.setTextFill(Color.WHITE);
         text.setPrefWidth(screenWidth*52.5/100);
         text.setMaxHeight(screenHeight*3.25/100);
@@ -925,7 +1246,7 @@ public class ClientGUIView extends Application implements View{
         StackPane.setMargin(text,new Insets(0,0,(screenHeight * 17.7 / 100),0));
         StackPane.setAlignment(yes,Pos.BOTTOM_LEFT);
         StackPane.setMargin(yes,new Insets(0,0,(screenHeight * 12 / 100),screenWidth * 42 / 100));
-        yes.setVisible(true);
+        yes.setVisible(false);
         StackPane.setAlignment(no,Pos.BOTTOM_LEFT);
         StackPane.setMargin(no,new Insets(0,0,(screenHeight * 12 / 100),screenWidth * 46 / 100));
         no.setVisible(false);
@@ -1011,12 +1332,20 @@ public class ClientGUIView extends Application implements View{
         map.getChildren().addAll(move,grab,shoot,exit);
         StackPane.setMargin(move,new Insets(0,screenWidth * 2 / 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(move,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(grab,new Insets(0,screenWidth * 8 / 100,screenHeight * 23 / 100,0));
+        StackPane.setMargin(grab,new Insets(0,screenWidth * 10 / 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(grab,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(shoot,new Insets(0,screenWidth * 14/ 100,screenHeight * 23 / 100,0));
+        StackPane.setMargin(shoot,new Insets(0,screenWidth * 15/ 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(shoot,Pos.BOTTOM_RIGHT);
         StackPane.setMargin(exit,new Insets(0,screenWidth * 20/ 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(exit,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(exit,new Insets(0,screenWidth * 26/ 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(exit,Pos.BOTTOM_RIGHT);
+        move.setStyle(orangeB);
+        grab.setStyle(orangeB);
+        shoot.setStyle(orangeB);
+        exit.setStyle(orangeB);
+        power.setStyle(orangeB);
+        power.setId("Power");
         move.setId("Movement");
         grab.setId("Grab");
         shoot.setId("Shoot");
@@ -1025,10 +1354,13 @@ public class ClientGUIView extends Application implements View{
         grab.setOnMouseClicked(this::handleStepAction);
         shoot.setOnMouseClicked(this::handleStepAction);
         exit.setOnMouseClicked(this::handleStepAction);
+        power.setOnMouseClicked(this::handleStepAction);
         exit.setDisable(true);
         move.setDisable(true);
         grab.setDisable(true);
         shoot.setDisable(true);
+        power.setDisable(true);
+        power.setVisible(false);
         exit.setVisible(false);
         move.setVisible(false);
         grab.setVisible(false);
@@ -1147,11 +1479,11 @@ public class ClientGUIView extends Application implements View{
             }
             if (i >= myP.getWeapons().size()){
                 cardW = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back.png"));
-                weapons.get(i).setId("0");
+                weapons.get(i).setId("0_0");
             }
             else {
                 cardW = createWeaponCard(myP.getWeapons().get(i).getId());
-                weapons.get(i).setId("" + myP.getWeapons().get(i).getId());
+                weapons.get(i).setId("0_" + myP.getWeapons().get(i).getId());
             }
             powerUp.get(i).setImage(cardP);
             weapons.get(i).setImage(cardW);
@@ -1223,6 +1555,7 @@ public class ClientGUIView extends Application implements View{
             Player p = ClientContext.get().getMap().getPlayerById(Integer.parseInt(dash.getId()));
             if(p == null)
                 p = ClientContext.get().getPlayersInWaiting().stream().filter(play->play.getId() == Integer.parseInt(dash.getId())).findFirst().orElse(null);
+            System.out.println(p.getNickName()+" Danno "+p.getDamage().size() +" color "+p.getMark().size());
             for (PlayerColor  c :p.getDamage()) {
                 Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
                 ImageView damages = new ImageView(damage);
@@ -1261,14 +1594,14 @@ public class ClientGUIView extends Application implements View{
     private void deletePlayerInfo(){
         for(List<ImageView> p : playerDamage){
             for(ImageView v : p ){
-                map.getChildren().remove(v);
                 v.setImage(null);
+                map.getChildren().remove(v);
             }
         }
         for(List<ImageView> p : playerMarks){
             for(ImageView v : p ){
-                map.getChildren().remove(v);
                 v.setImage(null);
+                map.getChildren().remove(v);
             }
         }
         playerDamage.clear();
@@ -1337,8 +1670,8 @@ public class ClientGUIView extends Application implements View{
         int k = 1;
         List<game.model.Color> color = new ArrayList<>(ClientContext.get().getMyPlayer().getAmmo());
         for(game.model.Color c : color){
-            System.out.println(c.toString());
             Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.valueOf(c.toString()));
+            ammo.setId(c.toString());
             map.getChildren().add(ammo);
             myAmmo.add(ammo);
             StackPane.setAlignment(ammo, Pos.BOTTOM_LEFT);
@@ -1425,329 +1758,18 @@ public class ClientGUIView extends Application implements View{
         text.setText("Wait Your Turn:");
     }
 
-/*
-    private void showMap(){
-        int mapId = 1;
-        StackPane map = new StackPane();
-        Image image = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/mappa1.png"));
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(screenWidth*55/100);
-        imageView.setPreserveRatio(true);
-        Image image2 = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_18.png"));
-        Image image7 = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/Teleporter_R.png"));
-        ImageView im2 = new ImageView(image2);
-        im2.setId("Distruttore");
-        ImageView im3 = new ImageView(image2);
-        im3.setId("THOR");
-        ImageView im4 = new ImageView(image2);
-        im4.setId("Spada Laser");
-        ImageView im5 = new ImageView(image7);
-        im5.setId("Machine Gun");
-        ImageView im6 = new ImageView(image7);
-        im6.setId("Bomba");
-        ImageView im7 = new ImageView(image7);
-        im7.setId("Launch Granede");
-        Image imdg = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/BluDash.png"));
-        Image myp = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/YellowDash.png"));
-        ImageView imd1 = new ImageView(imdg);
-        imd1.setId("Player 2");
-        ImageView imd2 = new ImageView(imdg);
-        imd2.setId("Player 3");
-        ImageView imd3 = new ImageView(imdg);
-        imd3.setId("Player 4");
-        ImageView imd4 = new ImageView(imdg);
-        imd4.setId("Player 5");
-        ImageView imd5 = new ImageView(myp);
-        imd5.setId("MyPlayer");
-
-        imd5.setOnMouseClicked(e -> {
-            System.out.println(((ImageView)e.getSource()).getId());
-        });
-
-
-        text.setStyle("-fx-font: 20px Tahoma;");
-        text.setTextFill(Color.WHITE);
-        text.setPrefWidth(screenWidth*52.5/100);
-        text.setMaxHeight(screenHeight*3.25/100);
-        text.setWrapText(true);
-
-
-
-
-        map.setPrefSize(screenWidth,screenHeight);
-        map.getChildren().addAll(imageView,im2,im3,im4,im5,im6,im7,imd1,imd2,imd3,imd4,imd5,text);
-
-        List<ImageView> im = new ArrayList<>(Arrays.asList(im2,im3,im4,im5,im6,im7));
-        List<ImageView> imd = new ArrayList<>(Arrays.asList(imd1,imd2,imd3,imd4,imd5));
-
-        List<ImageView> mapWR = new ArrayList<>(Arrays.asList(new ImageView(image2),new ImageView(image2),new ImageView(image2)));
-        List<ImageView> mapWT = new ArrayList<>(Arrays.asList(new ImageView(image2),new ImageView(image2),new ImageView(image2)));
-        List<ImageView> mapWL = new ArrayList<>(Arrays.asList(new ImageView(image2),new ImageView(image2),new ImageView(image2)));
-
-        int i = 0;
-        for(ImageView imw : im){
-            imw.setFitWidth(screenWidth*6.9/100);
-            imw.setPreserveRatio(true);
-            StackPane.setAlignment(imw,Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(imw,new Insets(0,i,0,0));
-            i = i + (int)(screenHeight*14/100);
-            imw.setOnMouseClicked(this::handleWeaponClick);
-        }
-
-        i = 0;
-        for(ImageView imw : imd){
-            imw.setFitWidth(screenWidth*36.6/100);
-            imw.setPreserveRatio(true);
-            StackPane.setAlignment(imw,Pos.TOP_RIGHT);
-            StackPane.setMargin(imw,new Insets(i,0,0,0));
-            i = i + (int)(screenHeight*18.6/100);
-            imw.setOnMouseClicked(this::handleWeaponClick);
-        }
-        StackPane.setAlignment(imd5,Pos.BOTTOM_LEFT);
-        double spaceX = 0;
-        for(ImageView weapon : mapWL){
-            map.getChildren().add(weapon);
-            weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("1");
-            weapon.setPreserveRatio(true);
-            StackPane.setAlignment(weapon,Pos.CENTER_LEFT);
-            weapon.setRotate(270);
-            StackPane.setMargin(weapon,new Insets(screenHeight*12/100 + spaceX,0,0,screenWidth*1.83/100));
-            weapon.setOnMouseClicked(null);
-            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
-            weapon.setOnMouseExited(this::handleMouseOutWeapon);
-            spaceX = spaceX - screenHeight*22.4/100;
-            //weapon.setEffect(new DropShadow(20,Color.GREEN));
-        }
-        double spaceT = 0;
-        for(ImageView weapon : mapWT){
-            map.getChildren().add(weapon);
-            weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("2");
-            weapon.setPreserveRatio(true);
-            StackPane.setAlignment(weapon,Pos.TOP_CENTER);
-            StackPane.setMargin(weapon,new Insets(0,screenWidth*34/100 + spaceT,0,0));
-            weapon.setOnMouseClicked(this::handleWeaponClick);
-            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
-            weapon.setOnMouseExited(this::handleMouseOutWeapon);
-            spaceT = spaceT - screenHeight*20/100;
-            //weapon.setEffect(new DropShadow(20,Color.GREEN));
-        }
-
-        double spaceR = 0;
-        for(ImageView weapon : mapWR){
-            map.getChildren().add(weapon);
-            weapon.setFitWidth(screenWidth*5.12/100);
-            weapon.setId("3");
-            weapon.setPreserveRatio(true);
-            StackPane.setAlignment(weapon,Pos.CENTER);
-            weapon.setRotate(90);
-            StackPane.setMargin(weapon,new Insets(screenHeight*43/100 + spaceR,0,0,screenWidth*4/100));
-            weapon.setOnMouseClicked(this::handleWeaponClick);
-            weapon.setOnMouseEntered(this::handleMouseOnWeapon);
-            weapon.setOnMouseExited(this::handleMouseOutWeapon);
-            spaceR = spaceR - screenHeight*22.4/100;
-            //weapon.setEffect(new DropShadow(20,Color.GREEN));
-        }
-
-
-
-        //stampa rettangoli invisibili e ammo
-        List<Rectangle> squares = new ArrayList<>();
-        List<ImageView> ammos = new ArrayList<>();
-        spaceX = 0;
-        double spaceY = 0;
-        image = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/ammo/BRR.png"));
-        for(i = 1; i < 13; i++){
-            Rectangle rec = new Rectangle(130,130);
-            rec.setFill(Color.TRANSPARENT);
-            rec.setId(""+i);
-            rec.setStroke(Color.GREEN);
-            rec.setEffect(new DropShadow(40,Color.GREEN));
-            squares.add(rec);
-            ImageView am = new ImageView(image);
-            am.setId(""+i);
-            ammos.add(am);
-            am.setFitWidth(screenWidth*2.4/100);
-            am.setPreserveRatio(true);
-            map.getChildren().add(rec);
-            map.getChildren().add(am);
-            StackPane.setAlignment(rec,Pos.TOP_LEFT);
-            StackPane.setMargin(rec,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
-            StackPane.setAlignment(am,Pos.TOP_LEFT);
-            StackPane.setMargin(am,new Insets(screenHeight*19/100 + spaceY,0,0,screenWidth*11/100 + spaceX));
-            rec.setOnMouseClicked(this :: handleSquareClick);
-            if(i % 4 == 0 && i != 0){
-                spaceX = 0;
-                spaceY = spaceY + screenHeight*18/100;
-            }else{
-                spaceX = spaceX + screenWidth*9.5/100;
-            }
-        }
-
-        //player stamp
-        List<Circle> players = new ArrayList<>();
-        spaceX = 0;
-        spaceY = 0;
-        for(i = 1; i< 13 ; i++) {
-            for (int j = 0; j < 5; j++) {
-                Circle c = new Circle(9, Color.GREENYELLOW);
-                c.setStroke(Color.BLACK);
-                players.add(c);
-                map.getChildren().add(c);
-                c.setId("hwllp");
-                StackPane.setAlignment(c,Pos.TOP_LEFT);
-                StackPane.setMargin(c, new Insets(screenHeight * 29 / 100 + spaceY, 0, 0, screenWidth * 11 / 100 + spaceX + j * 20));
-                c.setOnMouseClicked(mouseEvent -> {
-                    primaryStage.setAlwaysOnTop(false);
-                    Stage sg = new Stage();
-                    StackPane sp = new StackPane();
-                    sp.setPrefSize(500,500);
-                    Button b = new Button("alwdiwd");
-                    sp.getChildren().add(b);
-                    StackPane.setAlignment(b,Pos.CENTER);
-                    Scene sc = new Scene(sp);
-                    sg.setAlwaysOnTop(true);
-                    sg.setScene(sc);
-                    sg.show();
-                });
-                //c.setOnMouseClicked(this::handlePlayerClick);
-            }
-            if (i % 4 == 0 && i != 0) {
-                spaceY = spaceY + screenHeight * 18 / 100;
-                spaceX = 0;
-            } else {
-                spaceX = spaceX + screenWidth * 9.5 / 100;
-
-            }
-        }
-
-        //Stampa gocce Kill
-        spaceY = 0;
-        for(int j = 0; j < 8; j++){
-            Image kill = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/YellowTear.png"));
-            ImageView kills = new ImageView(kill);
-            kills.setId(""+i);
-            kills.setFitHeight(screenHeight * 3 /100);
-            kills.setPreserveRatio(true);
-            map.getChildren().add(kills);
-            StackPane.setAlignment(kills,Pos.TOP_LEFT);
-            StackPane.setMargin(kills,new Insets(screenHeight * 5 / 100,0,0,screenWidth * 4.8 / 100 + spaceY));
-            spaceY = spaceY + screenWidth * 2.46 / 100;
-        }
-
-
-        //Stampa gocce My Player danno e marchio
-        spaceX = 0;
-        for(int j = 0; j < 12; j++){
-            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/BlueTear.png"));
-            ImageView damages = new ImageView(damage);
-            damages.setId(""+i);
-            damages.setFitHeight(screenHeight * 3 /100);
-            damages.setPreserveRatio(true);
-            map.getChildren().add(damages);
-            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
-            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 6.25 / 100,screenWidth * 3.44 / 100 + spaceX));
-            spaceX = spaceX + screenWidth * 2.25 / 100;
-            if(j > 1 && j != 4)
-                spaceX = spaceX - screenWidth * 0.25 / 100;
-        }
-        spaceX = 0;
-        for(int j = 0; j < 9; j++){
-            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/PurpleTear.png"));
-            ImageView damages = new ImageView(damage);
-            damages.setId(""+i);
-            damages.setFitHeight(screenHeight * 2 /100);
-            damages.setPreserveRatio(true);
-            map.getChildren().add(damages);
-            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
-            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 17.6 / 100 + spaceX));
-            spaceX = spaceX + screenWidth * 1 / 100;
-        }
-
-
-        //Stampa gocce other Player danno e marchio
-        spaceY = 0;
-        for(int k = 0; k < 4 ; k++) {
-            spaceX = 0;
-            for (int j = 0; j < 12; j++) {
-                Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/YellowTear.png"));
-                ImageView damages = new ImageView(damage);
-                damages.setId("" + i);
-                damages.setFitHeight(screenHeight * 3 / 100);
-                damages.setPreserveRatio(true);
-                map.getChildren().add(damages);
-                StackPane.setAlignment(damages, Pos.TOP_RIGHT);
-                StackPane.setMargin(damages, new Insets(screenHeight * 6.5 / 100 + spaceY, screenWidth * 32.1 / 100 - spaceX, 0, 0));
-                spaceX = spaceX + screenWidth * 2.25 / 100;
-                if (j > 1 && j != 4)
-                    spaceX = spaceX - screenWidth * 0.25 / 100;
-            }
-            spaceX = 0;
-            for (int j = 0; j < 9; j++) {
-                Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/BlueTear.png"));
-                ImageView damages = new ImageView(damage);
-                damages.setId("" + i);
-                damages.setFitHeight(screenHeight * 2 / 100);
-                damages.setPreserveRatio(true);
-                map.getChildren().add(damages);
-                StackPane.setAlignment(damages, Pos.TOP_RIGHT);
-                StackPane.setMargin(damages, new Insets(screenHeight * 0.4 / 100 + spaceY, screenWidth * 18 / 100 - spaceX, 0, 0));
-                spaceX = spaceX + screenWidth * 1 / 100;
-            }
-            spaceY = spaceY + screenHeight * 18.5 / 100;
-        }
-
-        //ammo
-        spaceX = 0;
-        spaceY = 0;
-        for(int j = 0; j < 3 ; j++){
-            for (int k = 0;k < 3 ; k ++){
-                Rectangle ammo = new Rectangle(screenHeight * 2 /100,screenHeight * 2 /100, Color.valueOf("Yellow"));
-                map.getChildren().add(ammo);
-                StackPane.setAlignment(ammo, Pos.BOTTOM_LEFT);
-                StackPane.setMargin(ammo, new Insets(0, 0, screenHeight * 12 / 100 - spaceY, screenWidth * 29 / 100 + spaceX));
-                spaceX = spaceX + screenWidth * 2.5 / 100;
-            }
-            spaceY = spaceY + screenHeight * 3.5 /100;
-            spaceX = 0;
-        }
-
-        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.png"));
-        BackgroundImage bi = new BackgroundImage(background,
-                BackgroundRepeat.REPEAT,
-                BackgroundRepeat.REPEAT,
-                BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-        map.setBackground(new Background(bi));
-
-        StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
-        StackPane.setMargin(text,new Insets(0,0,(screenHeight/(displayY/130)),0));
-        StackPane.setAlignment(imageView,Pos.TOP_LEFT);
-
-        Button move = new Button("Movement");
-        Button move1 = new Button("Movement");
-        Button move2 = new Button("Movement");
-        map.getChildren().addAll(move,move1,move2);
-        StackPane.setMargin(move,new Insets(0,screenWidth * 2 / 100,screenHeight * 23 / 100,0));
-        StackPane.setAlignment(move,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(move1,new Insets(0,screenWidth * 8 / 100,screenHeight * 23 / 100,0));
-        StackPane.setAlignment(move1,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(move2,new Insets(0,screenWidth * 14/ 100,screenHeight * 23 / 100,0));
-        StackPane.setAlignment(move2,Pos.BOTTOM_RIGHT);
-
-
-        Scene scene = new Scene(map);
-        primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
-        primaryStage.setAlwaysOnTop(true);
-        primaryStage.show();
-    }
-*/
-    //TODO mettere javaDoc
+    /**
+     * show the name of the player
+     * @param e
+     */
     private void handlePlayerClick(MouseEvent e){
-        text.setText("Player "+((Circle)e.getSource()).getId() + " position: " +((Circle)e.getSource()).getCenterX() + " Y :"+((Circle)e.getSource()).getCenterY() );
+        text.setText("Player "+((Circle)e.getSource()).getId());
     }
+
+    /**
+     *Identify the square selected 
+     * @param e
+     */
     private void handleSquareClick(MouseEvent e){
         Square choosenSquare;
         int i = Integer.parseInt(((Rectangle)e.getSource()).getId());
@@ -1758,30 +1780,70 @@ public class ClientGUIView extends Application implements View{
         disableSquare();
     }
 
+    /**
+     * Identify the weapon selected and check the state fot the response
+     * @param e
+     */
     private void handleWeaponClick(MouseEvent e){
+        CardWeapon selected;
+        List<game.model.Color> price;
+        List<CardPower> list;
         int id = Integer.parseInt(((ImageView)e.getSource()).getId().substring(2));
-        switch (state){
-            case CHOOSEWEAPONTOGRAB:
+        switch (state) {
+            case CHOOSEWEAPONTOGRAB: {
                 weaponG = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                if(ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
+                if (ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
                     chooseWeaponToWaste();
+                } else {
+                    if (weaponG.getPrice().size() == 1)
+                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                    list = possibleCardPowerToPay(weaponG.getPrice());
+                    if(list.size() != 0)
+                        choosePowerUpToPay(list);
+                    else
+                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,null, null));
                 }
-                else {
-                    choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
-                }
-                disableweapon();
+                disableWeapon();
                 break;
-            case CHOOSEWEAPONTOWASTE:
+            }
+            case CHOOSEWEAPONTOWASTE: {
                 weaponW = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                choosePowerUpToUse(ClientContext.get().getMyPlayer().getCardPower());
+                if (weaponG.getPrice().size() == 1) {
+                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                }
                 disableMyWeapon();
+                price = weaponG.getPrice();
+                list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+                if(list.size() != 0)
+                    choosePowerUpToPay(list);
+                else
+                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,null, null));
                 break;
-            case CHOOSEWEAPONTOSHOOT:
-                CardWeapon selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter( w -> w.getId() == id).findFirst().orElse(null);
+                }
+            case CHOOSEWEAPONTOSHOOT: {
+                selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
                 controller.getClient().sendMessage(new ChooseWeaponToShootResponse(selected));
                 disableMyWeapon();
+                break;
+            }
+            case CHOOSERELOAD: {
+                selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+                System.out.println("selected reload "+selected.getName());
+                disableMyWeapon();
+                if (selected != null) {
+                    price = selected.getPrice();
+                    list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+                    choosePowerUpToPay(list);
+                    weaponsToReload.remove(weaponToReload);
+                }
+                break;
+            }
         }
     }
+
+    /**
+     * Activate the weapon to waste
+     */
     private void chooseWeaponToWaste(){
         state = ClientState.CHOOSEWEAPONTOWASTE;
         for(ImageView iv : weapons){
@@ -1790,6 +1852,10 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Join the selected room
+     * @param rb
+     */
     private void handleJoinRoom(RadioButton rb){
         int id=0;
         if(rb.getId().equals("1"))
@@ -1802,28 +1868,46 @@ public class ClientGUIView extends Application implements View{
             id = 4;
         controller.getClient().sendMessage(new JoinWaitingRoomRequest(id, user));
     }
+
+    /**
+     * Create the room with the selected map
+     * @param e
+     */
     private void handleNewRoom(ActionEvent e){
 
         //Blank pane
         StackPane waits = new StackPane();
-        Label textw = new Label("Wait Other Player");
-        waits.getChildren().add(textw);
-        StackPane.setAlignment(textw,Pos.CENTER);
+        textwait = new Label("Wait Other Player");
+        textwait.setTextFill(Color.WHITE);
+        textwait.setWrapText(true);
+        waits.getChildren().add(textwait);
+        StackPane.setAlignment(textwait,Pos.CENTER);
         Scene wait = new Scene(waits);
 
+        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background01.jpg"));
+        BackgroundImage bi = new BackgroundImage(background,
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+
+        waits.setBackground(new Background(bi));
 
         int mapId = 1, nPlayer;
         StackPane sp = new StackPane();
         sp.setPrefSize(500,300);
+        sp.setBackground(new Background(bi));
         Scene room = new Scene(sp);
 
         Label text = new Label("Choose map id");
+        text.setTextFill(Color.WHITE);
         Label error = new Label("");
         ChoiceBox mapc = new ChoiceBox();
         mapc.getItems().add("Map 1");
         mapc.getItems().add("Map 2");
         mapc.getItems().add("Map 3");
         mapc.getItems().add("Map 4");
+        mapc.getSelectionModel().selectFirst();
         nPlayer = 5;
         Button submit = new Button("Create Room");
 
@@ -1850,12 +1934,22 @@ public class ClientGUIView extends Application implements View{
                 error.setText("Invalid Map choise");
         });
     }
+
+    /**
+     * Rotate and zoom the weapon on mouse over
+     * @param e
+     */
     private void handleMouseOnWeapon(MouseEvent e){
         ((ImageView)e.getSource()).setViewOrder(-1);
         ((ImageView)e.getSource()).setRotate(0);
         ((ImageView)e.getSource()).setFitWidth(screenWidth*12/100);
         ((ImageView)e.getSource()).setPreserveRatio(true);
     }
+
+    /**
+     * resize the weapon when the mouse isn't over
+     * @param e
+     */
     private void handleMouseOutWeapon(MouseEvent e){
         ((ImageView)e.getSource()).setViewOrder(0);
         switch (((ImageView)e.getSource()).getId().substring(0,1)){
@@ -1873,12 +1967,67 @@ public class ClientGUIView extends Application implements View{
         ((ImageView)e.getSource()).setPreserveRatio(true);
     }
 
+    /**
+     * Send the respawn request from the selected PU
+     * @param e
+     */
     private void handleRespawnSquare(MouseEvent e){
         CardPower p = ClientContext.get().getMyPlayer().getCardPower().stream().filter(l->l.getId() == Integer.parseInt(((ImageView)e.getSource()).getId())).findFirst().orElse(null);
         controller.getClient().sendMessage(new RespawnResponse((p)));
         disablePowerUp();
     }
 
+    /**
+     * Identify the power up selected and check the state fot the response
+     * @param e
+     */
+    private void handlePowerUpClick(MouseEvent e){
+        CardPower p = ClientContext.get().getMyPlayer().getCardPower().stream().filter(l->l.getId() == Integer.parseInt(((ImageView)e.getSource()).getId())).findFirst().orElse(null);
+        if(state.equals(ClientState.CHOOSECOUNTER))
+            controller.getClient().sendMessage(new CounterAttackResponse(p,shooter));
+        if(state.equals(ClientState.CHOOSECARDPOWER))
+            controller.getClient().sendMessage(new ChoosePowerUpResponse(p));
+        if(state.equals(ClientState.CHOOSESCOPE)){
+            scopeSelected = p;
+            activateAmmo();
+        }
+        disablePowerUp();
+    }
+
+    /**
+     * make the My player ammo clickable 
+     */
+    private void activateAmmo(){
+        for(Rectangle a : myAmmo){
+            a.setOnMouseClicked(this::handleAmmoClick);
+        }
+    }
+
+    /**
+     * disable the ammo click
+     */
+    private void disableAmmo(){
+        for(Rectangle a : myAmmo){
+            a.setOnMouseClicked(null);
+        }
+    }
+
+    /**
+     * Identify the ammo selected and check the Client state fot the response
+     * @param e
+     */
+    private void handleAmmoClick(MouseEvent e ){
+        if(state.equals(ClientState.CHOOSESCOPE)) {
+            game.model.Color c = game.model.Color.valueOf(((Rectangle) e.getSource()).getId());
+            controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, c));
+        }
+        disableAmmo();
+    }
+
+    /**
+     * Identify the button selected and call the action response
+     * @param e
+     */
     private void handleStepAction(MouseEvent e){
         Action chosenAction = Action.valueOf(((Button)e.getSource()).getId().toUpperCase());
         switch (chosenAction){
@@ -1905,6 +2054,16 @@ public class ClientGUIView extends Application implements View{
             case EXIT:
                 controller.getClient().sendMessage(new EndTurnRequest());
                 break;
+            case POWER:
+                state = ClientState.CHOOSECARDPOWER;
+                List<CardPower> powerList = ClientContext.get().getMyPlayer().getCardPower().stream().filter(c -> !c.isUseWhenAttacking() && !c.isUseWhenDamaged()).collect(Collectors.toList());
+                if(powerList.isEmpty()) {
+                    text.setText("There are no power-up cards available for use in this moment!");
+                    chooseStepActionPhase();
+                }
+                else
+                    activateCardPower(powerList);
+                break;
         }
         disableButton();
     }
@@ -1917,6 +2076,8 @@ public class ClientGUIView extends Application implements View{
         grab.setDisable(true);
         exit.setDisable(true);
         exit.setVisible(false);
+        power.setDisable(true);
+        power.setVisible(false);
     }
     private void disablePowerUp(){
         for (ImageView iv :powerUp) {
@@ -1930,7 +2091,7 @@ public class ClientGUIView extends Application implements View{
             iv.setEffect(null);
         }
     }
-    private void disableweapon(){
+    private void disableWeapon(){
         for (ImageView iv :mapWL) {
             iv.setOnMouseClicked(null);
             iv.setEffect(null);

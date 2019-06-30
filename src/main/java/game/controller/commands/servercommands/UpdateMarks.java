@@ -7,14 +7,14 @@ import game.model.Player;
 
 public class UpdateMarks implements ServerGameMessage {
 
-    Player p;
+    private int id;
 
-    public UpdateMarks(Player p) {
-        this.p = p;
+    public UpdateMarks(int id) {
+        this.id = id;
     }
 
-    public Player getP() {
-        return p;
+    public int getId() {
+        return id;
     }
 
     @Override
