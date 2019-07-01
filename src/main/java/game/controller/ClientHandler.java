@@ -123,8 +123,8 @@ public abstract class ClientHandler implements GameListener {
     }
 
     @Override
-    public void onDamage(Player damaged, Player attacker, int damage) {
-        sendMessage(new NotifyDamageResponse(attacker.getId(), damaged.getId(), damage));
+    public void onDamage(Player damaged, Player attacker, int damage, int marksToRemove) {
+        sendMessage(new NotifyDamageResponse(attacker.getId(), damaged.getId(), damage, marksToRemove));
     }
 
     @Override

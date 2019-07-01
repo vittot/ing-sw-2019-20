@@ -590,6 +590,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         List<CardWeapon> weaponsToReload;
         if (model.getCurrentTurn().getNumOfActions() > 0) {
             state = ServerState.WAITING_ACTION;
+            model.getPlayers().forEach(Player::updateMarks);
             return new ChooseTurnActionRequest();
         } else {
             if (!currPlayer.getWeapons().isEmpty() && state != ServerState.WAITING_RELOAD) {
@@ -836,7 +837,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     /*if (sc != this) {
                         sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getPlayers(), sc.getModel().getMap()));
                     } else {*/
-                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getMap(), sc.getModel().getPlayers(), sc.getCurrPlayer().getId()));
+                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getMap(), sc.getModel().getPlayers(), sc.getCurrPlayer().getId(), sc.getModel().getKillBoard()));
 
                     //}
                     if (model.getCurrentTurn().getCurrentPlayer() != sc.getCurrPlayer())

@@ -1112,12 +1112,12 @@
 
         <effectDescription>
             <name>Basic effect</name>
-            Deal 2 damage to 1 target you can see tht is not on your square. Then you may move the target 1 sqaure.
+            Deal 2 damage to 1 target you can see tht is not on your square. Then you may move the target 1 square.
         </effectDescription>
 
         <effectDescription>
             <name>Fragment warhead</name>
-            During the basic effect, deal 1 damage to every player on your target's original square-including the target, even if yu move it.
+            Deal 3 damage to 1 target you can see and 1 damage to every other target on his same square. Then you may move your first target 1 square
         </effectDescription>
 
         <effectDescription>
@@ -1209,7 +1209,7 @@
                 <minDist>1</minDist>
                 <maxDist>12</maxDist>
                 <targetVisib>Visible</targetVisib>
-                <damage>2</damage>
+                <damage>3</damage>
                 <marks>0</marks>
                 <lastTarget>false</lastTarget>
                 <differentTarget>Anyone</differentTarget>
@@ -1220,7 +1220,7 @@
                 <minEnemy>0</minEnemy>
                 <maxEnemy>1</maxEnemy>
                 <minDist>1</minDist>
-                <maxDist>1</maxDist>
+                <maxDist>12</maxDist>
                 <minMove>0</minMove>
                 <maxMove>1</maxMove>
                 <targetVisib>Visible</targetVisib>
@@ -1232,19 +1232,6 @@
                 <sameDirection>false</sameDirection>
                 <differentTarget>Anyone</differentTarget>
             </movementEffect>
-            <plainDamage>
-                <minEnemy>1</minEnemy>
-                <maxEnemy>1</maxEnemy>
-                <minDist>1</minDist>
-                <maxDist>12</maxDist>
-                <targetVisib>Visible</targetVisib>
-                <damage>2</damage>
-                <marks>0</marks>
-                <lastTarget>true</lastTarget>
-                <differentTarget>Anyone</differentTarget>
-                <chainTarget>false</chainTarget>
-                <sameDirection>false</sameDirection>
-            </plainDamage>
             <squareDamageEffect>
                 <minEnemy>1</minEnemy>
                 <maxEnemy>1</maxEnemy>

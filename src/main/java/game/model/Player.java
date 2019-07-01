@@ -284,7 +284,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
     @Override
     public void addDamage(Player shooter, int damage) {
         if(!this.equals(shooter) && damage > 0) {
-            int num;
+            int num=0;
             boolean isRage = false;
             Kill lastKill = null;
             List<PlayerColor> marksToBeRemoved = marks.stream().filter(m -> m == shooter.getColor()).collect(Collectors.toList());
@@ -302,7 +302,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
                     if (num > 11) {
                         isRage = true;
                     }
-                    game.addKill(shooter, this, isRage);
+                    if (game != null)
+                        game.addKill(shooter, this, isRage);
 
                 } else if (num > 5)
                     this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
@@ -313,7 +314,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 lastKill.setRage(true);
             }
             if (game != null)
-                game.notifyDamage(this, shooter, damage);
+                game.notifyDamage(this, shooter, damage, marksToBeRemoved.size());
         }
     }
 
