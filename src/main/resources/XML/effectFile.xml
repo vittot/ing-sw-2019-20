@@ -1169,7 +1169,7 @@
                 <minEnemy>0</minEnemy>
                 <maxEnemy>1</maxEnemy>
                 <minDist>1</minDist>
-                <maxDist>1</maxDist>
+                <maxDist>12</maxDist>
                 <minMove>0</minMove>
                 <maxMove>1</maxMove>
                 <targetVisib>Visible</targetVisib>
@@ -1779,7 +1779,7 @@
         </baseEffect>
         <alternativeEffect>
             <areaDamageEffect>
-                <minEnemy>4</minEnemy>
+                <minEnemy>1</minEnemy>
                 <maxEnemy>4</maxEnemy>
                 <minDist>1</minDist>
                 <maxDist>1</maxDist>

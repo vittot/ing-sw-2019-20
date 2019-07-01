@@ -575,10 +575,13 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             return checkTurnEnd();
         }catch (InsufficientAmmoException e){
             clientHandler.sendMessage(new InsufficientAmmoResponse());
+            avaialableActionSteps = model.getCurrentTurn().getActionList();
             return checkTurnEnd();
         }
         catch (NoCardWeaponSpaceException x){
-            return new MaxNumberOfWeaponsResponse();
+            clientHandler.sendMessage(new MaxNumberOfWeaponsResponse());
+            avaialableActionSteps = model.getCurrentTurn().getActionList();
+            return checkTurnEnd();
         }
     }
 
@@ -655,12 +658,13 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         }
         try{
             w.reloadWeapon(clientMsg.getPowerups());
-            state = ServerState.WAITING_TURN;
+            state = ServerState.WAITING_RELOAD;
             clientHandler.sendMessage(new CheckReloadResponse(clientMsg.getWeapon(), clientMsg.getPowerups()));
             return checkTurnEnd();
         }catch(InsufficientAmmoException e)
         {
             clientHandler.sendMessage(new InsufficientAmmoResponse());
+            state = ServerState.WAITING_RELOAD;
             return checkTurnEnd();
         }
     }
