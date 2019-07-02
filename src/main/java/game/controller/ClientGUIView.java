@@ -533,7 +533,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyRage(Player killer, Player victim) {
-
+        textNotify.setText("Player "+killer.getNickName()+" has raged "+victim.getNickName());
     }
 
     @Override
@@ -568,10 +568,19 @@ public class ClientGUIView extends Application implements View{
     public void choosePowerUpToRespawn(List<CardPower> cardPower) {
         textNotify.setText("Your turn: respawn");
         refreshMyPlayerCard();
-        for(ImageView im : powerUp){
-            if(!im.getId().equals("0")){
-                im.setEffect(new DropShadow(35,Color.GREEN));
-                im.setOnMouseClicked(this::handleRespawnSquare);
+        if(cardPower.size() > 3){
+            StackPane sp = new StackPane();
+            Scene tempS = new Scene(sp);
+            sg.setAlwaysOnTop(true);
+            primaryStage.setAlwaysOnTop(false);
+            sg.show();
+        }
+        else{
+            for(ImageView im : powerUp){
+                if(!im.getId().equals("0")){
+                    im.setEffect(new DropShadow(35,Color.GREEN));
+                    im.setOnMouseClicked(this::handleRespawnSquare);
+                }
             }
         }
     }
@@ -612,6 +621,7 @@ public class ClientGUIView extends Application implements View{
                     text.setText("Choose which power up use :");
                     activateCardPower(list);
                 }else{
+                    text.setText("Choose an ammo ");
                     scopeSelected = list.get(0);
                     activateAmmo();
                 }
@@ -871,31 +881,38 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
-        System.out.println("Reload");
-        state = ClientState.CHOOSERELOAD;
-        text.setText("You want to reload?");
-        this.weaponsToReload = weaponsToReload;
-        no.setVisible(true);
-        yes.setVisible(true);
-        no.setOnMouseClicked(mouseEvent -> {
-            yes.setVisible(false);
-            no.setVisible(false);
-            if(reloadRequests.size() == 0)
+        if(weaponsToReload.size() == 0){
+            if (reloadRequests.size() == 0)
                 controller.getClient().sendMessage(new EndActionRequest());
             else
                 controller.sendMessages(reloadRequests);
-        });
-        yes.setOnMouseClicked(mouseEvent -> {
-            for(ImageView iv : weapons) {
-                if (weaponsToReload.stream().anyMatch(mw -> mw.getId() == Integer.parseInt(iv.getId().substring(2)))) {
-                    iv.setEffect(new DropShadow(35, Color.GREEN));
-                    iv.setOnMouseClicked(this::handleWeaponClick);
+        }else {
+            System.out.println("Reload");
+            state = ClientState.CHOOSERELOAD;
+            text.setText("You want to reload?");
+            this.weaponsToReload = weaponsToReload;
+            no.setVisible(true);
+            yes.setVisible(true);
+            no.setOnMouseClicked(mouseEvent -> {
+                yes.setVisible(false);
+                no.setVisible(false);
+                if (reloadRequests.size() == 0)
+                    controller.getClient().sendMessage(new EndActionRequest());
+                else
+                    controller.sendMessages(reloadRequests);
+            });
+            yes.setOnMouseClicked(mouseEvent -> {
+                for (ImageView iv : weapons) {
+                    if (weaponsToReload.stream().anyMatch(mw -> mw.getId() == Integer.parseInt(iv.getId().substring(2)))) {
+                        iv.setEffect(new DropShadow(35, Color.GREEN));
+                        iv.setOnMouseClicked(this::handleWeaponClick);
+                    }
                 }
-            }
-            yes.setVisible(false);
-            no.setVisible(false);
-            text.setText("choose the weapon you want to reload!");
-        });
+                yes.setVisible(false);
+                no.setVisible(false);
+                text.setText("choose the weapon you want to reload!");
+            });
+        }
     }
 
 
@@ -2143,6 +2160,7 @@ public class ClientGUIView extends Application implements View{
      * @param e
      */
     private void handleAmmoClick(MouseEvent e ){
+        System.out.println("ammo");
         if(state.equals(ClientState.CHOOSESCOPE)) {
             game.model.Color c = game.model.Color.valueOf(((Rectangle) e.getSource()).getId());
             controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, c));
