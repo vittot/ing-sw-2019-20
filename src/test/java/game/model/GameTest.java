@@ -67,11 +67,14 @@ class GameTest {
         assertEquals(pTurn,third);
     }
 
+
     /**
      * Test the victory condition (Game's killboard becomes full)
      */
+    /*
     @Test
-    void checkVictory() {
+    void
+    checkVictory() {
         Player p1 = g.getPlayers().get(0);
         Player p2 = g.getPlayers().get(1);
 
@@ -95,7 +98,7 @@ class GameTest {
             p.respawn(cp);
         assertTrue(g.checkVictory());
     }
-
+*/
 
     /**
      * Check that refillMap refills all non spawnpoint Squares with an AmmoCard and all spawnpoints with all avaiable CardWeapons
