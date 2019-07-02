@@ -21,6 +21,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
@@ -77,6 +78,7 @@ public class ClientGUIView extends Application implements View{
     private Label text = new Label("");
     private ClientState state;
     private Label textwait;
+    private Tooltip toolw = new Tooltip("Right Click for more info");
 
     private Stage sg = new Stage();
     private AudioClip loginBack;
@@ -734,6 +736,7 @@ public class ClientGUIView extends Application implements View{
             if (weapons.stream().anyMatch(w -> w.getId() == id)) {
                 iv.setOnMouseClicked(this::handleWeaponClick);
                 iv.setEffect(new DropShadow(35, Color.GREEN));
+                Tooltip.install(iv,toolw);
             }
         }
     }
@@ -764,10 +767,11 @@ public class ClientGUIView extends Application implements View{
                 BackgroundSize.DEFAULT);
 
         waits.setBackground(new Background(bi));
-        Label textw = new Label("Wait Other Player");
-        textw.setTextFill(Color.WHITE);
-        waits.getChildren().add(textw);
-        StackPane.setAlignment(textw,Pos.CENTER);
+        textwait = new Label();
+        textwait.setText("Wait Other Player");
+        textwait.setTextFill(Color.WHITE);
+        waits.getChildren().add(textwait);
+        StackPane.setAlignment(textwait,Pos.CENTER);
         Scene wait = new Scene(waits);
         StackPane chooseRoom = new StackPane();
         chooseRoom.setBackground(new Background(bi));
@@ -789,7 +793,8 @@ public class ClientGUIView extends Application implements View{
                 rb.setId(""+w.getId());
                 rb.setToggleGroup(tg);
                 rb.setSelected(true);
-                Label text = new Label(w.toString().substring(14));
+                Label text = new Label(w.toString().substring(18));
+                text.setTextFill(Color.WHITE);
                 HBox choice = new HBox(rb,text);
                 infoRoom.getChildren().add(choice);
             }
@@ -1036,7 +1041,7 @@ public class ClientGUIView extends Application implements View{
         StackPane.setAlignment(tex,Pos.TOP_CENTER);
         int j = 1;
         for(Player p : ranking.keySet()){
-            Label pos = new Label(p.getNickName() + " got " +j+ "° place with"+ ranking.get(p) + "points");
+            Label pos = new Label(p.getNickName() + " got " +j+ "° place with "+ ranking.get(p) + " points");
             sp.getChildren().add(pos);
             StackPane.setAlignment(pos,Pos.TOP_CENTER);
             StackPane.setMargin(pos,new Insets(20 + j * 30, 0,0,0));
@@ -1785,58 +1790,106 @@ public class ClientGUIView extends Application implements View{
      * @param e
      */
     private void handleWeaponClick(MouseEvent e){
+        int id = Integer.parseInt(((ImageView) e.getSource()).getId().substring(2));
         CardWeapon selected;
-        List<game.model.Color> price;
-        List<CardPower> list;
-        int id = Integer.parseInt(((ImageView)e.getSource()).getId().substring(2));
-        switch (state) {
-            case CHOOSEWEAPONTOGRAB: {
-                weaponG = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                if (ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
-                    chooseWeaponToWaste();
-                } else {
-                    if (weaponG.getPrice().size() == 1)
+        if(e.getButton() == MouseButton.SECONDARY){
+            System.out.println("Right Click");
+            StackPane sp = new StackPane();
+            selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+            selected = ClientContext.get().getMap().getWeaponOnMap().stream().filter(w->w.getId() == id).findFirst().orElse(selected);
+            if(selected != null) {
+                sp.setPrefSize(screenWidth * 30 / 100, screenHeight * 50 / 100);
+                VBox vbox = new VBox(15);
+                Label nameW = new Label("Weapon : " +selected.getName());
+                Label name = new Label("Base Effect:");
+                Label desc = new Label("Description " +selected.getBaseEffect().getDescription());
+                desc.setMaxWidth(screenWidth * 30 / 100);
+                desc.setWrapText(true);
+                vbox.getChildren().addAll(nameW, name, desc);
+                VBox.setMargin(nameW, new Insets(0,0,0,10));
+                VBox.setMargin(name, new Insets(0,0,0,25));
+                VBox.setMargin(desc, new Insets(0,0,0,40));
+                if(selected.getPlusEffects() != null)
+                    for (FullEffect fe : selected.getPlusEffects()) {
+                        name = new Label("Optional effect: "+fe.getName());
+                        desc = new Label(fe.getDescription());
+                        desc.setWrapText(true);
+                        vbox.getChildren().addAll(name, desc);
+                        VBox.setMargin(name, new Insets(0,0,0,25));
+                        VBox.setMargin(desc, new Insets(0,0,0,40));
+                    }
+                if (selected.getAltEffect() != null) {
+                    name = new Label("Alternative effect: "+ selected.getAltEffect().getName());
+                    desc = new Label(selected.getAltEffect().getDescription());
+                    desc.setWrapText(true);
+                    vbox.getChildren().addAll(name, desc);
+                    VBox.setMargin(name, new Insets(0 ,0,0,25));
+                    VBox.setMargin(desc, new Insets(0,0,0,40));
+                }
+
+                //sp.getChildren().forEach(z ->StackPane.setAlignment(z,Pos.TOP_LEFT));
+                sp.getChildren().add(vbox);
+                Scene infoWeapon = new Scene(sp);
+                sg.setScene(infoWeapon);
+                primaryStage.setAlwaysOnTop(false);
+                sg.setAlwaysOnTop(true);
+                sg.show();
+            }
+        }
+        else {
+            List<game.model.Color> price;
+            List<CardPower> list;
+            switch (state) {
+                case CHOOSEWEAPONTOGRAB: {
+                    weaponG = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+                    if (ClientContext.get().getMyPlayer().getWeapons().size() == 3) {
+                        chooseWeaponToWaste();
+                    } else {
+                        if (weaponG.getPrice().size() == 1) {
+                            controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                        } else {
+                            list = possibleCardPowerToPay(weaponG.getPrice());
+                            if (list.size() != 0)
+                                choosePowerUpToPay(list);
+                            else
+                                controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                        }
+                    }
+                    disableWeapon();
+                    break;
+                }
+                case CHOOSEWEAPONTOWASTE: {
+                    weaponW = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+                    if (weaponG.getPrice().size() == 1) {
                         controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
-                    list = possibleCardPowerToPay(weaponG.getPrice());
-                    if(list.size() != 0)
+                    }
+                    disableMyWeapon();
+                    price = weaponG.getPrice();
+                    list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+                    if (list.size() != 0)
                         choosePowerUpToPay(list);
                     else
-                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,null, null));
+                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                    break;
                 }
-                disableWeapon();
-                break;
-            }
-            case CHOOSEWEAPONTOWASTE: {
-                weaponW = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                if (weaponG.getPrice().size() == 1) {
-                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                case CHOOSEWEAPONTOSHOOT: {
+                    selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+                    controller.getClient().sendMessage(new ChooseWeaponToShootResponse(selected));
+                    disableMyWeapon();
+                    break;
                 }
-                disableMyWeapon();
-                price = weaponG.getPrice();
-                list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
-                if(list.size() != 0)
-                    choosePowerUpToPay(list);
-                else
-                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,null, null));
-                break;
+                case CHOOSERELOAD: {
+                    selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+                    System.out.println("selected reload " + selected.getName());
+                    disableMyWeapon();
+                    if (selected != null) {
+                        price = selected.getPrice();
+                        list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+                        choosePowerUpToPay(list);
+                        weaponsToReload.remove(weaponToReload);
+                    }
+                    break;
                 }
-            case CHOOSEWEAPONTOSHOOT: {
-                selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                controller.getClient().sendMessage(new ChooseWeaponToShootResponse(selected));
-                disableMyWeapon();
-                break;
-            }
-            case CHOOSERELOAD: {
-                selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                System.out.println("selected reload "+selected.getName());
-                disableMyWeapon();
-                if (selected != null) {
-                    price = selected.getPrice();
-                    list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
-                    choosePowerUpToPay(list);
-                    weaponsToReload.remove(weaponToReload);
-                }
-                break;
             }
         }
     }
@@ -1877,7 +1930,8 @@ public class ClientGUIView extends Application implements View{
 
         //Blank pane
         StackPane waits = new StackPane();
-        textwait = new Label("Wait Other Player");
+        textwait = new Label();
+        textwait.setText("Wait Other Player");
         textwait.setTextFill(Color.WHITE);
         textwait.setWrapText(true);
         waits.getChildren().add(textwait);
@@ -2089,21 +2143,25 @@ public class ClientGUIView extends Application implements View{
         for (ImageView iv :weapons) {
             iv.setOnMouseClicked(null);
             iv.setEffect(null);
+            Tooltip.uninstall(iv,toolw);
         }
     }
     private void disableWeapon(){
         for (ImageView iv :mapWL) {
             iv.setOnMouseClicked(null);
             iv.setEffect(null);
+            Tooltip.uninstall(iv,toolw);
         }
         for (ImageView iv :mapWR) {
             iv.setOnMouseClicked(null);
             iv.setEffect(null);
+            Tooltip.uninstall(iv,toolw);
         }
 
         for (ImageView iv :mapWT) {
             iv.setOnMouseClicked(null);
             iv.setEffect(null);
+            Tooltip.uninstall(iv,toolw);
         }
 
     }
