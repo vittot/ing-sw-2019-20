@@ -12,6 +12,11 @@ public class RespawnRequest implements ServerGameMessage {
         this.cPU = cPU;
     }
 
+    public RespawnRequest()
+    {
+        this.cPU = null;
+    }
+
     public CardPower getcPU() {
         return cPU;
     }

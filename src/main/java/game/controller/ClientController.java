@@ -5,6 +5,8 @@ import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.GetAvailableMapsRequest;
 import game.controller.commands.clientcommands.GrabActionRequest;
+import game.controller.commands.clientcommands.LoginMessage;
+import game.controller.commands.clientcommands.RejoinGameResponse;
 import game.controller.commands.servercommands.*;
 import game.model.*;
 import game.model.exceptions.InsufficientAmmoException;
@@ -22,6 +24,7 @@ public class ClientController implements ServerGameMessageHandler {
     private ClientState state;
     private boolean gameStarted;
     private boolean gameEnded;
+    private boolean reconnecting;
 
     public ClientController(Client client, View view) {
         this.client = client;
@@ -30,6 +33,7 @@ public class ClientController implements ServerGameMessageHandler {
         this.clientView.setController(this);
         this.state = ClientState.WAITING_START;
         this.gameEnded = false;
+        this.reconnecting = false;
     }
 
     public Client getClient() {
@@ -48,20 +52,13 @@ public class ClientController implements ServerGameMessageHandler {
         return availableActions;
     }
 
+
     /**
-     * Start the listener thread for ServerMessages
+     * Start the connection listening and the identification phase
      */
-    private void start() {
-        client.startListening(this);
-    }
-
-
-
     public void run() {
-        this.start();
+        client.startListening(this);
         clientView.setUserNamePhase();
-
-
     }
 
     /**
@@ -327,9 +324,12 @@ public class ClientController implements ServerGameMessageHandler {
 
         Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == ClientContext.get().getMyID()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()));
         //System.out.println("HO PRESO IL MIO PLAYER");
-        p.addCardPower(serverMsg.getcPU());
+        if(serverMsg.getcPU() != null)
+            p.addCardPower(serverMsg.getcPU());
         //System.out.println("GLI HO DATO LA POWER UP");
         clientView.choosePowerUpToRespawn(p.getCardPower());
+        /*if(ClientContext.get().getMyPlayer().getNickName().equals("vitto"))
+            this.manageConnectionError();*/
     }
 
     /**
@@ -431,6 +431,10 @@ public class ClientController implements ServerGameMessageHandler {
      */
     @Override
     public void handle(NotifyTurnChanged notifyTurnChanged) {
+        if(notifyTurnChanged.getCurrPlayerId() != ClientContext.get().getMyID())
+            this.state = ClientState.WAITING_TURN;
+        else
+            this.state = ClientState.WAITING_ACTION;
         clientView.notifyTurnChanged(notifyTurnChanged.getCurrPlayerId());
     }
 
@@ -549,7 +553,14 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(RejoinGameRequest rejoinGameRequest) {
-        clientView.rejoinGamePhase(rejoinGameRequest.getOtherPlayerNames());
+        if(this.reconnecting)
+        {
+            client.sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
+            clientView.notifyReconnected();
+            this.reconnecting = false;
+        }
+        else
+            clientView.rejoinGamePhase(rejoinGameRequest.getOtherPlayerNames());
     }
 
     @Override
@@ -565,6 +576,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(RejoinGameConfirm rejoinGameConfirm) {
+        this.state = ClientState.WAITING_TURN;
         ClientContext.get().setMap(rejoinGameConfirm.getMap());
         if(rejoinGameConfirm.getId() != 0)
             ClientContext.get().setMyID(rejoinGameConfirm.getId());
@@ -728,8 +740,11 @@ public class ClientController implements ServerGameMessageHandler {
     public void retryConnection() {
         if(!client.init())
             clientView.notifyConnectionError();
-        else
-            startNewGame();
+        else{
+            client.startListening(this);
+            this.reconnecting = true;
+            client.sendMessage(new LoginMessage(ClientContext.get().getMyPlayer().getNickName(),true));
+        }
     }
 
     /**

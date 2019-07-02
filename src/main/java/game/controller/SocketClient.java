@@ -18,7 +18,7 @@ public class SocketClient extends Client implements ServerMessageHandler {
     private Thread processer;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outStream;
-    private ServerGameMessageHandler controller;
+    private ClientController controller;
     private LinkedBlockingQueue<ServerGameMessage> gameMessages;
 
     public SocketClient(String host, int port) {
@@ -115,6 +115,9 @@ public class SocketClient extends Client implements ServerMessageHandler {
         {
             System.out.println("ECCEZIONE IN SEND MESSAGE"); //TODO: call retry connection method
             e.printStackTrace();
+
+            controller.manageConnectionError();
+
         }
     }
 
@@ -154,6 +157,7 @@ public class SocketClient extends Client implements ServerMessageHandler {
     public void close() {
         try {
             stop = true;
+            stopWaitingPing();
             inputStream.close();
             outStream.close();
             socket.close();

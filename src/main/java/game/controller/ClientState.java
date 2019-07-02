@@ -22,5 +22,5 @@ public enum ClientState {                   //Used from GUI
     WAITING_SPAWN,
     WAITING_START,
     TIMED_OUT,
-    HANDLING_MOVEMENT;
+    HANDLING_MOVEMENT, RECONNECTING, WAITING_TURN;
 }

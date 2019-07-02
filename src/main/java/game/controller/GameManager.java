@@ -104,6 +104,8 @@ public class GameManager implements Serializable {
     public void rejoinUser(String user)
     {
         Game g = usersSuspended.remove(user);
+        if(g == null)
+            g=getGameOfUser(user);
         g.rejoinUser(user);
         usersLogged.add(user);
     }
@@ -154,13 +156,12 @@ public class GameManager implements Serializable {
     }
 
     /**
-     * Add a new WaitingRoom with the given mapId and num of players
+     * Add a new WaitingRoom with the given mapId
      * @param mapId
-     * @param numWaitingPlayers
      * @return the WaitingRoom created
      */
-    public WaitingRoom addWaitingRoom(int mapId, int numWaitingPlayers) {
-        waitingRooms.add(new WaitingRoom(waitingRooms.size()+1,mapId, numWaitingPlayers));
+    public WaitingRoom addWaitingRoom(int mapId) {
+        waitingRooms.add(new WaitingRoom(waitingRooms.size()+1,mapId));
         return waitingRooms.get(waitingRooms.size()-1);
     }
 
@@ -169,8 +170,23 @@ public class GameManager implements Serializable {
      * @param nickname
      * @return
      */
-    public Game getNameOfSuspendedUser(String nickname) {
+    public Game getGameOfSuspendedUser(String nickname) {
         return usersSuspended.get(nickname);
+    }
+
+    /**
+     * Return the game in which is playing a certain user
+     * @param nickname
+     * @return
+     */
+    Game getGameOfUser(String nickname)
+    {
+        for(Game g : games)
+        {
+            if(g.getPlayers().stream().filter(p->p.getNickName().equals(nickname)).count() > 0)
+                return g;
+        }
+        return null;
     }
 
     /**

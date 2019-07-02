@@ -15,25 +15,31 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class ClientHandler implements GameListener {
 
-    protected transient ServerController controller;
-    protected ScheduledExecutorService pingTimer;
+    protected ServerController controller;
+    ScheduledExecutorService pingTimer;
     private ScheduledExecutorService periodicPingTimer;
-    protected int nPingLost = 0;
-    static final int PING_WAITING_TIME_MS = 2000;
-    static final int PING_INTERVAL = 20000;
+    int nPingLost = 0;
+    //static final int PING_WAITING_TIME_MS = 4000;
+    //static final int PING_INTERVAL = 20000;
+    boolean stop;
     protected String username;
 
     public abstract void sendMessage(ServerMessage msg);
     public abstract void sendPingMessage(PingMessage msg);
 
-    protected void clientDisconnected()
+    ClientHandler()
+    {
+        stop = false;
+    }
+
+    void clientDisconnected()
     {
         /*try {
             pingTimer.cancel();
         }catch(IllegalStateException e){} //in case it has already been cancelled
         try{periodicPingTimer.cancel();}catch(IllegalStateException e){}*/
-        pingTimer.shutdownNow();
-        periodicPingTimer.shutdownNow();
+        stopPing();
+        stop();
 
         if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED && controller.getState() != ServerState.GAME_ENDED){
             controller.getModel().removeGameListener(this);
@@ -55,12 +61,15 @@ public abstract class ClientHandler implements GameListener {
      */
     void startPing(int pingPeriod)
     {
-        //periodicPingTimer = new Timer();
+        if(periodicPingTimer != null)
+            periodicPingTimer.shutdownNow();
+        if(pingTimer != null)
+            pingTimer.shutdownNow();
         periodicPingTimer = Executors.newSingleThreadScheduledExecutor();
         pingTimer = Executors.newScheduledThreadPool(1);
         Runnable task = ()-> {
             try {
-                pingClient(PING_WAITING_TIME_MS);
+                pingClient(Configuration.PING_WAITING_TIME_MS);
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -69,6 +78,15 @@ public abstract class ClientHandler implements GameListener {
 
         periodicPingTimer.scheduleAtFixedRate(task,0,pingPeriod, TimeUnit.MILLISECONDS);
 
+    }
+
+    /**
+     * Interrupt the ping mechanism
+     */
+    void stopPing()
+    {
+        pingTimer.shutdownNow();
+        periodicPingTimer.shutdownNow();
     }
 
     /**
@@ -98,9 +116,18 @@ public abstract class ClientHandler implements GameListener {
 
     }
 
+    @Override
+    public String getUsername() {
+        return username;
+    }
 
-
-
+    /**
+     * Stop the client handler
+     */
+    void stop()
+    {
+        stop = true;
+    }
 
     /**
      * Notify that it's the turn of another player

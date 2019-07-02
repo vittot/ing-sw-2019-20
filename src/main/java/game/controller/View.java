@@ -117,6 +117,8 @@ public interface View {
 
     void chooseCounterAttack(List<CardPower> counterattack, Player shooter);
 
+    void notifyReconnected();
+
     void notifyDeath(int idKiller, int idVictim, boolean rage);
 
     void notifyRage(Player killer, Player victim);

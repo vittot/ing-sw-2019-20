@@ -1,0 +1,6 @@
+<config>
+    <turnTimerMs>300001</turnTimerMs>
+    <waitingRoomTimerMs>10001</waitingRoomTimerMs>
+    <pingIntervalMs>10001</pingIntervalMs>
+    <pingWaitingTimeMs>4001</pingWaitingTimeMs>
+</config>

@@ -288,6 +288,11 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
+    public void notifyReconnected() {
+        runLater( ()->gui.notifyReconnected());
+    }
+
+    @Override
     public void notifyRage(Player killer, Player victim) {
 
     }

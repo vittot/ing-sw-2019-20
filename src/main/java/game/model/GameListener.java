@@ -21,4 +21,5 @@ public interface GameListener {
     void onReplaceAmmo(CardAmmo ca, Square s);
     void onPlayerUpdateMarks(Player player);
     void onPlayerRaged(Kill lastKill);
+    String getUsername();
 }

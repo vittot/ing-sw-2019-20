@@ -46,7 +46,7 @@ public abstract class Client {
      * Interrupt the scheduled executor which is called in case of missing ping
      */
     void stopWaitingPing()
-    {   stop = true;
+    {   //stop = true;
         if(disconnectionExecutor != null)
             disconnectionExecutor.shutdownNow();
     }

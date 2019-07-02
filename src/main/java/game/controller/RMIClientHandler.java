@@ -11,14 +11,14 @@ import java.rmi.server.Unreferenced;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RMIClientHandler extends ClientHandler implements IRMIClientHandler, ClientMessageHandler, Unreferenced {
-    private transient RemoteClient client;
+public class RMIClientHandler extends ClientHandler implements IRMIClientHandler, ClientMessageHandler {
+    private RemoteClient client;
     private ExecutorService threadPool;
 
     RMIClientHandler(GameManager gm) throws RemoteException {
         super();
-        //threadPool = Executors.newSingleThreadScheduledExecutor();
-        threadPool = Executors.newCachedThreadPool();
+        threadPool = Executors.newSingleThreadScheduledExecutor();
+        //threadPool = Executors.newCachedThreadPool();
         this.controller = new ServerController(this,gm);
         UnicastRemoteObject.exportObject(this, 0);
     }
@@ -29,15 +29,16 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
             final ServerController myController = controller;
             threadPool.submit(() ->
                     {
-                            if(myController.getCurrPlayer() != null)
-                                myController.getCurrPlayer().setSerializeEverything(true);
-                            try {
-                                client.receiveMessage(msg);
-                            }catch(RemoteException e)
-                            {
-                                clientDisconnected();
+                            if(!stop){
+                                if(myController.getCurrPlayer() != null)
+                                    myController.getCurrPlayer().setSerializeEverything(true);
+                                try {
+                                    client.receiveMessage(msg);
+                                }catch(RemoteException e)
+                                {
+                                    clientDisconnected();
+                                }
                             }
-
                     }
 
             );
@@ -84,8 +85,11 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
     @Override
     public void sendPingMessage(PingMessage msg) {
         try {
-            System.out.println("PING " + username);
-            client.receivePingMessage(msg);
+            if(!stop)
+            {
+                System.out.println("PING " + username);
+                client.receivePingMessage(msg);
+            }
         } catch (RemoteException e) {
             clientDisconnected();
         }
@@ -94,12 +98,8 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
     @Override
     public void register(RemoteClient client) throws RemoteException {
         this.client = client;
-        startPing(PING_INTERVAL);
+        startPing(Configuration.PING_INTERVAL_MS);
        // UnicastRemoteObject.unexportObject(this, false);
     }
 
-    @Override
-    public void unreferenced() {
-        clientDisconnected();
-    }
 }
