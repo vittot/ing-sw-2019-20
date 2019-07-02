@@ -764,9 +764,14 @@ public class Game {
         return players;
     }
 
+    /**
+     * Return the player with the given id
+     * @param id
+     * @return
+     */
     public Player getPlayer(int id)
     {
-        return players.get(id - 1);
+        return players.stream().filter(p -> p.getId() == id).findFirst().orElse(null);
     }
 
     public void setPlayers(List<Player> players) {
@@ -874,7 +879,7 @@ public class Game {
         }
         if(thisTurnKill.size()>1)
             thisTurnKill.get(0).getKiller().addPoints(1);
-        this.players.forEach(player::notifyPoints());
+        this.players.forEach(Player::notifyPoints);
         thisTurnKill.clear();
     }
 
