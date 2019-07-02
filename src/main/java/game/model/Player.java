@@ -650,7 +650,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
             ammo.addAll(ammos);
             if(position.getCardAmmo().getCardPower() > 0){
                 powerups = new ArrayList<>();
-                for(int i=0; i<position.getCardAmmo().getCardPower(); i++)
+                for(int i=0; i<position.getCardAmmo().getCardPower() && cardPower.size() + i + 1 <= 3; i++)
                     powerups.add(game.drawPowerUp());
                 cardPower.addAll(powerups);
             }
