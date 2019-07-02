@@ -486,6 +486,7 @@ public class ClientController implements ServerGameMessageHandler {
         if(p.getId() == ClientContext.get().getMyID())
             this.state = ClientState.WAITING_ACTION;
         ClientContext.get().getPlayersInWaiting().remove(p);
+        p.getDamage().clear();
         clientView.notifyRespawn(notifyRespawn.getpId());
     }
 

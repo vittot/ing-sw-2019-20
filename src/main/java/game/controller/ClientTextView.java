@@ -153,7 +153,7 @@ public class ClientTextView implements  View {
         do {
                showWeapons(weaponsToReload,0,true, true, false);
             do {
-                writeText("Insert the id of a weapon you want to reload or -1 to terminate the reload phase:");
+                writeText("Insert the Fid of a weapon you want to reload or -1 to terminate the reload phase:");
                 n = readInt();
             } while (n != -1 && n < 1 && n > weaponsToReload.size());
             if(n != -1)
@@ -839,7 +839,7 @@ public class ClientTextView implements  View {
         Player victim = ClientContext.get().getMap().getPlayerById(idVictim);
         System.out.print(">> Player "+victim.getNickName()+" was killed by the player "+killer.getNickName());
         if(isRage)
-            writeText(" that also has raged him!");
+            System.out.println(" that also has raged him!");
         else
             writeText("!");
     }
@@ -867,6 +867,7 @@ public class ClientTextView implements  View {
     public void showRanking(SortedMap<Player, Integer> ranking){
         int i=1;
         System.out.println("The game is over! \nLet's see the final results:");
+        ArrayList<Integer> points = new ArrayList<>(ranking.values());
         for(Player p : ranking.keySet()) {
             switch (i) {
                 case 1:
@@ -885,8 +886,8 @@ public class ClientTextView implements  View {
                     System.out.print(">>> Fifth place : ");
                     break;
             }
+            System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+points.get(i-1) +".");
             i++;
-            System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+ranking.get(p) +".");
         }
         restartGamePhase();
         

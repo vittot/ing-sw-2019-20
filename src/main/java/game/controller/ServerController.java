@@ -693,7 +693,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     public ServerGameMessage handle(RespawnResponse clientMsg) {
         if(checkIfEnded())
             return new NotifyEndGame(model.getRanking());
-        if(model.getCurrentTurn().getCurrentPlayer() != currPlayer)
+        if(model.getCurrentTurn().getCurrentPlayer() != currPlayer && state != ServerState.WAITING_RESPAWN)
             return new OperationCompletedResponse("Not your turn!");
 
         if (currPlayer.isDead() || state == ServerState.WAITING_SPAWN) {
@@ -712,7 +712,6 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 {
                     state = ServerState.WAITING_TURN;
                     model.decreaseToBeRespawned();
-                    clientHandler.sendMessage(new OperationCompletedResponse("You are respawned!"));
                     clientHandler.sendMessage(new RemoveSpawnPowerUp(clientMsg.getPowerUp()));
                     if(model.getnPlayerToBeRespawned() == 0)
                         model.getCurrentTurn().newTurn(false); //TODO: check final frezy
@@ -956,12 +955,15 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 model = gameManager.getGameOfSuspendedUser(loginMessage.getNickname());
             else
                 model = gameManager.getGameOfUser(loginMessage.getNickname());
-            List<String> otherPlayerNames = model.getMap().getAllPlayers().stream().filter(p -> !p.isSuspended()).map(Player::getNickName).collect(Collectors.toList());
 
-            if(loginMessage.isReconnecting() && model.getCurrentTurn().getCurrentPlayer().getNickName().equals(loginMessage.getNickname()))
-                endTurnManagement();
+            if (model != null) {
+                List<String> otherPlayerNames = model.getMap().getAllPlayers().stream().filter(p -> !p.isSuspended()).map(Player::getNickName).collect(Collectors.toList());
 
-            return new RejoinGameRequest(otherPlayerNames);
+                if (loginMessage.isReconnecting() && model.getCurrentTurn().getCurrentPlayer().getNickName().equals(loginMessage.getNickname()))
+                    endTurnManagement();
+
+                return new RejoinGameRequest(otherPlayerNames);
+            }
         }
 
         gameManager.addLoggedUser(loginMessage.getNickname());
@@ -1363,7 +1365,9 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     @Override
     public void onRespawn() {
         state = ServerState.WAITING_RESPAWN;
-        clientHandler.sendMessage(new RespawnRequest(model.drawPowerUp()));
+        CardPower cp = model.drawPowerUp();
+        this.currPlayer.addCardPower(cp);
+        clientHandler.sendMessage(new RespawnRequest(cp));
     }
 
     @Override

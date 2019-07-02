@@ -872,6 +872,9 @@ public class Game {
             killBoard.add(k);
             updatePoints(k.getVictim());
         }
+        if(thisTurnKill.size()>1)
+            thisTurnKill.get(0).getKiller().addPoints(1);
+        this.players.forEach(player::notifyPoints());
         thisTurnKill.clear();
     }
 
