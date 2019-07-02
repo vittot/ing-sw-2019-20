@@ -1425,6 +1425,14 @@ public class ClientTextView implements  View {
         }
     }
 
+    /**
+     * Show reconnection message
+     */
+    @Override
+    public void notifyReconnected() {
+        writeText("Reconnected to the server!");
+    }
+
     @Override
     public void connectionFailed() {
         writeText("ERROR: Unable to connect, check your connection and the server ip!");

@@ -4,27 +4,27 @@ import game.controller.commands.*;
 import game.controller.commands.clientcommands.PongMessage;
 import game.controller.commands.servercommands.PingMessage;
 
+import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class RMIClient extends Client implements RemoteClient,ServerMessageHandler {
 
     private transient IRMIClientHandler rmiClientHandler;
     private String serverIP;
+    private LinkedBlockingQueue<ServerGameMessage> gameMessages;
+    private Thread processer;
 
 
     public RMIClient(String serverIP) throws RemoteException{
         super();
         this.serverIP = serverIP;
         this.nPingLost = 0;
-        UnicastRemoteObject.exportObject(this,0);
+        this.gameMessages = new LinkedBlockingQueue<>();
     }
 
     @Override
@@ -45,6 +45,23 @@ public class RMIClient extends Client implements RemoteClient,ServerMessageHandl
     public void startListening(ClientController handler) {
         this.controller = handler;
         this.disconnectionExecutor = Executors.newSingleThreadScheduledExecutor();
+        processer = new Thread(
+                () -> {
+                    do {
+                        ServerGameMessage msg = null;
+                        try {
+                            msg = gameMessages.poll(1, TimeUnit.MINUTES);
+                            if(msg != null) //it's null if timeout is elapsed
+                                msg.handle(controller);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+
+                    }while(!stop);
+                }
+        );
+        processer.setName("PROCESSER THREAD");
+        processer.start();
         waitNextPing();
     }
 
@@ -72,7 +89,12 @@ public class RMIClient extends Client implements RemoteClient,ServerMessageHandl
 
     @Override
     public synchronized void handle(ServerGameMessage msg) {
-        msg.handle(controller);
+        //msg.handle(controller);
+        try {
+            gameMessages.put(msg);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -82,10 +104,12 @@ public class RMIClient extends Client implements RemoteClient,ServerMessageHandl
 
     @Override
     public boolean init() {
+        if(!stop)
+            close();
         try{
             Registry registry = LocateRegistry.getRegistry(serverIP);
-
             IRMIListener remoteListener = (IRMIListener) registry.lookup("rmiListener");
+            UnicastRemoteObject.exportObject(this,0);
             this.rmiClientHandler = remoteListener.getHandler();
             this.rmiClientHandler.register(this);
             this.stop = false;
@@ -100,9 +124,14 @@ public class RMIClient extends Client implements RemoteClient,ServerMessageHandl
 
     @Override
     public void close() {
-        stop = true;
+        stopWaitingPing();
         rmiClientHandler = null;
-        //System.exit(0); //necessary to close the rmi background thread
+        try{
+            UnicastRemoteObject.unexportObject(this,true);
+        }catch (NoSuchObjectException e)
+        {
+
+        }
     }
 
 }

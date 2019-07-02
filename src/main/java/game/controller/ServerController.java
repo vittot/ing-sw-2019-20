@@ -235,6 +235,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     {
         //state
         model.refillMap();
+        model.getCurrentTurn().stopTimer();
         List<Player> toBeRespawned = model.changeTurn();
         toBeRespawned.forEach(Player::notifyRespawn);
         if(model.getnPlayerToBeRespawned() == 0)
@@ -579,14 +580,14 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 }
             }
             endTurnManagement();
-            //if(model.getnPlayerToBeRespawned() == 0)
-            //    model.getCurrentTurn().newTurn(false); //TODO: check final frezy
+
             if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){
                 state = ServerState.WAITING_ACTION;
                 return new ChooseTurnActionRequest();
             }
             else {
                 //TODO notify ClientContext clients
+                state = ServerState.WAITING_TURN;
                 return new OperationCompletedResponse("Wait for you next turn!");
             }
         }
@@ -966,14 +967,20 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
     @Override
     public ServerGameMessage handle(LoginMessage loginMessage) {
-        if(gameManager.getUsersLogged().contains(loginMessage.getNickname()))
+        if(!loginMessage.isReconnecting() && gameManager.getUsersLogged().contains(loginMessage.getNickname()))
             return new UserAlreadyLoggedResponse();
 
         this.nickname = loginMessage.getNickname();
-        if(gameManager.getUsersSuspended().contains(loginMessage.getNickname()))
+        if(gameManager.getUsersSuspended().contains(loginMessage.getNickname()) || loginMessage.isReconnecting())
         {
-            model = gameManager.getNameOfSuspendedUser(loginMessage.getNickname());
+            if(gameManager.getUsersSuspended().contains(loginMessage.getNickname()))
+                model = gameManager.getGameOfSuspendedUser(loginMessage.getNickname());
+            else
+                model = gameManager.getGameOfUser(loginMessage.getNickname());
             List<String> otherPlayerNames = model.getMap().getAllPlayers().stream().filter(p -> !p.isSuspended()).map(Player::getNickName).collect(Collectors.toList());
+
+            if(loginMessage.isReconnecting() && model.getCurrentTurn().getCurrentPlayer().getNickName().equals(loginMessage.getNickname()))
+                endTurnManagement();
 
             return new RejoinGameRequest(otherPlayerNames);
         }
@@ -995,6 +1002,8 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(rejoin)
         {
             int id = 0;
+            GameServer.get().removeHandler(rejoinGameResponse.getUser(),this.clientHandler);
+            model.removeGameListener(rejoinGameResponse.getUser());
             model.addGameListener(this.clientHandler);
             Player p = model.getPlayers().stream().filter(pl -> pl.getNickName().equals(rejoinGameResponse.getUser())).findFirst().orElse(null);
             if(p!=null){
@@ -1007,6 +1016,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             else
                 this.state = ServerState.WAITING_SPAWN;
             gameManager.rejoinUser(rejoinGameResponse.getUser());
+            this.clientHandler.startPing(ClientHandler.PING_INTERVAL);
             return new RejoinGameConfirm(model.getMap(),model.getPlayers(),id);
         }
         else
@@ -1396,9 +1406,14 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             clientHandler.sendMessage(new ChooseTurnActionRequest());
         }
         else{
-            CardPower cp = model.drawPowerUp();
-            currPlayer.addCardPower(cp);
-            clientHandler.sendMessage(new RespawnRequest(cp));
+            if(currPlayer.getCardPower().size()<2) {
+                CardPower cp = model.drawPowerUp();
+                currPlayer.addCardPower(cp);
+                clientHandler.sendMessage(new RespawnRequest(cp));
+            }
+            else
+                clientHandler.sendMessage(new RespawnRequest());
+
         }
 
     }

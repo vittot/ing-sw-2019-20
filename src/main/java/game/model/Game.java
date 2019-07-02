@@ -989,6 +989,19 @@ public class Game {
         this.gameObservers.remove(gl);
     }
 
+    /**
+     * Remove GameListener with a given username
+     * @param username
+     */
+    public void removeGameListener(String username)
+    {
+        GameListener toRemove = null;
+        for(GameListener gl : this.gameObservers)
+            if(gl.getUsername().equals(username))
+                toRemove = gl;
+        this.gameObservers.remove(toRemove);
+    }
+
     void notifyDamage(Player hit, Player attacker, int damage){
         gameObservers.forEach(o -> o.onDamage(hit,attacker,damage));
     }

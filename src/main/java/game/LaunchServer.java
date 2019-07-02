@@ -20,8 +20,9 @@ public class LaunchServer {
         boolean retry;
         do{
             try{
-            server = new GameServer(5000);
-            retry = false;
+                server = GameServer.get();
+                server.connect(5000);
+                retry = false;
             }catch(BindException e)
             {
                 System.out.println("There is a server instance already running, please close it and retry.");

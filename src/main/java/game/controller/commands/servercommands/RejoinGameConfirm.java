@@ -23,7 +23,7 @@ public class RejoinGameConfirm implements ServerGameMessage {
             this.players.add(new Player(p));
         }
         this.pId = pId;
-        for(Player p : players)
+        for(Player p : this.players)
             if(p.getId() != pId)
                 p.setCardPower(null);
     }

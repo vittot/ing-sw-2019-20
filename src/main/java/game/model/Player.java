@@ -744,22 +744,26 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     public void suspend(boolean timeOut)
     {
-        this.suspended = true;
-        GameManager.get().suspendPlayer(this);
+        if(!suspended)
+        {
+            this.suspended = true;
+            GameManager.get().suspendPlayer(this);
 
-        if(!timeOut)
-            this.game.getCurrentTurn().stopTimer();
-        if(!this.game.isEnded())
-        {   this.game.notifyPlayerSuspended(this, timeOut);
-            if(this.game.getNumPlayersAlive() < 3)
+            if(!timeOut)
+                this.game.getCurrentTurn().stopTimer();
+            if(!this.game.isEnded())
+            {   this.game.notifyPlayerSuspended(this, timeOut);
+            /*if(this.game.getNumPlayersAlive() < 3)
             {
                 this.game.endGame();
+            }*/
             }
+            this.playerObserver.onSuspend(timeOut);
         }
-        this.playerObserver.onSuspend(timeOut);
+
     }
 
-    public void rejoin()
+    void rejoin()
     {
         this.suspended = false;
         this.game.notifyPlayerRejoined(this);

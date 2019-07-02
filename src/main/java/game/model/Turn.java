@@ -74,7 +74,6 @@ public class Turn {
      */
     public void newTurn(Player player, boolean finalFrezy){
 
-        stopTimer();
         game.getPlayers().forEach(Player::updateMarks);
         currentPlayer = player;
 

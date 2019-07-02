@@ -1128,6 +1128,14 @@ public class ClientGUIView extends Application implements View{
     }
 
     /**
+     * Show reconnection message
+     */
+    @Override
+    public void notifyReconnected() {
+        //TODO
+    }
+
+    /**
      * Create a Ammo card from a Ammo in map, build a String with initials of Color
      * @param i
      * @return

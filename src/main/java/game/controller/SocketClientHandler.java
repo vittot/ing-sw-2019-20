@@ -23,16 +23,13 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
     private ObjectInputStream inPingStream;
     private ObjectOutputStream outPingStream;
     private Socket pingSocket;
-    private boolean stop;
 
     SocketClientHandler(Socket s) throws IOException {
+        super();
         this.socket = s;
         this.outStream = new ObjectOutputStream(s.getOutputStream());
         this.inStream = new ObjectInputStream(s.getInputStream());
-
         this.controller = new ServerController(this);
-        stop = false;
-        //the controller game will be set after the request of a new game or to join an existing game
     }
 
 
@@ -47,9 +44,13 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
             try{
                 /*if(controller.getCurrPlayer() != null)
                     controller.getCurrPlayer().setSerializeEverything(true);*/
-                outStream.writeObject(msg);
-                outStream.flush();
-                outStream.reset();
+                if(!stop)
+                {
+                    outStream.writeObject(msg);
+                    outStream.flush();
+                    outStream.reset();
+                }
+
                 /*if(controller.getCurrPlayer() != null)
                     controller.getCurrPlayer().setSerializeEverything(false);*/
             }
