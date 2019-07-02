@@ -22,6 +22,7 @@ public class Game {
     private List<CardWeapon> deckWeapon;
     private List<CardPower> powerWaste;
     private List<CardAmmo> ammoWaste;
+    private List<Kill> thisTurnKill;
     private List<Kill> killBoard;
     private Player firstPlayerToPlay;
     private Turn currentTurn;
@@ -49,6 +50,7 @@ public class Game {
         this.ended = false;
         this.gameObservers = new ArrayList<>();
         this.killBoard = new ArrayList<>(killBoardSize);
+        this.thisTurnKill = new ArrayList<>();
         this.deckWeapon = new ArrayList<>();
         this.deckAmmo = new ArrayList<>();
         this.deckPower = new ArrayList<>();
@@ -755,7 +757,7 @@ public class Game {
      * @return
      */
     public Kill getLastKill(Player player) {
-        return killBoard.stream().filter(k -> k.getVictim() == player).reduce((f, s) -> s).orElse(null);
+        return thisTurnKill.stream().filter(k -> k.getVictim() == player).reduce((f, s) -> s).orElse(null);
     }
 
     public List<Player> getPlayers() {
@@ -815,6 +817,10 @@ public class Game {
         return killBoard;
     }
 
+    public List<Kill> getThisTurnKill() {
+        return thisTurnKill;
+    }
+
     public void setKillBoard(List<Kill> killBoard) {
         this.killBoard = killBoard;
     }
@@ -855,11 +861,21 @@ public class Game {
      * @param victim
      * @param isRage
      */
-    public void addKill(Player killer, Player victim, boolean isRage) {
+    public void addThisTurnKill(Player killer, Player victim, boolean isRage) {
         Kill newKill = new Kill(killer, victim, isRage);
-        killBoard.add(newKill);
-        updatePoints(victim);
+        thisTurnKill.add(newKill);
         notifyDeath(newKill);
+    }
+
+    public void addKill() {
+        for(Kill k : thisTurnKill) {
+            killBoard.add(k);
+            updatePoints(k.getVictim());
+        }
+        if(thisTurnKill.size()>1)
+            thisTurnKill.get(0).getKiller().addPoints(1);
+        this.players.forEach(player::notifyPoints());
+        thisTurnKill.clear();
     }
 
     /**
@@ -1128,5 +1144,9 @@ public class Game {
 
     public void notifyUpdateMarks(Player player) {
         gameObservers.forEach(o -> o.onPlayerUpdateMarks(player));
+    }
+
+    public void notifyRage(Kill lastKill) {
+        gameObservers.forEach(o -> o.onPlayerRaged(lastKill));
     }
 }

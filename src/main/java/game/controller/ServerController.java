@@ -134,12 +134,8 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(!selectableTarget.containsAll(selectedTargets)) {
             clientHandler.sendMessage(new InvalidTargetResponse());
             return checkShootActionEnd();
-        }/*
-        if(!validateSelectedTargets(selectedTargets,currSimpleEffect)){
-            clientHandler.sendMessage(new InvalidTargetResponse());
-            return checkTurnEnd();
-        }*/
-        //in case no target has been selected (and it's allowed) it stops
+        }
+
         if(selectedTargets.isEmpty())
             return new OperationCompletedResponse("");
         toApplyEffect = new ArrayList<>();
@@ -696,7 +692,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     public ServerGameMessage handle(RespawnResponse clientMsg) {
         if(checkIfEnded())
             return new NotifyEndGame(model.getRanking());
-        if(model.getCurrentTurn().getCurrentPlayer() != currPlayer)
+        if(model.getCurrentTurn().getCurrentPlayer() != currPlayer && state != ServerState.WAITING_RESPAWN)
             return new OperationCompletedResponse("Not your turn!");
 
         if (currPlayer.isDead() || state == ServerState.WAITING_SPAWN) {
@@ -715,7 +711,6 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 {
                     state = ServerState.WAITING_TURN;
                     model.decreaseToBeRespawned();
-                    clientHandler.sendMessage(new OperationCompletedResponse("You are respawned!"));
                     clientHandler.sendMessage(new RemoveSpawnPowerUp(clientMsg.getPowerUp()));
                     if(model.getnPlayerToBeRespawned() == 0)
                         model.getCurrentTurn().newTurn(false); //TODO: check final frezy
@@ -959,12 +954,15 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 model = gameManager.getGameOfSuspendedUser(loginMessage.getNickname());
             else
                 model = gameManager.getGameOfUser(loginMessage.getNickname());
-            List<String> otherPlayerNames = model.getMap().getAllPlayers().stream().filter(p -> !p.isSuspended()).map(Player::getNickName).collect(Collectors.toList());
 
-            if(loginMessage.isReconnecting() && model.getCurrentTurn().getCurrentPlayer().getNickName().equals(loginMessage.getNickname()))
-                endTurnManagement();
+            if (model != null) {
+                List<String> otherPlayerNames = model.getMap().getAllPlayers().stream().filter(p -> !p.isSuspended()).map(Player::getNickName).collect(Collectors.toList());
 
-            return new RejoinGameRequest(otherPlayerNames);
+                if (loginMessage.isReconnecting() && model.getCurrentTurn().getCurrentPlayer().getNickName().equals(loginMessage.getNickname()))
+                    endTurnManagement();
+
+                return new RejoinGameRequest(otherPlayerNames);
+            }
         }
 
         gameManager.addLoggedUser(loginMessage.getNickname());

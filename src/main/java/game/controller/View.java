@@ -122,4 +122,8 @@ public interface View {
     void notifyReconnected();
 
     void showPoints();
+
+    void notifyDeath(int idKiller, int idVictim, boolean rage);
+
+    void notifyRage(Player killer, Player victim);
 }

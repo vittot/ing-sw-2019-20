@@ -303,7 +303,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
                         isRage = true;
                     }
                     if (game != null)
-                        game.addKill(shooter, this, isRage);
+                        game.addThisTurnKill(shooter, this, isRage);
 
                 } else if (num > 5)
                     this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
@@ -312,6 +312,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
             } else if (this.damage.size() == 11 && damage > 0) {
                 lastKill = game.getLastKill(this);
                 lastKill.setRage(true);
+                if(game != null)
+                    game.notifyRage(lastKill);
             }
             if (game != null)
                 game.notifyDamage(this, shooter, damage, marksToBeRemoved.size());

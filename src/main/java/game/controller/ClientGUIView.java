@@ -483,14 +483,19 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
-    public void notifyDeath(Kill kill) {
-        if(kill.getVictim().getId() == ClientContext.get().getMyID()){
+    public void notifyDeath(int idKiller, int idVictim, boolean rage) {
+        if(idKiller == ClientContext.get().getMyID()){
             String url = getClass().getResource("/graphics/sound/death.wav").toExternalForm();
             AudioClip audio = new AudioClip(url);
             audio.play();
         }
-        text.setText("Player "+kill.getKiller().getNickName() + " killed "+kill.getVictim().getNickName());
+        text.setText("Player "+ClientContext.get().getMap().getPlayerById(idKiller).getNickName() + " killed "+ClientContext.get().getMap().getPlayerById(idVictim).getNickName());
         refreshDeaths();
+    }
+
+    @Override
+    public void notifyRage(Player killer, Player victim) {
+
     }
 
     @Override

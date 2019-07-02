@@ -219,4 +219,9 @@ public abstract class ClientHandler implements GameListener {
     public void onPlayerUpdateMarks(Player player) {
         sendMessage(new UpdateMarks(player.getId()));
     }
+
+    @Override
+    public void onPlayerRaged(Kill kill){
+        sendMessage(new NotifyRage(kill));
+    }
 }
