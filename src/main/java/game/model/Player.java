@@ -253,8 +253,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     public void addCardPower(CardPower cp)
     {
-        if(this.cardPower == null)
-            System.out.println("LE CARD POWER SONO NULL, COME DOVREI FARE AD AGGIUNGERLE?!");
+        /*if(this.cardPower == null)
+            System.out.println("LE CARD POWER SONO NULL, COME DOVREI FARE AD AGGIUNGERLE?!");*/
         CardPower alreadyPresent = this.cardPower.stream().filter(c -> c.getId() == cp.getId()).findFirst().orElse(null);
         if(alreadyPresent == null)
             this.cardPower.add(cp);
@@ -669,6 +669,11 @@ public class Player implements Target, Serializable, Comparable<Player> {
     public void notifyTurn()
     {
         playerObserver.onTurnStart();
+    }
+
+    public void notifyPoints()
+    {
+        playerObserver.notifyPoints();
     }
 
     /**

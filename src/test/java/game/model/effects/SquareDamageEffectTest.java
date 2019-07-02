@@ -124,9 +124,9 @@ class SquareDamageEffectTest {
      */
     @Test
     void applyDamage() throws MapOutOfLimitException {
-        /*effect = new SquareDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,3,1,true,true);
+        effect = new SquareDamageEffect(1,1,1,1,TargetVisibility.VISIBLE,3,1,true,true);
         effect.applyEffect(game.getPlayer(4), Collections.singletonList(game.getMap().getSquare(0,0)));
         assertTrue(game.getMap().getSquare(0,0).getPlayers().stream().filter(p -> p.getDamage().size()==3 && p.getThisTurnMarks().size() == 1).count()==2);
-    */}
+    }
 
 }

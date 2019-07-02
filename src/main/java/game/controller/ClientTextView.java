@@ -122,7 +122,7 @@ public class ClientTextView implements  View {
      * Starting phase during the player enter his username for the game
      */
     public void setUserNamePhase (){
-        Random r  = new Random();
+        //Random r  = new Random();
         do {
             writeText("Provide username:");
             ClientContext.get().setUser(readText());
@@ -1463,6 +1463,14 @@ public class ClientTextView implements  View {
     @Override
     public void notifyReconnected() {
         writeText("Reconnected to the server!");
+    }
+
+    /**
+     * Show updated points
+     */
+    @Override
+    public void showPoints() {
+        writeText("Your new points are " + ClientContext.get().getMyPlayer().getPoints());
     }
 
     @Override

@@ -39,8 +39,8 @@ import java.util.stream.Collectors;
 
 
 public class ClientGUIView extends Application implements View{
-    public static ClientGUIView GUI;
-    public ClientController controller;
+    private static ClientGUIView GUI;
+    private ClientController controller;
     private String user;
     private Stage primaryStage;
     private double screenWidth = Screen.getScreens().get(0).getBounds().getWidth();
@@ -1135,6 +1135,11 @@ public class ClientGUIView extends Application implements View{
         //TODO
     }
 
+    @Override
+    public void showPoints() {
+        //TODO
+    }
+
     /**
      * Create a Ammo card from a Ammo in map, build a String with initials of Color
      * @param i
@@ -1839,6 +1844,7 @@ public class ClientGUIView extends Application implements View{
                 System.out.println("selected reload "+selected.getName());
                 disableMyWeapon();
                 if (selected != null) {
+                    weaponToReload = selected;
                     price = selected.getPrice();
                     list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
                     choosePowerUpToPay(list);

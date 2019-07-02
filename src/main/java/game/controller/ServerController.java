@@ -612,7 +612,6 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 return new ChooseTurnActionRequest();
             }
             else {
-                //TODO notify ClientContext clients
                 state = ServerState.WAITING_TURN;
                 return new OperationCompletedResponse("Wait for you next turn!");
             }
@@ -1367,7 +1366,9 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     @Override
     public void onRespawn() {
         state = ServerState.WAITING_RESPAWN;
-        clientHandler.sendMessage(new RespawnRequest(model.drawPowerUp()));
+        CardPower cp = model.drawPowerUp();
+        this.currPlayer.addCardPower(cp);
+        clientHandler.sendMessage(new RespawnRequest(cp));
     }
 
     @Override
@@ -1404,6 +1405,14 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             endTurnManagement();
 
 
+    }
+
+    /**
+     * Notify the player of its points
+     */
+    @Override
+    public void notifyPoints() {
+        clientHandler.sendMessage(new NotifyPoints(this.currPlayer.getPoints()));
     }
 
     void notifyPlayerExitedFromWaitingRoom(int pId){

@@ -120,4 +120,6 @@ public interface View {
     void chooseCounterAttack(List<CardPower> counterattack, Player shooter);
 
     void notifyReconnected();
+
+    void showPoints();
 }

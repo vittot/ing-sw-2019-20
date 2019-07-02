@@ -2,7 +2,6 @@ package game.controller;
 
 import game.controller.commands.ClientGameMessage;
 import game.controller.commands.ServerGameMessageHandler;
-import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.GetAvailableMapsRequest;
 import game.controller.commands.clientcommands.GrabActionRequest;
 import game.controller.commands.clientcommands.LoginMessage;
@@ -694,6 +693,16 @@ public class ClientController implements ServerGameMessageHandler {
         catch(InsufficientAmmoException e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Update player points
+     * @param notifyPoints
+     */
+    @Override
+    public void handle(NotifyPoints notifyPoints) {
+        ClientContext.get().getMyPlayer().setPoints(notifyPoints.getPoints());
+        clientView.showPoints();
     }
 
     @Override

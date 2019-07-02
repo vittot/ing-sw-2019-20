@@ -119,11 +119,12 @@ public class WaitingRoom implements Serializable {
      * Remove a player from the waitingroom
      * @param sc ServerController of the player which need to be removed
      */
-    public void removeWaitingPlayer(ServerController sc)
+    void removeWaitingPlayer(ServerController sc)
     {
         Player p = players.remove(sc);
         GameManager.get().getUsersLogged().remove(p.getNickName());
-        this.stopTimer();
+        if(players.size() < N_MINIMUM_PLAYERS)
+            stopTimer();
         for(ServerController s: players.keySet())
         {
             s.notifyPlayerExitedFromWaitingRoom(p.getId());
