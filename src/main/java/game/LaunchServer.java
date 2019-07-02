@@ -1,7 +1,9 @@
 package game;
 
 import game.controller.GameServer;
+import game.controller.XMLParser;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.DatagramSocket;
@@ -13,6 +15,7 @@ public class LaunchServer {
 
     public static void main(String[] args) throws IOException {
 
+        loadConfigurationSettings();
         setServerHostname();
 
         Scanner scanner = new Scanner(System.in);
@@ -38,6 +41,17 @@ public class LaunchServer {
             } finally {
                 server.close();
             }
+    }
+
+    /**
+     * Load the configuration settings
+     */
+    private static void loadConfigurationSettings() {
+
+        File configFile = new File("config.xml");
+        if(!configFile.exists())
+            XMLParser.writeDefaultConfigFile();
+        XMLParser.readConfigFile();
     }
 
     /**

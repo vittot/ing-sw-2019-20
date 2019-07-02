@@ -242,12 +242,12 @@ public class ClientGUIView extends Application implements View{
 
     private void callRoomCreate(String s ){
 
-        int mapId = 0, nPlayer= 3;
+        int mapId = 0;
         if(s == "Map 1") mapId = 1;
         if(s == "Map 2") mapId = 2;
         if(s == "Map 3") mapId = 3;
         if(s == "Map 4") mapId = 4;
-        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,user));
+        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,user));
     }
 
     @Override

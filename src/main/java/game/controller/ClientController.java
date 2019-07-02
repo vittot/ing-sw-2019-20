@@ -334,8 +334,8 @@ public class ClientController implements ServerGameMessageHandler {
             p.addCardPower(serverMsg.getcPU());
         //System.out.println("GLI HO DATO LA POWER UP");
         clientView.choosePowerUpToRespawn(p.getCardPower());
-        if(ClientContext.get().getMyPlayer().getNickName().equals("vitto"))
-            this.manageConnectionError();
+        /*if(ClientContext.get().getMyPlayer().getNickName().equals("vitto"))
+            this.manageConnectionError();*/
     }
 
     /**

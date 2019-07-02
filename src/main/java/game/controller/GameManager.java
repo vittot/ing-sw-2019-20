@@ -156,13 +156,12 @@ public class GameManager implements Serializable {
     }
 
     /**
-     * Add a new WaitingRoom with the given mapId and num of players
+     * Add a new WaitingRoom with the given mapId
      * @param mapId
-     * @param numWaitingPlayers
      * @return the WaitingRoom created
      */
-    public WaitingRoom addWaitingRoom(int mapId, int numWaitingPlayers) {
-        waitingRooms.add(new WaitingRoom(waitingRooms.size()+1,mapId, numWaitingPlayers));
+    public WaitingRoom addWaitingRoom(int mapId) {
+        waitingRooms.add(new WaitingRoom(waitingRooms.size()+1,mapId));
         return waitingRooms.get(waitingRooms.size()-1);
     }
 

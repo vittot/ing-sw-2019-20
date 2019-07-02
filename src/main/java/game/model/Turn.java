@@ -1,5 +1,6 @@
 package game.model;
 
+import game.controller.Configuration;
 import game.model.exceptions.NoResidualActionAvaiableException;
 
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public class Turn {
                 currentPlayer.suspend(true);
             }
         };
-        timer.schedule(task,Game.TIME_FOR_ACTION);
+        timer.schedule(task, Configuration.TURN_TIMER_MS);
     }
 
     public void newTurn(boolean finalFrezy)
@@ -118,7 +119,7 @@ public class Turn {
     public void stopTimer()
     {
         timer.cancel();
-        System.out.println("TIMER CANCELLED" + currentPlayer.getNickName());
+        System.out.println("TIMER CANCELLED " + currentPlayer.getNickName());
     }
 
     /**
