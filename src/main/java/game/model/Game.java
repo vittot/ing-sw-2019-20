@@ -26,7 +26,7 @@ public class Game {
     private Player firstPlayerToPlay;
     private Turn currentTurn;
     public static final int MAXPLAYERS = 5;
-    public static int TIME_FOR_ACTION = 60000000; //TODO: read from config file
+    public static int TIME_FOR_ACTION = 300000; //TODO: read from config file
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
@@ -989,8 +989,21 @@ public class Game {
         this.gameObservers.remove(gl);
     }
 
-    void notifyDamage(Player hit, Player attacker, int damage){
-        gameObservers.forEach(o -> o.onDamage(hit,attacker,damage));
+    /**
+     * Remove GameListener with a given username
+     * @param username
+     */
+    public void removeGameListener(String username)
+    {
+        GameListener toRemove = null;
+        for(GameListener gl : this.gameObservers)
+            if(gl.getUsername().equals(username))
+                toRemove = gl;
+        this.gameObservers.remove(toRemove);
+    }
+
+    void notifyDamage(Player hit, Player attacker, int damage, int marksToRemove){
+        gameObservers.forEach(o -> o.onDamage(hit,attacker,damage, marksToRemove));
     }
 
     void notifyMarks(Player marked, Player marker, int marks)

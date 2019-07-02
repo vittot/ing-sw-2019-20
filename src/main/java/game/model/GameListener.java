@@ -7,7 +7,7 @@ public interface GameListener {
 
     void onChangeTurn(Player p);
     void onGameEnd(SortedMap<Player,Integer> gameRanking);
-    void onDamage(Player damaged, Player attacker, int damage);
+    void onDamage(Player damaged, Player attacker, int damage, int marksToRemove);
     void onMarks(Player marked, Player marker, int marks);
     void onDeath(Kill kill);
     void onGrabWeapon(Player p, CardWeapon cw, CardWeapon cww);
@@ -20,4 +20,5 @@ public interface GameListener {
     void onReplaceWeapon(CardWeapon cw, Square s);
     void onReplaceAmmo(CardAmmo ca, Square s);
     void onPlayerUpdateMarks(Player player);
+    String getUsername();
 }

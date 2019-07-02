@@ -286,4 +286,9 @@ public class ClientGuiWrapper implements View {
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
         runLater( () ->gui.chooseCounterAttack(counterattack,shooter));
     }
+
+    @Override
+    public void notifyReconnected() {
+        runLater( ()->gui.notifyReconnected());
+    }
 }

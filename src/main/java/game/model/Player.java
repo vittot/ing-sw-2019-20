@@ -29,7 +29,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
     private CardWeapon actualWeapon;
     private CardPower actualCardPower;
     private List<Color> ammo;
-    private transient List<CardPower> cardPower;
+    private List<CardPower> cardPower;
     private int deaths;
     private transient int points;
     private Square position;
@@ -62,6 +62,33 @@ public class Player implements Target, Serializable, Comparable<Player> {
     {
         this(id,color);
         this.nickName = nick;
+    }
+
+    /**
+     * Copy constructor
+     * @param or
+     */
+    public Player(Player or) {
+        this.color = or.color;
+        this.marks = or.marks;
+        this.thisTurnMarks = or.thisTurnMarks;
+        this.id = or.id;
+        this.nickName = or.nickName;
+        this.damage = or.damage;
+        this.adrenaline = or.adrenaline;
+        this.weapons = or.weapons;
+        this.actualWeapon = or.actualWeapon;
+        this.actualCardPower = or.actualCardPower;
+        this.ammo = or.ammo;
+        this.cardPower = or.cardPower;
+        this.deaths = or.deaths;
+        this.points = or.points;
+        this.position = or.position;
+        this.game = or.game;
+        this.isDead = or.isDead;
+        this.serializeEverything = or.serializeEverything;
+        this.playerObserver = or.playerObserver;
+        this.suspended = or.suspended;
     }
 
     public boolean isSuspended() {
@@ -226,6 +253,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     public void addCardPower(CardPower cp)
     {
+        if(this.cardPower == null)
+            System.out.println("LE CARD POWER SONO NULL, COME DOVREI FARE AD AGGIUNGERLE?!");
         CardPower alreadyPresent = this.cardPower.stream().filter(c -> c.getId() == cp.getId()).findFirst().orElse(null);
         if(alreadyPresent == null)
             this.cardPower.add(cp);
@@ -255,20 +284,12 @@ public class Player implements Target, Serializable, Comparable<Player> {
     @Override
     public void addDamage(Player shooter, int damage) {
         if(!this.equals(shooter) && damage > 0) {
-            int num;
+            int num=0;
             boolean isRage = false;
             Kill lastKill = null;
             List<PlayerColor> marksToBeRemoved = marks.stream().filter(m -> m == shooter.getColor()).collect(Collectors.toList());
             damage += marksToBeRemoved.size();
             marks.removeAll(marksToBeRemoved);
-
-        /*for(int i=0;i<marks.size();i++){
-            if(marks.get(i)==shooter.getColor()){
-                damage++;
-                marks.remove(i);
-                i--;
-            }
-        }*/
 
             if (this.damage.size() < 11) {
                 for (int i = 0; i < damage; i++)
@@ -281,7 +302,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
                     if (num > 11) {
                         isRage = true;
                     }
-                    game.addKill(shooter, this, isRage);
+                    if (game != null)
+                        game.addKill(shooter, this, isRage);
 
                 } else if (num > 5)
                     this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
@@ -292,7 +314,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 lastKill.setRage(true);
             }
             if (game != null)
-                game.notifyDamage(this, shooter, damage);
+                game.notifyDamage(this, shooter, damage, marksToBeRemoved.size());
         }
     }
 
@@ -571,6 +593,47 @@ public class Player implements Target, Serializable, Comparable<Player> {
         }
     }
 
+    public List<Color> controlGrabAmmo(List<Color> ammos){
+        int nRed = 0, nBlue = 0, nYellow = 0;
+        for(Color a : ammo)
+            switch(a){
+                case BLUE:
+                    nBlue++;
+                    break;
+                case YELLOW:
+                    nYellow++;
+                    break;
+                case RED:
+                    nRed++;
+                    break;
+                default:
+                    break;
+            }
+        List<Color> toRemove = new ArrayList<>();
+        for(Color c: ammos)
+        {
+            if(c == Color.BLUE) {
+                if(nBlue >= 3)
+                    toRemove.add(c);
+                nBlue++;
+            }
+            else if(c == Color.RED)
+            {
+                if(nRed >= 3)
+                    toRemove.add(c);
+                nRed++;
+            }
+            else if(c == Color.YELLOW)
+            {
+                if(nYellow >= 3)
+                    toRemove.add(c);
+                nYellow++;
+            }
+        }
+        ammos.removeAll(toRemove);
+        return ammos;
+    }
+
     /**
      * Pick an ammo from the current Player position
      */
@@ -581,29 +644,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
         }
         if(position.getCardAmmo()!=null){
             List<Color> ammos = position.getCardAmmo().getAmmo();
-            int nRed = 0, nBlue = 0, nYellow = 0;
-            List<Color> toRemove = new ArrayList<>();
-            for(Color c: ammos)
-            {
-                if(c == Color.BLUE) {
-                    if(nBlue >= 3)
-                        toRemove.add(c);
-                    nBlue++;
-                }
-                else if(c == Color.RED)
-                {
-                    if(nRed >= 3)
-                        toRemove.add(c);
-                    nRed++;
-                }
-                else if(c == Color.YELLOW)
-                {
-                    if(nYellow >= 3)
-                        toRemove.add(c);
-                    nYellow++;
-                }
-            }
-            ammos.removeAll(toRemove);
+            ammos = controlGrabAmmo(ammos);
             ammo.addAll(ammos);
             if(position.getCardAmmo().getCardPower() > 0){
                 powerups = new ArrayList<>();
@@ -637,13 +678,13 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
-        if(serializeEverything) {
+        /*if(serializeEverything) {
             //The cast to Serializable is necessary to avoid Sonar bug issues because List does not implement Serializable but all implementations of List (such as ArrayList) in effect implements Serializable
-            oos.writeObject((Serializable)cardPower);
+            //oos.writeObject((Serializable)cardPower);
             oos.writeObject((Serializable)weapons);
             oos.writeInt(points);
         }
-        serializeEverything = false;
+        serializeEverything = false;*/
     }
 
     /**
@@ -653,15 +694,15 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
-        if(serializeEverything)
+        /*if(serializeEverything)
         {
-            cardPower = (List<CardPower>)ois.readObject();
+            //cardPower = (List<CardPower>)ois.readObject();
             weapons = (List<CardWeapon>)ois.readObject();
             points = ois.readInt();
         }
-        else{
+        else{*/
             weapons = new ArrayList<>();
-        }
+        //}
     }
 
     /**
@@ -715,22 +756,26 @@ public class Player implements Target, Serializable, Comparable<Player> {
      */
     public void suspend(boolean timeOut)
     {
-        this.suspended = true;
-        GameManager.get().suspendPlayer(this);
+        if(!suspended)
+        {
+            this.suspended = true;
+            GameManager.get().suspendPlayer(this);
 
-        if(!timeOut)
-            this.game.getCurrentTurn().stopTimer();
-        if(!this.game.isEnded())
-        {   this.game.notifyPlayerSuspended(this, timeOut);
-            if(this.game.getNumPlayersAlive() < 3)
+            if(!timeOut)
+                this.game.getCurrentTurn().stopTimer();
+            if(!this.game.isEnded())
+            {   this.game.notifyPlayerSuspended(this, timeOut);
+            /*if(this.game.getNumPlayersAlive() < 3)
             {
                 this.game.endGame();
+            }*/
             }
+            this.playerObserver.onSuspend(timeOut);
         }
-        this.playerObserver.onSuspend(timeOut);
+
     }
 
-    public void rejoin()
+    void rejoin()
     {
         this.suspended = false;
         this.game.notifyPlayerRejoined(this);

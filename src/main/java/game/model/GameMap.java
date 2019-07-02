@@ -59,6 +59,33 @@ public class GameMap implements Serializable {
         }
     }
 
+    /**
+     * Return a copy of the map which includes card ammos and card weapons (but not players)
+     * @return
+     */
+    public GameMap copy()
+    {
+        GameMap copy = new GameMap(this);
+        int i;
+        int j;
+        Square orSquare;
+        for(i=0;i<dimX;i++)
+        {
+            for(j=0;j<dimY;j++) {
+                try{
+                    orSquare = this.getSquare(i,j);
+                    copy.grid[j][i].setCardAmmo(orSquare.getCardAmmo());
+                    copy.grid[j][i].setWeapons(orSquare.getWeapons());
+                }catch(MapOutOfLimitException e)
+                {
+                    copy.grid[j][i] = null;
+                }
+
+            }
+        }
+        return copy;
+    }
+
     public String getDescription() {
         return description;
     }

@@ -79,10 +79,39 @@ public class AreaDamageEffect extends SimpleEffect {
      * @param targets choosen targets
      */
     public void applyEffect(Player shooter, List<Target> targets){
+        List<Square> shooted = new ArrayList<>();
+        int n1 = 0, n2 = 0, n3 = 0;
+        Player p;
+        boolean correct;
         for(Target t : targets)
         {
-            t.addDamage(shooter,damage);
-            t.addThisTurnMarks(shooter,marks);
+            correct = false;
+            p = (Player) t;
+            if(shooted.size() < 3 && !shooted.contains(p.getPosition()))
+                shooted.add(p.getPosition());
+            switch(shooted.indexOf(p.getPosition())){
+                case 0:
+                    n1++;
+                    if(n1<=maxEnemyPerSquare)
+                        correct = true;
+                    break;
+                case 1:
+                    n2++;
+                    if(n2<=maxEnemyPerSquare)
+                        correct = true;
+                    break;
+                case 2:
+                    n3++;
+                    if(n3<=maxEnemyPerSquare)
+                        correct = true;
+                    break;
+                default:
+                    break;
+            }
+            if(correct) {
+                t.addDamage(shooter, damage);
+                t.addThisTurnMarks(shooter, marks);
+            }
         }
     }
 

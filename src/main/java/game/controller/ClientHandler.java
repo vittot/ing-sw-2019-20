@@ -9,21 +9,38 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public abstract class ClientHandler implements GameListener {
 
-    protected transient ServerController controller;
-    protected Timer pingTimer;
-    private Timer periodicPingTimer;
-    protected int nPingLost = 0;
-    static final int PING_WAITING_TIME_MS = 1000;
-    static final int PING_INTERVAL = 10000;
+    protected ServerController controller;
+    ScheduledExecutorService pingTimer;
+    private ScheduledExecutorService periodicPingTimer;
+    int nPingLost = 0;
+    static final int PING_WAITING_TIME_MS = 4000;
+    static final int PING_INTERVAL = 20000;
+    boolean stop;
+    protected String username;
 
     public abstract void sendMessage(ServerMessage msg);
+    public abstract void sendPingMessage(PingMessage msg);
 
-    protected void clientDisconnected()
+    ClientHandler()
     {
-        periodicPingTimer.cancel();
+        stop = false;
+    }
+
+    void clientDisconnected()
+    {
+        /*try {
+            pingTimer.cancel();
+        }catch(IllegalStateException e){} //in case it has already been cancelled
+        try{periodicPingTimer.cancel();}catch(IllegalStateException e){}*/
+        stopPing();
+        stop();
+
         if(controller.getState() != ServerState.WAITING_FOR_PLAYERS && controller.getState() != ServerState.JUST_LOGGED && controller.getState() != ServerState.GAME_ENDED){
             controller.getModel().removeGameListener(this);
             controller.getCurrPlayer().suspend(false);
@@ -44,15 +61,32 @@ public abstract class ClientHandler implements GameListener {
      */
     void startPing(int pingPeriod)
     {
-        periodicPingTimer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
+        if(periodicPingTimer != null)
+            periodicPingTimer.shutdownNow();
+        if(pingTimer != null)
+            pingTimer.shutdownNow();
+        periodicPingTimer = Executors.newSingleThreadScheduledExecutor();
+        pingTimer = Executors.newScheduledThreadPool(1);
+        Runnable task = ()-> {
+            try {
                 pingClient(PING_WAITING_TIME_MS);
+            }catch(Exception e){
+                e.printStackTrace();
             }
         };
-        periodicPingTimer.scheduleAtFixedRate(task,0,pingPeriod);
+        //periodicPingTimer.scheduleAtFixedRate(task,0,pingPeriod);
 
+        periodicPingTimer.scheduleAtFixedRate(task,0,pingPeriod, TimeUnit.MILLISECONDS);
+
+    }
+
+    /**
+     * Interrupt the ping mechanism
+     */
+    void stopPing()
+    {
+        pingTimer.shutdownNow();
+        periodicPingTimer.shutdownNow();
     }
 
     /**
@@ -61,25 +95,39 @@ public abstract class ClientHandler implements GameListener {
      * When the number of lost pings arrives at 3 it considers the client disconnected
      * @param waitingTime in ms
      */
-    synchronized void pingClient(int waitingTime)
+    void pingClient(int waitingTime)
     {
-        pingTimer = new Timer();
-        sendMessage(new PingMessage());
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
+        //pingTimer = new Timer();
+        sendPingMessage(new PingMessage());
+        Runnable task = () -> {
                 nPingLost++;
-                if(nPingLost >= 3)
+                if(nPingLost >= 3){
+                    System.out.println("HO DISCONNESSO PER PERDITA 3 PING");
                     clientDisconnected();
-            }
-        };
-        pingTimer.schedule(task, waitingTime);
+
+                }
+            };
+
+        //pingTimer.schedule(task, waitingTime);
+        synchronized (this){
+            pingTimer = Executors.newScheduledThreadPool(1);
+            pingTimer.schedule(task,waitingTime,TimeUnit.MILLISECONDS);
+        }
 
     }
 
+    @Override
+    public String getUsername() {
+        return username;
+    }
 
-
-
+    /**
+     * Stop the client handler
+     */
+    void stop()
+    {
+        stop = true;
+    }
 
     /**
      * Notify that it's the turn of another player
@@ -102,8 +150,8 @@ public abstract class ClientHandler implements GameListener {
     }
 
     @Override
-    public void onDamage(Player damaged, Player attacker, int damage) {
-        sendMessage(new NotifyDamageResponse(attacker.getId(), damaged.getId(), damage));
+    public void onDamage(Player damaged, Player attacker, int damage, int marksToRemove) {
+        sendMessage(new NotifyDamageResponse(attacker.getId(), damaged.getId(), damage, marksToRemove));
     }
 
     @Override
@@ -165,5 +213,10 @@ public abstract class ClientHandler implements GameListener {
     @Override
     public void onReplaceAmmo(CardAmmo ca, Square s) {
         sendMessage(new NotifyAmmoRefill(ca,s));
+    }
+
+    @Override
+    public void onPlayerUpdateMarks(Player player) {
+        sendMessage(new UpdateMarks(player.getId()));
     }
 }

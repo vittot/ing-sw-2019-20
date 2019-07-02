@@ -8,13 +8,24 @@ import game.controller.commands.ServerGameMessage;
 public class LoginMessage implements ClientGameMessage {
 
     private String nickname;
+    private boolean reconnecting;
 
     public LoginMessage(String user) {
         this.nickname = user;
+        this.reconnecting = false;
+    }
+
+    public LoginMessage(String nickname, boolean reconnecting) {
+        this.nickname = nickname;
+        this.reconnecting = reconnecting;
     }
 
     public String getNickname() {
         return nickname;
+    }
+
+    public boolean isReconnecting() {
+        return reconnecting;
     }
 
     @Override

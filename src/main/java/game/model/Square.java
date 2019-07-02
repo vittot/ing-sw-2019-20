@@ -81,6 +81,10 @@ public class Square implements Target, Serializable {
         return edges;
     }
 
+    public void setWeapons(List<CardWeapon> weapons) {
+        this.weapons = weapons;
+    }
+
     /**
      * Return the square's edge in the given Direction
      * @param d

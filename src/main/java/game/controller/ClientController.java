@@ -5,6 +5,8 @@ import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.GetAvailableMapsRequest;
 import game.controller.commands.clientcommands.GrabActionRequest;
+import game.controller.commands.clientcommands.LoginMessage;
+import game.controller.commands.clientcommands.RejoinGameResponse;
 import game.controller.commands.servercommands.*;
 import game.model.*;
 import game.model.exceptions.InsufficientAmmoException;
@@ -22,6 +24,7 @@ public class ClientController implements ServerGameMessageHandler {
     private ClientState state;
     private boolean gameStarted;
     private boolean gameEnded;
+    private boolean reconnecting;
 
     public ClientController(Client client, View view) {
         this.client = client;
@@ -30,6 +33,7 @@ public class ClientController implements ServerGameMessageHandler {
         this.clientView.setController(this);
         this.state = ClientState.WAITING_START;
         this.gameEnded = false;
+        this.reconnecting = false;
     }
 
     public Client getClient() {
@@ -48,20 +52,13 @@ public class ClientController implements ServerGameMessageHandler {
         return availableActions;
     }
 
+
     /**
-     * Start the listener thread for ServerMessages
+     * Start the connection listening and the identification phase
      */
-    private void start() {
-        client.startListening(this);
-    }
-
-
-
     public void run() {
-        this.start();
+        client.startListening(this);
         clientView.setUserNamePhase();
-
-
     }
 
     /**
@@ -199,7 +196,10 @@ public class ClientController implements ServerGameMessageHandler {
         Player shooter = ClientContext.get().getMap().getPlayerById(serverMsg.getShooterId());
         Player hitten = ClientContext.get().getMap().getPlayerById(serverMsg.getHit());
         List<CardPower> counterattack = null;
-        hitten.addDamage(shooter, serverMsg.getDamage());
+        for(int i = 0; i < serverMsg.getDamage(); i++)
+            hitten.getDamage().add(shooter.getColor());
+        for(int i = 0; i < serverMsg.getMarksToRemove(); i++)
+            hitten.getMark().remove(shooter.getColor());
         clientView.damageNotification(serverMsg.getShooterId(),serverMsg.getDamage(),serverMsg.getHit());
         if(hitten.getId() == ClientContext.get().getMyID()) {
             counterattack = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower());
@@ -214,8 +214,11 @@ public class ClientController implements ServerGameMessageHandler {
     @Override
     public void handle(NotifyDeathResponse serverMsg) {
         ClientContext instance = ClientContext.get();
-        instance.getKillboard().add(serverMsg.getKill());
-        clientView.notifyDeath(serverMsg.getKill());
+        Player killer = ClientContext.get().getMap().getPlayerById(serverMsg.getIdKiller());
+        Player victim = ClientContext.get().getMap().getPlayerById(serverMsg.getIdVictim());
+        Kill kill = new Kill(killer,victim,serverMsg.isRage());
+        instance.getKillboard().add(kill);
+        clientView.notifyDeath(kill);
         //TODO Update death view methods(kill), pass a kill is a problem (????????)
         return;
 
@@ -323,10 +326,16 @@ public class ClientController implements ServerGameMessageHandler {
      */
     @Override
     public void handle(RespawnRequest serverMsg) {
-        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == ClientContext.get().getMyID()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()));
+        //System.out.println("SONO NELL'HANDLE DEL RESPAWN");
 
-        p.addCardPower(serverMsg.getcPU());
+        Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == ClientContext.get().getMyID()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()));
+        //System.out.println("HO PRESO IL MIO PLAYER");
+        if(serverMsg.getcPU() != null)
+            p.addCardPower(serverMsg.getcPU());
+        //System.out.println("GLI HO DATO LA POWER UP");
         clientView.choosePowerUpToRespawn(p.getCardPower());
+        if(ClientContext.get().getMyPlayer().getNickName().equals("vitto"))
+            this.manageConnectionError();
     }
 
     /**
@@ -383,6 +392,7 @@ public class ClientController implements ServerGameMessageHandler {
      */
     @Override
     public void handle(NotifyGameStarted serverMsg) {
+
         this.gameStarted = true;
         this.state = ClientState.WAITING_SPAWN;
         ClientContext.get().setMap(serverMsg.getMap());
@@ -390,6 +400,16 @@ public class ClientController implements ServerGameMessageHandler {
         if(serverMsg.getId() != 0)
             ClientContext.get().setMyID(serverMsg.getId());
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
+        ClientContext.get().setKillboard(serverMsg.getKillBoard());
+        if(ClientContext.get().getMyPlayer().getCardPower() == null)
+        {
+            System.out.println("NON HO LE MIE CARD POWER =( !");
+            for(Player p : serverMsg.getPlayers())
+            {
+                System.out.println("Player " + p.getId() + " powercard= " + p.getCardPower());
+            }
+        }
+        //System.out.println("GAME STARTED FINISHED");
         clientView.notifyStart();
     }
 
@@ -417,6 +437,10 @@ public class ClientController implements ServerGameMessageHandler {
      */
     @Override
     public void handle(NotifyTurnChanged notifyTurnChanged) {
+        if(notifyTurnChanged.getCurrPlayerId() != ClientContext.get().getMyID())
+            this.state = ClientState.WAITING_TURN;
+        else
+            this.state = ClientState.WAITING_ACTION;
         clientView.notifyTurnChanged(notifyTurnChanged.getCurrPlayerId());
     }
 
@@ -535,7 +559,14 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(RejoinGameRequest rejoinGameRequest) {
-        clientView.rejoinGamePhase(rejoinGameRequest.getOtherPlayerNames());
+        if(this.reconnecting)
+        {
+            client.sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
+            clientView.notifyReconnected();
+            this.reconnecting = false;
+        }
+        else
+            clientView.rejoinGamePhase(rejoinGameRequest.getOtherPlayerNames());
     }
 
     @Override
@@ -551,10 +582,19 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(RejoinGameConfirm rejoinGameConfirm) {
+        this.state = ClientState.WAITING_TURN;
         ClientContext.get().setMap(rejoinGameConfirm.getMap());
         if(rejoinGameConfirm.getId() != 0)
             ClientContext.get().setMyID(rejoinGameConfirm.getId());
         ClientContext.get().setPlayersInWaiting(rejoinGameConfirm.getPlayers());
+        for(Player p : rejoinGameConfirm.getPlayers())
+            if(p.getPosition() != null) {
+                try {
+                    ClientContext.get().getMap().getSquare(p.getPosition().getX(),p.getPosition().getY()).addPlayer(p);
+                } catch (MapOutOfLimitException e) {
+
+                }
+            }
         clientView.rejoinGameConfirm();
     }
 
@@ -607,11 +647,11 @@ public class ClientController implements ServerGameMessageHandler {
     @Override
     public void handle(NotifyWeaponRefill notifyWeaponRefill){
         CardWeapon cw = notifyWeaponRefill.getCw();
-        Square position = notifyWeaponRefill.getPosition();
+
         if(ClientContext.get().getMap() != null)
         {
             try{
-                ClientContext.get().getMap().getSquare(position.getX(),position.getY()).addWeapon(Collections.singletonList(cw));
+                ClientContext.get().getMap().getSquare(notifyWeaponRefill.getX(),notifyWeaponRefill.getY()).addWeapon(Collections.singletonList(cw));
             }catch(MapOutOfLimitException e)
             {
                 System.out.println("ERROR: tried to refill outside of game map");
@@ -623,10 +663,10 @@ public class ClientController implements ServerGameMessageHandler {
     @Override
     public void handle(NotifyAmmoRefill notifyAmmoRefill){
         CardAmmo ca = notifyAmmoRefill.getCa();
-        Square position = notifyAmmoRefill.getPosition();
+
         if(ClientContext.get().getMap() != null)
             try{
-                ClientContext.get().getMap().getSquare(position.getX(),position.getY()).setCardAmmo(ca);
+                ClientContext.get().getMap().getSquare(notifyAmmoRefill.getX(),notifyAmmoRefill.getY()).setCardAmmo(ca);
             }catch(MapOutOfLimitException e)
             {
                 System.out.println("ERROR: tried to refill outside of game map");
@@ -635,7 +675,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(UpdateMarks updateMarks) {
-        Player p = ClientContext.get().getMap().getPlayerById(updateMarks.getP().getId());
+        Player p = ClientContext.get().getMap().getPlayerById(updateMarks.getId());
         if(p != null)
             p.updateMarks();
     }
@@ -691,6 +731,7 @@ public class ClientController implements ServerGameMessageHandler {
      * Called by the newtork layer in case of connection error
      */
     public void manageConnectionError() {
+        client.stopWaitingPing();
         clientView.notifyConnectionError();
     }
 
@@ -700,6 +741,11 @@ public class ClientController implements ServerGameMessageHandler {
     public void retryConnection() {
         if(!client.init())
             clientView.notifyConnectionError();
+        else{
+            client.startListening(this);
+            this.reconnecting = true;
+            client.sendMessage(new LoginMessage(ClientContext.get().getMyPlayer().getNickName(),true));
+        }
     }
 
     /**

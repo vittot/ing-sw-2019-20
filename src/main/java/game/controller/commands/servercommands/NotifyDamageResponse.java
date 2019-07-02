@@ -8,11 +8,13 @@ public class NotifyDamageResponse implements ServerGameMessage {
     private int shooterId;
     private int hitId;
     private int damage;
+    private int marksToRemove;
 
-    public NotifyDamageResponse(int shooterId, int hitId, int damage) {
+    public NotifyDamageResponse(int shooterId, int hitId, int damage, int marksToRemove) {
         this.shooterId = shooterId;
         this.hitId = hitId;
         this.damage = damage;
+        this.marksToRemove = marksToRemove;
     }
 
     public int getShooterId() {
@@ -25,6 +27,10 @@ public class NotifyDamageResponse implements ServerGameMessage {
 
     public int getDamage() {
         return damage;
+    }
+
+    public int getMarksToRemove() {
+        return marksToRemove;
     }
 
     @Override

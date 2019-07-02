@@ -1,9 +1,9 @@
 package game.controller;
 
 import game.controller.commands.*;
+import game.controller.commands.clientcommands.LoginMessage;
 import game.controller.commands.clientcommands.PongMessage;
 import game.controller.commands.servercommands.PingMessage;
-import game.model.Player;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -11,14 +11,14 @@ import java.rmi.server.Unreferenced;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RMIClientHandler extends ClientHandler implements IRMIClientHandler, ClientMessageHandler, Unreferenced {
-    private transient RemoteClient client;
+public class RMIClientHandler extends ClientHandler implements IRMIClientHandler, ClientMessageHandler {
+    private RemoteClient client;
     private ExecutorService threadPool;
 
     RMIClientHandler(GameManager gm) throws RemoteException {
         super();
-        //threadPool = Executors.newSingleThreadScheduledExecutor();
-        threadPool = Executors.newCachedThreadPool();
+        threadPool = Executors.newSingleThreadScheduledExecutor();
+        //threadPool = Executors.newCachedThreadPool();
         this.controller = new ServerController(this,gm);
         UnicastRemoteObject.exportObject(this, 0);
     }
@@ -29,15 +29,16 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
             final ServerController myController = controller;
             threadPool.submit(() ->
                     {
-                            if(myController.getCurrPlayer() != null)
-                                myController.getCurrPlayer().setSerializeEverything(true);
-                            try {
-                                client.receiveMessage(msg);
-                            }catch(RemoteException e)
-                            {
-                                clientDisconnected();
+                            if(!stop){
+                                if(myController.getCurrPlayer() != null)
+                                    myController.getCurrPlayer().setSerializeEverything(true);
+                                try {
+                                    client.receiveMessage(msg);
+                                }catch(RemoteException e)
+                                {
+                                    clientDisconnected();
+                                }
                             }
-
                     }
 
             );
@@ -50,6 +51,16 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
             cmsg.handle(this);
     }
 
+    public void receivePongMessage(PongMessage msg) throws RemoteException
+    {
+        try {
+            handle(msg);
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void handle(ClientGameMessage msg) {
         ServerGameMessage answ = msg.handle(controller);
@@ -57,9 +68,31 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
     }
 
     @Override
+    public void handle(LoginMessage login) {
+        this.username = login.getNickname();
+        ServerGameMessage answ = login.handle(controller);
+        sendMessage(answ);
+    }
+
+    @Override
     public synchronized void handle(PongMessage msg) {
-        pingTimer.cancel();
+        pingTimer.shutdownNow();
+        pingTimer = Executors.newScheduledThreadPool(1);
+        System.out.println(username + " PONG");
         nPingLost = 0;
+    }
+
+    @Override
+    public void sendPingMessage(PingMessage msg) {
+        try {
+            if(!stop)
+            {
+                System.out.println("PING " + username);
+                client.receivePingMessage(msg);
+            }
+        } catch (RemoteException e) {
+            clientDisconnected();
+        }
     }
 
     @Override
@@ -69,13 +102,4 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
        // UnicastRemoteObject.unexportObject(this, false);
     }
 
-    @Override
-    public void unreferenced() {
-        clientDisconnected();
-    }
-
-    @Override
-    public void onPlayerUpdateMarks(Player player) {
-
-    }
 }

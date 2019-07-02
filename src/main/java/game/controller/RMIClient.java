@@ -4,25 +4,33 @@ import game.controller.commands.*;
 import game.controller.commands.clientcommands.PongMessage;
 import game.controller.commands.servercommands.PingMessage;
 
+import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.*;
 
-public class RMIClient extends UnicastRemoteObject implements Client, RemoteClient,ServerMessageHandler {
+public class RMIClient extends Client implements RemoteClient,ServerMessageHandler {
 
-    private transient ServerGameMessageHandler controller;
     private transient IRMIClientHandler rmiClientHandler;
     private String serverIP;
+    private LinkedBlockingQueue<ServerGameMessage> gameMessages;
+    private Thread processer;
+
 
     public RMIClient(String serverIP) throws RemoteException{
         super();
         this.serverIP = serverIP;
+        this.nPingLost = 0;
+        this.gameMessages = new LinkedBlockingQueue<>();
     }
 
     @Override
     public void sendMessage(ClientMessage msg) {
+        if(stop)
+            return;
         try {
             rmiClientHandler.receiveMessage(msg);
         }
@@ -36,16 +44,57 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
     @Override
     public void startListening(ClientController handler) {
         this.controller = handler;
+        this.disconnectionExecutor = Executors.newSingleThreadScheduledExecutor();
+        processer = new Thread(
+                () -> {
+                    do {
+                        ServerGameMessage msg = null;
+                        try {
+                            msg = gameMessages.poll(1, TimeUnit.MINUTES);
+                            if(msg != null) //it's null if timeout is elapsed
+                                msg.handle(controller);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+
+                    }while(!stop);
+                }
+        );
+        processer.setName("PROCESSER THREAD");
+        processer.start();
+        waitNextPing();
     }
+
 
     @Override
     public void receiveMessage(ServerMessage msg) throws RemoteException {
-        msg.handle(this);
+            msg.handle(this);
+    }
+
+    @Override
+    public void receivePingMessage(PingMessage msg) throws RemoteException {
+        //System.out.println("PING FROM SERVER");
+        try{
+            nPingLost = 0;
+            if(disconnectionExecutor != null)
+                disconnectionExecutor.shutdownNow();
+            waitNextPing();
+            rmiClientHandler.receivePongMessage(new PongMessage());
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public synchronized void handle(ServerGameMessage msg) {
-        msg.handle(controller);
+        //msg.handle(controller);
+        try {
+            gameMessages.put(msg);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -55,12 +104,15 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
 
     @Override
     public boolean init() {
+        if(!stop)
+            close();
         try{
             Registry registry = LocateRegistry.getRegistry(serverIP);
-
             IRMIListener remoteListener = (IRMIListener) registry.lookup("rmiListener");
+            UnicastRemoteObject.exportObject(this,0);
             this.rmiClientHandler = remoteListener.getHandler();
             this.rmiClientHandler.register(this);
+            this.stop = false;
             return true;
 
         }catch(RemoteException | NotBoundException e)
@@ -72,8 +124,14 @@ public class RMIClient extends UnicastRemoteObject implements Client, RemoteClie
 
     @Override
     public void close() {
+        stopWaitingPing();
         rmiClientHandler = null;
-        System.exit(0); //necessary to close the rmi background thread
+        try{
+            UnicastRemoteObject.unexportObject(this,true);
+        }catch (NoSuchObjectException e)
+        {
+
+        }
     }
 
 }
