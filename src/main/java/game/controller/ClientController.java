@@ -196,7 +196,10 @@ public class ClientController implements ServerGameMessageHandler {
         Player shooter = ClientContext.get().getMap().getPlayerById(serverMsg.getShooterId());
         Player hitten = ClientContext.get().getMap().getPlayerById(serverMsg.getHit());
         List<CardPower> counterattack = null;
-        hitten.addDamage(shooter, serverMsg.getDamage());
+        for(int i = 0; i < serverMsg.getDamage(); i++)
+            hitten.getDamage().add(shooter.getColor());
+        for(int i = 0; i < serverMsg.getMarksToRemove(); i++)
+            hitten.getMark().remove(shooter.getColor());
         clientView.damageNotification(serverMsg.getShooterId(),serverMsg.getDamage(),serverMsg.getHit());
         if(hitten.getId() == ClientContext.get().getMyID()) {
             counterattack = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower());
@@ -397,6 +400,7 @@ public class ClientController implements ServerGameMessageHandler {
         if(serverMsg.getId() != 0)
             ClientContext.get().setMyID(serverMsg.getId());
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
+        ClientContext.get().setKillboard(serverMsg.getKillBoard());
         if(ClientContext.get().getMyPlayer().getCardPower() == null)
         {
             System.out.println("NON HO LE MIE CARD POWER =( !");

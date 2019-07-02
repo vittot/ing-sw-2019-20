@@ -481,7 +481,18 @@ public class ClientTextView implements  View {
         do{
             writeText("The action you have selected preview this ordered single step combination, choose the next: (info for player information/exit[e] to stop action)");
             for(Action ac : possibleActions){
-                writeText(ac.name());
+                System.out.print(">> "+ac.name());
+                switch(ac.name()){
+                    case "MOVEMENT":
+                        System.out.println(" [M]");
+                        break;
+                    case "GRAB":
+                        System.out.println(" [G]");
+                        break;
+                    case "SHOOT":
+                        System.out.println(" [S]");
+                        break;
+                }
             }
             action = readText();
             action = action.toUpperCase();
@@ -616,6 +627,27 @@ public class ClientTextView implements  View {
         controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
     }
 
+    public final static void clearConsole()
+    {
+        try
+        {
+            final String os = System.getProperty("os.name");
+
+            if (os.contains("Windows"))
+            {
+                Runtime.getRuntime().exec("cls");
+            }
+            else
+            {
+                Runtime.getRuntime().exec("clear");
+            }
+        }
+        catch (final Exception e)
+        {
+            //  Handle any exceptions.
+        }
+    }
+
     /**
      * Choose the action for the current turn
      */
@@ -623,6 +655,8 @@ public class ClientTextView implements  View {
         Action choosenAction;
         String action;
         do{
+            //clearConsole();
+            //showMap(ClientContext.get().getMap());
             writeText("Choose the action you want to make between {MOVEMENT[M], GRAB[G], SHOOT[S]} (write info to see the details of the game, write power to use power-up cards): ");
             action = readText();
             action = action.toUpperCase();
@@ -900,7 +934,7 @@ public class ClientTextView implements  View {
         char c;
         int n = 1, t=1;
         list = list.stream().filter(x -> x.getName().equals("Targeting scope")).collect(Collectors.toList());
-        if(list.size() > 0) {
+        if(list.size() > 0 && !ClientContext.get().getMyPlayer().getAmmo().isEmpty()) {
             writeText("Do you want to use a Targeting scope power-up card to apply an additional damage to one of your previous target?");
             writeText("Insert [Y]es or [N]o");
             do {
@@ -1167,8 +1201,6 @@ public class ClientTextView implements  View {
         }
         else
             writeText(checkPlayerColor(p.getColor()) + "You haven't available power-up cards! " + ANSI_RESET);
-
-        writeText("You have:"+ANSI_RESET);
         if(p.getDamage().size()==0)
             writeText(checkPlayerColor(p.getColor())+"No damage"+ANSI_RESET);
         else{

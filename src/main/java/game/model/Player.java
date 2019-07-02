@@ -284,20 +284,12 @@ public class Player implements Target, Serializable, Comparable<Player> {
     @Override
     public void addDamage(Player shooter, int damage) {
         if(!this.equals(shooter) && damage > 0) {
-            int num;
+            int num=0;
             boolean isRage = false;
             Kill lastKill = null;
             List<PlayerColor> marksToBeRemoved = marks.stream().filter(m -> m == shooter.getColor()).collect(Collectors.toList());
             damage += marksToBeRemoved.size();
             marks.removeAll(marksToBeRemoved);
-
-        /*for(int i=0;i<marks.size();i++){
-            if(marks.get(i)==shooter.getColor()){
-                damage++;
-                marks.remove(i);
-                i--;
-            }
-        }*/
 
             if (this.damage.size() < 11) {
                 for (int i = 0; i < damage; i++)
@@ -310,7 +302,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
                     if (num > 11) {
                         isRage = true;
                     }
-                    game.addKill(shooter, this, isRage);
+                    if (game != null)
+                        game.addKill(shooter, this, isRage);
 
                 } else if (num > 5)
                     this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
@@ -321,7 +314,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 lastKill.setRage(true);
             }
             if (game != null)
-                game.notifyDamage(this, shooter, damage);
+                game.notifyDamage(this, shooter, damage, marksToBeRemoved.size());
         }
     }
 
@@ -600,6 +593,47 @@ public class Player implements Target, Serializable, Comparable<Player> {
         }
     }
 
+    public List<Color> controlGrabAmmo(List<Color> ammos){
+        int nRed = 0, nBlue = 0, nYellow = 0;
+        for(Color a : ammo)
+            switch(a){
+                case BLUE:
+                    nBlue++;
+                    break;
+                case YELLOW:
+                    nYellow++;
+                    break;
+                case RED:
+                    nRed++;
+                    break;
+                default:
+                    break;
+            }
+        List<Color> toRemove = new ArrayList<>();
+        for(Color c: ammos)
+        {
+            if(c == Color.BLUE) {
+                if(nBlue >= 3)
+                    toRemove.add(c);
+                nBlue++;
+            }
+            else if(c == Color.RED)
+            {
+                if(nRed >= 3)
+                    toRemove.add(c);
+                nRed++;
+            }
+            else if(c == Color.YELLOW)
+            {
+                if(nYellow >= 3)
+                    toRemove.add(c);
+                nYellow++;
+            }
+        }
+        ammos.removeAll(toRemove);
+        return ammos;
+    }
+
     /**
      * Pick an ammo from the current Player position
      */
@@ -610,29 +644,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
         }
         if(position.getCardAmmo()!=null){
             List<Color> ammos = position.getCardAmmo().getAmmo();
-            int nRed = 0, nBlue = 0, nYellow = 0;
-            List<Color> toRemove = new ArrayList<>();
-            for(Color c: ammos)
-            {
-                if(c == Color.BLUE) {
-                    if(nBlue >= 3)
-                        toRemove.add(c);
-                    nBlue++;
-                }
-                else if(c == Color.RED)
-                {
-                    if(nRed >= 3)
-                        toRemove.add(c);
-                    nRed++;
-                }
-                else if(c == Color.YELLOW)
-                {
-                    if(nYellow >= 3)
-                        toRemove.add(c);
-                    nYellow++;
-                }
-            }
-            ammos.removeAll(toRemove);
+            ammos = controlGrabAmmo(ammos);
             ammo.addAll(ammos);
             if(position.getCardAmmo().getCardPower() > 0){
                 powerups = new ArrayList<>();

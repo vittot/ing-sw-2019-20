@@ -5,6 +5,7 @@ import game.controller.commands.ServerGameMessage;
 import game.model.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -96,9 +97,14 @@ public class MovementEffect extends SimpleEffect {
     public List<Target> searchTarget (Player shooter) {
         List<Player> targets = new ArrayList<>();
         List<Player> prevTargets = null;
-        if(shooter.getActualWeapon() != null)
-            if(shooter.getActualWeapon().getPreviousTargets() != null)
+        if(shooter.getActualWeapon() != null) {
+            if (shooter.getActualWeapon().getPreviousTargets() != null)
                 prevTargets = shooter.getActualWeapon().getPreviousTargets();
+        }
+        else {
+            if (shooter.getActualCardPower() != null && shooter.getActualCardPower().getLastTarget() != null)
+                prevTargets = Collections.singletonList(shooter.getActualCardPower().getLastTarget());
+        }
         Square shooterPos;
         if(chainMove)
             shooterPos = shooter.getActualWeapon().getLastTargetSquare();
@@ -170,17 +176,21 @@ public class MovementEffect extends SimpleEffect {
                 if(minMove==0)
                     result.add(currentPosition);
                 for (int i = 1; i <= maxMove && tmp!=null; i++) {
-                    tmp = tmp.getNextSquare(currDirection);
-                    if (minMove <= i && maxMove >= i && tmp != null)
-                        result.add(tmp);
+                    if(tmp.getEdge(currDirection) != Edge.WALL) {
+                        tmp = tmp.getNextSquare(currDirection);
+                        if (minMove <= i && maxMove >= i && tmp != null)
+                            result.add(tmp);
+                    }
+                    else
+                        i = maxMove+1;
                 }
             }
             else {
                 List<Square> squares = shooter.getGame().getMap().getAllSquares();
                 for(Square s : squares){
-                    if(s.getX()!=currentPosition.getX() || s.getY()!=currentPosition.getY())
-                        if(GameMap.distanceBtwSquares(s,currentPosition)>=minMove && GameMap.distanceBtwSquares(s,currentPosition)<=maxMove)
-                            result.add(s);
+                    //if(s.getX()!=currentPosition.getX() || s.getY()!=currentPosition.getY())
+                    if(GameMap.distanceBtwSquares(s,currentPosition)>=minMove && GameMap.distanceBtwSquares(s,currentPosition)<=maxMove)
+                        result.add(s);
                 }
             }
             if(visibilityAfter==TargetVisibility.VISIBLE) {
@@ -203,7 +213,8 @@ public class MovementEffect extends SimpleEffect {
      */
     @Override
     public void applyEffect(Player player, List<Target> targets){
-        player.move((Square)targets.get(0));
+        if(!player.getPosition().equals(targets.get(0)))
+            player.move((Square)targets.get(0));
     }
 
     @Override

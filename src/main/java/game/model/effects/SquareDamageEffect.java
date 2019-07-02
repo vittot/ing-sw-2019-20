@@ -125,6 +125,7 @@ public class SquareDamageEffect extends SimpleEffect {
             s = (Square) t;
             t.addDamage(shooter, damage);
             t.addThisTurnMarks(shooter, marks);
+            prevTargets.removeAll(s.getPlayers());
             prevTargets.addAll(s.getPlayers());
         }
         if (prevTargets.size() == 0) {

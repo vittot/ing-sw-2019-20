@@ -1002,8 +1002,8 @@ public class Game {
         this.gameObservers.remove(toRemove);
     }
 
-    void notifyDamage(Player hit, Player attacker, int damage){
-        gameObservers.forEach(o -> o.onDamage(hit,attacker,damage));
+    void notifyDamage(Player hit, Player attacker, int damage, int marksToRemove){
+        gameObservers.forEach(o -> o.onDamage(hit,attacker,damage, marksToRemove));
     }
 
     void notifyMarks(Player marked, Player marker, int marks)

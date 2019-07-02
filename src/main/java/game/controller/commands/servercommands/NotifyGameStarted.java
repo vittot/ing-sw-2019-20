@@ -13,10 +13,12 @@ public class NotifyGameStarted implements ServerGameMessage {
     private GameMap map;
     private List<Player> players;
     private int id = 0;
+    private List<Kill> killBoard;
 
-    public NotifyGameStarted(GameMap map, List<Player> players, int id) {
+    public NotifyGameStarted(GameMap map, List<Player> players, int id, List<Kill> killBoard) {
         this.map = map.copy();
         this.players = new ArrayList<>();
+        this.killBoard = killBoard;
         for(Player p : players)
         {
             this.players.add(new Player(p));
@@ -37,6 +39,10 @@ public class NotifyGameStarted implements ServerGameMessage {
 
     public GameMap getMap() {
         return map;
+    }
+
+    public List<Kill> getKillBoard() {
+        return killBoard;
     }
 
     @Override
