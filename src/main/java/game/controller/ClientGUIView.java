@@ -36,7 +36,13 @@ import javafx.stage.Stage;
 
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.sun.javafx.application.PlatformImpl.runLater;
 
 
 public class ClientGUIView extends Application implements View{
@@ -76,9 +82,23 @@ public class ClientGUIView extends Application implements View{
     private Button yes = new Button("Yes");
     private Button no = new Button("No");
     private Label text = new Label("");
-    private ClientState state;
+    private Label textNotify = new Label("");
+    private ClientState state = ClientState.WAITING_TURN;
     private Label textwait;
     private Tooltip toolw = new Tooltip("Right Click for more info");
+    private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+
+    private Runnable timert = new Runnable() {
+        @Override
+        public void run() {
+            System.out.println("TIMer");
+            state = ClientState.WAITING_ACTION;
+            yes.setVisible(false);
+            no.setVisible(false);
+            controller.getClient().sendMessage(new CounterAttackResponse());
+            runLater(GUI::chooseTurnActionPhase);
+        }
+    };
 
     private Stage sg = new Stage();
     private AudioClip loginBack;
@@ -225,28 +245,33 @@ public class ClientGUIView extends Application implements View{
         yes.setVisible(true);
         no.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
+            timer.shutdownNow();
             text.setText("Choose wich power Up you want to use");
             if(counterattack.size() > 1 ){
                 activateCardPower(counterattack);
-            }else
-                controller.getClient().sendMessage(new CounterAttackResponse(counterattack.get(0),shooter));
+            }else {
+                controller.getClient().sendMessage(new CounterAttackResponse(counterattack.get(0), shooter));
+                state = ClientState.WAITING_TURN;
+            }
             yes.setVisible(false);
             no.setVisible(false);
         });
         no.setOnMouseClicked(mouseEvent -> {
+            timer.shutdownNow();
             controller.getClient().sendMessage(new CounterAttackResponse());
             yes.setVisible(false);
             no.setVisible(false);
+            state = ClientState.WAITING_TURN;
         });
     }
 
     private void callRoomCreate(String s ){
 
         int mapId = 0;
-        if(s == "Map 1") mapId = 1;
-        if(s == "Map 2") mapId = 2;
-        if(s == "Map 3") mapId = 3;
-        if(s == "Map 4") mapId = 4;
+        if(s.equals("Map 1")) mapId = 1;
+        if(s.equals("Map 2")) mapId = 2;
+        if(s.equals("Map 3")) mapId = 3;
+        if(s.equals("Map 4")) mapId = 4;
         controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,user));
     }
 
@@ -318,7 +343,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void insufficientAmmoNotification() {
-        text.setText("Not enough ammo");
+        textNotify.setText("Not enough ammo");
     }
 
     @Override
@@ -381,7 +406,7 @@ public class ClientGUIView extends Application implements View{
         Button submit = new Button("Submit");
         sp.getChildren().add(submit);
         StackPane.setAlignment(submit,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(text,new Insets(0,10,10,0));
+        StackPane.setMargin(tex,new Insets(0,10,10,0));
         submit.setOnMouseClicked(mouseEvent -> {
             for(CheckBox c : check){
                 if(c.isSelected()){
@@ -409,46 +434,54 @@ public class ClientGUIView extends Application implements View{
         System.out.println("Turn action Phase");
         refreshMyPlayerCard();
         refreshMyPlayerAmmo();
-        text.setText("Choose your Action ");
-        state = ClientState.CHOOSEACTIOIN;
-        move.setVisible(true);
-        move.setDisable(false);
-        shoot.setVisible(true);
-        shoot.setDisable(false);
-        grab.setVisible(true);
-        grab.setDisable(false);
-        power.setVisible(true);
-        power.setDisable(false);
+        System.out.println(state);
+        if(state.equals(ClientState.CHOOSECOUNTER)){
+            text.setText("Fast, choose if you want to use counterattack!!!");
+            timer.schedule(timert,5, TimeUnit.SECONDS);
+        }
+        else{
+            text.setText("Choose your Action ");
+            state = ClientState.CHOOSEACTIOIN;
+            move.setVisible(true);
+            move.setDisable(false);
+            shoot.setVisible(true);
+            shoot.setDisable(false);
+            grab.setVisible(true);
+            grab.setDisable(false);
+            power.setVisible(true);
+            power.setDisable(false);
+        }
     }
+
 
     @Override
     public void invalidTargetNotification() {
-        text.setText("Invalid terget selected!");
+        textNotify.setText("Invalid terget selected!");
     }
 
     @Override
     public void invalidWeaponNotification() {
-        text.setText("Invalid weapon selected!");
+        textNotify.setText("Invalid weapon selected!");
     }
 
     @Override
     public void invalidActionNotification() {
-        text.setText("Invalid action!");
+        textNotify.setText("Invalid action!");
     }
 
     @Override
     public void insufficientNumberOfActionNotification() {
-        text.setText("You cannot do others actions for this turn!");
+        textNotify.setText("You cannot do others actions for this turn!");
     }
 
     @Override
     public void invalidStepNotification() {
-        text.setText("The step selected is not valid, you loose the action!! xd!!1!1!!");
+        textNotify.setText("The step selected is not valid, you loose the action!! xd!!1!1!!");
     }
 
     @Override
     public void maxNumberOfWeaponNotification() {
-        text.setText("You can't grab another weapon!");
+        textNotify.setText("You can't grab another weapon!");
     }
 
     @Override
@@ -459,15 +492,15 @@ public class ClientGUIView extends Application implements View{
         String nick = ClientContext.get().getMap().getPlayerById(shooterId).getNickName();
         String hitted = ClientContext.get().getMap().getPlayerById(hit).getNickName();
         if(shooterId == ClientContext.get().getMyID()){
-            text.setText("You dealt damage");
+            textNotify.setText("You dealt damage");
             refreshPlayerDamage();
         }
         else{
             if(hit == ClientContext.get().getMyID()){
-                text.setText(nick + " dealt damage to you");
+                textNotify.setText(nick + " dealt damage to you");
                 refreshMyPlayerDamage();
             }else{
-                text.setText(nick + " dealt damage to "+ hitted);
+                textNotify.setText(nick + " dealt damage to "+ hitted);
                 refreshPlayerDamage();
             }
         }
@@ -480,7 +513,10 @@ public class ClientGUIView extends Application implements View{
         AudioClip audio = new AudioClip(url);
         audio.play();
         String moved = ClientContext.get().getMap().getPlayerById(pId).getNickName();
-        text.setText("Player "+ moved + " moved!");
+        if(pId == ClientContext.get().getMyID())
+            textNotify.setText("You moved correctly");
+        else
+            textNotify.setText("Player "+ moved + " moved!");
         refreshPlayerPosition();
     }
 
@@ -491,7 +527,7 @@ public class ClientGUIView extends Application implements View{
             AudioClip audio = new AudioClip(url);
             audio.play();
         }
-        text.setText("Player "+kill.getKiller().getNickName() + " killed "+kill.getVictim().getNickName());
+        textNotify.setText("Player "+kill.getKiller().getNickName() + " killed "+kill.getVictim().getNickName());
         refreshDeaths();
     }
 
@@ -505,10 +541,10 @@ public class ClientGUIView extends Application implements View{
         if(pID == ClientContext.get().getMyID()){
             refreshMyPlayerCard();
             refreshMyPlayerAmmo();
-            text.setText("You grabbed "+name);
+            textNotify.setText("You grabbed "+name);
         }else{
             String pName = ClientContext.get().getMap().getPlayerById(pID).getNickName();
-            text.setText("Player "+pName+ " grabbed "+ name);
+            textNotify.setText("Player "+pName+ " grabbed "+ name);
         }
     }
 
@@ -516,16 +552,16 @@ public class ClientGUIView extends Application implements View{
     public void powerUpUsageNotification(int id, String name, String description) {
         if(id == ClientContext.get().getMyID()){
             refreshMyPlayerCard();
-            text.setText("You used "+name);
+            textNotify.setText("You used "+name);
         }else{
             String pName = ClientContext.get().getMap().getPlayerById(id).getNickName();
-            text.setText("Player "+pName+ " used "+ name);
+            textNotify.setText("Player "+pName+ " used "+ name);
         }
     }
 
     @Override
     public void choosePowerUpToRespawn(List<CardPower> cardPower) {
-        text.setText("Your turn: respawn");
+        textNotify.setText("Your turn: respawn");
         refreshMyPlayerCard();
         for(ImageView im : powerUp){
             if(!im.getId().equals("0")){
@@ -538,7 +574,7 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void notifyCompletedOperation(String message) {
         System.out.println("notifyOperationcomeplte");
-        text.setText(message);
+        textNotify.setText(message);
         if(!this.controller.getState().equals(ClientState.WAITING_START)){
             refreshMyPlayerCard();
             refreshMyPlayerAmmo();
@@ -547,17 +583,18 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyInvalidPowerUP() {
-        text.setText("Invalid Power Up");
+        textNotify.setText("Invalid Power Up");
     }
 
     @Override
     public void notifyInvalidGrabPosition() {
-        text.setText("Invalid position, no card ammo here");
+        textNotify.setText("Invalid position, no card ammo here");
     }
 
 
     @Override
     public void choosePowerUpToUse(List<CardPower> cardPower) {
+        System.out.println("ChoosePowerUptouse");
         List <CardPower> list = cardPower.stream().filter(x -> x.getName().equals("Targeting scope")).collect(Collectors.toList());
         int dim = list.size();
         if(dim > 0 ){
@@ -660,11 +697,14 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyInvalidMessage() {
-        text.setText("Invalid choise!");
+        textNotify.setText("Invalid choise!");
     }
 
     @Override
     public void notifyTurnChanged(int pID) {
+        System.out.println("Turn changed");
+        if(!state.equals(ClientState.CHOOSECOUNTER))
+            text.setText("");
         refreshWeaponCard();
         refreshAmmoCard();
         if(pID == ClientContext.get().getMyID())
@@ -674,9 +714,9 @@ public class ClientGUIView extends Application implements View{
             if( p == null)
                 p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == pID).findFirst().orElse(null);
             if(p == null)
-                text.setText("Player "+pID+ " turn! Wit your time.");
+                textNotify.setText("Player "+pID+ " turn! Wit your time.");
             else
-                text.setText("Player "+p.getNickName()+" turn! Wait yout turn.");
+                textNotify.setText("Player "+p.getNickName()+" turn! Wait yout turn.");
         }
     }
 
@@ -691,11 +731,11 @@ public class ClientGUIView extends Application implements View{
         String shooter = ClientContext.get().getMap().getPlayerById(idShooter).getNickName();
         if(idHitten == ClientContext.get().getMyID()) {
             refreshMyPlayerDamage();
-            text.setText("You got hitted by "+ shooter);
+            textNotify.setText("You got hitted by "+ shooter);
         }
         else {
             refreshPlayerDamage();
-            text.setText(hitted+" got hitted by "+ shooter);
+            textNotify.setText(hitted+" got hitted by "+ shooter);
         }
     }
 
@@ -706,8 +746,10 @@ public class ClientGUIView extends Application implements View{
         AudioClip audio = new AudioClip(url);
         audio.play();
         if(pID == ClientContext.get().getMyID()) {
+            textNotify.setText("You grabbed correctly!");
             refreshMyPlayerAmmo();
-        }
+        }else
+            textNotify.setText("Player "+ClientContext.get().getMap().getPlayerById(pID)+ "moved!" );
         refreshAmmoCard();
     }
 
@@ -824,6 +866,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
+        System.out.println("Reload");
         state = ClientState.CHOOSERELOAD;
         text.setText("You want to reload?");
         this.weaponsToReload = weaponsToReload;
@@ -853,7 +896,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void showReloadMessage(CardWeapon cW) {
-        text.setText("You correctly reload " + cW.getName());
+        textNotify.setText("You correctly reload " + cW.getName());
     }
 
     @Override
@@ -980,7 +1023,7 @@ public class ClientGUIView extends Application implements View{
         int j = 1;
         StackPane.setAlignment(none,Pos.TOP_LEFT);
         StackPane.setMargin(none,new Insets(100 + j , 0,0,40));
-        j++;
+        j = j + 35;
         for(FullEffect f : plusEffects){
             RadioButton eff = new RadioButton("Effect: "+f.getName());
             eff.setId(f.getName());
@@ -1067,12 +1110,12 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyPlayerSuspended(Player p) {
-        text.setText("Player "+ p.getNickName() + "got suspended!");
+        textNotify.setText("Player "+ p.getNickName() + "got suspended!");
     }
 
     @Override
     public void timeOutPhase() {
-        text.setText("You timed out and you have been kicked out!");
+        textNotify.setText("You timed out and you have been kicked out!");
         if(this.controller.getState() != ClientState.GAME_END) {
             try {
                 Thread.sleep(2000);
@@ -1088,7 +1131,7 @@ public class ClientGUIView extends Application implements View{
                     no.setVisible(false);
                     yes.setVisible(false);
                 } else
-                    text.setText("Game Finished");
+                    textNotify.setText("Game Finished");
             });
             no.setOnMouseClicked(mouseEvent -> this.controller.stopListening());
         }
@@ -1114,12 +1157,12 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void rejoinGameConfirm() {
-        text.setText("You successfully rejoin your previous game! Now wait for your turn..");
+        textNotify.setText("You successfully rejoin your previous game! Now wait for your turn..");
     }
 
     @Override
     public void notifyPlayerRejoin(Player p) {
-        text.setText("Player " + p.getNickName() + " has rejoined the game!");
+        textNotify.setText("Player " + p.getNickName() + " has rejoined the game!");
     }
 
     @Override
@@ -1253,8 +1296,15 @@ public class ClientGUIView extends Application implements View{
         text.setTextFill(Color.WHITE);
         text.setPrefWidth(screenWidth*52.5/100);
         text.setMaxHeight(screenHeight*3.25/100);
-        text.setWrapText(true);
-        map.getChildren().addAll(text, yes , no);
+        textNotify.setStyle("-fx-font: 20px Tahoma;");
+        textNotify.setWrapText(true);
+        textNotify.setTextFill(Color.WHITE);
+        textNotify.setPrefWidth(screenWidth*52.5/100);
+        textNotify.setMaxHeight(screenHeight*3.25/100);
+
+        map.getChildren().addAll(text, textNotify , yes , no);
+        StackPane.setAlignment(textNotify,Pos.BOTTOM_LEFT);
+        StackPane.setMargin(textNotify,new Insets(0,0,(screenHeight * 21 / 100),0));
         StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
         StackPane.setMargin(text,new Insets(0,0,(screenHeight * 17.7 / 100),0));
         StackPane.setAlignment(yes,Pos.BOTTOM_LEFT);
@@ -1541,6 +1591,7 @@ public class ClientGUIView extends Application implements View{
             ImageView imw = new ImageView(dash);
             map.getChildren().add(imw);
             playerDashBoard.add(imw);
+            imw.setOnMouseClicked(mouseEvent -> System.out.println(""+p.getId()));
             imw.setId(""+p.getId());
             imw.setFitWidth(screenWidth*36.6/100);
             imw.setPreserveRatio(true);
@@ -1768,7 +1819,7 @@ public class ClientGUIView extends Application implements View{
         refreshPlayerDamage();
         refreshMyPlayerDamage();
         refreshMyPlayerAmmo();
-        text.setText("Wait Your Turn:");
+        textNotify.setText("Wait Your Turn:");
     }
 
     /**
@@ -1786,7 +1837,7 @@ public class ClientGUIView extends Application implements View{
     private void handleSquareClick(MouseEvent e){
         Square choosenSquare;
         int i = Integer.parseInt(((Rectangle)e.getSource()).getId());
-        text.setText("You selected square in: " + (i-1)/4 + ", " + (i-1)%4);
+        textNotify.setText("You selected square in: " + (i-1)/4 + ", " + (i-1)%4);
         choosenSquare = possiblePositions.stream().filter( p -> p.getX() == (i-1)%4 && p.getY() == (i-1)/4).findFirst().orElse(null);
         controller.getClient().sendMessage(new ChooseSquareResponse(choosenSquare));
         this.possiblePositions = null;
@@ -1856,7 +1907,7 @@ public class ClientGUIView extends Application implements View{
                         if (weaponG.getPrice().size() == 1) {
                             controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
                         } else {
-                            list = possibleCardPowerToPay(weaponG.getPrice());
+                            list = possibleCardPowerToPay(weaponG.getPrice().subList(1,weaponG.getPrice().size()));
                             if (list.size() != 0)
                                 choosePowerUpToPay(list);
                             else
@@ -1891,6 +1942,7 @@ public class ClientGUIView extends Application implements View{
                     System.out.println("selected reload " + selected.getName());
                     disableMyWeapon();
                     if (selected != null) {
+                        weaponToReload = selected;
                         price = selected.getPrice();
                         list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
                         choosePowerUpToPay(list);
@@ -2045,8 +2097,10 @@ public class ClientGUIView extends Application implements View{
      */
     private void handlePowerUpClick(MouseEvent e){
         CardPower p = ClientContext.get().getMyPlayer().getCardPower().stream().filter(l->l.getId() == Integer.parseInt(((ImageView)e.getSource()).getId())).findFirst().orElse(null);
-        if(state.equals(ClientState.CHOOSECOUNTER))
-            controller.getClient().sendMessage(new CounterAttackResponse(p,shooter));
+        if(state.equals(ClientState.CHOOSECOUNTER)) {
+            controller.getClient().sendMessage(new CounterAttackResponse(p, shooter));
+            state = ClientState.WAITING_TURN;
+        }
         if(state.equals(ClientState.CHOOSECARDPOWER))
             controller.getClient().sendMessage(new ChoosePowerUpResponse(p));
         if(state.equals(ClientState.CHOOSESCOPE)){
@@ -2120,7 +2174,7 @@ public class ClientGUIView extends Application implements View{
                 state = ClientState.CHOOSECARDPOWER;
                 List<CardPower> powerList = ClientContext.get().getMyPlayer().getCardPower().stream().filter(c -> !c.isUseWhenAttacking() && !c.isUseWhenDamaged()).collect(Collectors.toList());
                 if(powerList.isEmpty()) {
-                    text.setText("There are no power-up cards available for use in this moment!");
+                    textNotify.setText("There are no power-up cards available for use in this moment!");
                     chooseStepActionPhase();
                 }
                 else
