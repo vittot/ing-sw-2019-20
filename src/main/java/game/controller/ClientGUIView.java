@@ -512,6 +512,7 @@ public class ClientGUIView extends Application implements View{
         String url = getClass().getResource("/graphics/sound/move.wav").toExternalForm();
         AudioClip audio = new AudioClip(url);
         audio.play();
+        System.out.println("moved");
         String moved = ClientContext.get().getMap().getPlayerById(pId).getNickName();
         if(pId == ClientContext.get().getMyID())
             textNotify.setText("You moved correctly");
@@ -950,6 +951,8 @@ public class ClientGUIView extends Application implements View{
         no.setOnMouseClicked(mouseEvent -> {
             if(price != null)
                 choosePowerUpToPay(price);
+            else
+                controller.getClient().sendMessage(new ChooseFirstEffectResponse(2,null));
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -1617,7 +1620,8 @@ public class ClientGUIView extends Application implements View{
             Image dash = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.getColor().toString()+"Dash.png"));
             ImageView imw = new ImageView(dash);
             map.getChildren().add(imw);
-            playerDashBoard.add(imw);
+            if(p.getId() == ClientContext.get().getMyID())
+                playerDashBoard.add(imw);
             imw.setOnMouseClicked(mouseEvent -> System.out.println(""+p.getId()));
             imw.setId(""+p.getId());
             imw.setFitWidth(screenWidth*36.6/100);
@@ -1673,6 +1677,18 @@ public class ClientGUIView extends Application implements View{
                 StackPane.setMargin(marks, new Insets(screenHeight * 0.4 / 100 + spaceY, screenWidth * 18 / 100 - spaceX, 0, 0));
                 spaceX = spaceX + screenWidth * 1 / 100;
             }
+
+            for(PlayerColor c : p.getThisTurnMarks()){
+                Image mark = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
+                ImageView marks = new ImageView(mark);
+                infoM.add(marks);
+                marks.setFitHeight(screenHeight * 2 / 100);
+                marks.setPreserveRatio(true);
+                map.getChildren().add(marks);
+                StackPane.setAlignment(marks, Pos.TOP_RIGHT);
+                StackPane.setMargin(marks, new Insets(screenHeight * 0.4 / 100 + spaceY, screenWidth * 18 / 100 - spaceX, 0, 0));
+                spaceX = spaceX + screenWidth * 1 / 100;
+            }
             spaceY = spaceY + screenHeight * 18.5 / 100;
             playerDamage.add(infoD);
             playerMarks.add(infoM);
@@ -1698,7 +1714,14 @@ public class ClientGUIView extends Application implements View{
         playerDamage.clear();
         playerMarks.clear();
     }
-
+    private synchronized ImageView createMyTear(String color){
+        Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+color+"Tear.png"));
+        ImageView damages = new ImageView(damage);
+        myPlayerDamage.add(damages);
+        damages.setPreserveRatio(true);
+        map.getChildren().add(damages);
+        return  damages;
+    }
     /**
      * refresh  my player damage and marks
      */
@@ -1707,12 +1730,8 @@ public class ClientGUIView extends Application implements View{
         int j = 0;
         deleteMyPlayerDamage();
         for(PlayerColor p : ClientContext.get().getMyPlayer().getDamage()){
-            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.toString()+"Tear.png"));
-            ImageView damages = new ImageView(damage);
-            myPlayerDamage.add(damages);
+            ImageView damages = createMyTear(p.toString());
             damages.setFitHeight(screenHeight * 3 /100);
-            damages.setPreserveRatio(true);
-            map.getChildren().add(damages);
             StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
             StackPane.setMargin(damages,new Insets(0,0,screenHeight * 6.25 / 100,screenWidth * 3.44 / 100 + spaceX));
             spaceX = spaceX + screenWidth * 2.25 / 100;
@@ -1722,12 +1741,15 @@ public class ClientGUIView extends Application implements View{
         }
         spaceX = 0;
         for(PlayerColor p : ClientContext.get().getMyPlayer().getMark()){
-            Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.toString()+"Tear.png"));
-            ImageView damages = new ImageView(damage);
-            myPlayerMarks.add(damages);
+            ImageView damages = createMyTear(p.toString());
             damages.setFitHeight(screenHeight * 2 /100);
-            damages.setPreserveRatio(true);
-            map.getChildren().add(damages);
+            StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
+            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 17.6 / 100 + spaceX));
+            spaceX = spaceX + screenWidth * 1 / 100;
+        }
+        for(PlayerColor p : ClientContext.get().getMyPlayer().getThisTurnMarks()){
+            ImageView damages = createMyTear(p.toString());
+            damages.setFitHeight(screenHeight * 2 /100);
             StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
             StackPane.setMargin(damages,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 17.6 / 100 + spaceX));
             spaceX = spaceX + screenWidth * 1 / 100;
@@ -1950,7 +1972,7 @@ public class ClientGUIView extends Application implements View{
                         controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
                     }
                     disableMyWeapon();
-                    price = weaponG.getPrice();
+                    price = weaponG.getPrice().subList(1,weaponG.getPrice().size());
                     list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
                     if (list.size() != 0)
                         choosePowerUpToPay(list);
@@ -1972,7 +1994,10 @@ public class ClientGUIView extends Application implements View{
                         weaponToReload = selected;
                         price = selected.getPrice();
                         list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
-                        choosePowerUpToPay(list);
+                        if(list.size() == 0)
+                            choosePowerUpToPay(list);
+                        else
+                            reloadRequests.add(new ReloadWeaponRequest(weaponToReload,null));
                         weaponsToReload.remove(weaponToReload);
                     }
                     break;
