@@ -12,9 +12,8 @@ public class CreateWaitingRoomRequest implements ClientGameMessage {
     private int numWaitingPlayers;
     private String creatorNicknme;
 
-    public CreateWaitingRoomRequest(int mapId, int numWaitingPlayers, String creatorNicknme) {
+    public CreateWaitingRoomRequest(int mapId, String creatorNicknme) {
         this.mapId = mapId;
-        this.numWaitingPlayers = numWaitingPlayers;
         this.creatorNicknme = creatorNicknme;
     }
 

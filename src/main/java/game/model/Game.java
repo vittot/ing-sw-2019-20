@@ -25,8 +25,8 @@ public class Game {
     private List<Kill> killBoard;
     private Player firstPlayerToPlay;
     private Turn currentTurn;
-    public static final int MAXPLAYERS = 5;
-    public static int TIME_FOR_ACTION = 300000; //TODO: read from config file
+    static final int MAXPLAYERS = 5;
+    //public static int TIME_FOR_ACTION = 300000;
     private static final List<Integer> POINTSCOUNT;
     private int killboardSize = 8;
     private List<GameListener> gameObservers;
@@ -65,7 +65,6 @@ public class Game {
         this.firstPlayerToPlay = this.players.get(0);
         players.stream().forEach(p -> p.setGame(this));
         readDeck("effectFile.xml");
-        //readMap(mapId, "mapFile.xml");
         this.map = new GameMap(GameManager.get().getMap(mapId));
         readPowerUpDeck("powerupFile.xml");
         readAmmoDeck("ammoFile.xml");
@@ -76,7 +75,7 @@ public class Game {
 
     }
 
-    public Player getFirstPlayerToPlay() {
+    Player getFirstPlayerToPlay() {
         return firstPlayerToPlay;
     }
 
@@ -166,9 +165,9 @@ public class Game {
 
 
         } catch (JDOMException e1) {
-            //TODO ecce
+            return null;
         } catch (IOException e1) {
-            //TODO ecc
+            return null;
         }
         if(grid != null){
             map.setDescription(desc);

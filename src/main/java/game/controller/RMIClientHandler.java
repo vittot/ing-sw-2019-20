@@ -98,7 +98,7 @@ public class RMIClientHandler extends ClientHandler implements IRMIClientHandler
     @Override
     public void register(RemoteClient client) throws RemoteException {
         this.client = client;
-        startPing(PING_INTERVAL);
+        startPing(Configuration.PING_INTERVAL_MS);
        // UnicastRemoteObject.unexportObject(this, false);
     }
 

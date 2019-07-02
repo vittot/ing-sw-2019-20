@@ -828,60 +828,57 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(w != null) {
             int n;
             n = w.addWaitingPlayer(this, joinWaitingRoomRequest.getNickName());
-            if (n != w.getNumWaitingPlayers()) {
+            //if (n != w.getNumWaitingPlayers()) {
                 return new JoinWaitingRoomResponse(n, w);
-            } else {
-                clientHandler.sendMessage(new JoinWaitingRoomResponse(n,w));
-                for (ServerController sc : w.getServerControllers()) {
-                    //TODO: moved in clienthandler sc.getCurrPlayer().setSerializeEverything(true);
-                    /*if (sc != this) {
-                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getPlayers(), sc.getModel().getMap()));
-                    } else {*/
-                        sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getMap(), sc.getModel().getPlayers(), sc.getCurrPlayer().getId(), sc.getModel().getKillBoard()));
+            /*} else {
 
-                    //}
-                    if (model.getCurrentTurn().getCurrentPlayer() != sc.getCurrPlayer())
-                        sc.getClientHandler().sendMessage(new OperationCompletedResponse("Wait your turn.."));
-
-                }
-
-                for (ServerController sc : w.getServerControllers()) {
-                    if (sc != this) {
-                        if (model.getCurrentTurn().getCurrentPlayer() == sc.getCurrPlayer()) {
-                            CardPower cp = model.drawPowerUp();
-                            sc.getCurrPlayer().addCardPower(cp);
-                            //sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
-                            model.getCurrentTurn().startTimer();
-                            sc.getClientHandler().sendMessage(new RespawnRequest(cp));
-
-                        } //else
-                            //sc.getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!\nWait your turn.."));
-
-                    }
-
-
-                }
-
-
-                if (model.getCurrentTurn().getCurrentPlayer() == getCurrPlayer()) {
-                    CardPower cp = model.drawPowerUp();
-                    getCurrPlayer().addCardPower(cp);
-                    getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
-                    model.getCurrentTurn().startTimer();
-                    return new RespawnRequest(cp);
-                }
-
-                return new OperationCompletedResponse("");
-
-            }
+            }*/
         }
 
         return new InvalidMessageResponse("The indicated room id does not exist on the Server");
     }
 
+    /**
+     * Send NotifyGameStarted and RespawnRequest
+     * @param w
+     */
+    public void launchGame(WaitingRoom w)
+    {
+        for (ServerController sc : w.getServerControllers()) {
+            sc.getClientHandler().sendMessage(new NotifyGameStarted(sc.getModel().getMap(), sc.getModel().getPlayers(), sc.getCurrPlayer().getId(), sc.getModel().getKillBoard()));
+
+            if (model.getCurrentTurn().getCurrentPlayer() != sc.getCurrPlayer())
+                sc.getClientHandler().sendMessage(new OperationCompletedResponse("Wait your turn.."));
+
+        }
+
+        for (ServerController sc : w.getServerControllers()) {
+            //if (sc != this) {
+                if (model.getCurrentTurn().getCurrentPlayer() == sc.getCurrPlayer()) {
+                    CardPower cp = model.drawPowerUp();
+                    sc.getCurrPlayer().addCardPower(cp);
+                    model.getCurrentTurn().startTimer();
+                    sc.getClientHandler().sendMessage(new RespawnRequest(cp));
+
+                }
+
+            //}
+        }
+
+
+        /*if (model.getCurrentTurn().getCurrentPlayer() == getCurrPlayer()) {
+            CardPower cp = model.drawPowerUp();
+            getCurrPlayer().addCardPower(cp);
+            //getClientHandler().sendMessage(new OperationCompletedResponse("Game has started!"));
+            model.getCurrentTurn().startTimer();
+            getClientHandler().sendMessage(new RespawnRequest(cp));
+        }*/
+
+    }
+
     @Override
     public ServerGameMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest) {
-        WaitingRoom w = gameManager.addWaitingRoom(createWaitingRoomRequest.getMapId(),createWaitingRoomRequest.getNumWaitingPlayers());
+        WaitingRoom w = gameManager.addWaitingRoom(createWaitingRoomRequest.getMapId());
         int n=w.addWaitingPlayer(this, createWaitingRoomRequest.getCreatorNicknme());
         return new CreateWaitingRoomResponse(n);
     }
@@ -1002,7 +999,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             else
                 this.state = ServerState.WAITING_SPAWN;
             gameManager.rejoinUser(rejoinGameResponse.getUser());
-            this.clientHandler.startPing(ClientHandler.PING_INTERVAL);
+            this.clientHandler.startPing(Configuration.PING_INTERVAL_MS);
             return new RejoinGameConfirm(model.getMap(),model.getPlayers(),id);
         }
         else

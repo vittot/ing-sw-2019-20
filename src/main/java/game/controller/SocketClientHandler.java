@@ -71,7 +71,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
     @Override
     public void run() {
 
-        startPing(PING_INTERVAL);
+        startPing(Configuration.PING_INTERVAL_MS);
         try {
             do {
                 ClientMessage inMsg = (ClientMessage) inStream.readObject();

@@ -19,8 +19,8 @@ public abstract class ClientHandler implements GameListener {
     ScheduledExecutorService pingTimer;
     private ScheduledExecutorService periodicPingTimer;
     int nPingLost = 0;
-    static final int PING_WAITING_TIME_MS = 4000;
-    static final int PING_INTERVAL = 20000;
+    //static final int PING_WAITING_TIME_MS = 4000;
+    //static final int PING_INTERVAL = 20000;
     boolean stop;
     protected String username;
 
@@ -69,7 +69,7 @@ public abstract class ClientHandler implements GameListener {
         pingTimer = Executors.newScheduledThreadPool(1);
         Runnable task = ()-> {
             try {
-                pingClient(PING_WAITING_TIME_MS);
+                pingClient(Configuration.PING_WAITING_TIME_MS);
             }catch(Exception e){
                 e.printStackTrace();
             }

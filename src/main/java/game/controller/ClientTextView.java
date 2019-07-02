@@ -462,13 +462,13 @@ public class ClientTextView implements  View {
                 mapId = readInt();
             } while (mapId < 1 || mapId > availableMaps.size());
 
-            do {
+            /*do {
                 writeText("Enter the number of player to start the game [3-5]:");
                 nPlayer = readInt();
-            } while (nPlayer < 3 || nPlayer > 5);
+            } while (nPlayer < 3 || nPlayer > 5);*/
         }
 
-        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,nPlayer,ClientContext.get().getUser()));
+        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,ClientContext.get().getUser()));
     }
 
     /**

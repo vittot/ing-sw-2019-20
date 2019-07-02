@@ -14,7 +14,7 @@ class WaitingRoomTest {
 
     @Test
     void serializeTest() throws IOException, ClassNotFoundException {
-        WaitingRoom w = new WaitingRoom(1,1,3);
+        WaitingRoom w = new WaitingRoom(1,1);
         ServerController s = mock(ServerController.class);
         ServerController s2 = mock(ServerController.class);
         w.addWaitingPlayer(s, "aa");

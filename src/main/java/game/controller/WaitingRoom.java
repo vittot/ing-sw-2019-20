@@ -8,22 +8,28 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class WaitingRoom implements Serializable {
     private int id;
     private transient Map<ServerController,Player> players;
     private int numWaitingPlayers;
     private int mapId;
+    private final int N_MINIMUM_PLAYERS = 3;
+    private final int NUM_PLAYERS = 5;
+    private transient ScheduledExecutorService timer;
 
-    public WaitingRoom(int id, int mapId, int numWaitingPlayers)
+    public WaitingRoom(int id, int mapId)
     {
         this.mapId = mapId;
         this.id = id;
         players = new HashMap<>();
-        this.numWaitingPlayers = numWaitingPlayers;
+        this.numWaitingPlayers = NUM_PLAYERS;
     }
 
-    public int getNumWaitingPlayers() {
+    int getNumWaitingPlayers() {
         return numWaitingPlayers;
     }
 
@@ -46,7 +52,7 @@ public class WaitingRoom implements Serializable {
      * Add a waiting client in this room, when the room is full it starts the game and notify the clients about it
      * @param s
      */
-    public int addWaitingPlayer(ServerController s, String nick)
+    int addWaitingPlayer(ServerController s, String nick)
     {
         int n = players.size();
         Player p = new Player(n+1, PlayerColor.values()[n],nick);
@@ -55,32 +61,74 @@ public class WaitingRoom implements Serializable {
         players.put(s,p);
         s.setWaitingRoom(this);
         if(players.size() == numWaitingPlayers){
-            Game g = GameManager.get().addGame(mapId,new ArrayList<>(players.values()));
-            GameManager.get().removeWaitingRoom(this);
-            g.refillMap();
-            for(Map.Entry<ServerController, Player> e: players.entrySet())
-            {
-                e.getKey().startGame(g, e.getValue());
-                g.addGameListener(e.getKey().getClientHandler());
-            }
-
+            startGame();
+        }
+        else if(players.size() == N_MINIMUM_PLAYERS)
+        {
+            startTimer();
         }
         return n+1;
 
     }
 
+    /**
+     * Start the waiting room timer at the end of which the game will be started
+     */
+    private void startTimer()
+    {
+        timer = Executors.newSingleThreadScheduledExecutor();
+        Runnable r = this::startGame;
+        timer.schedule(r,Configuration.WAITING_ROOM_TIMER_MS, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Reset the waiting room timer
+     */
+    private void stopTimer()
+    {
+        timer.shutdownNow();
+    }
+
+    /**
+     * Start the game
+     */
+    private void startGame()
+    {
+        Game g = GameManager.get().addGame(mapId,new ArrayList<>(players.values()));
+        GameManager.get().removeWaitingRoom(this);
+        g.refillMap();
+        for(Map.Entry<ServerController, Player> e: players.entrySet())
+        {
+            e.getKey().startGame(g, e.getValue());
+            g.addGameListener(e.getKey().getClientHandler());
+        }
+        players.entrySet().iterator().next().getKey().launchGame(this);
+
+
+    }
+
+    /**
+     * Notify all players that a new Player joined the waiting room
+     * @param p
+     */
     private void notifyPlayerJoin(Player p) {
        players.keySet().forEach(sc -> sc.notifyPlayerJoinedWaitingRoom(p));
     }
 
+    /**
+     * Remove a player from the waitingroom
+     * @param sc ServerController of the player which need to be removed
+     */
     public void removeWaitingPlayer(ServerController sc)
     {
         Player p = players.remove(sc);
         GameManager.get().getUsersLogged().remove(p.getNickName());
+        this.stopTimer();
         for(ServerController s: players.keySet())
         {
             s.notifyPlayerExitedFromWaitingRoom(p.getId());
         }
+
 
     }
 

@@ -99,8 +99,10 @@ public class Square implements Target, Serializable {
                 return edges[1];
             case DOWN:
                 return edges[2];
-            default:
+            case LEFT:
                 return edges[3];
+            default:
+                return null;
         }
     }
 
