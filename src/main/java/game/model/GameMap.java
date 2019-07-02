@@ -362,4 +362,11 @@ public class GameMap implements Serializable {
         result = 31 * result + Arrays.hashCode(grid);
         return result;
     }
+    public List<CardWeapon> getWeaponOnMap(){
+        List<CardWeapon> cp = new ArrayList<>();
+        for(Square sq : this.getSpawnpoints()){
+            sq.getWeapons().forEach( w -> cp.add(w));
+        }
+        return cp;
+    }
 }

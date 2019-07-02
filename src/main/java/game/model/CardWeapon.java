@@ -199,8 +199,7 @@ public class CardWeapon implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CardWeapon that = (CardWeapon) o;
-        return id == that.id &&
-                Objects.equals(name, that.name);
+        return id == that.id;
     }
 
     @Override
