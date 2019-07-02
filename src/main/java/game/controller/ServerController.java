@@ -149,7 +149,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     public ServerGameMessage handle(CounterAttackResponse counterAttackResponse) {
         if(counterAttackResponse.isConfirm()){
             if(getCurrPlayer().getCardPower().contains(counterAttackResponse.getCardPower())) {
-                model.getPlayer(counterAttackResponse.getToShoot().getId()).addThisTurnMarks(getCurrPlayer(), 1);
+                model.getMap().getPlayerById(counterAttackResponse.getToShoot().getId()).addThisTurnMarks(getCurrPlayer(), 1);
                 getCurrPlayer().removePowerUp(Collections.singletonList(counterAttackResponse.getCardPower()));
                 return new ChoosePowerUpUsed(counterAttackResponse.getCardPower());
             }
@@ -219,9 +219,10 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             return checkTurnEnd();
         }
         else {
-            List<Player> prevTargets = currPlayer.getActualWeapon().getPreviousTargets();
-            prevTargets.remove(toBeMoved);
-            prevTargets.add(toBeMoved);
+            CardWeapon cw = currPlayer.getActualWeapon();
+            List<Player> prev = cw.getPreviousTargets();
+            prev.remove(toBeMoved);
+            prev.add(toBeMoved);
             Square dest = toBeMoved.getPosition();
             currPlayer.getActualWeapon().setLastDirection(GameMap.getDirection(start,dest));
             return terminateFullEffect();
@@ -601,6 +602,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     return new ReloadWeaponAsk(weaponsToReload);
                 }
             }
+
             endTurnManagement();
 
             if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){

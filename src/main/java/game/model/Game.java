@@ -874,7 +874,7 @@ public class Game {
         }
         if(thisTurnKill.size()>1)
             thisTurnKill.get(0).getKiller().addPoints(1);
-        this.players.forEach(player::notifyPoints());
+        this.players.forEach(Player::notifyPoints);
         thisTurnKill.clear();
     }
 
