@@ -142,7 +142,7 @@ public class MovementEffect extends SimpleEffect {
 
         List<Target> retList = new ArrayList<>();
         for(Player p: targets){
-            if(selectPosition(p) != null)
+            if(!selectPosition(p).isEmpty())
                 retList.add(p);
         }
         return retList;

@@ -655,8 +655,8 @@ public class ClientTextView implements  View {
         Action choosenAction;
         String action;
         do{
-            //clearConsole();
-            //showMap(ClientContext.get().getMap());
+            clearConsole();
+            showMap(ClientContext.get().getMap());
             writeText("Choose the action you want to make between {MOVEMENT[M], GRAB[G], SHOOT[S]} (write info to see the details of the game, write power to use power-up cards): ");
             action = readText();
             action = action.toUpperCase();

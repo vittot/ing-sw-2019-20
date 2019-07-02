@@ -1325,7 +1325,7 @@
                 <damage>2</damage>
                 <marks>0</marks>
                 <lastTarget>false</lastTarget>
-                <differentTarget>Anyone</differentTarget>
+                <differentTarget>NotTheLast</differentTarget>
                 <chainTarget>false</chainTarget>
                 <sameDirection>true</sameDirection>
             </plainDamage>

@@ -236,6 +236,8 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         model.refillMap();
         model.getCurrentTurn().stopTimer();
         List<Player> toBeRespawned = model.changeTurn();
+        if(!model.getThisTurnKill().isEmpty())
+            model.addKill();
         toBeRespawned.forEach(Player::notifyRespawn);
         if(model.getnPlayerToBeRespawned() == 0)
             model.getCurrentTurn().newTurn(false); //TODO: check final frezy
@@ -1090,7 +1092,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     return new UsePlusEffectRequest(remainingPlusEffects);
                 else {
 
-                    return checkTurnEnd();
+                    return checkShootActionEnd();
                 }
             }
         }

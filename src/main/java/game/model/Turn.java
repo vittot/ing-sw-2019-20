@@ -76,8 +76,7 @@ public class Turn {
     public void newTurn(Player player, boolean finalFrezy){
 
         game.getPlayers().forEach(Player::updateMarks);
-        if(!game.getThisTurnKill().isEmpty())
-            game.addKill();
+
         currentPlayer = player;
 
         if(finalFrezy && player.equals(game.getFirstPlayerToPlay())){
