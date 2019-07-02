@@ -122,7 +122,7 @@ public class ClientTextView implements  View {
      * Starting phase during the player enter his username for the game
      */
     public void setUserNamePhase (){
-        Random r  = new Random();
+        //Random r  = new Random();
         do {
             writeText("Provide username:");
             ClientContext.get().setUser(readText());
@@ -153,7 +153,7 @@ public class ClientTextView implements  View {
         do {
                showWeapons(weaponsToReload,0,true, true, false);
             do {
-                writeText("Insert the id of a weapon you want to reload or -1 to terminate the reload phase:");
+                writeText("Insert the Fid of a weapon you want to reload or -1 to terminate the reload phase:");
                 n = readInt();
             } while (n != -1 && n < 1 && n > weaponsToReload.size());
             if(n != -1)
@@ -829,15 +829,24 @@ public class ClientTextView implements  View {
 
     /**
      *
-     * @param kill
+     * @param idKiller
+     * @param idVictim
+     * @param isRage
      */
     @Override
-    public void notifyDeath(Kill kill) {
-        System.out.print("Player "+kill.getVictim().getId()+" was killed by the player "+kill.getKiller().getId());
-        if(kill.isRage())
-            writeText(" that also has raged him!");
+    public void notifyDeath(int idKiller, int idVictim, boolean isRage) {
+        Player killer = ClientContext.get().getMap().getPlayerById(idKiller);
+        Player victim = ClientContext.get().getMap().getPlayerById(idVictim);
+        System.out.print(">> Player "+victim.getNickName()+" was killed by the player "+killer.getNickName());
+        if(isRage)
+            System.out.println(" that also has raged him!");
         else
             writeText("!");
+    }
+
+    @Override
+    public void notifyRage(Player killer, Player victim) {
+        writeText("Player "+killer.getNickName()+" raged player "+victim.getNickName()+"!");
     }
 
     /**
@@ -858,6 +867,7 @@ public class ClientTextView implements  View {
     public void showRanking(SortedMap<Player, Integer> ranking){
         int i=1;
         System.out.println("The game is over! \nLet's see the final results:");
+        ArrayList<Integer> points = new ArrayList<>(ranking.values());
         for(Player p : ranking.keySet()) {
             switch (i) {
                 case 1:
@@ -876,8 +886,8 @@ public class ClientTextView implements  View {
                     System.out.print(">>> Fifth place : ");
                     break;
             }
+            System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+points.get(i-1) +".");
             i++;
-            System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+ranking.get(p) +".");
         }
         restartGamePhase();
         
@@ -1463,6 +1473,14 @@ public class ClientTextView implements  View {
     @Override
     public void notifyReconnected() {
         writeText("Reconnected to the server!");
+    }
+
+    /**
+     * Show updated points
+     */
+    @Override
+    public void showPoints() {
+        writeText("Your new points are " + ClientContext.get().getMyPlayer().getPoints());
     }
 
     @Override

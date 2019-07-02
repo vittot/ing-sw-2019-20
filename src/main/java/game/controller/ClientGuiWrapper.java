@@ -2,7 +2,6 @@ package game.controller;
 
 import game.model.*;
 import game.model.effects.FullEffect;
-import game.model.effects.SimpleEffect;
 
 import java.util.List;
 import java.util.SortedMap;
@@ -93,8 +92,8 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
-    public void notifyDeath(Kill kill) {
-        runLater(()->gui.notifyDeath(kill));
+    public void notifyDeath(int idKiller, int idVictim, boolean rage) {
+        runLater(()->gui.notifyDeath(idKiller, idVictim, rage));
     }
 
     @Override
@@ -290,5 +289,15 @@ public class ClientGuiWrapper implements View {
     @Override
     public void notifyReconnected() {
         runLater( ()->gui.notifyReconnected());
+    }
+
+    @Override
+    public void showPoints() {
+        runLater(()->gui.showPoints());
+    }
+
+    @Override
+    public void notifyRage(Player killer, Player victim) {
+
     }
 }

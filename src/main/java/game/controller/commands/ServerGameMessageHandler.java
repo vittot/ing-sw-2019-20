@@ -64,4 +64,6 @@ public interface ServerGameMessageHandler {
     void handle(UpdateMarks updateMarks);
     void handle(ChoosePowerUpUsed choosePowerUpUsed);
     void handle(AddPayment addPayment);
+    void handle(NotifyPoints notifyPoints);
+    void handle(NotifyRage notifyRage);
 }

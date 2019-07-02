@@ -2,7 +2,6 @@ package game.controller;
 
 import game.controller.commands.ClientGameMessage;
 import game.controller.commands.ServerGameMessageHandler;
-import game.controller.commands.ServerMessageHandler;
 import game.controller.commands.clientcommands.GetAvailableMapsRequest;
 import game.controller.commands.clientcommands.GrabActionRequest;
 import game.controller.commands.clientcommands.LoginMessage;
@@ -213,13 +212,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(NotifyDeathResponse serverMsg) {
-        ClientContext instance = ClientContext.get();
-        Player killer = ClientContext.get().getMap().getPlayerById(serverMsg.getIdKiller());
-        Player victim = ClientContext.get().getMap().getPlayerById(serverMsg.getIdVictim());
-        Kill kill = new Kill(killer,victim,serverMsg.isRage());
-        instance.getKillboard().add(kill);
-        clientView.notifyDeath(kill);
-        //TODO Update death view methods(kill), pass a kill is a problem (????????)
+        clientView.notifyDeath(serverMsg.getIdKiller(),serverMsg.getIdVictim(),serverMsg.isRage());
         return;
 
     }
@@ -492,6 +485,7 @@ public class ClientController implements ServerGameMessageHandler {
         if(p.getId() == ClientContext.get().getMyID())
             this.state = ClientState.WAITING_ACTION;
         ClientContext.get().getPlayersInWaiting().remove(p);
+        p.getDamage().clear();
         clientView.notifyRespawn(notifyRespawn.getpId());
     }
 
@@ -694,6 +688,21 @@ public class ClientController implements ServerGameMessageHandler {
         catch(InsufficientAmmoException e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Update player points
+     * @param notifyPoints
+     */
+    @Override
+    public void handle(NotifyPoints notifyPoints) {
+        ClientContext.get().getMyPlayer().setPoints(notifyPoints.getPoints());
+        clientView.showPoints();
+    }
+
+    @Override
+    public void handle(NotifyRage notifyRage) {
+        clientView.notifyRage(notifyRage.getKiller(), notifyRage.getVictim());
     }
 
     @Override

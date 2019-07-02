@@ -46,8 +46,8 @@ import static com.sun.javafx.application.PlatformImpl.runLater;
 
 
 public class ClientGUIView extends Application implements View{
-    public static ClientGUIView GUI;
-    public ClientController controller;
+    private static ClientGUIView GUI;
+    private ClientController controller;
     private String user;
     private Stage primaryStage;
     private double screenWidth = Screen.getScreens().get(0).getBounds().getWidth();
@@ -521,14 +521,19 @@ public class ClientGUIView extends Application implements View{
     }
 
     @Override
-    public void notifyDeath(Kill kill) {
-        if(kill.getVictim().getId() == ClientContext.get().getMyID()){
+    public void notifyDeath(int idKiller, int idVictim, boolean rage) {
+        if(idKiller == ClientContext.get().getMyID()){
             String url = getClass().getResource("/graphics/sound/death.wav").toExternalForm();
             AudioClip audio = new AudioClip(url);
             audio.play();
         }
-        textNotify.setText("Player "+kill.getKiller().getNickName() + " killed "+kill.getVictim().getNickName());
+        textNotify.setText("Player "+ClientContext.get().getMap().getPlayerById(idKiller).getNickName() + " killed "+ClientContext.get().getMap().getPlayerById(idVictim).getNickName());
         refreshDeaths();
+    }
+
+    @Override
+    public void notifyRage(Player killer, Player victim) {
+
     }
 
     @Override
@@ -1180,6 +1185,11 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void notifyReconnected() {
+        //TODO
+    }
+
+    @Override
+    public void showPoints() {
         //TODO
     }
 

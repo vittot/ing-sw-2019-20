@@ -17,10 +17,10 @@ public class XMLParser {
     public static void readConfigFile()
     {
         SAXBuilder builder = new SAXBuilder();
-        Document document = null;
+        Document document;
         try
         {
-            document = builder.build(ClassLoader.getSystemClassLoader().getResourceAsStream("XML/config.xml"));
+            document = builder.build(new File("config.xml"));
             Element root = document.getRootElement();
             int turnTimerMs = Integer.parseInt(root.getChildText("turnTimerMs"));
             int waitingRoomTimerMs = Integer.parseInt(root.getChildText("waitingRoomTimerMs"));
