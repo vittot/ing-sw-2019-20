@@ -134,12 +134,8 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(!selectableTarget.containsAll(selectedTargets)) {
             clientHandler.sendMessage(new InvalidTargetResponse());
             return checkShootActionEnd();
-        }/*
-        if(!validateSelectedTargets(selectedTargets,currSimpleEffect)){
-            clientHandler.sendMessage(new InvalidTargetResponse());
-            return checkTurnEnd();
-        }*/
-        //in case no target has been selected (and it's allowed) it stops
+        }
+
         if(selectedTargets.isEmpty())
             return new OperationCompletedResponse("");
         toApplyEffect = new ArrayList<>();

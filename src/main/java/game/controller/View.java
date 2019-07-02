@@ -39,8 +39,6 @@ public interface View {
 
     void notifyMovement(int pId, int newX, int newY);
 
-    void notifyDeath(Kill kill);
-
     void grabWeaponNotification(int pID, String name, int x, int y);
 
     void powerUpUsageNotification(int id, String name, String description);
@@ -119,4 +117,7 @@ public interface View {
 
     void chooseCounterAttack(List<CardPower> counterattack, Player shooter);
 
+    void notifyDeath(int idKiller, int idVictim, boolean rage);
+
+    void notifyRage(Player killer, Player victim);
 }

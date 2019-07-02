@@ -677,7 +677,7 @@
                 <damage>1</damage>
                 <marks>0</marks>
                 <lastTarget>true</lastTarget>
-                <differentTarget>NoneOfThePrevious</differentTarget>
+                <differentTarget>Anyone</differentTarget>
                 <chainTarget>true</chainTarget>
                 <sameDirection>false</sameDirection>
             </plainDamage>

@@ -93,8 +93,8 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
-    public void notifyDeath(Kill kill) {
-        runLater(()->gui.notifyDeath(kill));
+    public void notifyDeath(int idKiller, int idVictim, boolean rage) {
+        runLater(()->gui.notifyDeath(idKiller, idVictim, rage));
     }
 
     @Override
@@ -285,5 +285,10 @@ public class ClientGuiWrapper implements View {
     @Override
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
         runLater( () ->gui.chooseCounterAttack(counterattack,shooter));
+    }
+
+    @Override
+    public void notifyRage(Player killer, Player victim) {
+
     }
 }

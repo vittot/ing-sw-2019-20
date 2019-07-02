@@ -216,13 +216,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(NotifyDeathResponse serverMsg) {
-        ClientContext instance = ClientContext.get();
-        Player killer = ClientContext.get().getMap().getPlayerById(serverMsg.getIdKiller());
-        Player victim = ClientContext.get().getMap().getPlayerById(serverMsg.getIdVictim());
-        Kill kill = new Kill(killer,victim,serverMsg.isRage());
-        instance.getKillboard().add(kill);
-        clientView.notifyDeath(kill);
-        //TODO Update death view methods(kill), pass a kill is a problem (????????)
+        clientView.notifyDeath(serverMsg.getIdKiller(),serverMsg.getIdVictim(),serverMsg.isRage());
         return;
 
     }
@@ -682,6 +676,11 @@ public class ClientController implements ServerGameMessageHandler {
         catch(InsufficientAmmoException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void handle(NotifyRage notifyRage) {
+        clientView.notifyRage(notifyRage.getKiller(), notifyRage.getVictim());
     }
 
     @Override

@@ -20,4 +20,5 @@ public interface GameListener {
     void onReplaceWeapon(CardWeapon cw, Square s);
     void onReplaceAmmo(CardAmmo ca, Square s);
     void onPlayerUpdateMarks(Player player);
+    void onPlayerRaged(Kill lastKill);
 }

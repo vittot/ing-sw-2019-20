@@ -14,5 +14,5 @@ public enum ServerState {
     HANDLING_SHOOT,
     WAITING_POWER_USAGE,
     WAITING_POWER_TERMINATE,
-    GAME_ENDED;
+    GAME_ENDED
 }

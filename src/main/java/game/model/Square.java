@@ -99,8 +99,10 @@ public class Square implements Target, Serializable {
                 return edges[1];
             case DOWN:
                 return edges[2];
-            default:
+            case LEFT:
                 return edges[3];
+            default:
+                return null;
         }
     }
 
@@ -269,7 +271,7 @@ public class Square implements Target, Serializable {
         List<Square> result = map.getRoomSquares(c).stream().filter(s2 -> GameMap.distanceBtwSquares(this,s2)<=maxDist && GameMap.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList());
         for(Direction d : Direction.values())
         {
-            if(this.getEdge(d) == Edge.DOOR)
+            if(this.getEdge(d) != null && this.getEdge(d) == Edge.DOOR)
             {
                 next = this.getNextSquare(d);
                 result.addAll(map.getRoomSquares(next.getColor()).stream().filter(s2 -> GameMap.distanceBtwSquares(this,s2)<=maxDist && GameMap.distanceBtwSquares(this,s2)>=minDist).collect(Collectors.toList()));

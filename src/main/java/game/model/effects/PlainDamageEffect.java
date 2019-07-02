@@ -120,16 +120,16 @@ public class PlainDamageEffect extends SimpleEffect {
             {
 
                 case UP:
-                    targets = targets.stream().filter(t -> t.getPosition().getY() < lastTargPos.getY()).collect(Collectors.toList());
+                    targets = targets.stream().filter(t -> t.getPosition().getY() <= lastTargPos.getY()).collect(Collectors.toList());
                     break;
                 case DOWN:
-                    targets = targets.stream().filter(t -> t.getPosition().getY() > lastTargPos.getY()).collect(Collectors.toList());
+                    targets = targets.stream().filter(t -> t.getPosition().getY() >= lastTargPos.getY()).collect(Collectors.toList());
                     break;
                 case LEFT:
-                    targets = targets.stream().filter(t -> t.getPosition().getX() < lastTargPos.getX()).collect(Collectors.toList());
+                    targets = targets.stream().filter(t -> t.getPosition().getX() <= lastTargPos.getX()).collect(Collectors.toList());
                     break;
                 case RIGHT:
-                    targets = targets.stream().filter(t -> t.getPosition().getX() > lastTargPos.getX()).collect(Collectors.toList());
+                    targets = targets.stream().filter(t -> t.getPosition().getX() >= lastTargPos.getX()).collect(Collectors.toList());
                     break;
             }
         }

@@ -829,15 +829,24 @@ public class ClientTextView implements  View {
 
     /**
      *
-     * @param kill
+     * @param idKiller
+     * @param idVictim
+     * @param isRage
      */
     @Override
-    public void notifyDeath(Kill kill) {
-        System.out.print("Player "+kill.getVictim().getId()+" was killed by the player "+kill.getKiller().getId());
-        if(kill.isRage())
+    public void notifyDeath(int idKiller, int idVictim, boolean isRage) {
+        Player killer = ClientContext.get().getMap().getPlayerById(idKiller);
+        Player victim = ClientContext.get().getMap().getPlayerById(idVictim);
+        System.out.print(">> Player "+victim.getNickName()+" was killed by the player "+killer.getNickName());
+        if(isRage)
             writeText(" that also has raged him!");
         else
             writeText("!");
+    }
+
+    @Override
+    public void notifyRage(Player killer, Player victim) {
+        writeText("Player "+killer.getNickName()+" raged player "+victim.getNickName()+"!");
     }
 
     /**
