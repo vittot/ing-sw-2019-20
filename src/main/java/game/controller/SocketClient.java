@@ -10,22 +10,19 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.*;
 
-public class SocketClient extends Client implements ServerMessageHandler {
+public class SocketClient extends ClientNetwork implements ServerMessageHandler {
     private final String host;
     private final int port;
     private Socket socket;
     private Thread receiver;
-    private Thread processer;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outStream;
     private ClientController controller;
-    private LinkedBlockingQueue<ServerGameMessage> gameMessages;
 
     public SocketClient(String host, int port) {
+        super();
         this.host = host;
         this.port = port;
-        this.gameMessages = new LinkedBlockingQueue<>();
-        this.nPingLost = 0;
     }
 
     public boolean init() {
@@ -50,28 +47,7 @@ public class SocketClient extends Client implements ServerMessageHandler {
     public void startListening(ClientController handler)
     {
 
-        this.controller = handler;
-
-        this.disconnectionExecutor = Executors.newSingleThreadScheduledExecutor();
-        waitNextPing();
-
-        processer = new Thread(
-                () -> {
-                    do {
-                        ServerGameMessage msg = null;
-                        try {
-                            msg = gameMessages.poll(1, TimeUnit.MINUTES);
-                            if(msg != null) //it's null if timeout is elapsed
-                                msg.handle(controller);
-                        } catch (InterruptedException e) {
-                            return;
-                        }
-
-                    }while(!stop);
-                }
-        );
-        processer.setName("PROCESSER THREAD");
-        processer.start();
+        super.startListening(handler);
 
         receiver = new Thread(
 
@@ -162,7 +138,7 @@ public class SocketClient extends Client implements ServerMessageHandler {
             outStream.close();
             socket.close();
             receiver.interrupt();
-            processer.interrupt();
+            processor.interrupt();
         }catch(IOException e)
         {
             e.printStackTrace();

@@ -224,4 +224,9 @@ public abstract class ClientHandler implements GameListener {
     public void onPlayerRaged(Kill kill){
         sendMessage(new NotifyRage(kill));
     }
+
+    @Override
+    public void onFinalFrenzy() {
+        sendMessage(new NotifyFinalFrenzy());
+    }
 }

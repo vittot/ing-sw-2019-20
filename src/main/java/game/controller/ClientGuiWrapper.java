@@ -47,8 +47,8 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
-    public void chooseTurnActionPhase() {
-        runLater(gui::chooseTurnActionPhase);
+    public void chooseTurnActionPhase(boolean isMovementAllowed) {
+        runLater(()->gui.chooseTurnActionPhase(isMovementAllowed));
     }
 
     @Override
@@ -298,6 +298,16 @@ public class ClientGuiWrapper implements View {
 
     @Override
     public void notifyRage(Player killer, Player victim) {
+        runLater(()->gui.notifyRage(killer,victim));
+    }
 
+    @Override
+    public void showNoWeaponToReload() {
+        runLater(()->gui.showNoWeaponToReload());
+    }
+
+    @Override
+    public void notifyFinalFrenzy() {
+        runLater(()->gui.notifyFinalFrenzy());
     }
 }

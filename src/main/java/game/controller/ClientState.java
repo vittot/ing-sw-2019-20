@@ -14,7 +14,7 @@ public enum ClientState {                   //Used from GUI
     CHOOSECOUNTER,
     CHOOSECARDPOWER,
     CHOOSESCOPE,
-    WAITING_GRAB_WEAPON,                    //Used from Client Context
+    WAITING_GRAB_WEAPON,
     WAITING_GRAB_AMMO,
     WAITING_SHOOT,
     WAITING_ACTION,
@@ -22,5 +22,5 @@ public enum ClientState {                   //Used from GUI
     WAITING_SPAWN,
     WAITING_START,
     TIMED_OUT,
-    HANDLING_MOVEMENT, RECONNECTING, WAITING_TURN;
+    HANDLING_MOVEMENT, RECONNECTING, WAITING_TURN, WAITING_FINAL_RELOAD;
 }

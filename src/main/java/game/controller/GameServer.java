@@ -75,6 +75,8 @@ public class GameServer {
 
     /**
      * Remove the clientHandler for a given username
+     * @param user
+     * @param newHandler
      */
     public void removeHandler(String user, ClientHandler newHandler)
     {

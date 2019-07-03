@@ -21,6 +21,8 @@ public class Turn {
     private Timer timer; /** field that reference the timer object that allow the disconnection of the current player cause of a long time inactivity */
     private boolean afterFirstPlayer = false; /** field that recognize if the current player is playing after or before the player that starts the game */
     private List <Player> lastTurnPlayed;
+    private int nPlayedFinalFrenzy;
+    private boolean finalFrenzy;
 
     /**
      * construct a turn of a specific game
@@ -33,6 +35,9 @@ public class Turn {
         this.game = game;
         actionList = new ArrayList<>();
         numOfActions = 2;
+        finalFrenzy = false;
+        lastTurnPlayed = new ArrayList<>();
+        nPlayedFinalFrenzy = 0;
     }
 
     /**
@@ -75,6 +80,10 @@ public class Turn {
         return numOfMovs;
     }
 
+    public int getnPlayedFinalFrenzy() {
+        return nPlayedFinalFrenzy;
+    }
+
     /**
      * return the currentAction attribute
      * @return currentAction
@@ -99,6 +108,14 @@ public class Turn {
         this.numOfActions = numOfActions;
     }
 
+    public void setNumOfMovs(int numOfMovs) {
+        this.numOfMovs = numOfMovs;
+    }
+
+    public void setCurrentAction(Action currentAction) {
+        this.currentAction = currentAction;
+    }
+
     /**
      * provide the creation and good starting of a new turn
      * @param player , finalFrezy
@@ -108,6 +125,11 @@ public class Turn {
         game.getPlayers().forEach(Player::updateMarks);
 
         currentPlayer = player;
+
+        this.finalFrenzy = finalFrezy;
+
+        if(finalFrezy)
+            this.nPlayedFinalFrenzy++;
 
         if(finalFrezy && player.equals(game.getFirstPlayerToPlay())){
             this.afterFirstPlayer = true;
@@ -119,12 +141,14 @@ public class Turn {
             numOfMovs = 0;
             numOfActions = 1;
         }
-        if(finalFrezy && !afterFirstPlayer){
+        else if(finalFrezy && !afterFirstPlayer){
             numOfMovs = 0;
             numOfActions = 2;
         }
-        numOfActions = 2;
-        numOfMovs = 0;
+        else {
+            numOfActions = 2;
+            numOfMovs = 0;
+        }
         startTimer();
         game.notifyTurnChange(currentPlayer);
     }
@@ -160,7 +184,7 @@ public class Turn {
     public void stopTimer()
     {
         timer.cancel();
-        System.out.println("TIMER CANCELLED " + currentPlayer.getNickName());
+        //System.out.println("TIMER CANCELLED " + currentPlayer.getNickName());
     }
 
     /**
@@ -170,7 +194,7 @@ public class Turn {
      */
     public boolean applyStep(Action ac){
         //timer.cancel();
-        System.out.println("TIMER CANCELLED" + currentPlayer.getNickName()) ;
+
         int i = 0;
         currentPlayer.rifleActualWeapon();
         game.getPlayers().forEach(Player::updateMarks);
@@ -191,7 +215,7 @@ public class Turn {
      * @param action
      * @param adrenaline
      */
-    public List<Action> newAction(Action action, AdrenalineLevel adrenaline, boolean finalFreazy) throws NoResidualActionAvaiableException {
+    public List<Action> newAction(Action action, AdrenalineLevel adrenaline) throws NoResidualActionAvaiableException {
         actionList.clear();
         currentAction = action;
 
@@ -199,7 +223,7 @@ public class Turn {
             throw new NoResidualActionAvaiableException();
         }
         numOfActions = numOfActions - 1;
-        if(finalFreazy) {
+        if(finalFrenzy) {
             if (this.lastTurnPlayed.contains(currentPlayer)){
                 switch (action) {
                     case GRAB:
@@ -268,5 +292,22 @@ public class Turn {
         return actionList;
     }
 
-    
+
+    /**
+     * Return if the turn is the final frenzy turn
+     * @return
+     */
+    public boolean isFinalFrenzy() {
+        return finalFrenzy;
+    }
+
+    /**
+     * Check if the "movement" turn action is allowed
+     * @return
+     */
+    public boolean isMovAllowed() {
+        if(finalFrenzy && lastTurnPlayed.contains(currentPlayer))
+            return false;
+        return true;
+    }
 }

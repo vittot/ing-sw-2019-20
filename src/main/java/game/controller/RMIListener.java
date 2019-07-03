@@ -30,6 +30,7 @@ public class RMIListener extends UnicastRemoteObject implements IRMIListener {
     /**
      * Remove an RMIClientHandler
      * @param user username associated to the handler
+     * @param newHandler
      */
     public void removeRMIClientHandler(String user, ClientHandler newHandler)
     {
