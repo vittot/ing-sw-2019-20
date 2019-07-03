@@ -2188,7 +2188,7 @@ public class ClientGUIView extends Application implements View{
         System.out.println("ammo");
         if(state.equals(ClientState.CHOOSESCOPE)) {
             game.model.Color c = game.model.Color.valueOf(((Rectangle) e.getSource()).getId());
-            controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, c));
+            controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, c, null));
         }
         disableAmmo();
     }
