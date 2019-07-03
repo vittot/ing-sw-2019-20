@@ -48,46 +48,152 @@ import static com.sun.javafx.application.PlatformImpl.runLater;
 public class ClientGUIView extends Application implements View{
     private static ClientGUIView GUI;
     private ClientController controller;
+    /**
+     * User name choosed
+     */
     private String user;
+    /**
+     * Primary stage used for map print
+     */
     private Stage primaryStage;
+    /**
+     * screen width
+     */
     private double screenWidth = Screen.getScreens().get(0).getBounds().getWidth();
+    /**
+     * Screen height
+     */
     private double screenHeight = Screen.getScreens().get(0).getBounds().getHeight();
-    private List<GameMap> availableMaps;
 
 
+    /**
+     * Stule for buttons
+     */
     private final String orangeB = "-fx-background-color: linear-gradient(#ffd65b, #e68400), linear-gradient(#ffef84, #f2ba44), linear-gradient(#ffea6a, #efaa22), linear-gradient(#ffe657 0%, #f8c202 50%, #eea10b 100%), linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0)); -fx-background-radius: 24; -fx-background-insets: 0,1,2,3,0; -fx-text-fill: #654b00; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 7 16 7 16;";
 
+    /**
+     * Primary Pane of the game
+     */
     private StackPane map = new StackPane();
+    /**
+     * Scene of the map pane
+     */
     private Scene scene = new Scene(map);
+    /**
+     * Invisible square for every map square, for square click action
+     */
     private List<Rectangle> squares = new ArrayList<>();
+    /**
+     * Drawing for my player ammo
+     */
     private List<Rectangle> myAmmo = new ArrayList<>();
+    /**
+     * List of Image that contain ammo image of the card in the map
+     */
     private List<ImageView> ammos = new ArrayList<>();
+    /**
+     * Player in the map
+     */
     private List<Circle> players = new ArrayList<>();
+    /**
+     * ImageView  List of player DashBoard
+     */
     private List<ImageView> playerDashBoard = new ArrayList<>();
+    /**
+     * ImageView list for My player power up
+     */
     private List<ImageView> powerUp = new ArrayList<>();
+    /**
+     * ImageView list for My player weapon
+     */
     private List<ImageView> weapons = new ArrayList<>();
+    /**
+     * Weapons in the left spawn of the map
+     */
     private List<ImageView> mapWL = new ArrayList<>();
+    /**
+     * Weapons in the right spawn of the map
+     */
     private List<ImageView> mapWR = new ArrayList<>();
+    /**
+     * Weapons in the top spawn of the map
+     */
     private List<ImageView> mapWT = new ArrayList<>();
+    /**
+     * List of other player ear image
+     */
     private List<List<ImageView>> playerDamage = new ArrayList<>();
+    /**
+     * List of other player marks image
+     */
     private List<List<ImageView>> playerMarks = new ArrayList<>();
+    /**
+     * List of my player tear damage
+     */
     private List<ImageView> myPlayerDamage = new ArrayList<>();
+    /**
+     * List of my player tear marks
+     */
     private List<ImageView> myPlayerMarks = new ArrayList<>();
+    /**
+     * List of deaths kill tear
+     */
     private List<ImageView> deathsBoard = new ArrayList<>();
+    /**
+     * Movement button
+     */
     private Button move = new Button("Movement");
+    /**
+     * Grab button
+     */
     private Button grab = new Button("Grab");
+    /**
+     * Shoot button
+     */
     private Button shoot = new Button("Shoot");
+    /**
+     * Exit action button
+     */
     private Button exit = new Button("Exit");
+    /**
+     * Power up action button
+     */
     private Button power = new Button("Power-Up");
+    /**
+     * Button that have a positive response to questions
+     */
     private Button yes = new Button("Yes");
+    /**
+     * Button that have a negative response to questions
+     */
     private Button no = new Button("No");
+    /**
+     * Label used for question and important message
+     */
     private Label text = new Label("");
+    /**
+     * Label used for notification message
+     */
     private Label textNotify = new Label("");
+    /**
+     * Rappresent the GUI state during the decisions
+     */
     private ClientState state = ClientState.WAITING_TURN;
+    /**
+     * Label used for waiting room message
+     */
     private Label textwait;
+    /**
+     * Tooltip for weapon info
+     */
     private Tooltip toolw = new Tooltip("Right Click for more info");
+    /**
+     * Used for timer during counterAttack request
+     */
     private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-
+    /**
+     * Runnable when the timer finished
+     */
     private Runnable timert = new Runnable() {
         @Override
         public void run() {
@@ -99,30 +205,70 @@ public class ClientGUIView extends Application implements View{
             runLater(GUI::chooseTurnActionPhase);
         }
     };
-
+    /**
+     * Alternative stage used for some power up/ weapons decision (multi-chooise step)
+     */
     private Stage sg = new Stage();
+    /**
+     * Login background music
+     */
     private AudioClip loginBack;
-
+    /**
+     * List of possible position to make movement action
+     */
     private List<Square> possiblePositions;
+    /**
+     * List of possible weapons for grab action
+     */
     private List<CardWeapon> weaponToGrab;
+    /**
+     * weapon selected for grab action
+     */
     private CardWeapon weaponG;
+    /**
+     * weapon selected for waste in a grab action
+     */
     private CardWeapon weaponW;
+    /**
+     * Plus Effect used in choise plus effect or choise plus effect before base
+     */
     private FullEffect plusEff;                                                                                         //used for CHOOSEPLUSEFFECT and CHOOSEPBB
+    /**
+     * List of possible FullEffect to choose
+     */
     private List<FullEffect> fullEffectList;                                                                            //used for CHOOSEPLUSEFFECT and CHOOSEPLUSORDER
-    private List<ClientGameMessage> reloadRequests = new ArrayList<>();
-    private List<CardWeapon> weaponsToReload;
+    /**
+     * select weapon to reload
+     */
     private CardWeapon weaponToReload;
+    /**
+     * Selected Scope power up to use
+     */
     private CardPower scopeSelected;
+    /**
+     * Char that indicate if you want to use plus effect before base effect
+     */
     private char t = 'n';
+    /**
+     * Shooter in counter attack response
+     */
     private Player shooter;
-    private List<Label> points = new ArrayList<>();
+    /**
+     * Label used for my point
+     */
     private Label myPoint;
 
-
+    /**
+     * Save the Gui instace
+     */
     public ClientGUIView() {
         GUI = this;
     }
 
+    /**
+     * Reurnn the GUI instance
+     * @return GUI instace
+     */
     public static ClientGUIView getInstance(){
         if(GUI!=null){
             return GUI;
@@ -141,31 +287,46 @@ public class ClientGUIView extends Application implements View{
         return GUI;
     }
 
+    /**
+     * Start methods that inizialize primary stage
+     * @param primaryStage
+     */
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         //showMap();
     }
 
+    /**
+     * Methods that check is primary Stage is alredy setted
+     * @return
+     */
     private boolean isPrimaryStageOn()
     {
         return primaryStage != null;
     }
 
-
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Methods that set ClientController
+     * @param controller
+     */
     public void setController(ClientController controller){
         this.controller = controller;
     }
 
+    /**
+     * CLI methods
+     */
     @Override
-    public void waitStart() {
-        //TODO (?)
-    }
+    public void waitStart() {}
 
+    /**
+     * Show the choose connection windows
+     */
     @Override
     public void chooseConnection() {
 
@@ -207,6 +368,9 @@ public class ClientGUIView extends Application implements View{
         b2.setOnAction(actionEvent -> LaunchClient.startConnection("SOCKET",ipTextField.getText()));
     }
 
+    /**
+     * Show the error when you lose connection to the server
+     */
     @Override
     public void notifyConnectionError() {
         StackPane sp = new StackPane();
@@ -230,6 +394,9 @@ public class ClientGUIView extends Application implements View{
         primaryStage.show();
     }
 
+    /**
+     * Alert when the client can't find the server
+     */
     @Override
     public void connectionFailed() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -239,6 +406,11 @@ public class ClientGUIView extends Application implements View{
         alert.showAndWait();
     }
 
+    /**
+     * Methods that ask if you want to use counterAttack
+     * @param counterattack List of possible CounteAttack power up to choose from
+     * @param shooter Player you shoot you
+     */
     @Override
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
         state = ClientState.CHOOSECOUNTER;
@@ -267,6 +439,10 @@ public class ClientGUIView extends Application implements View{
         });
     }
 
+    /**
+     * Methods that create the room from user input
+     * @param s
+     */
     private void callRoomCreate(String s ){
 
         int mapId = 0;
@@ -277,12 +453,18 @@ public class ClientGUIView extends Application implements View{
         controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,user));
     }
 
+    /**
+     *Methods that notify game starte and call map creation
+     */
     @Override
     public void notifyStart() {
         loginBack.setVolume(0.2);
         showMapGame();
     }
 
+    /**
+     * Windows that ask to choose user name
+     */
     @Override
     public void setUserNamePhase() {
         //UserLogin GUI creation
@@ -343,11 +525,17 @@ public class ClientGUIView extends Application implements View{
 
     }
 
+    /**
+     * Exception of insufficent ammo for paying
+     */
     @Override
     public void insufficientAmmoNotification() {
         textNotify.setText("Not enough ammo \n" + textNotify.getText());
     }
 
+    /**
+     * Activate the possible action using action buttons
+     */
     @Override
     public void chooseStepActionPhase() {
         text.setText("Choose your single step");
@@ -356,20 +544,34 @@ public class ClientGUIView extends Application implements View{
         power.setDisable(false);
         exit.setVisible(true);
         exit.setDisable(false);
-        if(this.controller.getAvailableActions().contains(Action.MOVEMENT)){
-            move.setVisible(true);
-            move.setDisable(false);
+        if(this.controller.getAvailableActions().size() == 1){
+            textNotify.setText("Auto action complete : "+this.controller.getAvailableActions().get(0) + "\n" + textNotify.getText());
+            if(this.controller.getAvailableActions().get(0).equals(Action.GRAB))
+                controller.getClient().sendMessage(new GrabActionRequest());
+            if(this.controller.getAvailableActions().get(0).equals(Action.SHOOT))
+                controller.getClient().sendMessage(new ShootActionRequest());
+            disableButton();
         }
-        if(this.controller.getAvailableActions().contains(Action.GRAB)){
-            grab.setVisible(true);
-            grab.setDisable(false);
-        }
-        if(this.controller.getAvailableActions().contains(Action.SHOOT)){
-            shoot.setVisible(true);
-            shoot.setDisable(false);
+        else {
+            if (this.controller.getAvailableActions().contains(Action.MOVEMENT)) {
+                move.setVisible(true);
+                move.setDisable(false);
+            }
+            if (this.controller.getAvailableActions().contains(Action.GRAB)) {
+                grab.setVisible(true);
+                grab.setDisable(false);
+            }
+            if (this.controller.getAvailableActions().contains(Action.SHOOT)) {
+                shoot.setVisible(true);
+                shoot.setDisable(false);
+            }
         }
     }
 
+    /**
+     * Show the possible square for movement action
+     * @param possiblePositions
+     */
     @Override
     public void chooseSquarePhase(List<Square> possiblePositions) {
         this.possiblePositions = possiblePositions;
@@ -382,6 +584,10 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Ask to choose from the possibleTarget
+     * @param possibleTargets
+     */
     @Override
     public void chooseTargetPhase(List<Target> possibleTargets) {
         int maxE = ClientContext.get().getCurrentEffect().getMaxEnemy();
@@ -431,6 +637,9 @@ public class ClientGUIView extends Application implements View{
         sg.show();
     }
 
+    /**
+     * Activate the possible tunr action
+     */
     @Override
     public void chooseTurnActionPhase() {
         System.out.println("Turn action Phase");
@@ -455,37 +664,57 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
-
+    /**
+     * Exception of invalid target
+     */
     @Override
     public void invalidTargetNotification() {
         textNotify.setText("Invalid terget selected!\n" + textNotify.getText());
     }
 
+    /**
+     * Exception of invalid weapon selected
+     */
     @Override
     public void invalidWeaponNotification() {
         textNotify.setText("Invalid weapon selected!\n" + textNotify.getText());
     }
 
+    /**
+     * Exception of invalid action
+     */
     @Override
     public void invalidActionNotification() {
         textNotify.setText("Invalid action!\n" + textNotify.getText());
     }
 
+    /**
+     * Exception called when you finish all your action
+     */
     @Override
     public void insufficientNumberOfActionNotification() {
         textNotify.setText("You cannot do others actions for this turn!\n" + textNotify.getText());
     }
 
+    /**
+     * Exception of invalid step action choice
+     */
     @Override
     public void invalidStepNotification() {
         textNotify.setText("The step selected is not valid, you loose the action!! xd!!1!1!!\n" + textNotify.getText());
     }
 
+    /**
+     * Exception when you try to pick up a weapon with full slots
+     */
     @Override
     public void maxNumberOfWeaponNotification() {
         textNotify.setText("You can't grab another weapon!\n" + textNotify.getText());
     }
 
+    /**
+     * Damage notification 
+     */
     @Override
     public void damageNotification(int shooterId, int damage, int hit) {
         String url = getClass().getResource("/graphics/sound/shoot.wav").toExternalForm();
@@ -508,6 +737,12 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Notify that player moved
+     * @param pId id of the player
+     * @param newX new x position 
+     * @param newY new Y position
+     */
     @Override
     public void notifyMovement(int pId, int newX, int newY) {
         System.out.println("Notify Movement");
@@ -523,6 +758,12 @@ public class ClientGUIView extends Application implements View{
         refreshPlayerPosition();
     }
 
+    /**
+     * notify that a player died
+     * @param idKiller id  killer
+     * @param idVictim id victim 
+     * @param rage bool that say if the kill was with rage
+     */
     @Override
     public void notifyDeath(int idKiller, int idVictim, boolean rage) {
         if(idKiller == ClientContext.get().getMyID()){
@@ -534,11 +775,23 @@ public class ClientGUIView extends Application implements View{
         refreshDeaths();
     }
 
+    /**
+     * notify is someone gor raged
+     * @param killer player that kill 
+     * @param victim player victim
+     */
     @Override
     public void notifyRage(Player killer, Player victim) {
         textNotify.setText("Player "+killer.getNickName()+" has raged "+victim.getNickName() + "\n" + textNotify.getText());
     }
 
+    /**
+     * Grab weapon notification
+     * @param pID id of the player 
+     * @param name name of the weapom grabbed
+     * @param x position x 
+     * @param y position y 
+     */
     @Override
     public void grabWeaponNotification(int pID, String name, int x, int y) {
         System.out.println("Notify grab weapon");
@@ -556,6 +809,12 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * power up notification
+     * @param id id of the player
+     * @param name name of the power up used 
+     * @param description description of the power up
+     */
     @Override
     public void powerUpUsageNotification(int id, String name, String description) {
         if(id == ClientContext.get().getMyID()){
@@ -567,6 +826,10 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Ask the plywer with wich power up he want to respawn
+     * @param cardPower list of possible power up to waste
+     */
     @Override
     public void choosePowerUpToRespawn(List<CardPower> cardPower) {
         textNotify.setText("Your turn: respawn\n" + textNotify.getText());
@@ -588,27 +851,60 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * nofication of operation complete
+     * @param message
+     */
     @Override
     public void notifyCompletedOperation(String message) {
         System.out.println("notifyOperationcomeplte");
-        textNotify.setText(message + "\n" + textNotify.getText());
+        //textNotify.setText(message + "\n" + textNotify.getText());
         if(!this.controller.getState().equals(ClientState.WAITING_START)){
             refreshMyPlayerCard();
             refreshMyPlayerAmmo();
         }
     }
 
+    /**
+     * notification of invalid power up
+     */
     @Override
     public void notifyInvalidPowerUP() {
         textNotify.setText("Invalid Power Up\n" + textNotify.getText());
     }
 
+    /**
+     * notification of invalid postion for a grab
+     */
     @Override
     public void notifyInvalidGrabPosition() {
         textNotify.setText("Invalid position, no card ammo here\n" + textNotify.getText());
     }
 
+    /**
+     * Methods that ask with which methods he want to pay (ammo/power up)
+     */
+    private void chooseTargetScopePayment(){
+        text.setText("You want to pay with ammo? ( No for power up)");
+        yes.setVisible(true);
+        no.setVisible(true);
+        yes.setOnMouseClicked(mouseEvent -> {
+            activateAmmo();
+            no.setVisible(false);
+            yes.setVisible(false);
+        });
+        no.setOnMouseClicked(mouseEvent -> {
+            List <CardPower> list = ClientContext.get().getMyPlayer().getCardPower().stream().filter(x -> x.getId() == scopeSelected.getId()).collect(Collectors.toList());
+            choosePowerUpToPay(list);
+            no.setVisible(false);
+            yes.setVisible(false);
+        });
+    }
 
+    /**
+     * Choose which targetting scope he want use
+     * @param cardPower list of possible scope power up
+     */
     @Override
     public void choosePowerUpToUse(List<CardPower> cardPower) {
         System.out.println("ChoosePowerUptouse");
@@ -620,25 +916,29 @@ public class ClientGUIView extends Application implements View{
             yes.setVisible(true);
             no.setVisible(true);
             yes.setOnMouseClicked(mouseEvent -> {
+                no.setVisible(false);
+                yes.setVisible(false);
                 if(dim > 1){
                     text.setText("Choose which power up use :");
                     activateCardPower(list);
                 }else{
-                    text.setText("Choose an ammo ");
                     scopeSelected = list.get(0);
-                    activateAmmo();
+                    chooseTargetScopePayment();
                 }
-                no.setVisible(false);
-                yes.setVisible(false);
             });
             no.setOnMouseClicked(mouseEvent -> {
-                controller.getClient().sendMessage(new ChoosePowerUpResponse());
                 no.setVisible(false);
                 yes.setVisible(false);
+                controller.getClient().sendMessage(new ChoosePowerUpResponse());
             });
         }
 
     }
+
+    /**
+     * Choose with which power up he want to pay, usd from more methods
+     * @param cardPower
+     */
     private synchronized void choosePowerUpToPay(List<CardPower> cardPower) {
         StackPane sp = new StackPane();
         Scene tempScene = new Scene(sp);
@@ -701,8 +1001,10 @@ public class ClientGUIView extends Application implements View{
                     controller.getClient().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, choosenPW));
                     break;
                 case CHOOSERELOAD:
-                    reloadRequests.add(new ReloadWeaponRequest(weaponToReload,choosenPW));
-                    reloadWeaponPhase(weaponsToReload);
+                    controller.getClient().sendMessage(new ReloadWeaponRequest(weaponToReload, choosenPW));
+                    break;
+                case CHOOSESCOPE:
+                    controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, null, choosenPW));
                     break;
             }
             sg.close();
@@ -713,11 +1015,18 @@ public class ClientGUIView extends Application implements View{
         sg.show();
     }
 
+    /**
+     * notification of invalid message
+     */
     @Override
     public void notifyInvalidMessage() {
         textNotify.setText("Invalid choise!\n" + textNotify.getText());
     }
 
+    /**
+     * notify that turn changed
+     * @param pID
+     */
     @Override
     public void notifyTurnChanged(int pID) {
         System.out.println("Turn changed");
@@ -738,6 +1047,12 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * notify that someone got dome marks
+     * @param marks number of marks
+     * @param idHitten is player that got marks
+     * @param idShooter id player that give marks
+     */
     @Override
     public void notifyMarks(int marks, int idHitten, int idShooter) {
        /* String url = getClass().getResource("/graphics/sound/shoot.wav").toExternalForm();
@@ -757,6 +1072,10 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * notification of grab ammo action
+     * @param pID id of player that grab
+     */
     @Override
     public void notifyGrabCardAmmo(int pID) {
         System.out.println("notifyGrabAmmo");
@@ -771,6 +1090,10 @@ public class ClientGUIView extends Application implements View{
         refreshAmmoCard();
     }
 
+    /**
+     * notification od respawn
+     * @param pID id of the player respawned
+     */
     @Override
     public void notifyRespawn(int pID) {
         String url = getClass().getResource("/graphics/sound/respawn.wav").toExternalForm();
@@ -781,6 +1104,11 @@ public class ClientGUIView extends Application implements View{
             refreshMyPlayerCard();
         refreshPlayerPosition();
     }
+
+    /**
+     * Make the power up clickable
+     * @param list listo of power up to activate
+     */
     private void activateCardPower(List<CardPower> list){
         for(CardPower cp : list){
             ImageView im = powerUp.stream().filter(c -> Integer.parseInt(c.getId())==cp.getId()).findAny().orElse(null);
@@ -790,6 +1118,12 @@ public class ClientGUIView extends Application implements View{
             }
         }
     }
+
+    /**
+     * make the weapon clickable
+     * @param weapons list of all weapons
+     * @param iv wepoan to activate
+     */
     private void activateWeapon(List<CardWeapon> weapons, ImageView iv){
         int id = Integer.parseInt(iv.getId().substring(2));
         if(id != 0) {
@@ -800,6 +1134,11 @@ public class ClientGUIView extends Application implements View{
             }
         }
     }
+
+    /**
+     * Choose which weapon to grab
+     * @param weapons possible choice
+     */
     @Override
     public void chooseWeaponToGrab(List<CardWeapon> weapons) {
         text.setText("Select the weapon to grab!");
@@ -816,6 +1155,10 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Choose which room join
+     * @param waitingRooms possible waiting room to join
+     */
     @Override
     public void chooseRoomPhase(List<WaitingRoom> waitingRooms) {
         StackPane waits = new StackPane();
@@ -877,33 +1220,34 @@ public class ClientGUIView extends Application implements View{
         primaryStage.show();
     }
 
+    /**
+     * CLI Methods
+     * @param availableMaps
+     */
     @Override
     public void showMapsPhase(List<GameMap> availableMaps) {
-        this.availableMaps = availableMaps;
         controller.getClient().sendMessage(new GetWaitingRoomsRequest());
     }
 
+    /**
+     * Choise if the player want to reload
+     * @param weaponsToReload possible weapons to reload
+     */
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
         if(weaponsToReload.size() == 0){
-            if (reloadRequests.size() == 0)
-                controller.getClient().sendMessage(new EndActionRequest());
-            else
-                controller.sendMessages(reloadRequests);
+            textNotify.setText("Invalid weapons selection \n" + textNotify.getText());
         }else {
             System.out.println("Reload");
             state = ClientState.CHOOSERELOAD;
             text.setText("You want to reload?");
-            this.weaponsToReload = weaponsToReload;
             no.setVisible(true);
             yes.setVisible(true);
             no.setOnMouseClicked(mouseEvent -> {
                 yes.setVisible(false);
                 no.setVisible(false);
-                if (reloadRequests.size() == 0)
-                    controller.getClient().sendMessage(new EndActionRequest());
-                else
-                    controller.sendMessages(reloadRequests);
+                controller.getClient().sendMessage(new EndActionRequest());
+
             });
             yes.setOnMouseClicked(mouseEvent -> {
                 for (ImageView iv : weapons) {
@@ -920,11 +1264,19 @@ public class ClientGUIView extends Application implements View{
     }
 
 
+    /**
+     * Message od correct reload
+     * @param cW weapon reloaded
+     */
     @Override
     public void showReloadMessage(CardWeapon cW) {
         textNotify.setText("You correctly reload " + cW.getName() + "\n" + textNotify.getText());
     }
 
+    /**
+     * Choose which weapon to shoot
+     * @param myWeapons possible wepoans to shoot
+     */
     @Override
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
         state = ClientState.CHOOSEWEAPONTOSHOOT;
@@ -938,6 +1290,11 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Choose which effect do
+     * @param baseEff base effect
+     * @param altEff alternative effect
+     */
     @Override
     public void chooseFirstEffect(FullEffect baseEff, FullEffect altEff) {
         state = ClientState.CHOOSEFIRSTEFFECT;
@@ -963,6 +1320,10 @@ public class ClientGUIView extends Application implements View{
 
     }
 
+    /**
+     * Choose if use plus effect before base effect
+     * @param plusEff possible effect before base
+     */
     @Override
     public void usePlusBeforeBase(FullEffect plusEff) {
         List<CardPower> price = possibleCardPowerToPay(plusEff);
@@ -1011,6 +1372,10 @@ public class ClientGUIView extends Application implements View{
         return list;
     }
 
+    /**
+     * Choose if you want to continue with the plus effect, in order?
+     * @param plusEffects
+     */
     @Override
     public void usePlusInOrder(List<FullEffect> plusEffects) {
         state = ClientState.CHOOSEPLUSORDER;
@@ -1033,6 +1398,11 @@ public class ClientGUIView extends Application implements View{
             controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,null,'n'));
         });
     }
+
+    /**
+     * Choose which plus effect do
+     * @param plusEffects possible choice
+     */
     @Override
     public synchronized void choosePlusEffect(List<FullEffect> plusEffects) {
         state = ClientState.CHOOSEPLUSEFFECT;
@@ -1101,6 +1471,10 @@ public class ClientGUIView extends Application implements View{
         sg.show();
     }
 
+    /**
+     * Show the finish game point
+     * @param ranking sorted map with points and player
+     */
     @Override
     public void showRanking(SortedMap<Player, Integer> ranking) {
         System.out.println("RANK");
@@ -1123,6 +1497,10 @@ public class ClientGUIView extends Application implements View{
         sg.show();
     }
 
+    /**
+     * Show if the player want to rejoin the match
+     * @param otherPlayers other player in the game
+     */
     @Override
     public void rejoinGamePhase(List<String> otherPlayers) {
         disablePowerUp();
@@ -1142,11 +1520,18 @@ public class ClientGUIView extends Application implements View{
         no.setOnMouseClicked(mouseEvent -> primaryStage.close());
     }
 
+    /**
+     * notification of player suspended
+     * @param p plyer who got suspended
+     */
     @Override
     public void notifyPlayerSuspended(Player p) {
         textNotify.setText("Player "+ p.getNickName() + "got suspended!\n" + textNotify.getText());
     }
 
+    /**
+     * Message that show if the pllayer want to rejoin the game after a time out error
+     */
     @Override
     public void timeOutPhase() {
         textNotify.setText("You timed out and you have been kicked out!\n" + textNotify.getText());
@@ -1171,6 +1556,9 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Message that show a already used user name
+     */
     @Override
     public void alreadyLoggedPhase() {
         StackPane sp = new StackPane();
@@ -1184,29 +1572,47 @@ public class ClientGUIView extends Application implements View{
         btn.setOnAction(ac ->setUserNamePhase());
     }
 
+    /**
+     * Complete login message
+     */
     @Override
     public void loginCompletedPhase() {
         controller.getClient().sendMessage(new GetAvailableMapsRequest());
     }
 
+    /**
+     * Complete rejoin message
+     */
     @Override
     public void rejoinGameConfirm() {
         textNotify.setText("You successfully rejoin your previous game! Now wait for your turn..\n" + textNotify.getText());
     }
 
+    /**
+     * Notification of player rejoined
+     * @param p player that rejoind the ga,e
+     */
     @Override
     public void notifyPlayerRejoin(Player p) {
         textNotify.setText("Player " + p.getNickName() + " has rejoined the game!\n" + textNotify.getText());
     }
 
+    /**
+     * notify that a player leaved a waiting room
+     * @param p player that leave
+     */
     @Override
     public void notifyPlayerLeavedWaitingRoom(Player p) {
-        textwait.setText(textwait.getText() +"\n Player "+p.getNickName()+" leaved the waiting room.");
+        textwait.setText("Player "+p.getNickName()+" leaved the waiting room.\n" + textNotify.getText());
     }
 
+    /**
+     * notify that a player joined a waiting room
+     * @param p player that joined
+     */
     @Override
     public void notifyPlayerJoinedWaitingRoom(Player p) {
-        textwait.setText(textwait.getText() +"\n Player "+p.getNickName()+" joined the waiting room.");
+        textwait.setText("Player "+p.getNickName()+" joined the waiting room. \n" + textNotify.getText());
     }
 
     /**
@@ -1217,11 +1623,11 @@ public class ClientGUIView extends Application implements View{
         textNotify.setText("Reconnected to the server!!");
     }
 
+    /**
+     * show my point
+     */
     @Override
     public void showPoints() {
-        for(Label l : points){
-            l.setText(""+ClientContext.get().getMap().getPlayerById(Integer.parseInt(l.getId())).getPoints());
-        }
         myPoint.setText(""+ClientContext.get().getMyPlayer().getPoints());
     }
 
@@ -1341,12 +1747,12 @@ public class ClientGUIView extends Application implements View{
         textNotify.setStyle("-fx-font: 15px Tahoma;");
         textNotify.setTextFill(Color.WHITE);
         textNotify.setPrefWidth(screenWidth*52.5/100);
-        textNotify.setMaxHeight(screenHeight*6/100);
+        textNotify.setMaxHeight(screenHeight * 12/100);
         textNotify.setText("");
 
         map.getChildren().addAll(text, textNotify , yes , no);
         StackPane.setAlignment(textNotify,Pos.BOTTOM_LEFT);
-        StackPane.setMargin(textNotify,new Insets(0,0,(screenHeight * 25 / 100),0));
+        StackPane.setMargin(textNotify,new Insets(0,0,(screenHeight * 22 / 100),0));
         StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
         StackPane.setMargin(text,new Insets(0,0,(screenHeight * 17.7 / 100),0));
         StackPane.setAlignment(yes,Pos.BOTTOM_LEFT);
@@ -1445,6 +1851,8 @@ public class ClientGUIView extends Application implements View{
         StackPane.setAlignment(exit,Pos.BOTTOM_RIGHT);
         StackPane.setMargin(exit,new Insets(0,screenWidth * 26/ 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(exit,Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(power,new Insets(0,screenWidth * 23/ 100,screenHeight * 23 / 100,0));
+        StackPane.setAlignment(power,Pos.BOTTOM_RIGHT);
         move.setStyle(orangeB);
         grab.setStyle(orangeB);
         shoot.setStyle(orangeB);
@@ -1647,26 +2055,24 @@ public class ClientGUIView extends Application implements View{
                     point.setTextFill(Color.BLACK);
                     break;
             }
-            name.setFont(Font.font(16));
+            name.setFont(Font.font(20));
             point.setFont(Font.font(25));
-            map.getChildren().addAll(imw,name,point);
+            map.getChildren().addAll(imw,name);
             imw.setId(""+p.getId());
             imw.setFitWidth(screenWidth*36.6/100);
             imw.setPreserveRatio(true);
             if(p.equals(ClientContext.get().getMyPlayer())){
                 myPoint = point;
+                map.getChildren().add(point);
                 StackPane.setAlignment(imw,Pos.BOTTOM_LEFT);
                 StackPane.setAlignment(name,Pos.BOTTOM_LEFT);
-                StackPane.setMargin(name,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 4 / 100));
+                StackPane.setMargin(name,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 6 / 100));
                 StackPane.setAlignment(point,Pos.BOTTOM_LEFT);
-                StackPane.setMargin(point,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 2/ 100 ));
+                StackPane.setMargin(point,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 4/ 100 ));
 
             }else {
                 playerDashBoard.add(imw);
-                points.add(point);
                 System.out.println("Plater :" +p.getNickName());
-                StackPane.setAlignment(point,Pos.TOP_RIGHT);
-                StackPane.setMargin(point,new Insets(i + screenHeight * 0.4 / 100,screenWidth * 33 / 100,0,0));
                 StackPane.setAlignment(name,Pos.TOP_RIGHT);
                 StackPane.setMargin(name,new Insets(i + screenHeight * 0.4 / 100,screenWidth * 29 / 100,0,0));
                 StackPane.setAlignment(imw,Pos.TOP_RIGHT);
@@ -2040,8 +2446,7 @@ public class ClientGUIView extends Application implements View{
                         if(list.size() == 0)
                             choosePowerUpToPay(list);
                         else
-                            reloadRequests.add(new ReloadWeaponRequest(weaponToReload,null));
-                        weaponsToReload.remove(weaponToReload);
+                            controller.getClient().sendMessage(new ReloadWeaponRequest(weaponToReload,null));
                     }
                     break;
                 }
@@ -2128,13 +2533,13 @@ public class ClientGUIView extends Application implements View{
         ObservableList list = sp.getChildren();
         list.addAll(text,mapc, submit,error);
         StackPane.setAlignment(ivMap,Pos.TOP_RIGHT);
-        StackPane.setMargin(ivMap,new Insets(60,60,0,0));
+        StackPane.setMargin(ivMap,new Insets(60,100,0,0));
         StackPane.setAlignment(text,Pos.TOP_CENTER);
         StackPane.setMargin(text,new Insets(25,0,0,0));
         StackPane.setAlignment(mapc,Pos.CENTER_LEFT);
         StackPane.setMargin(mapc,new Insets(0,0,0,50));
         StackPane.setAlignment(submit,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(submit,new Insets(0,35,30,0));
+        StackPane.setMargin(submit,new Insets(0,35,20,0));
         StackPane.setAlignment(error,Pos.BOTTOM_LEFT);
 
         primaryStage.setScene(room);
@@ -2206,7 +2611,7 @@ public class ClientGUIView extends Application implements View{
             controller.getClient().sendMessage(new ChoosePowerUpResponse(p));
         if(state.equals(ClientState.CHOOSESCOPE)){
             scopeSelected = p;
-            activateAmmo();
+            chooseTargetScopePayment();
         }
         disablePowerUp();
     }
@@ -2237,7 +2642,7 @@ public class ClientGUIView extends Application implements View{
         System.out.println("ammo");
         if(state.equals(ClientState.CHOOSESCOPE)) {
             game.model.Color c = game.model.Color.valueOf(((Rectangle) e.getSource()).getId());
-            controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, c, null));
+            controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, c, new ArrayList<>()));
         }
         disableAmmo();
     }
@@ -2270,7 +2675,10 @@ public class ClientGUIView extends Application implements View{
                     controller.getClient().sendMessage(new ChooseTurnActionResponse(Action.GRAB));
                 break;
             case EXIT:
-                controller.getClient().sendMessage(new EndTurnRequest());
+                if(controller.getState() == ClientState.HANDLING_MOVEMENT)
+                    controller.getClient().sendMessage(new EndTurnRequest());
+                else
+                    chooseStepActionPhase();
                 break;
             case POWER:
                 state = ClientState.CHOOSECARDPOWER;
@@ -2285,6 +2693,10 @@ public class ClientGUIView extends Application implements View{
         }
         disableButton();
     }
+
+    /**
+     * disable all button
+     */
     private void disableButton(){
         move.setVisible(false);
         move.setDisable(true);
@@ -2297,12 +2709,18 @@ public class ClientGUIView extends Application implements View{
         power.setDisable(true);
         power.setVisible(false);
     }
+    /**
+     * disable all power up
+     */
     private void disablePowerUp(){
         for (ImageView iv :powerUp) {
             iv.setOnMouseClicked(null);
             iv.setEffect(null);
         }
     }
+    /**
+     * disable all my weapon
+     */
     private void disableMyWeapon(){
         for (ImageView iv :weapons) {
             iv.setOnMouseClicked(null);
@@ -2310,6 +2728,9 @@ public class ClientGUIView extends Application implements View{
             Tooltip.uninstall(iv,toolw);
         }
     }
+    /**
+     * disable all wepoan in the map
+     */
     private void disableWeapon(){
         for (ImageView iv :mapWL) {
             iv.setOnMouseClicked(null);
@@ -2329,6 +2750,9 @@ public class ClientGUIView extends Application implements View{
         }
 
     }
+    /**
+     * disable all square
+     */
     private void disableSquare(){
         for (Rectangle r :squares) {
             r.setStroke(Color.TRANSPARENT);

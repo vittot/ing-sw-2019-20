@@ -13,28 +13,86 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.SortedMap;
 
+/**
+ * Class that contain all the game information
+ */
 public class Game {
+    /**
+     * Id of the game
+     */
     private int id;
+    /**
+     * List of the player in game
+     */
     private List <Player> players;
+    /**
+     * map of the game
+     */
     private GameMap map;
+    /**
+     * deck of all card power in the game
+      */
     private List<CardPower> deckPower;
+    /**
+     * List of all card ammo in the agem
+     */
     private List<CardAmmo> deckAmmo;
+    /**
+     * Listo of all card weapons in the game
+     */
     private List<CardWeapon> deckWeapon;
+    /**
+     * List of card power wasted in the game
+     */
     private List<CardPower> powerWaste;
+    /**
+     * List of ammo card wasted in the game
+     */
     private List<CardAmmo> ammoWaste;
+    /**
+     * List of kill in a turn
+     */
     private List<Kill> thisTurnKill;
+    /**
+     * List of kill in alll game
+     */
     private List<Kill> killBoard;
+    /**
+     * First Player to play
+     */
     private Player firstPlayerToPlay;
+    /**
+     * Current turn
+     */
     private Turn currentTurn;
+    /**
+     * max number of player
+     */
     static final int MAXPLAYERS = 5;
-    //public static int TIME_FOR_ACTION = 300000;
+    /**
+     * List of point for deaths
+     */
     private static final List<Integer> POINTSCOUNT;
+    /**
+     * Max number of kill
+     */
     private int killboardSize = 8;
+    /**
+     * List  of game listener
+     */
     private List<GameListener> gameObservers;
+    /**
+     * number of player to be respawned
+     */
     private int nPlayerToBeRespawned;
+    /**
+     * flag to say if the game is finished
+     */
     private boolean ended;
 
-
+    /**
+     * Inizialize the point array
+     */
     static {
         POINTSCOUNT = new ArrayList<>();
         POINTSCOUNT.add(8);
@@ -45,6 +103,10 @@ public class Game {
         POINTSCOUNT.add(1);
     }
 
+    /**
+     * Constructor
+     * @param killBoardSize int
+     */
     public Game(int killBoardSize){
         this.killboardSize = killBoardSize;
         this.ended = false;
@@ -58,6 +120,13 @@ public class Game {
         this.powerWaste =  new ArrayList<>();
     }
 
+    /**
+     * Constructor
+     * @param id int
+     * @param mapId int
+     * @param killBoardSize int
+     * @param players list of player
+     */
     public Game(int id, int mapId, int killBoardSize, List<Player> players)
     {
         this(killBoardSize);
@@ -77,10 +146,20 @@ public class Game {
 
     }
 
+    /**
+     *
+     * @return first player to play
+     */
     Player getFirstPlayerToPlay() {
         return firstPlayerToPlay;
     }
 
+    /**
+     * Constructor
+     * @param players list of pllayer
+     * @param map map
+     * @param killBoardSize int
+     */
     public Game(List<Player> players, GameMap map, int killBoardSize) {
         this(killBoardSize);
         this.players = players;
@@ -88,6 +167,13 @@ public class Game {
         currentTurn = new Turn(this.players.get(0),this);
         players.stream().forEach(p -> p.setGame(this));
     }
+
+    /**
+     * Constructor
+     * @param players list of player
+     * @param mapId int
+     * @param killBoardSize int
+     */
     public Game(List<Player> players, int mapId,int killBoardSize) {
         this.players = players;
         this.killboardSize = killBoardSize;
@@ -98,11 +184,18 @@ public class Game {
         readMap(mapId, "mapFile.xml");
     }
 
-
+    /**
+     *
+     * @return id of the game
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     *
+     * @return the available map
+     */
     public static List<GameMap> getAvailableMaps()
     {
         int id = 1;
@@ -118,7 +211,12 @@ public class Game {
         return availableMaps;
     }
 
-
+    /**
+     * Read the xml map
+     * @param id int
+     * @param fileName string
+     * @return gamemap
+     */
     public static GameMap readMap(int id, String fileName){
         GameMap map = new GameMap(id,4,3);;
         Square [][] grid = null;
@@ -182,14 +280,24 @@ public class Game {
         return map;
     }
 
-    public static Edge createEquivalentEdge (String name){
+    /**
+     * create edge from a string
+     * @param name string
+     * @return edge
+     */
+    private static Edge createEquivalentEdge (String name){
         if(name.equals("door")) return Edge.DOOR;
         if(name.equals("open")) return Edge.OPEN;
         if(name.equals("wall")) return Edge.WALL;
         return null;
     }
 
-    public static MapColor createEquivalentMapColor (String name){
+    /**
+     * Retunr the color of the square
+     * @param name String
+     * @return map color
+     */
+    private static MapColor createEquivalentMapColor (String name){
         if(name.equals("blue")) return MapColor.BLUE;
         if(name.equals("grey")) return MapColor.GREY;
         if(name.equals("green")) return MapColor.GREEN;
@@ -203,7 +311,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    public boolean readDeck(String fileName){
+    private boolean readDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         int id=1;
@@ -232,7 +340,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    public boolean readAmmoDeck(String fileName){
+    private boolean readAmmoDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         try
@@ -258,7 +366,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    public boolean readPowerUpDeck(String fileName){
+    private boolean readPowerUpDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         try
@@ -285,7 +393,7 @@ public class Game {
      * Get a Element powerup and build it
      * @param ammo
      */
-    public void addAmmoCard(Element ammo){
+    private void addAmmoCard(Element ammo){
 
         List<Color> ammos = new ArrayList<>();
         for(Element e : ammo.getChildren("color")) {
@@ -303,7 +411,7 @@ public class Game {
      * Get a Element powerup and build it
      * @param powerup
      */
-    public void addPowerUp(Element powerup){
+    private void addPowerUp(Element powerup){
         String name = powerup.getChild("name").getText().trim();
         String desc = powerup.getChild("description").getText().trim();
         Color c = createEquivalentAmmo(powerup.getChild("color").getText().trim());
@@ -329,7 +437,7 @@ public class Game {
      * @param weapon
      * @param id
      */
-    public void addWeapon(Element weapon, int id){
+    private void addWeapon(Element weapon, int id){
         String name = weapon.getChild("name").getText().trim();
         List desc = takeDescription(weapon);
         List names = takeNameEffect(weapon);
@@ -351,6 +459,13 @@ public class Game {
         //Collections.shuffle(this.deckWeapon);
     }
 
+    /**
+     * Insert the price in the weapon effect
+     * @param effectal  effect
+     * @param effectop effect
+     * @param priceal price
+     * @param priceop price
+     */
     private void insertPrice(FullEffect effectal, List<FullEffect> effectop, List<Color> priceal, List<List<Color>> priceop) {
         //effect.setPrice(price);
         if(effectal!=null)
@@ -367,6 +482,14 @@ public class Game {
         }
     }
 
+    /**
+     * Insert the description of the effetc
+     * @param ef base
+     * @param aef alternative
+     * @param oef optional
+     * @param desc description
+     * @param name nanem
+     */
     private void insertDescription (FullEffect ef,FullEffect aef,List<FullEffect> oef, List<String> desc, List<String> name){
         ef.setName(name.get(0));
         ef.setDescription(desc.get(0));
@@ -390,7 +513,7 @@ public class Game {
      * @return
      * @throws DataConversionException
      */
-    public SimpleEffect createEquivalentMovementEffect (Element effect) throws DataConversionException {
+    private SimpleEffect createEquivalentMovementEffect (Element effect) throws DataConversionException {
         int mine = Integer.parseInt(effect.getChildText("minEnemy"));
         int maxd = Integer.parseInt(effect.getChildText("maxDist"));
         int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
@@ -414,7 +537,7 @@ public class Game {
      * @return
      * @throws DataConversionException
      */
-    public SimpleEffect createEquivalentPlainEffect (Element effect) throws DataConversionException {
+    private SimpleEffect createEquivalentPlainEffect (Element effect) throws DataConversionException {
         int mine = Integer.parseInt(effect.getChildText("minEnemy"));
         int mind = Integer.parseInt(effect.getChildText("minDist"));
         int dam = Integer.parseInt(effect.getChildText("damage"));
@@ -435,7 +558,7 @@ public class Game {
      * @return
      * @throws DataConversionException
      */
-    public SimpleEffect createEquivalentSquareEffect (Element effect) throws DataConversionException {
+    private SimpleEffect createEquivalentSquareEffect (Element effect) throws DataConversionException {
         int mine = Integer.parseInt(effect.getChildText("minEnemy"));
         int marks = Integer.parseInt(effect.getChildText("marks"));
         int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
@@ -454,7 +577,7 @@ public class Game {
      * @return
      * @throws DataConversionException
      */
-    public SimpleEffect createEquivalentRoomEffect (Element effect) throws DataConversionException {
+    private SimpleEffect createEquivalentRoomEffect (Element effect) throws DataConversionException {
         int maxd = Integer.parseInt(effect.getChildText("maxDist"));
         int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
         int mind = Integer.parseInt(effect.getChildText("minDist"));
@@ -471,7 +594,7 @@ public class Game {
      * @return
      * @throws DataConversionException
      */
-    public SimpleEffect createEquivalentAreaEffect (Element effect) throws DataConversionException {
+    private SimpleEffect createEquivalentAreaEffect (Element effect) throws DataConversionException {
         int mine = Integer.parseInt(effect.getChildText("minEnemy"));
         int maxe = Integer.parseInt(effect.getChildText("maxEnemy"));
         int mind = Integer.parseInt(effect.getChildText("minDist"));
@@ -489,7 +612,7 @@ public class Game {
      * @param vis
      * @return
      */
-    public DifferentTarget createDifferent (String vis){
+    private DifferentTarget createDifferent (String vis){
         if(vis.equals("Anyone")) return DifferentTarget.ANYONE;
         if(vis.equals("NoneOfThePrevious")) return DifferentTarget.NONEOFTHEPREVIOUS;
         if(vis.equals("NotTheLast")) return DifferentTarget.NOTTHELAST;
@@ -500,7 +623,7 @@ public class Game {
      * @param vis
      * @return
      */
-    public TargetVisibility createVisibility (String vis){
+    private TargetVisibility createVisibility (String vis){
         if(vis.equals("Visible")) return TargetVisibility.VISIBLE;
         if(vis.equals("Invisible")) return TargetVisibility.INVISIBLE;
         if(vis.equals("Direction")) return TargetVisibility.DIRECTION;
@@ -513,7 +636,7 @@ public class Game {
      * @param name
      * @return
      */
-    public Color createEquivalentAmmo(String name){
+    private Color createEquivalentAmmo(String name){
         name = name.trim();
         if(name.equals("blue"))
             return Color.BLUE;
@@ -531,7 +654,7 @@ public class Game {
      * @param weapon
      * @return
      */
-    public List<FullEffect> takeEffectopz(Element weapon){
+    private List<FullEffect> takeEffectopz(Element weapon){
         List<FullEffect> effect = new ArrayList<FullEffect>();
         FullEffect temp = null;
         for(Element ef : weapon.getChildren("optionalEffect")) {
@@ -561,7 +684,7 @@ public class Game {
      * @param weapon
      * @return
      */
-    public FullEffect takeEffectal(Element weapon){
+    private FullEffect takeEffectal(Element weapon){
         FullEffect effect = new FullEffect();
         if( weapon.getChild("alternativeEffect") == null)
             return null;
@@ -584,7 +707,7 @@ public class Game {
      * @param powerup
      * @return
      */
-    public FullEffect takePowerUpEffect(Element powerup){
+    private FullEffect takePowerUpEffect(Element powerup){
         FullEffect effect = new FullEffect();
         if( powerup.getChild("effect") == null)
             return null;
@@ -607,7 +730,7 @@ public class Game {
      * @param weapon
      * @return
      */
-    public FullEffect takeEffect(Element weapon){
+    private FullEffect takeEffect(Element weapon){
         FullEffect effect = new FullEffect();
         for(Element ef : weapon.getChild("baseEffect").getChildren()) {
             try{
@@ -623,7 +746,12 @@ public class Game {
         return effect;
     }
 
-    public List<List<Color>> takePriceOpz(Element weapon){
+    /**
+     * take the price of the optional effect
+     * @param weapon element
+     * @return list of color
+     */
+    private List<List<Color>> takePriceOpz(Element weapon){
         List<List<Color>> pricetot = new ArrayList<List<Color>>();
         List<Color> price;
         Color c;
@@ -642,14 +770,26 @@ public class Game {
         }
         return pricetot;
     }
-    public List<Color> takePrice(Element weapon){
+
+    /**
+     * take the price of the base effect
+     * @param weapon element
+     * @return list of color
+     */
+    private List<Color> takePrice(Element weapon){
         List price = new ArrayList<Color>();
         for (Element pr : weapon.getChild("price").getChildren("ammo")){
             price.add(createEquivalentAmmo(pr.getText().trim()));
         }
         return price;
     }
-    public List<Color> takePriceAl(Element weapon){
+
+    /**
+     * take the alternative price of the weapon
+     * @param weapon element
+     * @return list of color
+     */
+    private List<Color> takePriceAl(Element weapon){
         List price = null;
         if(weapon.getChild("alternativePrice") != null)
             for (Element pr : weapon.getChild("alternativePrice").getChildren("ammo")){
@@ -667,7 +807,7 @@ public class Game {
      * @param weapon
      * @return
      */
-    public List<String> takeDescription(Element weapon){
+    private List<String> takeDescription(Element weapon){
         List desc = new ArrayList<String>();
         for (Element ds : weapon.getChildren("effectDescription")){
             desc.add(ds.getText().trim());
@@ -675,7 +815,12 @@ public class Game {
         return desc;
     }
 
-    public List<String> takeNameEffect(Element weapon){
+    /**
+     * take the name effect
+     * @param weapon elemnt
+     * @return list of string
+     */
+    private List<String> takeNameEffect(Element weapon){
         List eff = new ArrayList<String>();
         for (Element ds : weapon.getChildren("effectDescription")){
             eff.add(ds.getChildText("name"));
@@ -688,7 +833,7 @@ public class Game {
      * @param victim
      * @return PlayerColor of the shooter
      */
-    public PlayerColor firstBlood(Player victim) {
+    private PlayerColor firstBlood(Player victim) {
         return victim.getDamage().get(0);
     }
 
@@ -697,7 +842,7 @@ public class Game {
      *
      * @param victim killed Player
      */
-    public void updatePoints(Player victim) {
+    private void updatePoints(Player victim) {
         HashMap<PlayerColor, Integer> damagePlayer = new HashMap<>();
 
         for (int i = 0; i < players.size(); i++) {
@@ -756,13 +901,10 @@ public class Game {
      * @param player
      * @return
      */
-    public Kill getLastKill(Player player) {
+    private Kill getLastKill(Player player) {
         return thisTurnKill.stream().filter(k -> k.getVictim() == player).reduce((f, s) -> s).orElse(null);
     }
 
-    public List<Player> getPlayers() {
-        return players;
-    }
 
     /**
      * Return the player with the given id
@@ -774,81 +916,24 @@ public class Game {
         return players.stream().filter(p -> p.getId() == id).findFirst().orElse(null);
     }
 
-    public void setPlayers(List<Player> players) {
-        this.players = players;
-    }
-
-    public GameMap getMap() {
-        return map;
-    }
-
-    public void setMap(GameMap map) {
-        this.map = map;
-    }
-
-    public List<CardPower> getDeckPower() {
-        return deckPower;
-    }
-
-    public void setDeckPower(List<CardPower> deckPower) {
-        this.deckPower = deckPower;
-    }
-
-    public List<CardAmmo> getDeckAmmo() {
-        return deckAmmo;
-    }
-
-    public void setDeckAmmo(List<CardAmmo> deckAmmo) {
-        this.deckAmmo = deckAmmo;
-    }
-
-    public List<CardWeapon> getDeckWeapon() {
-        return deckWeapon;
-    }
-
-    public void setDeckWeapon(List<CardWeapon> deckWeapon) {
-        this.deckWeapon = deckWeapon;
-    }
-
-    public List<CardPower> getPowerWaste() {
-        return powerWaste;
-    }
-
-    public void setPowerWaste(List<CardPower> powerWaste) {
-        this.powerWaste = powerWaste;
-    }
-
-    public List<Kill> getKillBoard() {
-        return killBoard;
-    }
-
-    public List<Kill> getThisTurnKill() {
-        return thisTurnKill;
-    }
-
-    public void setKillBoard(List<Kill> killBoard) {
-        this.killBoard = killBoard;
-    }
-
-    public Turn getCurrentTurn() {
-        return currentTurn;
-    }
-
-    public void setCurrentTurn(Turn currentTurn) {
-        this.currentTurn = currentTurn;
-    }
-
-    public List<CardAmmo> getAmmoWaste() { return ammoWaste; }
-
-    public void setAmmoWaste(List<CardAmmo> ammoWaste) { this.ammoWaste = ammoWaste; }
-
+    /**
+     * Add power up to the waste deck
+     * @param c power up
+     */
     public void addPowerWaste(CardPower c)
     {
         powerWaste.add(c);
     }
 
+    /**
+     * decrese the respawn counter
+     */
     public void decreaseToBeRespawned(){if(nPlayerToBeRespawned > 0) nPlayerToBeRespawned--;}
 
+    /**
+     * Get the player to respawn
+     * @return
+     */
     public int getnPlayerToBeRespawned() {return nPlayerToBeRespawned; }
 
     /**
@@ -872,6 +957,9 @@ public class Game {
         notifyDeath(newKill);
     }
 
+    /**
+     * Add the kill number
+     */
     public void addKill() {
         for(Kill k : thisTurnKill) {
             killBoard.add(k);
@@ -987,6 +1075,11 @@ public class Game {
 
     }
 
+    /**
+     * notify of a replaced ammo
+     * @param ca
+     * @param s
+     */
     private void notifyReplaceAmmo(CardAmmo ca, Square s) {
         gameObservers.forEach(o -> o.onReplaceAmmo(ca,s));
     }
@@ -1153,5 +1246,131 @@ public class Game {
 
     public void notifyRage(Kill lastKill) {
         gameObservers.forEach(o -> o.onPlayerRaged(lastKill));
+    }
+
+    /**
+     * Gets List of the player in game.
+     *
+     * @return Value of List of the player in game.
+     */
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    /**
+     * Gets deck of all card power in the game.
+     *
+     * @return Value of deck of all card power in the game.
+     */
+    public List<CardPower> getDeckPower() {
+        return deckPower;
+    }
+
+    /**
+     * Gets List of kill in a turn.
+     *
+     * @return Value of List of kill in a turn.
+     */
+    public List<Kill> getThisTurnKill() {
+        return thisTurnKill;
+    }
+
+    /**
+     * Sets new Id of the game.
+     *
+     * @param id New value of Id of the game.
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * Sets new List of ammo card wasted in the game.
+     *
+     * @param ammoWaste New value of List of ammo card wasted in the game.
+     */
+    public void setAmmoWaste(List<CardAmmo> ammoWaste) {
+        this.ammoWaste = ammoWaste;
+    }
+
+    /**
+     * Gets Current turn.
+     *
+     * @return Value of Current turn.
+     */
+    public Turn getCurrentTurn() {
+        return currentTurn;
+    }
+
+    /**
+     * Sets new Current turn.
+     *
+     * @param currentTurn New value of Current turn.
+     */
+    public void setCurrentTurn(Turn currentTurn) {
+        this.currentTurn = currentTurn;
+    }
+
+    /**
+     * Gets List of all card ammo in the agem.
+     *
+     * @return Value of List of all card ammo in the agem.
+     */
+    public List<CardAmmo> getDeckAmmo() {
+        return deckAmmo;
+    }
+
+    /**
+     * Gets map of the game.
+     *
+     * @return Value of map of the game.
+     */
+    public GameMap getMap() {
+        return map;
+    }
+
+    /**
+     * Sets new List of the player in game.
+     *
+     * @param players New value of List of the player in game.
+     */
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
+
+    /**
+     * Sets new List of all card ammo in the agem.
+     *
+     * @param deckAmmo New value of List of all card ammo in the agem.
+     */
+    public void setDeckAmmo(List<CardAmmo> deckAmmo) {
+        this.deckAmmo = deckAmmo;
+    }
+
+    /**
+     * Sets new map of the game.
+     *
+     * @param map New value of map of the game.
+     */
+    public void setMap(GameMap map) {
+        this.map = map;
+    }
+
+    /**
+     * Sets new Listo of all card weapons in the game.
+     *
+     * @param deckWeapon New value of Listo of all card weapons in the game.
+     */
+    public void setDeckWeapon(List<CardWeapon> deckWeapon) {
+        this.deckWeapon = deckWeapon;
+    }
+
+    /**
+     * Gets List of kill in alll game.
+     *
+     * @return Value of List of kill in alll game.
+     */
+    public List<Kill> getKillBoard() {
+        return killBoard;
     }
 }
