@@ -9,6 +9,7 @@ import game.model.effects.FullEffect;
 import game.model.exceptions.MapOutOfLimitException;
 import javafx.animation.Animation;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -36,7 +37,6 @@ import javafx.stage.Stage;
 
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -115,6 +115,8 @@ public class ClientGUIView extends Application implements View{
     private CardPower scopeSelected;
     private char t = 'n';
     private Player shooter;
+    private List<Label> points = new ArrayList<>();
+    private Label myPoint;
 
 
     public ClientGUIView() {
@@ -343,7 +345,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void insufficientAmmoNotification() {
-        textNotify.setText("Not enough ammo");
+        textNotify.setText("Not enough ammo \n" + textNotify.getText());
     }
 
     @Override
@@ -456,32 +458,32 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void invalidTargetNotification() {
-        textNotify.setText("Invalid terget selected!");
+        textNotify.setText("Invalid terget selected!\n" + textNotify.getText());
     }
 
     @Override
     public void invalidWeaponNotification() {
-        textNotify.setText("Invalid weapon selected!");
+        textNotify.setText("Invalid weapon selected!\n" + textNotify.getText());
     }
 
     @Override
     public void invalidActionNotification() {
-        textNotify.setText("Invalid action!");
+        textNotify.setText("Invalid action!\n" + textNotify.getText());
     }
 
     @Override
     public void insufficientNumberOfActionNotification() {
-        textNotify.setText("You cannot do others actions for this turn!");
+        textNotify.setText("You cannot do others actions for this turn!\n" + textNotify.getText());
     }
 
     @Override
     public void invalidStepNotification() {
-        textNotify.setText("The step selected is not valid, you loose the action!! xd!!1!1!!");
+        textNotify.setText("The step selected is not valid, you loose the action!! xd!!1!1!!\n" + textNotify.getText());
     }
 
     @Override
     public void maxNumberOfWeaponNotification() {
-        textNotify.setText("You can't grab another weapon!");
+        textNotify.setText("You can't grab another weapon!\n" + textNotify.getText());
     }
 
     @Override
@@ -492,15 +494,15 @@ public class ClientGUIView extends Application implements View{
         String nick = ClientContext.get().getMap().getPlayerById(shooterId).getNickName();
         String hitted = ClientContext.get().getMap().getPlayerById(hit).getNickName();
         if(shooterId == ClientContext.get().getMyID()){
-            textNotify.setText("You dealt damage");
+            textNotify.setText("You dealt damage\n" + textNotify.getText());
             refreshPlayerDamage();
         }
         else{
             if(hit == ClientContext.get().getMyID()){
-                textNotify.setText(nick + " dealt damage to you");
+                textNotify.setText(nick + " dealt damage to you\n" + textNotify.getText());
                 refreshMyPlayerDamage();
             }else{
-                textNotify.setText(nick + " dealt damage to "+ hitted);
+                textNotify.setText(nick + " dealt damage to "+ hitted + "\n" + textNotify.getText());
                 refreshPlayerDamage();
             }
         }
@@ -515,9 +517,9 @@ public class ClientGUIView extends Application implements View{
         System.out.println("moved");
         String moved = ClientContext.get().getMap().getPlayerById(pId).getNickName();
         if(pId == ClientContext.get().getMyID())
-            textNotify.setText("You moved correctly");
+            textNotify.setText("You moved correctly\n" + textNotify.getText());
         else
-            textNotify.setText("Player "+ moved + " moved!");
+            textNotify.setText("Player "+ moved + " moved!\n" + textNotify.getText());
         refreshPlayerPosition();
     }
 
@@ -528,13 +530,13 @@ public class ClientGUIView extends Application implements View{
             AudioClip audio = new AudioClip(url);
             audio.play();
         }
-        textNotify.setText("Player "+ClientContext.get().getMap().getPlayerById(idKiller).getNickName() + " killed "+ClientContext.get().getMap().getPlayerById(idVictim).getNickName());
+        textNotify.setText("Player "+ClientContext.get().getMap().getPlayerById(idKiller).getNickName() + " killed "+ClientContext.get().getMap().getPlayerById(idVictim).getNickName() + "\n" + textNotify.getText());
         refreshDeaths();
     }
 
     @Override
     public void notifyRage(Player killer, Player victim) {
-        textNotify.setText("Player "+killer.getNickName()+" has raged "+victim.getNickName());
+        textNotify.setText("Player "+killer.getNickName()+" has raged "+victim.getNickName() + "\n" + textNotify.getText());
     }
 
     @Override
@@ -547,10 +549,10 @@ public class ClientGUIView extends Application implements View{
         if(pID == ClientContext.get().getMyID()){
             refreshMyPlayerCard();
             refreshMyPlayerAmmo();
-            textNotify.setText("You grabbed "+name);
+            textNotify.setText("You grabbed "+name + "\n" + textNotify.getText());
         }else{
             String pName = ClientContext.get().getMap().getPlayerById(pID).getNickName();
-            textNotify.setText("Player "+pName+ " grabbed "+ name);
+            textNotify.setText("Player "+pName+ " grabbed "+ name +"\n" + textNotify.getText());
         }
     }
 
@@ -558,16 +560,16 @@ public class ClientGUIView extends Application implements View{
     public void powerUpUsageNotification(int id, String name, String description) {
         if(id == ClientContext.get().getMyID()){
             refreshMyPlayerCard();
-            textNotify.setText("You used "+name);
+            textNotify.setText("You used "+name + "\n" + textNotify.getText());
         }else{
             String pName = ClientContext.get().getMap().getPlayerById(id).getNickName();
-            textNotify.setText("Player "+pName+ " used "+ name);
+            textNotify.setText("Player "+pName+ " used "+ name + "\n" + textNotify.getText());
         }
     }
 
     @Override
     public void choosePowerUpToRespawn(List<CardPower> cardPower) {
-        textNotify.setText("Your turn: respawn");
+        textNotify.setText("Your turn: respawn\n" + textNotify.getText());
         refreshMyPlayerCard();
         if(cardPower.size() > 3){
             StackPane sp = new StackPane();
@@ -589,7 +591,7 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void notifyCompletedOperation(String message) {
         System.out.println("notifyOperationcomeplte");
-        textNotify.setText(message);
+        textNotify.setText(message + "\n" + textNotify.getText());
         if(!this.controller.getState().equals(ClientState.WAITING_START)){
             refreshMyPlayerCard();
             refreshMyPlayerAmmo();
@@ -598,12 +600,12 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyInvalidPowerUP() {
-        textNotify.setText("Invalid Power Up");
+        textNotify.setText("Invalid Power Up\n" + textNotify.getText());
     }
 
     @Override
     public void notifyInvalidGrabPosition() {
-        textNotify.setText("Invalid position, no card ammo here");
+        textNotify.setText("Invalid position, no card ammo here\n" + textNotify.getText());
     }
 
 
@@ -613,12 +615,12 @@ public class ClientGUIView extends Application implements View{
         List <CardPower> list = cardPower.stream().filter(x -> x.getName().equals("Targeting scope")).collect(Collectors.toList());
         int dim = list.size();
         if(dim > 0 ){
+            state = ClientState.CHOOSESCOPE;
             text.setText("Do you want to use a Targeting scope power-up card to apply an additional damage to one of your previous target?");
             yes.setVisible(true);
             no.setVisible(true);
             yes.setOnMouseClicked(mouseEvent -> {
                 if(dim > 1){
-                    state = ClientState.CHOOSESCOPE;
                     text.setText("Choose which power up use :");
                     activateCardPower(list);
                 }else{
@@ -637,7 +639,7 @@ public class ClientGUIView extends Application implements View{
         }
 
     }
-    private void choosePowerUpToPay(List<CardPower> cardPower) {
+    private synchronized void choosePowerUpToPay(List<CardPower> cardPower) {
         StackPane sp = new StackPane();
         Scene tempScene = new Scene(sp);
         List<CheckBox> powerUp = new ArrayList<>();
@@ -713,7 +715,7 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyInvalidMessage() {
-        textNotify.setText("Invalid choise!");
+        textNotify.setText("Invalid choise!\n" + textNotify.getText());
     }
 
     @Override
@@ -730,9 +732,9 @@ public class ClientGUIView extends Application implements View{
             if( p == null)
                 p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == pID).findFirst().orElse(null);
             if(p == null)
-                textNotify.setText("Player "+pID+ " turn! Wit your time.");
+                textNotify.setText("Player "+pID+ " turn! Wit your time.\n" + textNotify.getText());
             else
-                textNotify.setText("Player "+p.getNickName()+" turn! Wait yout turn.");
+                textNotify.setText("Player "+p.getNickName()+" turn! Wait yout turn.\n" + textNotify.getText());
         }
     }
 
@@ -747,11 +749,11 @@ public class ClientGUIView extends Application implements View{
         String shooter = ClientContext.get().getMap().getPlayerById(idShooter).getNickName();
         if(idHitten == ClientContext.get().getMyID()) {
             refreshMyPlayerDamage();
-            textNotify.setText("You got hitted by "+ shooter);
+            textNotify.setText("You got hitted by "+ shooter +"\n" + textNotify.getText());
         }
         else {
             refreshPlayerDamage();
-            textNotify.setText(hitted+" got hitted by "+ shooter);
+            textNotify.setText(hitted+" got hitted by "+ shooter + "\n" + textNotify.getText());
         }
     }
 
@@ -762,10 +764,10 @@ public class ClientGUIView extends Application implements View{
         AudioClip audio = new AudioClip(url);
         audio.play();
         if(pID == ClientContext.get().getMyID()) {
-            textNotify.setText("You grabbed correctly!");
+            textNotify.setText("You grabbed correctly!\n" + textNotify.getText());
             refreshMyPlayerAmmo();
         }else
-            textNotify.setText("Player "+ClientContext.get().getMap().getPlayerById(pID)+ "moved!" );
+            textNotify.setText("Player "+ClientContext.get().getMap().getPlayerById(pID).getNickName() + "grab!\n" + textNotify.getText() );
         refreshAmmoCard();
     }
 
@@ -800,6 +802,7 @@ public class ClientGUIView extends Application implements View{
     }
     @Override
     public void chooseWeaponToGrab(List<CardWeapon> weapons) {
+        text.setText("Select the weapon to grab!");
         state = ClientState.CHOOSEWEAPONTOGRAB;
         weaponToGrab = weapons;
         for(ImageView iv : mapWT){
@@ -919,12 +922,13 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void showReloadMessage(CardWeapon cW) {
-        textNotify.setText("You correctly reload " + cW.getName());
+        textNotify.setText("You correctly reload " + cW.getName() + "\n" + textNotify.getText());
     }
 
     @Override
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
         state = ClientState.CHOOSEWEAPONTOSHOOT;
+        text.setText("Choose weapon to shoot!");
         for(ImageView iv : weapons){
             if(myWeapons.stream().anyMatch(mw->mw.getId() == Integer.parseInt(iv.getId().substring(2)))){
                 iv.setEffect(new DropShadow(35,Color.GREEN));
@@ -949,7 +953,7 @@ public class ClientGUIView extends Application implements View{
         });
         no.setVisible(true);
         no.setOnMouseClicked(mouseEvent -> {
-            if(price != null)
+            if(price.size() != 0)
                 choosePowerUpToPay(price);
             else
                 controller.getClient().sendMessage(new ChooseFirstEffectResponse(2,null));
@@ -968,7 +972,7 @@ public class ClientGUIView extends Application implements View{
         yes.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
             t = 'y';
-            if(price != null)
+            if(price.size() != 0)
                 choosePowerUpToPay(price);
             else
                 controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,null));
@@ -1016,7 +1020,7 @@ public class ClientGUIView extends Application implements View{
         yes.setVisible(true);
         no.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
-            if(list != null)
+            if(list.size() != 0)
                 choosePowerUpToPay(list);
             else
                 controller.getClient().sendMessage(new UseOrderPlusResponse(fullEffectList, null, 'y'));
@@ -1030,7 +1034,7 @@ public class ClientGUIView extends Application implements View{
         });
     }
     @Override
-    public void choosePlusEffect(List<FullEffect> plusEffects) {
+    public synchronized void choosePlusEffect(List<FullEffect> plusEffects) {
         state = ClientState.CHOOSEPLUSEFFECT;
         StackPane sp = new StackPane();
         Scene tempScene = new Scene(sp);
@@ -1121,8 +1125,13 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void rejoinGamePhase(List<String> otherPlayers) {
+        disablePowerUp();
+        disableMyWeapon();
+        disableSquare();
+        disableAmmo();
+        disableButton();
+        disableWeapon();
         text.setText("Hello "+ClientContext.get().getMyPlayer().getNickName() + " do you want to rejoin the game?");
-
         yes.setVisible(true);
         no.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
@@ -1135,12 +1144,12 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyPlayerSuspended(Player p) {
-        textNotify.setText("Player "+ p.getNickName() + "got suspended!");
+        textNotify.setText("Player "+ p.getNickName() + "got suspended!\n" + textNotify.getText());
     }
 
     @Override
     public void timeOutPhase() {
-        textNotify.setText("You timed out and you have been kicked out!");
+        textNotify.setText("You timed out and you have been kicked out!\n" + textNotify.getText());
         if(this.controller.getState() != ClientState.GAME_END) {
             try {
                 Thread.sleep(2000);
@@ -1156,7 +1165,7 @@ public class ClientGUIView extends Application implements View{
                     no.setVisible(false);
                     yes.setVisible(false);
                 } else
-                    textNotify.setText("Game Finished");
+                    textNotify.setText("Game Finished\n" + textNotify.getText());
             });
             no.setOnMouseClicked(mouseEvent -> this.controller.stopListening());
         }
@@ -1182,12 +1191,12 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void rejoinGameConfirm() {
-        textNotify.setText("You successfully rejoin your previous game! Now wait for your turn..");
+        textNotify.setText("You successfully rejoin your previous game! Now wait for your turn..\n" + textNotify.getText());
     }
 
     @Override
     public void notifyPlayerRejoin(Player p) {
-        textNotify.setText("Player " + p.getNickName() + " has rejoined the game!");
+        textNotify.setText("Player " + p.getNickName() + " has rejoined the game!\n" + textNotify.getText());
     }
 
     @Override
@@ -1205,12 +1214,15 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void notifyReconnected() {
-        //TODO
+        textNotify.setText("Reconnected to the server!!");
     }
 
     @Override
     public void showPoints() {
-        //TODO
+        for(Label l : points){
+            l.setText(""+ClientContext.get().getMap().getPlayerById(Integer.parseInt(l.getId())).getPoints());
+        }
+        myPoint.setText(""+ClientContext.get().getMyPlayer().getPoints());
     }
 
     /**
@@ -1325,16 +1337,16 @@ public class ClientGUIView extends Application implements View{
         text.setWrapText(true);
         text.setTextFill(Color.WHITE);
         text.setPrefWidth(screenWidth*52.5/100);
-        text.setMaxHeight(screenHeight*3.25/100);
-        textNotify.setStyle("-fx-font: 20px Tahoma;");
-        textNotify.setWrapText(true);
+        text.setMaxHeight(screenHeight* 3 /100);
+        textNotify.setStyle("-fx-font: 15px Tahoma;");
         textNotify.setTextFill(Color.WHITE);
         textNotify.setPrefWidth(screenWidth*52.5/100);
-        textNotify.setMaxHeight(screenHeight*3.25/100);
+        textNotify.setMaxHeight(screenHeight*6/100);
+        textNotify.setText("");
 
         map.getChildren().addAll(text, textNotify , yes , no);
         StackPane.setAlignment(textNotify,Pos.BOTTOM_LEFT);
-        StackPane.setMargin(textNotify,new Insets(0,0,(screenHeight * 21 / 100),0));
+        StackPane.setMargin(textNotify,new Insets(0,0,(screenHeight * 25 / 100),0));
         StackPane.setAlignment(text,Pos.BOTTOM_LEFT);
         StackPane.setMargin(text,new Insets(0,0,(screenHeight * 17.7 / 100),0));
         StackPane.setAlignment(yes,Pos.BOTTOM_LEFT);
@@ -1619,16 +1631,44 @@ public class ClientGUIView extends Application implements View{
         for(Player p : ClientContext.get().getPlayersInWaiting()){
             Image dash = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+p.getColor().toString()+"Dash.png"));
             ImageView imw = new ImageView(dash);
-            map.getChildren().add(imw);
-            if(p.getId() == ClientContext.get().getMyID())
-                playerDashBoard.add(imw);
-            imw.setOnMouseClicked(mouseEvent -> System.out.println(""+p.getId()));
+            Label name = new Label(p.getNickName());
+            Label point = new Label("0");
+            point.setId(""+p.getId());
+            switch(p.getColor()){
+                case PURPLE:
+                case BLUE:
+                    name.setTextFill(Color.WHITE);
+                    point.setTextFill(Color.WHITE);
+                    break;
+                case GREEN:
+                case YELLOW:
+                case GREY:
+                    name.setTextFill(Color.BLACK);
+                    point.setTextFill(Color.BLACK);
+                    break;
+            }
+            name.setFont(Font.font(16));
+            point.setFont(Font.font(25));
+            map.getChildren().addAll(imw,name,point);
             imw.setId(""+p.getId());
             imw.setFitWidth(screenWidth*36.6/100);
             imw.setPreserveRatio(true);
             if(p.equals(ClientContext.get().getMyPlayer())){
+                myPoint = point;
                 StackPane.setAlignment(imw,Pos.BOTTOM_LEFT);
+                StackPane.setAlignment(name,Pos.BOTTOM_LEFT);
+                StackPane.setMargin(name,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 4 / 100));
+                StackPane.setAlignment(point,Pos.BOTTOM_LEFT);
+                StackPane.setMargin(point,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 2/ 100 ));
+
             }else {
+                playerDashBoard.add(imw);
+                points.add(point);
+                System.out.println("Plater :" +p.getNickName());
+                StackPane.setAlignment(point,Pos.TOP_RIGHT);
+                StackPane.setMargin(point,new Insets(i + screenHeight * 0.4 / 100,screenWidth * 33 / 100,0,0));
+                StackPane.setAlignment(name,Pos.TOP_RIGHT);
+                StackPane.setMargin(name,new Insets(i + screenHeight * 0.4 / 100,screenWidth * 29 / 100,0,0));
                 StackPane.setAlignment(imw,Pos.TOP_RIGHT);
                 StackPane.setMargin(imw,new Insets(i,0,0,0));
                 i = i + (int)(screenHeight*18.6/100);
@@ -1886,7 +1926,7 @@ public class ClientGUIView extends Application implements View{
     private void handleSquareClick(MouseEvent e){
         Square choosenSquare;
         int i = Integer.parseInt(((Rectangle)e.getSource()).getId());
-        textNotify.setText("You selected square in: " + (i-1)/4 + ", " + (i-1)%4);
+        textNotify.setText("You selected square in: " + (i-1)/4 + ", " + (i-1)%4 + "\n" + textNotify.getText());
         choosenSquare = possiblePositions.stream().filter( p -> p.getX() == (i-1)%4 && p.getY() == (i-1)/4).findFirst().orElse(null);
         controller.getClient().sendMessage(new ChooseSquareResponse(choosenSquare));
         this.possiblePositions = null;
@@ -1967,17 +2007,20 @@ public class ClientGUIView extends Application implements View{
                     break;
                 }
                 case CHOOSEWEAPONTOWASTE: {
-                    weaponW = weaponToGrab.stream().filter(w -> w.getId() == id).findFirst().orElse(null);
+                    weaponW = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
                     if (weaponG.getPrice().size() == 1) {
-                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, weaponW));
+                    }else{
+                        price = weaponG.getPrice().subList(1,weaponG.getPrice().size());
+                        list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
+                        if (list.size() != 0) {
+                            choosePowerUpToPay(list);
+                        }
+                        else {
+                            controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, weaponW));
+                        }
                     }
                     disableMyWeapon();
-                    price = weaponG.getPrice().subList(1,weaponG.getPrice().size());
-                    list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
-                    if (list.size() != 0)
-                        choosePowerUpToPay(list);
-                    else
-                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
                     break;
                 }
                 case CHOOSEWEAPONTOSHOOT: {
@@ -2010,6 +2053,7 @@ public class ClientGUIView extends Application implements View{
      * Activate the weapon to waste
      */
     private void chooseWeaponToWaste(){
+        text.setText("Choose weapon to waste: ");
         state = ClientState.CHOOSEWEAPONTOWASTE;
         for(ImageView iv : weapons){
             iv.setEffect(new DropShadow(35, Color.GREEN));
@@ -2059,33 +2103,38 @@ public class ClientGUIView extends Application implements View{
 
         waits.setBackground(new Background(bi));
 
-        int mapId = 1, nPlayer;
         StackPane sp = new StackPane();
         sp.setPrefSize(500,300);
         sp.setBackground(new Background(bi));
         Scene room = new Scene(sp);
-
+        Image iMap = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/mappa1.png"));
+        ImageView ivMap = new ImageView(iMap);
         Label text = new Label("Choose map id");
         text.setTextFill(Color.WHITE);
         Label error = new Label("");
+        sp.getChildren().add(ivMap);
+        ivMap.setFitHeight(150);
+        ivMap.setPreserveRatio(true);
         ChoiceBox mapc = new ChoiceBox();
-        mapc.getItems().add("Map 1");
-        mapc.getItems().add("Map 2");
-        mapc.getItems().add("Map 3");
-        mapc.getItems().add("Map 4");
+        mapc.setItems(FXCollections.observableArrayList("Map 1", "Map 2", "Map 3 ", "Map 4"));
+        mapc.getSelectionModel().selectedIndexProperty().addListener((ov, oldSelected, newSelected) -> {
+            int i = newSelected.intValue() + 1;
+            ivMap.setImage(new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/mappa"+i+".png")));
+        });
         mapc.getSelectionModel().selectFirst();
-        nPlayer = 5;
         Button submit = new Button("Create Room");
 
 
         ObservableList list = sp.getChildren();
         list.addAll(text,mapc, submit,error);
+        StackPane.setAlignment(ivMap,Pos.TOP_RIGHT);
+        StackPane.setMargin(ivMap,new Insets(60,60,0,0));
         StackPane.setAlignment(text,Pos.TOP_CENTER);
         StackPane.setMargin(text,new Insets(25,0,0,0));
         StackPane.setAlignment(mapc,Pos.CENTER_LEFT);
         StackPane.setMargin(mapc,new Insets(0,0,0,50));
         StackPane.setAlignment(submit,Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(submit,new Insets(0,50,25,0));
+        StackPane.setMargin(submit,new Insets(0,35,30,0));
         StackPane.setAlignment(error,Pos.BOTTOM_LEFT);
 
         primaryStage.setScene(room);
@@ -2227,7 +2276,7 @@ public class ClientGUIView extends Application implements View{
                 state = ClientState.CHOOSECARDPOWER;
                 List<CardPower> powerList = ClientContext.get().getMyPlayer().getCardPower().stream().filter(c -> !c.isUseWhenAttacking() && !c.isUseWhenDamaged()).collect(Collectors.toList());
                 if(powerList.isEmpty()) {
-                    textNotify.setText("There are no power-up cards available for use in this moment!");
+                    textNotify.setText("There are no power-up cards available for use in this moment!\n" + textNotify.getText());
                     chooseStepActionPhase();
                 }
                 else
