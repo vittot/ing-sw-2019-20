@@ -1,5 +1,8 @@
 package game.model;
 
+/**
+ * enum class that groups the five possible colors for the player in game
+ */
 public enum PlayerColor {
     YELLOW,
     PURPLE,
@@ -8,6 +11,10 @@ public enum PlayerColor {
     GREEN;
 
 
+    /**
+     * return the string conversion of an enum value
+     * @return string version
+     */
     @Override
     public String toString() {
         switch(this) {

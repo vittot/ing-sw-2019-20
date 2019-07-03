@@ -18,22 +18,31 @@ public class ClientTextView implements  View {
     private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_GREY = "\u001b[37m";
-    private ClientController controller;
-    private Scanner fromKeyBoard;
-    private List<GameMap> availableMaps;
-    private Thread waitingThread;
+    private ClientController controller; /** reference to che client controller */
+    private Scanner fromKeyBoard; /** standard input reference */
+    private List<GameMap> availableMaps; /** list of available maps */
+    private Thread waitingThread; /** thread to wait the game start */
 
 
-
+    /**
+     * construct the CLI object
+     */
     public ClientTextView(){
        initInput();
     }
 
+    /**
+     * construct the CLI object specifying the client controller reference
+     * @param controller
+     */
     public ClientTextView(ClientController controller) {
         this.controller = controller;
         initInput();
     }
 
+    /**
+     * Initialize the standard input reference
+     */
     private void initInput()
     {
         this.fromKeyBoard = new Scanner(System.in);
@@ -45,10 +54,18 @@ public class ClientTextView implements  View {
         }*/
     }
 
+    /**
+     * print view notification on screen
+     * @param text
+     */
     public synchronized void writeText (String text){
         System.out.println(">> " + text);
     }
 
+    /**
+     * read a string from input
+     * @return a string
+     */
     public synchronized String readText(){
         initInput();
         String string = null;
@@ -62,6 +79,10 @@ public class ClientTextView implements  View {
 
     }
 
+    /**
+     * read a char from input
+     * @return a string
+     */
     public synchronized char readChar(){
         try {
             String string = readText();
@@ -140,6 +161,10 @@ public class ClientTextView implements  View {
         controller.getClientNetwork().sendMessage(new GetWaitingRoomsRequest());
     }
 
+    /**
+     * manage the user interaction to permit to reload a weapon with the possibility of use power-up card to pay
+     * @param weaponsToReload
+     */
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
         writeText("Here you will be able to choose what weapon reload from the unloaded ones!");
@@ -164,16 +189,27 @@ public class ClientTextView implements  View {
 
     }
 
+    /**
+     * notify that a weapon has been correctly reloaded
+     * @param cW
+     */
     @Override
     public void showReloadMessage(CardWeapon cW) {
         writeText("The weapon " + cW.getName() + " has been correctly reloaded");
     }
 
+    /**
+     * notify that a player has been suspended
+     * @param p
+     */
     @Override
     public void notifyPlayerSuspended(Player p) {
         writeText("Player " + p.getNickName() +  " has been suspended from the game because of connection lost");
     }
 
+    /**
+     * notify the client that the server suspend him from the game and ask him to rejoin it
+     */
     @Override
     public void timeOutPhase() {
         char choice;
@@ -197,38 +233,62 @@ public class ClientTextView implements  View {
         }
     }
 
+    /**
+     * notify that the nickname selected is already used by another client and manage a second choose
+     */
     @Override
     public void alreadyLoggedPhase() {
         writeText("There is already a user logged with this name on the server! Choose another name:");
         setUserNamePhase();
     }
 
+    /**
+     * notify the correct login to the server
+     */
     @Override
     public void loginCompletedPhase() {
         writeText("You correctly logged in!");
         controller.getClientNetwork().sendMessage(new GetAvailableMapsRequest());
     }
 
+    /**
+     * notify successfully rejoin of the mìgame
+     */
     @Override
     public void rejoinGameConfirm() {
         writeText("You successfully rejoin your previous game! Now wait for your turn..");
     }
 
+    /**
+     * notify the other clients that a specific client has rejoined the game
+     * @param p
+     */
     @Override
     public void notifyPlayerRejoin(Player p) {
         writeText("Player " + p.getNickName() + " has rejoined the game!");
     }
 
+    /**
+     * notify that a new player joined the waiting room
+     * @param p
+     */
     @Override
     public void notifyPlayerJoinedWaitingRoom(Player p) {
         writeText("Player " + p.getNickName() + " has joined the waiting room!");
     }
 
+    /**
+     * set clientController reference
+     * @param clientController
+     */
     @Override
     public void setController(ClientController clientController) {
         this.controller = clientController;
     }
 
+    /**
+     * wait before the game start
+     */
     @Override
     public void waitStart(){
 
@@ -249,6 +309,9 @@ public class ClientTextView implements  View {
         waitingThread.start();
     }
 
+    /**
+     * choose the type of connection and the server to connect to
+     */
     @Override
     public void chooseConnection() {
         String choice, ip;
@@ -269,6 +332,11 @@ public class ClientTextView implements  View {
         LaunchClient.startConnection(choice,ip);
     }
 
+    /**
+     * manage the counter attack by Tagback grenade
+     * @param counterattack
+     * @param shooter
+     */
     @Override
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
         char c;
@@ -296,11 +364,19 @@ public class ClientTextView implements  View {
 
     }
 
+    /**
+     * notify that a player leaved the waiting room
+     * @param p
+     */
     @Override
     public void notifyPlayerLeavedWaitingRoom(Player p) {
         writeText("Player " + p.getNickName() + " has leaved the waiting room!");
     }
 
+    /**
+     * notify the successfully reconnection to the server
+     * @param otherPlayers
+     */
     @Override
     public void rejoinGamePhase(List<String> otherPlayers) {
         char choice;
@@ -317,6 +393,10 @@ public class ClientTextView implements  View {
 
     }
 
+    /**
+     * manage the selection of the weapon to use during the shoot action
+     * @param myWeapons
+     */
     @Override
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
         int n;
@@ -328,6 +408,11 @@ public class ClientTextView implements  View {
         controller.getClientNetwork().sendMessage(new ChooseWeaponToShootResponse(myWeapons.get(n-1)));
     }
 
+    /**
+     * manage the choice between the base effect and the alternative effect of the selected weapon
+     * @param baseEff
+     * @param altEff
+     */
     @Override
     public void chooseFirstEffect(FullEffect baseEff, FullEffect altEff) {
         int n;
@@ -345,6 +430,10 @@ public class ClientTextView implements  View {
         controller.getClientNetwork().sendMessage(new ChooseFirstEffectResponse(n,toUse));
     }
 
+    /**
+     * manage the decision of use a plus effect before of the base effect
+     * @param plusEff
+     */
     @Override
     public void usePlusBeforeBase(FullEffect plusEff) {
         char t;
@@ -362,6 +451,10 @@ public class ClientTextView implements  View {
         controller.getClientNetwork().sendMessage(new UsePlusBeforeResponse(plusEff,t,toUse));
     }
 
+    /**
+     * manage the application of plus effects that have to be used in order
+     * @param plusEffects
+     */
     @Override
     public void usePlusInOrder(List<FullEffect> plusEffects) {
         List<CardPower> toUse = new ArrayList<>();
@@ -377,6 +470,10 @@ public class ClientTextView implements  View {
         controller.getClientNetwork().sendMessage(new UseOrderPlusResponse(plusEffects,toUse,t));
     }
 
+    /**
+     * manage the selection of the plus effect to use
+     * @param plusEffects
+     */
     @Override
     public void choosePlusEffect(List<FullEffect> plusEffects) {
         List<CardPower> toUse = new ArrayList<>();
@@ -649,27 +746,6 @@ public class ClientTextView implements  View {
         controller.getClientNetwork().sendMessage(new ChooseTargetResponse(choosenTarget));
     }
 
-    public final static void clearConsole()
-    {
-        try
-        {
-            final String os = System.getProperty("os.name");
-
-            if (os.contains("Windows"))
-            {
-                Runtime.getRuntime().exec("cls");
-            }
-            else
-            {
-                Runtime.getRuntime().exec("clear");
-            }
-        }
-        catch (final Exception e)
-        {
-            //  Handle any exceptions.
-        }
-    }
-
     /**
      * Choose the action for the current turn
      * @param isMovedAllowed indicate if the movement action is allowed or not
@@ -874,13 +950,18 @@ public class ClientTextView implements  View {
             writeText("!");
     }
 
+    /**
+     * notify clients that a player has been raged after his death
+     * @param killer
+     * @param victim
+     */
     @Override
     public void notifyRage(Player killer, Player victim) {
         writeText("Player "+killer.getNickName()+" raged player "+victim.getNickName()+"!");
     }
 
     /**
-     *
+     * manage the selection of the power-up card to discard to allow the player respawn
      * @param list
      */
     @Override
@@ -890,7 +971,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * show the final results of the game and the final ranking
      * @param ranking
      */
     @Override
@@ -923,6 +1004,9 @@ public class ClientTextView implements  View {
         
     }
 
+    /**
+     * manage the possibility to restart to play in a new game
+     */
     private void restartGamePhase() {
         char choice;
         writeText("Do you want to play a new game?[Y/N]");
@@ -941,7 +1025,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify a complete operation message
      * @param message
      */
     @Override
@@ -950,7 +1034,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify the choice of an invalid power-up card
      */
     @Override
     public void notifyInvalidPowerUP(){
@@ -958,7 +1042,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify the failure of a grab action
      */
     @Override
     public void notifyInvalidGrabPosition(){
@@ -966,7 +1050,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * manage the possibility to use a Targeting scope to apply additional damage to one of the previous client target
      * @param list
      */
     @Override
@@ -975,7 +1059,7 @@ public class ClientTextView implements  View {
         int n = 1, t=1;
         list = list.stream().filter(x -> x.getName().equals("Targeting scope")).collect(Collectors.toList());
         List<CardPower> cPw = null;
-        if(list.size() > 0 && !ClientContext.get().getMyPlayer().getAmmo().isEmpty()) {
+        if(list.size() > 0 && (!ClientContext.get().getMyPlayer().getAmmo().isEmpty() || ClientContext.get().getMyPlayer().getCardPower().size() > 2)) {
             writeText("Do you want to use a Targeting scope power-up card to apply an additional damage to one of your previous target?");
             writeText("Insert [Y]es or [N]o");
             do {
@@ -1014,13 +1098,16 @@ public class ClientTextView implements  View {
     }
 
 
+    /**
+     * notify the game starting
+     */
     @Override
     public void notifyStart() {
         writeText("Game has started!");
     }
 
     /**
-     *
+     * notify an invalid choice
      */
     @Override
     public void notifyInvalidMessage() {
@@ -1028,7 +1115,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify that the turn is changed
      * @param pID
      */
     @Override
@@ -1042,7 +1129,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify new marks given
      * @param marks
      * @param idHitten
      * @param idShooter
@@ -1097,6 +1184,10 @@ public class ClientTextView implements  View {
         return list.get(k-1);
     }
 
+    /**
+     *
+     * @param map
+     */
     public void showMap(GameMap map) {
         Square [][] grid = map.getGrid();
         String col;
@@ -1225,6 +1316,9 @@ public class ClientTextView implements  View {
     }
 
 
+    /**
+     *
+     */
     private void showMyPlayerInformation() {
         String death = "\u2620";
         Player p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());

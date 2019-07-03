@@ -1280,7 +1280,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(state != ServerState.WAITING_POWER_USAGE && damageEffect) {
             state = ServerState.WAITING_POWER_USAGE;
             List<CardPower> powers = controlPowerUpDamage();
-            if (!powers.isEmpty()) {
+            if (!powers.isEmpty() && (!currPlayer.getAmmo().isEmpty() || currPlayer.getCardPower().size() > 1)) {
                 return new AfterDamagePowerUpRequest(powers, selectableTarget);
             }
         }
