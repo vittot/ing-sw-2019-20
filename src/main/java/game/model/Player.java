@@ -17,29 +17,37 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * class that represents a single player in game
+ */
 public class Player implements Target, Serializable, Comparable<Player> {
-    private PlayerColor color;
-    private List<PlayerColor> marks;
-    private List<PlayerColor> thisTurnMarks;
-    private int id;
-    private String nickName;
-    private List<PlayerColor> damage;
-    private AdrenalineLevel adrenaline;
-    private transient List<CardWeapon> weapons;
-    private CardWeapon actualWeapon;
-    private CardPower actualCardPower;
-    private List<Color> ammo;
-    private List<CardPower> cardPower;
-    private int deaths;
-    private transient int points;
-    private Square position;
-    private transient Game game;
-    private boolean isDead;
-    private static final int MARKS_PER_ENEMY=3;
-    private boolean serializeEverything;
-    private transient PlayerObserver playerObserver;
-    private boolean suspended;
+    private PlayerColor color; /** field that specifies the player color */
+    private List<PlayerColor> marks; /** list of all the marks received by the player during the game */
+    private List<PlayerColor> thisTurnMarks; /** list of all the marks received during the current turn by the player */
+    private int id; /** field that contains the id of the player in game */
+    private String nickName; /** nickName chosen by the user to play the game */
+    private List<PlayerColor> damage; /** list of all the damages received by the player during the game */
+    private AdrenalineLevel adrenaline; /** field that indicates the player adrenaline state */
+    private transient List<CardWeapon> weapons; /** list of weapons grabbed by the player */
+    private CardWeapon actualWeapon; /** field representing the weapon actually used by the player */
+    private CardPower actualCardPower; /** reference to the power-up card actually use by the player */
+    private List<Color> ammo; /** list of ammos grabbed by the player */
+    private List<CardPower> cardPower; /** list of power-up cards grabbed by the player */
+    private int deaths; /** field that counts the player deaths */
+    private transient int points; /** field that counts the player points */
+    private Square position; /** reference to the square where the player is positioned */
+    private transient Game game; /** reference to the game */
+    private boolean isDead; /** field that indicates if the player is dead or alive */
+    private static final int MARKS_PER_ENEMY=3; /** constant value that specify the max number of marks that every player can give to each of the others */
+    private boolean serializeEverything; /** boolean value that permits to specify if the transient attribute have to been serialized in transmission */
+    private transient PlayerObserver playerObserver; /** reference to the object that is in charge of notify the game events */
+    private boolean suspended; /** boolean value that specifies if the player has been suspended from the game cause of connection lost */
 
+    /**
+     * construct a player object ready to start the game
+     * @param id
+     * @param color
+     */
     public Player(int id, PlayerColor color)
     {
         this.id = id;
@@ -58,6 +66,12 @@ public class Player implements Target, Serializable, Comparable<Player> {
         this.suspended = false;
     }
 
+    /**
+     * Player constructor
+     * @param id
+     * @param color
+     * @param nick
+     */
     public Player(int id, PlayerColor color, String nick)
     {
         this(id,color);
@@ -91,149 +105,281 @@ public class Player implements Target, Serializable, Comparable<Player> {
         this.suspended = or.suspended;
     }
 
+    /**
+     * return if the player is suspended from the game
+     * @return suspended
+     */
     public boolean isSuspended() {
         return suspended;
     }
 
+    /**
+     * set playerObserver attribute
+     * @param playerObserver
+     */
     public void setPlayerObserver(PlayerObserver playerObserver) {
         this.playerObserver = playerObserver;
     }
 
-    public boolean isSerializeEverything() {
-        return serializeEverything;
-    }
-
+    /**
+     * set serializeEverything attribute
+     * @param serializeEverything
+     */
     public void setSerializeEverything(boolean serializeEverything) {
         this.serializeEverything = serializeEverything;
     }
 
+    /**
+     * set suspended attribute
+     * @param suspended
+     */
     public void setSuspended(boolean suspended) {
         this.suspended = suspended;
     }
 
+    /**
+     * return the nickName attribute
+     * @return nickname
+     */
     public String getNickName() {
         return nickName;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
+    /**
+     * Return the player string reference
+     * @return nickName
+     */
     @Override
     public String returnName(){
         return this.nickName;
     }
 
+    /**
+     * return color attribute
+     * @return color
+     */
     public PlayerColor getColor() {
         return color;
     }
 
+    /**
+     * set color attribute
+     * @param color
+     */
     public void setColor(PlayerColor color) {
         this.color = color;
     }
 
+    /**
+     * return id attribute
+     * @return id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * set id attribute
+     * @param id
+     */
     public void setId(int id) {
         this.id = id;
     }
 
+    /**
+     * return actualWeapon attribute
+     * @return actualWeapon
+     */
     public CardWeapon getActualWeapon() { return actualWeapon; }
 
+    /**
+     * set actualWeapon attribute
+     * @param actualWeapon
+     */
     public void setActualWeapon(CardWeapon actualWeapon) {
         this.actualWeapon = actualWeapon;
     }
 
+    /**
+     * return game reference
+     * @return game
+     */
     public Game getGame() {
         return game;
     }
 
+    /**
+     * set game reference
+     * @param game
+     */
     public void setGame(Game game) {
         this.game = game;
     }
 
+    /**
+     * set points attribute
+     * @param points
+     */
     public void setPoints(int points) {
         this.points = points;
     }
 
+    /**
+     * return marks list
+     * @return marks
+     */
     public List<PlayerColor> getMark() {
         return marks;
     }
 
+    /**
+     * return damage list
+     * @return damage
+     */
     public List<PlayerColor> getDamage() {
         return damage;
     }
 
+    /**
+     * return the adrenaline level
+     * @return adrenaline
+     */
     public AdrenalineLevel getAdrenaline() {
         return adrenaline;
     }
 
+    /**
+     * set adrenaline level
+     * @param adrenaline
+     */
     public void setAdrenaline(AdrenalineLevel adrenaline) {
         this.adrenaline = adrenaline;
     }
 
+    /**
+     * return the weapons list
+     * @return weapons
+     */
     public List<CardWeapon> getWeapons() {
         return weapons;
     }
 
+    /**
+     * set weapons list
+     * @param weapons
+     */
     public void setWeapons(List<CardWeapon> weapons) {
         this.weapons = weapons;
     }
 
+    /**
+     * return ammo list
+     * @return
+     */
     public List<Color> getAmmo() {
         return ammo;
     }
 
+    /**
+     * set ammo list
+     * @param ammo
+     */
     public void setAmmo(List<Color> ammo) {
         this.ammo = ammo;
     }
 
+    /**
+     * return power-up cards list
+     * @return
+     */
     public List<CardPower> getCardPower() {
         return cardPower;
     }
 
+    /**
+     * set power-up cards list
+     * @param cardPower
+     */
     public void setCardPower(List<CardPower> cardPower) {
         this.cardPower = cardPower;
     }
 
+    /**
+     * return deaths attribute
+     * @return deaths
+     */
     public int getDeaths() {
         return deaths;
     }
 
+    /**
+     * set deaths parameter
+     * @param deaths
+     */
     public void setDeaths(int deaths) {
         this.deaths = deaths;
     }
 
+    /**
+     * return position reference
+     * @return position
+     */
     public Square getPosition() {
         return position;
     }
 
+    /**
+     * set position reference
+     * @param position
+     */
     public void setPosition(Square position) {
         this.position = position;
     }
 
+    /**
+     * return points attribute
+     * @return points
+     */
     public int getPoints() {
         return points;
     }
 
+    /**
+     * return if the player is dead
+     * @return isDead
+     */
     public boolean isDead() {
         return isDead;
     }
 
+    /**
+     * set the isDead attribute
+     * @param dead
+     */
     public void setDead(boolean dead) {
         isDead = dead;
     }
 
+    /**
+     * return thisTurnMarks list
+     * @return thisTurnMarks
+     */
     public List<PlayerColor> getThisTurnMarks() {
         return thisTurnMarks;
     }
 
+    /**
+     * return actualCardPower reference
+     * @return actualCardPower
+     */
     public CardPower getActualCardPower() {
         return actualCardPower;
     }
 
+    /**
+     * set actualCardPower reference
+     * @param actualCardPower
+     */
     public void setActualCardPower(CardPower actualCardPower) {
         this.actualCardPower = actualCardPower;
     }
@@ -489,9 +635,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
     }
 
     /**
-     *
+     * control if the player can grab a weapon
      * @param cw
-     * @return
+     * @return true/false
      */
     public boolean canGrabWeapon(CardWeapon cw){
         List<Color> priceTmp;
@@ -504,9 +650,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
     }
 
     /**
-     *
+     * control if the player can use a specific weapon effect
      * @param effect
-     * @return
+     * @return true/false
      */
     public boolean canUseWeaponEffect(FullEffect effect){
         List<Color> priceTmp;
@@ -518,9 +664,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
     }
 
     /**
-     *
+     * control if the player can reload an unloaded weapon
      * @param cw
-     * @return
+     * @return true/false
      */
     public boolean canReloadWeapon(CardWeapon cw){
         List<Color> priceTmp;
@@ -528,6 +674,11 @@ public class Player implements Target, Serializable, Comparable<Player> {
         return controlPayment(priceTmp);
     }
 
+    /**
+     * control if the player can pay an indicated price
+     * @param price
+     * @return true/false
+     */
     public boolean controlPayment(List<Color> price){
         if(!price.isEmpty()) {
             if (price.get(0) == Color.ANY)
@@ -551,6 +702,11 @@ public class Player implements Target, Serializable, Comparable<Player> {
         return true;
     }
 
+    /**
+     * control if the player has to use power-up to pay a specific price or it isn't necessary
+     * @param price
+     * @return true/false
+     */
     public boolean mustUsePowerUpsToPay(List<Color> price) {
         if (!price.isEmpty() && price != null) {
             if (ammo != null && !ammo.isEmpty()) {
@@ -605,6 +761,11 @@ public class Player implements Target, Serializable, Comparable<Player> {
 
     }
 
+    /**
+     * control if the player can grab ammos or he has full ammos for each color
+     * @param ammos
+     * @return
+     */
     public List<Color> controlGrabAmmo(List<Color> ammos){
         int nRed = 0, nBlue = 0, nYellow = 0;
         for(Color a : ammo)
@@ -647,7 +808,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
     }
 
     /**
-     * Pick an ammo from the current Player position
+     * Pick up an ammo card from the current Player position
+     * @return list containing power-up card grabbed
+     * @throws NoCardAmmoAvailableException
      */
     public List<CardPower> pickUpAmmo()throws NoCardAmmoAvailableException {
         List<CardPower> powerups = new ArrayList<>();
@@ -678,11 +841,17 @@ public class Player implements Target, Serializable, Comparable<Player> {
         playerObserver.onRespawn();
     }
 
+    /**
+     * notify the starting of a new turn
+     */
     public void notifyTurn()
     {
         playerObserver.onTurnStart();
     }
 
+    /**
+     * notify points update
+     */
     public void notifyPoints()
     {
         playerObserver.notifyPoints();
@@ -731,6 +900,10 @@ public class Player implements Target, Serializable, Comparable<Player> {
         return "Id: " + id + "\nNickname: " + nickName;
     }
 
+    /**
+     * produce a string player description
+     * @return player string version
+     */
     @Override
     public String toString() {
         return "Player{" +
@@ -740,6 +913,11 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 '}';
     }
 
+    /**
+     * compare two players and verify if they are equals
+     * @param o
+     * @return true/false
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -749,15 +927,27 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 color == player.color;
     }
 
+    /**
+     * used by equals method
+     * @return
+     */
     @Override
     public int hashCode() {
         return Objects.hash(color,id);
     }
 
+    /**
+     * add new ammos to the player's ammo list
+     * @param ammo
+     */
     public void addAmmo(Color ammo) {
         this.ammo.add(ammo);
     }
 
+    /**
+     * control if the player has weapons unloaded and so to reload
+     * @return list of weapons to reload
+     */
     public List<CardWeapon> hasToReload() {
         List<CardWeapon> toReload = new ArrayList<>();
         for (CardWeapon cw : weapons)
@@ -792,12 +982,20 @@ public class Player implements Target, Serializable, Comparable<Player> {
 
     }
 
+    /**
+     * permit the player to rejoin the game where he was suspended
+     */
     void rejoin()
     {
         this.suspended = false;
         this.game.notifyPlayerRejoined(this);
     }
 
+    /**
+     * control if the player has less or more point than another player
+     * @param p2
+     * @return true/false
+     */
     @Override
     public int compareTo(Player p2)
     {
