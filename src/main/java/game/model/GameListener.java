@@ -22,4 +22,5 @@ public interface GameListener {
     void onPlayerUpdateMarks(Player player);
     void onPlayerRaged(Kill lastKill);
     String getUsername();
+    void onFinalFrenzy();
 }

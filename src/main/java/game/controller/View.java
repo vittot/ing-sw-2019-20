@@ -21,7 +21,7 @@ public interface View {
 
     void chooseTargetPhase(List<Target> possibleTargets);
 
-    void chooseTurnActionPhase();
+    void chooseTurnActionPhase(boolean isMovementAllowed);
 
     void invalidTargetNotification();
 
@@ -122,4 +122,8 @@ public interface View {
     void notifyDeath(int idKiller, int idVictim, boolean rage);
 
     void notifyRage(Player killer, Player victim);
+
+    void showNoWeaponToReload();
+
+    void notifyFinalFrenzy();
 }

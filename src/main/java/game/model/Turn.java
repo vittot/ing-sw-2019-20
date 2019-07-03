@@ -18,7 +18,9 @@ public class Turn {
     private Game game;
     private Timer timer;
     private boolean afterFirstPlayer = false;
+    private boolean finalFrenzy;
     private List <Player> lastTurnPlayed;
+    private int nPlayedFinalFrenzy;
 
     public Turn(Player currentPlayer, Game game)
     {
@@ -26,6 +28,9 @@ public class Turn {
         this.game = game;
         actionList = new ArrayList<>();
         numOfActions = 2;
+        finalFrenzy = false;
+        lastTurnPlayed = new ArrayList<>();
+        nPlayedFinalFrenzy = 0;
     }
 
     public List<Action> getActionList() {
@@ -46,6 +51,10 @@ public class Turn {
 
     public int getNumOfMovs() {
         return numOfMovs;
+    }
+
+    public int getnPlayedFinalFrenzy() {
+        return nPlayedFinalFrenzy;
     }
 
     public Action getCurrentAction() {
@@ -70,14 +79,19 @@ public class Turn {
 
     /**
      *
-     * @param player , finalFrezy
-     * @return void
+     * @param player
+     * @param finalFrezy
      */
     public void newTurn(Player player, boolean finalFrezy){
 
         game.getPlayers().forEach(Player::updateMarks);
 
         currentPlayer = player;
+
+        this.finalFrenzy = finalFrezy;
+
+        if(finalFrezy)
+            this.nPlayedFinalFrenzy++;
 
         if(finalFrezy && player.equals(game.getFirstPlayerToPlay())){
             this.afterFirstPlayer = true;
@@ -89,12 +103,14 @@ public class Turn {
             numOfMovs = 0;
             numOfActions = 1;
         }
-        if(finalFrezy && !afterFirstPlayer){
+        else if(finalFrezy && !afterFirstPlayer){
             numOfMovs = 0;
             numOfActions = 2;
         }
-        numOfActions = 2;
-        numOfMovs = 0;
+        else {
+            numOfActions = 2;
+            numOfMovs = 0;
+        }
         startTimer();
         game.notifyTurnChange(currentPlayer);
     }
@@ -120,7 +136,7 @@ public class Turn {
     public void stopTimer()
     {
         timer.cancel();
-        System.out.println("TIMER CANCELLED " + currentPlayer.getNickName());
+        //System.out.println("TIMER CANCELLED " + currentPlayer.getNickName());
     }
 
     /**
@@ -130,7 +146,7 @@ public class Turn {
      */
     public boolean applyStep(Action ac){
         //timer.cancel();
-        System.out.println("TIMER CANCELLED" + currentPlayer.getNickName()) ;
+
         int i = 0;
         currentPlayer.rifleActualWeapon();
         game.getPlayers().forEach(Player::updateMarks);
@@ -151,7 +167,7 @@ public class Turn {
      * @param action
      * @param adrenaline
      */
-    public List<Action> newAction(Action action, AdrenalineLevel adrenaline, boolean finalFreazy) throws NoResidualActionAvaiableException {
+    public List<Action> newAction(Action action, AdrenalineLevel adrenaline) throws NoResidualActionAvaiableException {
         actionList.clear();
         currentAction = action;
 
@@ -159,7 +175,7 @@ public class Turn {
             throw new NoResidualActionAvaiableException();
         }
         numOfActions = numOfActions - 1;
-        if(finalFreazy) {
+        if(finalFrenzy) {
             if (this.lastTurnPlayed.contains(currentPlayer)){
                 switch (action) {
                     case GRAB:
@@ -228,5 +244,22 @@ public class Turn {
         return actionList;
     }
 
-    
+
+    /**
+     * Return if the turn is the final frenzy turn
+     * @return
+     */
+    public boolean isFinalFrenzy() {
+        return finalFrenzy;
+    }
+
+    /**
+     * Check if the "movement" turn action is allowed
+     * @return
+     */
+    public boolean isMovAllowed() {
+        if(finalFrenzy && lastTurnPlayed.contains(currentPlayer))
+            return false;
+        return true;
+    }
 }

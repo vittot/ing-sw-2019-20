@@ -31,7 +31,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
     private List<Color> ammo;
     private List<CardPower> cardPower;
     private int deaths;
-    private transient int points;
+    private int points;
+    private int killboardpoints;
     private Square position;
     private transient Game game;
     private boolean isDead;
@@ -47,6 +48,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
         this.adrenaline = AdrenalineLevel.NONE;
         this.deaths = 0;
         this.points = 0;
+        this.killboardpoints = 0;
         this.isDead = false;
         this.marks = new ArrayList<>();
         this.thisTurnMarks = new ArrayList<>();
@@ -117,6 +119,22 @@ public class Player implements Target, Serializable, Comparable<Player> {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    /**
+     * Get points obtained by the killboard
+     * @return killbaord points
+     */
+    public int getKillboardpoints() {
+        return killboardpoints;
+    }
+
+    /**
+     * Set the killboard points
+     * @param killboardpoints
+     */
+    public void setKillboardpoints(int killboardpoints) {
+        this.killboardpoints = killboardpoints;
     }
 
     @Override
@@ -270,6 +288,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
         this.position = game.getMap().respawnColor(discard.getMapColor());
         this.position.addPlayer(this);
         this.isDead = false;
+        if(game.getCurrentTurn().isFinalFrenzy()) //to count points correctly in final frenzy
+            this.deaths = 3;
         game.notifyRespawn(this);
     }
 
@@ -298,9 +318,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 if (num > 10) {
                     this.deaths++;
                     this.isDead = true;
-                    shooter.addThisTurnMarks(this, 1); //when the victim of a damage die, the shooter receive a marks from the dead player
                     if (num > 11) {
                         isRage = true;
+                        shooter.addThisTurnMarks(this, 1); //the shooter receive a mark in case of rage
                     }
                     if (game != null)
                         game.addThisTurnKill(shooter, this, isRage);
@@ -312,6 +332,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
             } else if (this.damage.size() == 11 && damage > 0) {
                 lastKill = game.getLastKill(this);
                 lastKill.setRage(true);
+                shooter.addThisTurnMarks(this, 1); //the shooter receive a mark in case of rage
                 if(game != null)
                     game.notifyRage(lastKill);
             }
@@ -792,7 +813,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
     public int compareTo(Player p2)
     {
         if(this.points == p2.getPoints())
-            return this.id - p2.getId();
+            return p2.getKillboardpoints() - this.killboardpoints;
         return p2.getPoints() - this.points;
     }
 }

@@ -130,7 +130,7 @@ class PlayerTest {
     void findFirstDamage() {
         enemy.addDamage(p,1);
         enemy.addDamage(enemy2,1);
-        assertTrue(enemy.findFirstDamage(p.getColor(),enemy2.getColor())==true);
+        assertTrue(enemy.findFirstDamage(p.getColor(),enemy2.getColor()));
     }
 
     /**

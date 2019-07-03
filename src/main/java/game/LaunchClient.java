@@ -2,9 +2,6 @@ package game;
 
 import game.controller.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -38,20 +35,20 @@ public class LaunchClient {
      */
     public static void startConnection(String connectionChoice, String serverIP)
     {
-        Client client = null; //useless assignment, but required for line 53
+        ClientNetwork clientNetwork = null; //useless assignment, but required for line 53
         boolean connected;
         if(connectionChoice.equals("RMI")) {
             try {
                 setRMIHostname();
-                client = new RMIClient(serverIP);
-                connected = client.init();
+                clientNetwork = new RMIClient(serverIP);
+                connected = clientNetwork.init();
             } catch (RemoteException e) {
                 connected = false;
             }
     }
         else {
-            client = new SocketClient(serverIP,5000);
-            connected = client.init();
+            clientNetwork = new SocketClient(serverIP,5000);
+            connected = clientNetwork.init();
         }
 
         if(!connected) {
@@ -59,7 +56,7 @@ public class LaunchClient {
             clientView.chooseConnection();
             return;
         }
-        ClientController controller = new ClientController(client,clientView);
+        ClientController controller = new ClientController(clientNetwork,clientView);
         controller.run();
 
 

@@ -10,25 +10,7 @@ import static org.mockito.Mockito.mock;
 
 class ServerControllerTest {
 
-    private <T extends SimpleEffect> int method(T t)
-    {
-        return 0;
-    }
 
-    private int method(MovementEffect m)
-    {
-        return 1;
-    }
-
-    @Test
-    void test()
-    {
-        SimpleEffect p = mock(PlainDamageEffect.class);
-        SimpleEffect m = mock(MovementEffect.class);
-        int a = method(p);
-        int b = method(m);
-        //assertTrue(a == 0 && b == 1);
-    }
 
 
 }

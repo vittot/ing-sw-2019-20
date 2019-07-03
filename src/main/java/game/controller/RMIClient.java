@@ -12,19 +12,18 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.*;
 
-public class RMIClient extends Client implements RemoteClient,ServerMessageHandler {
+public class RMIClient extends ClientNetwork implements RemoteClient,ServerMessageHandler {
 
     private transient IRMIClientHandler rmiClientHandler;
     private String serverIP;
-    private LinkedBlockingQueue<ServerGameMessage> gameMessages;
+
     private Thread processer;
 
 
     public RMIClient(String serverIP) throws RemoteException{
         super();
         this.serverIP = serverIP;
-        this.nPingLost = 0;
-        this.gameMessages = new LinkedBlockingQueue<>();
+
     }
 
     @Override
@@ -39,30 +38,6 @@ public class RMIClient extends Client implements RemoteClient,ServerMessageHandl
             System.out.println("ECCEZIONE IN SEND MESSAGE"); //TODO: call retry connection method
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void startListening(ClientController handler) {
-        this.controller = handler;
-        this.disconnectionExecutor = Executors.newSingleThreadScheduledExecutor();
-        processer = new Thread(
-                () -> {
-                    do {
-                        ServerGameMessage msg = null;
-                        try {
-                            msg = gameMessages.poll(1, TimeUnit.MINUTES);
-                            if(msg != null) //it's null if timeout is elapsed
-                                msg.handle(controller);
-                        } catch (InterruptedException e) {
-                            return;
-                        }
-
-                    }while(!stop);
-                }
-        );
-        processer.setName("PROCESSER THREAD");
-        processer.start();
-        waitNextPing();
     }
 
 

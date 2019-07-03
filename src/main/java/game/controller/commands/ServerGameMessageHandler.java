@@ -66,4 +66,5 @@ public interface ServerGameMessageHandler {
     void handle(AddPayment addPayment);
     void handle(NotifyPoints notifyPoints);
     void handle(NotifyRage notifyRage);
+    void handle(NotifyFinalFrenzy notifyFinalFrenzy);
 }

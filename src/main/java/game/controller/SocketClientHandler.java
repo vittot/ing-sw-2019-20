@@ -66,7 +66,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
 
 
     /**
-     * Receive clientMessage, send them to the controller to be handled and resend the answer to the Client
+     * Receive clientMessage, send them to the controller to be handled and resend the answer to the ClientNetwork
      */
     @Override
     public void run() {

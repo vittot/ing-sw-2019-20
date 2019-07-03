@@ -1,5 +1,6 @@
 package game.model;
 
+import game.controller.PlayerObserver;
 import game.model.effects.*;
 import game.model.exceptions.MapOutOfLimitException;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,8 +35,12 @@ class GameTest {
 
 
         List<Player> players = new ArrayList<>();
+        PlayerObserver po = mock(PlayerObserver.class);
+        doNothing().when(po).notifyPoints();
         for(i=0;i<3;i++) {
-            players.add(new Player(i,PlayerColor.values()[i]));
+            Player p = new Player(i+1,PlayerColor.values()[i]);
+            p.setPlayerObserver(po);
+            players.add(p);
         }
         g = new Game(players,m,3);
     }
@@ -71,10 +76,8 @@ class GameTest {
     /**
      * Test the victory condition (Game's killboard becomes full)
      */
-    /*
     @Test
-    void
-    checkVictory() {
+    void checkVictory() {
         Player p1 = g.getPlayers().get(0);
         Player p2 = g.getPlayers().get(1);
 
@@ -98,7 +101,7 @@ class GameTest {
             p.respawn(cp);
         assertTrue(g.checkVictory());
     }
-*/
+
 
     /**
      * Check that refillMap refills all non spawnpoint Squares with an AmmoCard and all spawnpoints with all avaiable CardWeapons
@@ -198,6 +201,44 @@ class GameTest {
 
         }
         assertTrue(correct);
+
+    }
+
+    /**
+     *
+     */
+    @Test
+    void updatePoints() {
+        Player p1  = g.getPlayer(1);
+        Player p2 = g.getPlayer(2);
+        Player p3 = g.getPlayer(3);
+        p1.addDamage(p2,3);
+        p2.addDamage(p1,4);
+        p1.addDamage(p3,6);
+        p2.addDamage(p1,2);
+        p1.addDamage(p2,7);
+        g.changeTurn();
+        int points1 = p1.getPoints();
+        int points2 = p2.getPoints();
+        int points3 = p3.getPoints();
+
+        assertTrue(points2 == 8+1 && points3 == 6 && points1 == 0);
+    }
+
+    /**
+     * Test the killboard points count
+     */
+    @Test
+    void countKillBoardPoints(){
+        Player p1  = g.getPlayer(1);
+        Player p2 = g.getPlayer(2);
+        Player p3 = g.getPlayer(3);
+        g.getKillBoard().add(new Kill(p1,p2,false));
+        g.getKillBoard().add(new Kill(p2,p1,true));
+        g.getKillBoard().add(new Kill(p2,p3,false));
+        g.getKillBoard().add(new Kill(p1,p3,true));
+        g.countKillBoardPoints();
+        assertTrue(p1.getKillboardpoints() == 8 && p2.getKillboardpoints() == 6 && p3.getKillboardpoints() == 0);
 
     }
 }

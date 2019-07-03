@@ -149,7 +149,7 @@ public class GameMap implements Serializable {
     }
 
     /**
-     * Get all GameMap squares as List<Square>
+     * Get all GameMap squares as List of Square
      * @return
      */
     public List<Square> getAllSquares()

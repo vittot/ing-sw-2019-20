@@ -40,7 +40,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     private List<Target> selectableTarget;
     private List<Square> selectableSquares;
     private ServerState state;
-    private List<Action> avaialableActionSteps;
+    private List<Action> availableActionSteps;
     private int numberOfTurnActionMade;
     private boolean damageEffect;
     private WaitingRoom waitingRoom;
@@ -90,6 +90,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
      * Called by the WaitingRoom when it's ready to start the game, it notify the client associated to this server controller that the game is started, sending the Game serialized object
      *
      * @param g
+     * @param p
      */
     void startGame(Game g, Player p)
     {
@@ -203,8 +204,8 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
         //return new NotifyMovement(currPlayer.getId(),clientMsg.getSelectedSquare().getX(),clientMsg.getSelectedSquare().getY());
         if(state  == ServerState.HANDLING_MOVEMENT) {
-            if (!avaialableActionSteps.isEmpty())
-                return new ChooseSingleActionRequest(avaialableActionSteps);
+            if (!availableActionSteps.isEmpty())
+                return new ChooseSingleActionRequest(availableActionSteps);
             else {
                 return checkTurnEnd();
             }
@@ -236,11 +237,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         model.refillMap();
         model.getCurrentTurn().stopTimer();
         List<Player> toBeRespawned = model.changeTurn();
-        if(!model.getThisTurnKill().isEmpty())
-            model.addKill();
         toBeRespawned.forEach(Player::notifyRespawn);
         if(model.getnPlayerToBeRespawned() == 0)
-            model.getCurrentTurn().newTurn(false); //TODO: check final frezy
+        {
+            newTurn();
+        }
     }
 
     /**
@@ -419,8 +420,8 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     case SHOOT:
                         break;
                 }
-                avaialableActionSteps = currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline(),model.isFinalFreazy());
-                return new ChooseSingleActionRequest(avaialableActionSteps);
+                availableActionSteps = currPlayer.getGame().getCurrentTurn().newAction(clientMsg.getTypeOfAction(), currPlayer.getAdrenaline());
+                return new ChooseSingleActionRequest(availableActionSteps);
             } else {
                 return new InvalidActionResponse();
             }
@@ -477,7 +478,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 clientHandler.sendMessage(new PickUpAmmoResponse(listA,listCp));
                 if(model.getCurrentTurn().getNumOfActions()>0){
                     state = ServerState.WAITING_ACTION;
-                    return new ChooseTurnActionRequest();
+                    return new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed());
                 }
                 else {
                     return checkTurnEnd();
@@ -497,7 +498,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
         if(model.getCurrentTurn().applyStep(Action.MOVEMENT)){
             currSimpleEffect = new MovementEffect();
-            avaialableActionSteps = model.getCurrentTurn().getActionList();
+            availableActionSteps = model.getCurrentTurn().getActionList();
             selectableSquares = currPlayer.getPosition().getSquaresInDirections(1,1);
             this.state = ServerState.HANDLING_MOVEMENT;
             return new ChooseSquareRequest(selectableSquares);
@@ -521,7 +522,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         }
         try{
             currPlayer.pickUpAmmo();
-            avaialableActionSteps = model.getCurrentTurn().getActionList();
+            availableActionSteps = model.getCurrentTurn().getActionList();
             return checkTurnEnd();
         }catch (NoCardAmmoAvailableException e){
             return new InvalidGrabPositionResponse();
@@ -570,17 +571,17 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         try {
             currPlayer.pickUpWeapon(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup());
             playerWeapons = currPlayer.getWeapons();
-            avaialableActionSteps = model.getCurrentTurn().getActionList();
+            availableActionSteps = model.getCurrentTurn().getActionList();
             clientHandler.sendMessage(new PickUpWeaponResponse(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup()));
             return checkTurnEnd();
         }catch (InsufficientAmmoException e){
             clientHandler.sendMessage(new InsufficientAmmoResponse());
-            avaialableActionSteps = model.getCurrentTurn().getActionList();
+            availableActionSteps = model.getCurrentTurn().getActionList();
             return checkTurnEnd();
         }
         catch (NoCardWeaponSpaceException x){
             clientHandler.sendMessage(new MaxNumberOfWeaponsResponse());
-            avaialableActionSteps = model.getCurrentTurn().getActionList();
+            availableActionSteps = model.getCurrentTurn().getActionList();
             return checkTurnEnd();
         }
     }
@@ -591,7 +592,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if (model.getCurrentTurn().getNumOfActions() > 0) {
             state = ServerState.WAITING_ACTION;
             model.getPlayers().forEach(Player::updateMarks);
-            return new ChooseTurnActionRequest();
+            return new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed());
         } else {
             if (!currPlayer.getWeapons().isEmpty() && state != ServerState.WAITING_RELOAD) {
                 weaponsToReload = currPlayer.hasToReload();
@@ -609,7 +610,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
             if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){
                 state = ServerState.WAITING_ACTION;
-                return new ChooseTurnActionRequest();
+                return new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed());
             }
             else {
                 state = ServerState.WAITING_TURN;
@@ -622,6 +623,44 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     public ServerGameMessage handle(EndTurnRequest endTurnRequest) {
         return checkTurnEnd();
     }
+
+    @Override
+    public ServerGameMessage handle(ReloadWeaponAction reloadWeaponAction) {
+        if(checkIfEnded())
+            return new NotifyEndGame(model.getRanking());
+        if(model.getCurrentTurn().getCurrentPlayer() != currPlayer)
+            return new OperationCompletedResponse("Not your turn!");
+
+
+        if(!model.getCurrentTurn().applyStep(Action.RELOAD))
+        {
+            clientHandler.sendMessage(new InvalidStepResponse());
+            return checkTurnEnd();
+        }
+
+        availableActionSteps = model.getCurrentTurn().getActionList();
+
+        List<CardWeapon> weaponsToReload = currPlayer.hasToReload();
+        if(weaponsToReload != null)
+            for(CardWeapon cw : currPlayer.getWeapons())
+                if(!currPlayer.canReloadWeapon(cw))
+                    weaponsToReload.remove(cw);
+        if (weaponsToReload != null && !weaponsToReload.isEmpty()) {
+            state = ServerState.WAITING_RELOAD;
+            return new ReloadWeaponAsk(weaponsToReload);
+        }
+        else{
+            clientHandler.sendMessage(new ReloadWeaponAsk(new ArrayList<>()));
+            if (!availableActionSteps.isEmpty() && model.getCurrentTurn().isFinalFrenzy())
+                return new ChooseSingleActionRequest(availableActionSteps);
+            else
+                return checkTurnEnd();
+        }
+
+
+    }
+
+
 
     /**
      * Reload a weapon, if possible
@@ -660,13 +699,18 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             w.reloadWeapon(clientMsg.getPowerups());
             state = ServerState.WAITING_RELOAD;
             clientHandler.sendMessage(new CheckReloadResponse(clientMsg.getWeapon(), clientMsg.getPowerups()));
-            return checkTurnEnd();
+            if (!availableActionSteps.isEmpty() && model.getCurrentTurn().isFinalFrenzy())
+                return new ChooseSingleActionRequest(availableActionSteps);
+            else
+                return checkTurnEnd();
+
         }catch(InsufficientAmmoException e)
         {
             clientHandler.sendMessage(new InsufficientAmmoResponse());
             state = ServerState.WAITING_RELOAD;
             return checkTurnEnd();
         }
+
     }
 
     /*
@@ -709,7 +753,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     /*model.getCurrentTurn().stopTimer();
                     model.getCurrentTurn().startTimer();*/
                     clientHandler.sendMessage(new RemoveSpawnPowerUp(clientMsg.getPowerUp()));
-                    return new ChooseTurnActionRequest();
+                    return new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed());
                 }
                 else if(state == ServerState.WAITING_RESPAWN)
                 {
@@ -717,10 +761,10 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     model.decreaseToBeRespawned();
                     clientHandler.sendMessage(new RemoveSpawnPowerUp(clientMsg.getPowerUp()));
                     if(model.getnPlayerToBeRespawned() == 0)
-                        model.getCurrentTurn().newTurn(false); //TODO: check final frezy
+                        newTurn();
                     if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){
                         state = ServerState.WAITING_ACTION;
-                        return new ChooseTurnActionRequest();
+                        return new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed());
                     }
                     else
                         return new OperationCompletedResponse("Wait for you turn..");
@@ -735,6 +779,45 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         }
         else{
             return new InvalidMessageResponse("You are not dead, you can't respawn!");
+        }
+    }
+
+    /**
+     * Start the new turn, eventualy with final frenzy
+     * When the last turn is terminated it ends the game
+     */
+    private void newTurn() {
+        if(model.isKillBoardFull() && model.getCurrentTurn().isFinalFrenzy())
+        {
+            if(model.getCurrentTurn().getnPlayedFinalFrenzy() == model.getNumPlayersAlive())
+            {
+                for(Player p : model.getPlayers())
+                    if(!p.getDamage().isEmpty())
+                        model.updatePoints(p,false);
+                model.countKillBoardPoints();
+                model.endGame();
+            }
+            else
+                model.getCurrentTurn().newTurn(true);
+        }
+        else if(model.isKillBoardFull() && !model.getCurrentTurn().isFinalFrenzy())
+        {
+            model.startFinalFrenzy();
+            model.notifyFinalFrenzy();
+            model.getCurrentTurn().newTurn(true);
+        }
+        else{
+            if(currPlayer.getId() == 2 || model.getCurrentTurn().isFinalFrenzy())
+            {
+                if(model.getCurrentTurn().getnPlayedFinalFrenzy() == model.getNumPlayersAlive())
+                    model.endGame();
+                else {
+                    model.notifyFinalFrenzy();
+                    model.getCurrentTurn().newTurn(true);
+                }
+            }
+            else
+                model.getCurrentTurn().newTurn(false);
         }
     }
 
@@ -895,7 +978,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(model.getCurrentTurn().getNumOfMovs() > 0 && model.getCurrentTurn().getCurrentAction().equals(Action.MOVEMENT))
             return checkTurnEnd();
         clientHandler.sendMessage(new OperationCompletedResponse("You can't stop the action!"));
-        return new ChooseSingleActionRequest(avaialableActionSteps);
+        return new ChooseSingleActionRequest(availableActionSteps);
     }
 
     @Override
@@ -1378,7 +1461,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(state != ServerState.WAITING_SPAWN)
         {
             state = ServerState.WAITING_ACTION;
-            clientHandler.sendMessage(new ChooseTurnActionRequest());
+            clientHandler.sendMessage(new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed()));
         }
         else{
             if(currPlayer.getCardPower().size()<2) {
