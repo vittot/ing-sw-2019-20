@@ -745,11 +745,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     clientHandler.sendMessage(new RemoveSpawnPowerUp(clientMsg.getPowerUp()));
                     if(model.getnPlayerToBeRespawned() == 0)
                         newTurn();
-                    if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){
+                    /*if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){
                         state = ServerState.WAITING_ACTION;
                         return new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed());
                     }
-                    else
+                    else*/
                         return new OperationCompletedResponse("Wait for you turn..");
                 }
                 else {
@@ -766,7 +766,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     }
 
     /**
-     * Start the new turn, eventualy with final frenzy
+     * Start the new turn, eventually with final frenzy
      * When the last turn is terminated it ends the game
      */
     private void newTurn() {
@@ -790,7 +790,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             model.getCurrentTurn().newTurn(true);
         }
         else{
-            if(currPlayer.getId() == 2 || model.getCurrentTurn().isFinalFrenzy())
+            /*if(currPlayer.getId() == 2 || model.getCurrentTurn().isFinalFrenzy())
             {
                 if(model.getCurrentTurn().getnPlayedFinalFrenzy() == model.getNumPlayersAlive())
                     model.endGame();
@@ -799,7 +799,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     model.getCurrentTurn().newTurn(true);
                 }
             }
-            else
+            else*/
                 model.getCurrentTurn().newTurn(false);
         }
     }

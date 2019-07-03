@@ -29,7 +29,7 @@ public class Game {
     static final int MAXPLAYERS = 5;
     //public static int TIME_FOR_ACTION = 300000;
     private static final List<Integer> POINTSCOUNT;
-    private int killboardSize = 8;
+    private int killboardSize = 3;
     private List<GameListener> gameObservers;
     private int nPlayerToBeRespawned;
     private boolean ended;

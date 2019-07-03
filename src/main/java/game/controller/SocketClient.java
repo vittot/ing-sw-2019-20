@@ -101,13 +101,13 @@ public class SocketClient extends ClientNetwork implements ServerMessageHandler 
         try {
             return (ServerMessage) inputStream.readObject();
         } catch (IOException e){
-            System.out.println("IOEXCEPTION READING");
-            e.printStackTrace();
+            /*System.out.println("IOEXCEPTION READING");
+            e.printStackTrace();*/
             return null;
         }catch(ClassNotFoundException e)
         {
-            System.out.println("CLASS NOT FOUND EXCEPTION READING");
-            e.printStackTrace();
+            /*System.out.println("CLASS NOT FOUND EXCEPTION READING");
+            e.printStackTrace();*/
             return null;
         }
     }
