@@ -705,7 +705,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             toReload.remove(w);
             if(toReload != null && !toReload.isEmpty())
                 return new ReloadWeaponAsk(toReload);
-            return checkTurnEnd()
+            return checkTurnEnd();
 
         }catch(InsufficientAmmoException e)
         {
