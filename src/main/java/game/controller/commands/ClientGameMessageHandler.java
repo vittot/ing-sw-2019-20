@@ -60,4 +60,6 @@ public interface ClientGameMessageHandler {
     ServerGameMessage handle(LogoutRequest logoutRequest);
 
     ServerGameMessage handle(EndTurnRequest endTurnRequest);
+
+    ServerGameMessage handle(ReloadWeaponAction reloadWeaponAction);
 }

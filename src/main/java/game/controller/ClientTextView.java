@@ -5,11 +5,7 @@ import game.controller.commands.ClientGameMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
-import game.model.effects.SimpleEffect;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,22 +18,31 @@ public class ClientTextView implements  View {
     private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_GREY = "\u001b[37m";
-    private ClientController controller;
-    private Scanner fromKeyBoard;
-    private List<GameMap> availableMaps;
-    private Thread waitingThread;
+    private ClientController controller; /** reference to che client controller */
+    private Scanner fromKeyBoard; /** standard input reference */
+    private List<GameMap> availableMaps; /** list of available maps */
+    private Thread waitingThread; /** thread to wait the game start */
 
 
-
+    /**
+     * construct the CLI object
+     */
     public ClientTextView(){
        initInput();
     }
 
+    /**
+     * construct the CLI object specifying the client controller reference
+     * @param controller
+     */
     public ClientTextView(ClientController controller) {
         this.controller = controller;
         initInput();
     }
 
+    /**
+     * Initialize the standard input reference
+     */
     private void initInput()
     {
         this.fromKeyBoard = new Scanner(System.in);
@@ -49,10 +54,18 @@ public class ClientTextView implements  View {
         }*/
     }
 
+    /**
+     * print view notification on screen
+     * @param text
+     */
     public synchronized void writeText (String text){
         System.out.println(">> " + text);
     }
 
+    /**
+     * read a string from input
+     * @return a string
+     */
     public synchronized String readText(){
         initInput();
         String string = null;
@@ -66,6 +79,10 @@ public class ClientTextView implements  View {
 
     }
 
+    /**
+     * read a char from input
+     * @return a string
+     */
     public synchronized char readChar(){
         try {
             String string = readText();
@@ -130,7 +147,7 @@ public class ClientTextView implements  View {
         } while (  ClientContext.get().getUser() == null);
 
         writeText("Wait for login...");
-        controller.getClient().sendMessage(new LoginMessage(ClientContext.get().getUser()));
+        controller.getClientNetwork().sendMessage(new LoginMessage(ClientContext.get().getUser()));
     }
 
     /**
@@ -141,9 +158,13 @@ public class ClientTextView implements  View {
     {
         this.availableMaps = availableMaps;
         printAvailableMaps();
-        controller.getClient().sendMessage(new GetWaitingRoomsRequest());
+        controller.getClientNetwork().sendMessage(new GetWaitingRoomsRequest());
     }
 
+    /**
+     * manage the user interaction to permit to reload a weapon with the possibility of use power-up card to pay
+     * @param weaponsToReload
+     */
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
         writeText("Here you will be able to choose what weapon reload from the unloaded ones!");
@@ -154,30 +175,41 @@ public class ClientTextView implements  View {
             do {
                 writeText("Insert the id of the weapon you want to reload or -1 to terminate the reload phase:");
                 n = readInt();
-            } while (n != -1 && n < 1 && n > weaponsToReload.size());
+            } while ((n != -1 && n < 1) || (n > weaponsToReload.size()));
 
             if (n != -1) {
                 cp = powerUpSelection(weaponsToReload.get(n - 1).getPrice(), null);
-                controller.getClient().sendMessage(new ReloadWeaponRequest(weaponsToReload.get(n - 1), cp));
+                controller.getClientNetwork().sendMessage(new ReloadWeaponRequest(weaponsToReload.get(n - 1), cp));
             }
-            else
-                controller.getClient().sendMessage(new EndActionRequest());
+            else if(this.controller.getState() == ClientState.WAITING_FINAL_RELOAD)
+                controller.getClientNetwork().sendMessage(new EndActionRequest());
         }
         else
-            controller.getClient().sendMessage(new EndActionRequest());
+            controller.getClientNetwork().sendMessage(new EndActionRequest());
 
     }
 
+    /**
+     * notify that a weapon has been correctly reloaded
+     * @param cW
+     */
     @Override
     public void showReloadMessage(CardWeapon cW) {
         writeText("The weapon " + cW.getName() + " has been correctly reloaded");
     }
 
+    /**
+     * notify that a player has been suspended
+     * @param p
+     */
     @Override
     public void notifyPlayerSuspended(Player p) {
         writeText("Player " + p.getNickName() +  " has been suspended from the game because of connection lost");
     }
 
+    /**
+     * notify the client that the server suspend him from the game and ask him to rejoin it
+     */
     @Override
     public void timeOutPhase() {
         char choice;
@@ -193,7 +225,7 @@ public class ClientTextView implements  View {
                 if(controller.getState() == ClientState.GAME_END)
                     writeText("The game is terminated!");
                 else
-                    controller.getClient().sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
+                    controller.getClientNetwork().sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
             }
             else{
                 this.controller.stopListening();
@@ -201,38 +233,62 @@ public class ClientTextView implements  View {
         }
     }
 
+    /**
+     * notify that the nickname selected is already used by another client and manage a second choose
+     */
     @Override
     public void alreadyLoggedPhase() {
         writeText("There is already a user logged with this name on the server! Choose another name:");
         setUserNamePhase();
     }
 
+    /**
+     * notify the correct login to the server
+     */
     @Override
     public void loginCompletedPhase() {
         writeText("You correctly logged in!");
-        controller.getClient().sendMessage(new GetAvailableMapsRequest());
+        controller.getClientNetwork().sendMessage(new GetAvailableMapsRequest());
     }
 
+    /**
+     * notify successfully rejoin of the mìgame
+     */
     @Override
     public void rejoinGameConfirm() {
         writeText("You successfully rejoin your previous game! Now wait for your turn..");
     }
 
+    /**
+     * notify the other clients that a specific client has rejoined the game
+     * @param p
+     */
     @Override
     public void notifyPlayerRejoin(Player p) {
         writeText("Player " + p.getNickName() + " has rejoined the game!");
     }
 
+    /**
+     * notify that a new player joined the waiting room
+     * @param p
+     */
     @Override
     public void notifyPlayerJoinedWaitingRoom(Player p) {
         writeText("Player " + p.getNickName() + " has joined the waiting room!");
     }
 
+    /**
+     * set clientController reference
+     * @param clientController
+     */
     @Override
     public void setController(ClientController clientController) {
         this.controller = clientController;
     }
 
+    /**
+     * wait before the game start
+     */
     @Override
     public void waitStart(){
 
@@ -253,6 +309,9 @@ public class ClientTextView implements  View {
         waitingThread.start();
     }
 
+    /**
+     * choose the type of connection and the server to connect to
+     */
     @Override
     public void chooseConnection() {
         String choice, ip;
@@ -273,6 +332,11 @@ public class ClientTextView implements  View {
         LaunchClient.startConnection(choice,ip);
     }
 
+    /**
+     * manage the counter attack by Tagback grenade
+     * @param counterattack
+     * @param shooter
+     */
     @Override
     public void chooseCounterAttack(List<CardPower> counterattack, Player shooter) {
         char c;
@@ -291,20 +355,28 @@ public class ClientTextView implements  View {
                 }
                 do{
                     n = readInt();
-                }while(n <= 0 && n > counterattack.size());
+                }while(n <= 0 || n > counterattack.size());
             }
-            controller.getClient().sendMessage(new CounterAttackResponse(counterattack.get(n-1),shooter));
+            controller.getClientNetwork().sendMessage(new CounterAttackResponse(counterattack.get(n-1),shooter));
         }
         else
-            controller.getClient().sendMessage(new CounterAttackResponse());
+            controller.getClientNetwork().sendMessage(new CounterAttackResponse());
 
     }
 
+    /**
+     * notify that a player leaved the waiting room
+     * @param p
+     */
     @Override
     public void notifyPlayerLeavedWaitingRoom(Player p) {
         writeText("Player " + p.getNickName() + " has leaved the waiting room!");
     }
 
+    /**
+     * notify the successfully reconnection to the server
+     * @param otherPlayers
+     */
     @Override
     public void rejoinGamePhase(List<String> otherPlayers) {
         char choice;
@@ -317,10 +389,14 @@ public class ClientTextView implements  View {
         }while(choice != 'Y' && choice != 'y' && choice != 'n' && choice != 'N');
 
         rejoin = choice == 'Y' || choice == 'y';
-        controller.getClient().sendMessage(new RejoinGameResponse(rejoin,ClientContext.get().getUser()));
+        controller.getClientNetwork().sendMessage(new RejoinGameResponse(rejoin,ClientContext.get().getUser()));
 
     }
 
+    /**
+     * manage the selection of the weapon to use during the shoot action
+     * @param myWeapons
+     */
     @Override
     public void chooseWeaponToShoot(List<CardWeapon> myWeapons) {
         int n;
@@ -329,9 +405,14 @@ public class ClientTextView implements  View {
         do{
             n = readInt();
         }while (n<1 || n>myWeapons.size());
-        controller.getClient().sendMessage(new ChooseWeaponToShootResponse(myWeapons.get(n-1)));
+        controller.getClientNetwork().sendMessage(new ChooseWeaponToShootResponse(myWeapons.get(n-1)));
     }
 
+    /**
+     * manage the choice between the base effect and the alternative effect of the selected weapon
+     * @param baseEff
+     * @param altEff
+     */
     @Override
     public void chooseFirstEffect(FullEffect baseEff, FullEffect altEff) {
         int n;
@@ -346,9 +427,13 @@ public class ClientTextView implements  View {
         }while(n != 1 && n != 2);
         if(n == 2 && altEff.getPrice() != null)
             toUse = powerUpSelection(altEff.getPrice(), null);
-        controller.getClient().sendMessage(new ChooseFirstEffectResponse(n,toUse));
+        controller.getClientNetwork().sendMessage(new ChooseFirstEffectResponse(n,toUse));
     }
 
+    /**
+     * manage the decision of use a plus effect before of the base effect
+     * @param plusEff
+     */
     @Override
     public void usePlusBeforeBase(FullEffect plusEff) {
         char t;
@@ -363,9 +448,13 @@ public class ClientTextView implements  View {
         }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
         if(plusEff.getPrice() != null && (t == 'y' || t == 'Y'))
             toUse = powerUpSelection(plusEff.getPrice(), null);
-        controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,toUse));
+        controller.getClientNetwork().sendMessage(new UsePlusBeforeResponse(plusEff,t,toUse));
     }
 
+    /**
+     * manage the application of plus effects that have to be used in order
+     * @param plusEffects
+     */
     @Override
     public void usePlusInOrder(List<FullEffect> plusEffects) {
         List<CardPower> toUse = new ArrayList<>();
@@ -378,9 +467,13 @@ public class ClientTextView implements  View {
         }while (t != 'Y' && t != 'y' && t != 'N' && t != 'n');
         if(plusEffects.get(0) != null && (t == 'y' || t == 'Y'))
             toUse = powerUpSelection(plusEffects.get(0).getPrice(), null);
-        controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,toUse,t));
+        controller.getClientNetwork().sendMessage(new UseOrderPlusResponse(plusEffects,toUse,t));
     }
 
+    /**
+     * manage the selection of the plus effect to use
+     * @param plusEffects
+     */
     @Override
     public void choosePlusEffect(List<FullEffect> plusEffects) {
         List<CardPower> toUse = new ArrayList<>();
@@ -393,13 +486,13 @@ public class ClientTextView implements  View {
             n = readInt();
         }while(n != -1 && (n<1 || n>plusEffects.size()));
         if(n == -1)
-            controller.getClient().sendMessage(new TerminateShootAction());
+            controller.getClientNetwork().sendMessage(new TerminateShootAction());
         else {
             toApply = plusEffects.get(n-1);
             plusEffects.remove(n-1);
             if(toApply.getPrice() != null)
                 toUse = powerUpSelection(toApply.getPrice(), null);
-            controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, toApply, toUse));
+            controller.getClientNetwork().sendMessage(new UsePlusEffectResponse(plusEffects, toApply, toUse));
         }
     }
 
@@ -440,7 +533,7 @@ public class ClientTextView implements  View {
         }while((nRoom <= 0 || nRoom > waitingRooms.size()) && nRoom != -1);
         if(nRoom != -1)
         {
-            controller.getClient().sendMessage(new JoinWaitingRoomRequest(nRoom,ClientContext.get().getUser()));
+            controller.getClientNetwork().sendMessage(new JoinWaitingRoomRequest(nRoom,ClientContext.get().getUser()));
         }
         else {
             printAvailableMaps();
@@ -468,9 +561,9 @@ public class ClientTextView implements  View {
         }
 
         if(mapId > 0)
-            controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,ClientContext.get().getUser()));
+            controller.getClientNetwork().sendMessage(new CreateWaitingRoomRequest(mapId,ClientContext.get().getUser()));
         else
-            controller.getClient().sendMessage(new GetWaitingRoomsRequest());
+            controller.getClientNetwork().sendMessage(new GetWaitingRoomsRequest());
     }
 
     /**
@@ -494,6 +587,9 @@ public class ClientTextView implements  View {
                     case "SHOOT":
                         System.out.println(" [S]");
                         break;
+                    case "RELOAD":
+                        System.out.println(" [R]");
+                        break;
                 }
             }
             action = readText();
@@ -503,7 +599,7 @@ public class ClientTextView implements  View {
                     action = "EXIT";
 
                 if(action.equals("EXIT") && controller.getState() == ClientState.HANDLING_MOVEMENT){
-                    controller.getClient().sendMessage(new EndActionRequest());
+                    controller.getClientNetwork().sendMessage(new EndActionRequest());
                     return;
                 }
 
@@ -523,7 +619,7 @@ public class ClientTextView implements  View {
                     }
                     else {
                         powerUpsAvailable = powerUpSelection();
-                        controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerUpsAvailable)));
+                        controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerUpsAvailable)));
                     }
 
                 }*/
@@ -534,6 +630,8 @@ public class ClientTextView implements  View {
                     action = "GRAB";
                 else if(action.equals("S"))
                     action = "SHOOT";
+                else if(action.equals("R"))
+                    action = "RELOAD";
 
                 chosenAction = Action.valueOf(action);
             }catch ( NullPointerException f){
@@ -548,16 +646,35 @@ public class ClientTextView implements  View {
                 case EXIT:
                     return;
                 case GRAB:
-                    controller.getClient().sendMessage(new GrabActionRequest());
+                    controller.getClientNetwork().sendMessage(new GrabActionRequest());
                     break;
                 case SHOOT:
-                    controller.getClient().sendMessage(new ShootActionRequest());
+                    controller.getClientNetwork().sendMessage(new ShootActionRequest());
                     break;
                 case MOVEMENT:
                     controller.setState(ClientState.HANDLING_MOVEMENT);
-                    controller.getClient().sendMessage(new MovementActionRequest());
+                    controller.getClientNetwork().sendMessage(new MovementActionRequest());
+                    break;
+                case RELOAD:
+                    controller.getClientNetwork().sendMessage(new ReloadWeaponAction());
                     break;
             }
+    }
+
+    /**
+     * Alert that there is no weapon which can be reloaded
+     */
+    public void showNoWeaponToReload()
+    {
+        writeText("No weapon can be reloaded!");
+    }
+
+    /**
+     * Alert about the start of the final frenzy
+     */
+    @Override
+    public void notifyFinalFrenzy() {
+        writeText("The FINAL FRENZY is started!");
     }
 
     /**
@@ -586,7 +703,7 @@ public class ClientTextView implements  View {
                 }
             }
         }while(!possibleSquare.contains(choosenSquare));
-        controller.getClient().sendMessage(new ChooseSquareResponse(choosenSquare));
+        controller.getClientNetwork().sendMessage(new ChooseSquareResponse(choosenSquare));
     }
 
     /**
@@ -626,40 +743,23 @@ public class ClientTextView implements  View {
                 writeText("Not enough target");
             }
         }
-        controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
-    }
-
-    public final static void clearConsole()
-    {
-        try
-        {
-            final String os = System.getProperty("os.name");
-
-            if (os.contains("Windows"))
-            {
-                Runtime.getRuntime().exec("cls");
-            }
-            else
-            {
-                Runtime.getRuntime().exec("clear");
-            }
-        }
-        catch (final Exception e)
-        {
-            //  Handle any exceptions.
-        }
+        controller.getClientNetwork().sendMessage(new ChooseTargetResponse(choosenTarget));
     }
 
     /**
      * Choose the action for the current turn
+     * @param isMovedAllowed indicate if the movement action is allowed or not
      */
-    public void chooseTurnActionPhase(){
+    public void chooseTurnActionPhase(boolean isMovedAllowed){
         Action choosenAction;
         String action;
         do{
             //clearConsole();
             //showMap(ClientContext.get().getMap());
-            writeText("Choose the action you want to make between {MOVEMENT[M], GRAB[G], SHOOT[S]} (write info to see the details of the game, write power to use power-up cards): ");
+            if(!isMovedAllowed)
+                writeText("Choose the action you want to make between {GRAB[G], SHOOT[S]} (write info to see the details of the game, write power to use power-up cards): ");
+            else
+                writeText("Choose the action you want to make between {MOVEMENT[M], GRAB[G], SHOOT[S]} (write info to see the details of the game, write power to use power-up cards): ");
             action = readText();
             action = action.toUpperCase();
             try {
@@ -677,10 +777,14 @@ public class ClientTextView implements  View {
                         action = "";
                     }
                     else
-                        controller.getClient().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerList)));
+                        controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse(choosePowerUp(powerList)));
                     choosenAction = null;
                 }
                 else if(action.equals("EXIT"))
+                {
+                    choosenAction = null;
+                }
+                else if((action.equals("MOVEMENT") || action.equals("M")) && !isMovedAllowed)
                 {
                     choosenAction = null;
                 }
@@ -700,7 +804,7 @@ public class ClientTextView implements  View {
 
         }while(choosenAction==null && !action.equals("POWER"));
         if(!action.equals("POWER"))
-            controller.getClient().sendMessage(new ChooseTurnActionResponse(choosenAction));
+            controller.getClientNetwork().sendMessage(new ChooseTurnActionResponse(choosenAction));
     }
 
     /**
@@ -750,7 +854,7 @@ public class ClientTextView implements  View {
      */
     @Override
     public void invalidStepNotification(){
-        writeText("The step selected is not valid, you loose the action!! xd!!1!1!!");
+        writeText("The step selected is not valid, you loose the action!!");
     }
 
     /**
@@ -846,23 +950,28 @@ public class ClientTextView implements  View {
             writeText("!");
     }
 
+    /**
+     * notify clients that a player has been raged after his death
+     * @param killer
+     * @param victim
+     */
     @Override
     public void notifyRage(Player killer, Player victim) {
         writeText("Player "+killer.getNickName()+" raged player "+victim.getNickName()+"!");
     }
 
     /**
-     *
+     * manage the selection of the power-up card to discard to allow the player respawn
      * @param list
      */
     @Override
     public void choosePowerUpToRespawn(List <CardPower> list){
         writeText("Choose which power-up card you want to discard to respawn (you will respawn in the room with the same color of the discard card):");
-        controller.getClient().sendMessage(new RespawnResponse(choosePowerUp(list)));
+        controller.getClientNetwork().sendMessage(new RespawnResponse(choosePowerUp(list)));
     }
 
     /**
-     *
+     * show the final results of the game and the final ranking
      * @param ranking
      */
     @Override
@@ -895,6 +1004,9 @@ public class ClientTextView implements  View {
         
     }
 
+    /**
+     * manage the possibility to restart to play in a new game
+     */
     private void restartGamePhase() {
         char choice;
         writeText("Do you want to play a new game?[Y/N]");
@@ -913,7 +1025,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify a complete operation message
      * @param message
      */
     @Override
@@ -922,7 +1034,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify the choice of an invalid power-up card
      */
     @Override
     public void notifyInvalidPowerUP(){
@@ -930,7 +1042,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify the failure of a grab action
      */
     @Override
     public void notifyInvalidGrabPosition(){
@@ -938,7 +1050,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * manage the possibility to use a Targeting scope to apply additional damage to one of the previous client target
      * @param list
      */
     @Override
@@ -947,7 +1059,7 @@ public class ClientTextView implements  View {
         int n = 1, t=1;
         list = list.stream().filter(x -> x.getName().equals("Targeting scope")).collect(Collectors.toList());
         List<CardPower> cPw = null;
-        if(list.size() > 0 && !ClientContext.get().getMyPlayer().getAmmo().isEmpty()) {
+        if(list.size() > 0 && (!ClientContext.get().getMyPlayer().getAmmo().isEmpty() || ClientContext.get().getMyPlayer().getCardPower().size() > 2)) {
             writeText("Do you want to use a Targeting scope power-up card to apply an additional damage to one of your previous target?");
             writeText("Insert [Y]es or [N]o");
             do {
@@ -974,25 +1086,28 @@ public class ClientTextView implements  View {
                     do {
                         t = readInt();
                     } while (t <= 0 && t > list.size());
-                    controller.getClient().sendMessage(new ChoosePowerUpResponse(list.get(n - 1), ClientContext.get().getMyPlayer().getAmmo().get(t - 1), cPw));
+                    controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse(list.get(n - 1), ClientContext.get().getMyPlayer().getAmmo().get(t - 1), cPw));
                 }
                 else
-                    controller.getClient().sendMessage(new ChoosePowerUpResponse(list.get(n-1), null, cPw));
+                    controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse(list.get(n-1), null, cPw));
             } else
-                controller.getClient().sendMessage(new ChoosePowerUpResponse());
+                controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse());
         }
         else
-            controller.getClient().sendMessage(new ChoosePowerUpResponse());
+            controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse());
     }
 
 
+    /**
+     * notify the game starting
+     */
     @Override
     public void notifyStart() {
         writeText("Game has started!");
     }
 
     /**
-     *
+     * notify an invalid choice
      */
     @Override
     public void notifyInvalidMessage() {
@@ -1000,7 +1115,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify that the turn is changed
      * @param pID
      */
     @Override
@@ -1014,7 +1129,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify new marks given
      * @param marks
      * @param idHitten
      * @param idShooter
@@ -1056,6 +1171,7 @@ public class ClientTextView implements  View {
     /**
      *  Allow the choice of a power-up card from the list of cards available for the player
      * @param list
+     * @return
      */
     private CardPower choosePowerUp(List<CardPower> list) {
         int k=0;
@@ -1068,6 +1184,10 @@ public class ClientTextView implements  View {
         return list.get(k-1);
     }
 
+    /**
+     *
+     * @param map
+     */
     public void showMap(GameMap map) {
         Square [][] grid = map.getGrid();
         String col;
@@ -1196,6 +1316,9 @@ public class ClientTextView implements  View {
     }
 
 
+    /**
+     *
+     */
     private void showMyPlayerInformation() {
         String death = "\u2620";
         Player p = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
@@ -1326,7 +1449,7 @@ public class ClientTextView implements  View {
             toUse = powerUpSelection(wG.getPrice().subList(1,wG.getPrice().size()), null);
         if (choiceWD != -1)
             wD = myP.getWeapons().get(choiceWD-1);
-        controller.getClient().sendMessage(new PickUpWeaponRequest(wG,toUse, wD));
+        controller.getClientNetwork().sendMessage(new PickUpWeaponRequest(wG,toUse, wD));
     }
 
     private List<CardPower> powerUpSelection(List<Color> price, CardPower useEffect)
@@ -1368,8 +1491,11 @@ public class ClientTextView implements  View {
     }
 
     /**
-     * print a weapon and its cost
-     * @param cw, p
+     * Print a weapon and its cost
+     * @param cw
+     * @param p
+     * @param showCost
+     * @param showLoaded
      */
     public void printWeapon(CardWeapon cw, int p, boolean showCost, boolean showLoaded)
     {
@@ -1397,6 +1523,8 @@ public class ClientTextView implements  View {
      * @param cws
      * @param p
      * @param numeric
+     * @param showCost
+     * @param showLoaded
      */
     public void showWeapons(List<CardWeapon> cws, int p, boolean numeric, boolean showCost, boolean showLoaded) {
         int i = 1;

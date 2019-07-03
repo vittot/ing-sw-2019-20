@@ -9,17 +9,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * class that represents a single tile in the map
+ */
 public class Square implements Target, Serializable {
-    private MapColor color;
-    private Edge[] edges; // up-right-down-left from 0 to 3
-    private boolean respawn;
-    private List<Player> players;
-    private List<CardWeapon> weapons;
-    private CardAmmo cardAmmo;
+    private MapColor color; /** field that contains the square room color */
+    private Edge[] edges; /** array that specify the 4 edges of the square between {WALL, DOOR, OPEN} (up-right-down-left from 0 to 3) */
+    private boolean respawn; /** field that specify if the square is a respawn square in the map */
+    private List<Player> players; /** reference to all the players that are positioned in this square */
+    private List<CardWeapon> weapons; /** list of weapons available in this tile (only in case of respawn tile) */
+    private CardAmmo cardAmmo; /** card ammo available to grab in this tile (only if this is not a respawn tile) */
     //Convention: the map starts with (0,0) the left upper corner and ends with (map.dimY-1,map.dimX-1) at the lower right corner
-    private int x; //this is the numb of the column (from 0), the 2nd index in the grid matrix
-    private int y; //this is the numb of the row (from 0), the 1st idex in the grid matrix
-    private GameMap map;
+    private int x; /** this is the numb of the column (from 0), the 2nd index in the grid matrix (x coordinate) */
+    private int y; /** this is the numb of the row (from 0), the 1st idex in the grid matrix (y coordinate) */
+    private GameMap map; /** reference to the game */
 
     /**
      * Construct an empty square
@@ -41,46 +44,88 @@ public class Square implements Target, Serializable {
         weapons = new ArrayList<>();
     }
 
+    /**
+     * construct an empty square
+     */
     public Square() {
         players = new ArrayList<>();
         weapons = new ArrayList<>();
     }
 
-
+    /**
+     * return the reference to the game map
+     * @return map
+     */
     public GameMap getMap() { return map; }
 
+    /**
+     * set the map attribute
+     * @param map
+     */
     public void setMap(GameMap map) {
         this.map = map;
     }
 
+    /**
+     * return color attribute
+     * @return color
+     */
     public MapColor getColor() {
         return color;
     }
 
+    /**
+     * set the color attribute
+     * @param color
+     */
     public void setColor(MapColor color) {
         this.color = color;
     }
 
+    /**
+     * return the x coordinate of the square in the map grid
+     * @return x
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * set the x coordinate of the square
+     * @param x
+     */
     public void setX(int x) {
         this.x = x;
     }
 
+    /**
+     * return the y coordinate of the square in the map grid
+     * @return
+     */
     public int getY() {
         return y;
     }
 
+    /**
+     * set the y coordinate of the square
+     * @param y
+     */
     public void setY(int y) {
         this.y = y;
     }
 
+    /**
+     * return the edges attribute
+     * @return edges
+     */
     public Edge[] getEdges() {
         return edges;
     }
 
+    /**
+     * set the weapons attribute
+     * @param weapons
+     */
     public void setWeapons(List<CardWeapon> weapons) {
         this.weapons = weapons;
     }
@@ -106,13 +151,17 @@ public class Square implements Target, Serializable {
         }
     }
 
+    /**
+     * set the edges attribute
+     * @param edges
+     */
     public void setEdges(Edge[] edges) {
         this.edges = edges;
     }
 
     /**
      * Get the next Square in the indicate Direction
-     * @param d
+     * @param d direction to consider
      * @return the next Square or null if it doesn't exist in the GameMap
      */
     public Square getNextSquare(Direction d)
@@ -138,14 +187,26 @@ public class Square implements Target, Serializable {
         }
     }
 
+    /**
+     * return if the square is a respawn square
+     * @return respawn
+     */
     public boolean isRespawn() {
         return respawn;
     }
 
+    /**
+     * set if the square is a respawn square
+     * @param respawn
+     */
     public void setRespawn(boolean respawn) {
         this.respawn = respawn;
     }
 
+    /**
+     * return all the players positioned in the square
+     * @return players
+     */
     public List<Player> getPlayers() {
         return players;
     }
@@ -159,19 +220,35 @@ public class Square implements Target, Serializable {
         p.setPosition(this);
     }
 
+    /**
+     * return the available weapons to grab in this square
+     * @return weapons
+     */
     public List<CardWeapon> getWeapons() {
         return weapons;
     }
 
+    /**
+     * add a list of weapons available to grab in the square
+     * @param weapons
+     */
     public void addWeapon(List<CardWeapon> weapons)
     {
         this.weapons.addAll(weapons);
     }
 
+    /**
+     * return cardAmmo attribute
+     * @return cardAmmo
+     */
     public CardAmmo getCardAmmo() {
         return cardAmmo;
     }
 
+    /**
+     * set cardAmmo attribute
+     * @param cardAmmo
+     */
     public void setCardAmmo(CardAmmo cardAmmo) {
         this.cardAmmo = cardAmmo;
     }
@@ -293,27 +370,6 @@ public class Square implements Target, Serializable {
         return map.getAllSquares().stream().filter(s -> !visibleSquares.contains(s) && GameMap.distanceBtwSquares(this,s)<=maxDist && GameMap.distanceBtwSquares(this,s)>=minDist).collect(Collectors.toList());
     }
 
-    /**public List<List<Square>> getVisibleSquares(){
-        List<List<Square>> result=new ArrayList<>();
-        List<Square> tmp = new ArrayList<>();
-        tmp= map.getRoomSquares(this.getColor());
-        result.add(tmp);
-        if(this.getAdiacentRoomSquares(Direction.UP)!=null){
-            result.add((ArrayList)this.getAdiacentRoomSquares(Direction.UP));
-        }
-        if (this.getAdiacentRoomSquares(Direction.RIGHT)!=null){
-            result.add((ArrayList)this.getAdiacentRoomSquares(Direction.RIGHT));
-        }
-        if (this.getAdiacentRoomSquares(Direction.DOWN)!=null){
-            result.add((ArrayList)this.getAdiacentRoomSquares(Direction.DOWN));
-        }
-        if (this.getAdiacentRoomSquares(Direction.LEFT)!=null){
-            result.add((ArrayList)this.getAdiacentRoomSquares(Direction.LEFT));
-        }
-        return result;
-    }*/
-
-
     /**
      * Return the reference to the square
      * @return
@@ -369,6 +425,11 @@ public class Square implements Target, Serializable {
         players.remove(player);
     }
 
+    /**
+     * compare the current square with another indicated analysing characteristic fields
+     * @param o square to compare
+     * @return if the two squares are equals
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -381,6 +442,10 @@ public class Square implements Target, Serializable {
                 Arrays.equals(edges, square.edges);
     }
 
+    /**
+     * used by the equals method
+     * @return result
+     */
     @Override
     public int hashCode() {
         int result = Objects.hash(color, respawn, x, y);
@@ -388,44 +453,10 @@ public class Square implements Target, Serializable {
         return result;
     }
 
-/*
-    public List<List<Target>> getSquaresInRange(int minDist, int maxDist){
-        List<List<Target>> result=new ArrayList<>();
-        List<Target> tmp=new ArrayList<>();
-        int sum;
-        for(int x=0;x<map.getDimX();x++){
-            for(int y=0;y<map.getDimY();y++){
-                sum=Math.abs(this.getX()-map.getGrid()[x][y].getX())+Math.abs(this.getY()-map.getGrid()[x][y].getY());
-                if(sum>=minDist && sum<=maxDist){
-                    tmp.add(map.getGrid()[x][y]);
-                    result.add(tmp);
-                    tmp.clear();
-                }
-            }
-        }
-        return result;
-    }
-
-    public List<List<Target>> getSquaresInRange(int minDist, int maxDist, int lastDirection){
-        List<List<Target>> result=new ArrayList<>();
-        List<Target> tmp=new ArrayList<>();
-        Square actual,next;
-        int sum;
-        Direction d=Direction.getDirection(lastDirection);
-        actual=this;
-        for(int i=0;i<maxDist;i++){
-            next=actual.getNextSquare(d);
-            sum=Math.abs(this.getX()-next.getX())+Math.abs(this.getY()-next.getY());
-            if(sum>=minDist && sum<=maxDist){
-                tmp.add(next);
-                result.add(tmp);
-                tmp.clear();
-            }
-            actual=next;
-        }
-        return result;
-    }*/
-
+    /**
+     * describe the object in string version
+     * @return description
+     */
     @Override
     public String toString() {
         return "Square{" +

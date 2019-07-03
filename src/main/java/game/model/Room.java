@@ -6,16 +6,28 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * class that represents a map room, (set of square with same map color)
+ */
 public class Room implements Target, Serializable {
 
-    private MapColor color;
-    private GameMap map;
+    private MapColor color; /** field that identifies the color of the room */
+    private GameMap map; /** reference to the game map */
 
+    /**
+     * construct a room specifying the color and the map that contains it
+     * @param color
+     * @param map
+     */
     public Room(MapColor color, GameMap map) {
         this.color = color;
         this.map = map;
     }
 
+    /**
+     * return the color attribute
+     * @return color
+     */
     public MapColor getColor() {
         return color;
     }
@@ -74,6 +86,10 @@ public class Room implements Target, Serializable {
         return null;
     }
 
+    /**
+     * describe the object in string version
+     * @return description
+     */
     @Override
     public String toString() {
         return "Room{" +
@@ -82,6 +98,11 @@ public class Room implements Target, Serializable {
                 '}';
     }
 
+    /**
+     * compare two rooms and verify if their equals
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -90,6 +111,10 @@ public class Room implements Target, Serializable {
         return color == room.color;
     }
 
+    /**
+     * used by equals method
+     * @return
+     */
     @Override
     public int hashCode() {
         return Objects.hash(color);

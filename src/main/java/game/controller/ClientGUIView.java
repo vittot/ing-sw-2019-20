@@ -201,8 +201,8 @@ public class ClientGUIView extends Application implements View{
             state = ClientState.WAITING_ACTION;
             yes.setVisible(false);
             no.setVisible(false);
-            controller.getClient().sendMessage(new CounterAttackResponse());
-            runLater(GUI::chooseTurnActionPhase);
+            controller.getClientNetwork().sendMessage(new CounterAttackResponse());
+            runLater(()->GUI.chooseTurnActionPhase(ClientContext.get().isMovedAllowed()));
         }
     };
     /**
@@ -424,7 +424,7 @@ public class ClientGUIView extends Application implements View{
             if(counterattack.size() > 1 ){
                 activateCardPower(counterattack);
             }else {
-                controller.getClient().sendMessage(new CounterAttackResponse(counterattack.get(0), shooter));
+                controller.getClientNetwork().sendMessage(new CounterAttackResponse(counterattack.get(0), shooter));
                 state = ClientState.WAITING_TURN;
             }
             yes.setVisible(false);
@@ -432,7 +432,7 @@ public class ClientGUIView extends Application implements View{
         });
         no.setOnMouseClicked(mouseEvent -> {
             timer.shutdownNow();
-            controller.getClient().sendMessage(new CounterAttackResponse());
+            controller.getClientNetwork().sendMessage(new CounterAttackResponse());
             yes.setVisible(false);
             no.setVisible(false);
             state = ClientState.WAITING_TURN;
@@ -450,7 +450,7 @@ public class ClientGUIView extends Application implements View{
         if(s.equals("Map 2")) mapId = 2;
         if(s.equals("Map 3")) mapId = 3;
         if(s.equals("Map 4")) mapId = 4;
-        controller.getClient().sendMessage(new CreateWaitingRoomRequest(mapId,user));
+        controller.getClientNetwork().sendMessage(new CreateWaitingRoomRequest(mapId,user));
     }
 
     /**
@@ -519,7 +519,7 @@ public class ClientGUIView extends Application implements View{
             if(userTextField.getText() != ""){
                 user = userTextField.getText();
                 ClientContext.get().setUser(user);
-                controller.getClient().sendMessage(new LoginMessage(ClientContext.get().getUser()));
+                controller.getClientNetwork().sendMessage(new LoginMessage(ClientContext.get().getUser()));
             }
         });
 
@@ -625,7 +625,7 @@ public class ClientGUIView extends Application implements View{
                 }
             }
             if(choosenTarget.size() <= maxE && choosenTarget.size() >= minE) {
-                controller.getClient().sendMessage(new ChooseTargetResponse(choosenTarget));
+                controller.getClientNetwork().sendMessage(new ChooseTargetResponse(choosenTarget));
                 sg.close();
             }
             else{
@@ -641,7 +641,8 @@ public class ClientGUIView extends Application implements View{
      * Activate the possible tunr action
      */
     @Override
-    public void chooseTurnActionPhase() {
+    public void chooseTurnActionPhase(boolean isMovementAllowed) {
+        //TODO handle parameter
         System.out.println("Turn action Phase");
         refreshMyPlayerCard();
         refreshMyPlayerAmmo();
@@ -713,7 +714,7 @@ public class ClientGUIView extends Application implements View{
     }
 
     /**
-     * Damage notification 
+     * Damage notification
      */
     @Override
     public void damageNotification(int shooterId, int damage, int hit) {
@@ -740,7 +741,7 @@ public class ClientGUIView extends Application implements View{
     /**
      * Notify that player moved
      * @param pId id of the player
-     * @param newX new x position 
+     * @param newX new x position
      * @param newY new Y position
      */
     @Override
@@ -761,7 +762,7 @@ public class ClientGUIView extends Application implements View{
     /**
      * notify that a player died
      * @param idKiller id  killer
-     * @param idVictim id victim 
+     * @param idVictim id victim
      * @param rage bool that say if the kill was with rage
      */
     @Override
@@ -777,7 +778,7 @@ public class ClientGUIView extends Application implements View{
 
     /**
      * notify is someone gor raged
-     * @param killer player that kill 
+     * @param killer player that kill
      * @param victim player victim
      */
     @Override
@@ -785,12 +786,17 @@ public class ClientGUIView extends Application implements View{
         textNotify.setText("Player "+killer.getNickName()+" has raged "+victim.getNickName() + "\n" + textNotify.getText());
     }
 
+    @Override
+    public void showNoWeaponToReload() {
+        //TODO
+    }
+
     /**
      * Grab weapon notification
-     * @param pID id of the player 
+     * @param pID id of the player
      * @param name name of the weapom grabbed
-     * @param x position x 
-     * @param y position y 
+     * @param x position x
+     * @param y position y
      */
     @Override
     public void grabWeaponNotification(int pID, String name, int x, int y) {
@@ -812,7 +818,7 @@ public class ClientGUIView extends Application implements View{
     /**
      * power up notification
      * @param id id of the player
-     * @param name name of the power up used 
+     * @param name name of the power up used
      * @param description description of the power up
      */
     @Override
@@ -929,7 +935,11 @@ public class ClientGUIView extends Application implements View{
             no.setOnMouseClicked(mouseEvent -> {
                 no.setVisible(false);
                 yes.setVisible(false);
-                controller.getClient().sendMessage(new ChoosePowerUpResponse());
+            });
+            no.setOnMouseClicked(mouseEvent -> {
+                controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse());
+                no.setVisible(false);
+                yes.setVisible(false);
             });
         }
 
@@ -983,28 +993,28 @@ public class ClientGUIView extends Application implements View{
             }
             switch (state){
                 case CHOOSEWEAPONTOWASTE:
-                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, weaponW));
+                    controller.getClientNetwork().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, weaponW));
                     break;
                 case CHOOSEWEAPONTOGRAB:
-                    controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, null));
+                    controller.getClientNetwork().sendMessage(new PickUpWeaponRequest(weaponG,choosenPW, null));
                     break;
                 case CHOOSEPBB:
-                    controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,choosenPW));
+                    controller.getClientNetwork().sendMessage(new UsePlusBeforeResponse(plusEff,t,choosenPW));
                     break;
                 case CHOOSEPLUSORDER:
-                    controller.getClient().sendMessage(new UseOrderPlusResponse(fullEffectList, choosenPW, 'y'));
+                    controller.getClientNetwork().sendMessage(new UseOrderPlusResponse(fullEffectList, choosenPW, 'y'));
                     break;
                 case CHOOSEFIRSTEFFECT:
-                    controller.getClient().sendMessage(new ChooseFirstEffectResponse(2,choosenPW));
+                    controller.getClientNetwork().sendMessage(new ChooseFirstEffectResponse(2,choosenPW));
                     break;
                 case CHOOSEPLUSEFFECT:
-                    controller.getClient().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, choosenPW));
+                    controller.getClientNetwork().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, choosenPW));
                     break;
                 case CHOOSERELOAD:
-                    controller.getClient().sendMessage(new ReloadWeaponRequest(weaponToReload, choosenPW));
+                    controller.getClientNetwork().sendMessage(new ReloadWeaponRequest(weaponToReload, choosenPW));
                     break;
                 case CHOOSESCOPE:
-                    controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, null, choosenPW));
+                    controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse(scopeSelected, null, choosenPW));
                     break;
             }
             sg.close();
@@ -1226,7 +1236,7 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void showMapsPhase(List<GameMap> availableMaps) {
-        controller.getClient().sendMessage(new GetWaitingRoomsRequest());
+        controller.getClientNetwork().sendMessage(new GetWaitingRoomsRequest());
     }
 
     /**
@@ -1246,7 +1256,7 @@ public class ClientGUIView extends Application implements View{
             no.setOnMouseClicked(mouseEvent -> {
                 yes.setVisible(false);
                 no.setVisible(false);
-                controller.getClient().sendMessage(new EndActionRequest());
+                controller.getClientNetwork().sendMessage(new EndActionRequest());
 
             });
             yes.setOnMouseClicked(mouseEvent -> {
@@ -1304,7 +1314,7 @@ public class ClientGUIView extends Application implements View{
         text.setText("Want to use Base effect? (No for alternative)");
         yes.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
-            controller.getClient().sendMessage(new ChooseFirstEffectResponse(1,null));
+            controller.getClientNetwork().sendMessage(new ChooseFirstEffectResponse(1,null));
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -1313,7 +1323,7 @@ public class ClientGUIView extends Application implements View{
             if(price.size() != 0)
                 choosePowerUpToPay(price);
             else
-                controller.getClient().sendMessage(new ChooseFirstEffectResponse(2,null));
+                controller.getClientNetwork().sendMessage(new ChooseFirstEffectResponse(2,null));
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -1336,13 +1346,13 @@ public class ClientGUIView extends Application implements View{
             if(price.size() != 0)
                 choosePowerUpToPay(price);
             else
-                controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,t,null));
+                controller.getClientNetwork().sendMessage(new UsePlusBeforeResponse(plusEff,t,null));
             yes.setVisible(false);
             no.setVisible(false);
         });
         no.setVisible(true);
         no.setOnMouseClicked(mouseEvent -> {
-            controller.getClient().sendMessage(new UsePlusBeforeResponse(plusEff,'n',null));
+            controller.getClientNetwork().sendMessage(new UsePlusBeforeResponse(plusEff,'n',null));
             yes.setVisible(false);
             no.setVisible(false);
         });
@@ -1388,14 +1398,14 @@ public class ClientGUIView extends Application implements View{
             if(list.size() != 0)
                 choosePowerUpToPay(list);
             else
-                controller.getClient().sendMessage(new UseOrderPlusResponse(fullEffectList, null, 'y'));
+                controller.getClientNetwork().sendMessage(new UseOrderPlusResponse(fullEffectList, null, 'y'));
             yes.setVisible(false);
             no.setVisible(false);
         });
         no.setOnMouseClicked(mouseEvent -> {
             yes.setVisible(false);
             no.setVisible(false);
-            controller.getClient().sendMessage(new UseOrderPlusResponse(plusEffects,null,'n'));
+            controller.getClientNetwork().sendMessage(new UseOrderPlusResponse(plusEffects,null,'n'));
         });
     }
 
@@ -1437,7 +1447,7 @@ public class ClientGUIView extends Application implements View{
         StackPane.setAlignment(submit, Pos.BOTTOM_RIGHT);
         submit.setOnMouseClicked(mouseEvent -> {
             if(((RadioButton)tg.getSelectedToggle()).getId().equals("none")) {
-                controller.getClient().sendMessage(new TerminateShootAction());
+                controller.getClientNetwork().sendMessage(new TerminateShootAction());
             }
             else{
                 int i = 0;
@@ -1452,17 +1462,17 @@ public class ClientGUIView extends Application implements View{
                     i++;
                 }
                 if(fe == null)
-                    controller.getClient().sendMessage(new TerminateShootAction());
+                    controller.getClientNetwork().sendMessage(new TerminateShootAction());
                 else
                     if(fe.getPrice() == null) {
-                        controller.getClient().sendMessage(new UsePlusEffectResponse(plusEffects, fe, null));
+                        controller.getClientNetwork().sendMessage(new UsePlusEffectResponse(plusEffects, fe, null));
                     }
                     else{
                         List<CardPower> list = possibleCardPowerToPay(fe);
                         if(list != null)
                             choosePowerUpToPay(list);
                         else
-                            controller.getClient().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, null));
+                            controller.getClientNetwork().sendMessage(new UsePlusEffectResponse(fullEffectList, plusEff, null));
                     }
             }
             sg.close();
@@ -1513,7 +1523,7 @@ public class ClientGUIView extends Application implements View{
         yes.setVisible(true);
         no.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
-            controller.getClient().sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
+            controller.getClientNetwork().sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
             no.setVisible(false);
             yes.setVisible(false);
         });
@@ -1546,7 +1556,7 @@ public class ClientGUIView extends Application implements View{
             no.setVisible(true);
             yes.setOnMouseClicked(mouseEvent -> {
                 if (controller.getState() != ClientState.GAME_END) {
-                    controller.getClient().sendMessage(new RejoinGameResponse(true, ClientContext.get().getUser()));
+                    controller.getClientNetwork().sendMessage(new RejoinGameResponse(true, ClientContext.get().getUser()));
                     no.setVisible(false);
                     yes.setVisible(false);
                 } else
@@ -1577,7 +1587,7 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void loginCompletedPhase() {
-        controller.getClient().sendMessage(new GetAvailableMapsRequest());
+        controller.getClientNetwork().sendMessage(new GetAvailableMapsRequest());
     }
 
     /**
@@ -1629,6 +1639,11 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void showPoints() {
         myPoint.setText(""+ClientContext.get().getMyPlayer().getPoints());
+    }
+
+    @Override
+    public void notifyFinalFrenzy() {
+        //TODO
     }
 
     /**
@@ -2334,7 +2349,7 @@ public class ClientGUIView extends Application implements View{
         int i = Integer.parseInt(((Rectangle)e.getSource()).getId());
         textNotify.setText("You selected square in: " + (i-1)/4 + ", " + (i-1)%4 + "\n" + textNotify.getText());
         choosenSquare = possiblePositions.stream().filter( p -> p.getX() == (i-1)%4 && p.getY() == (i-1)/4).findFirst().orElse(null);
-        controller.getClient().sendMessage(new ChooseSquareResponse(choosenSquare));
+        controller.getClientNetwork().sendMessage(new ChooseSquareResponse(choosenSquare));
         this.possiblePositions = null;
         disableSquare();
     }
@@ -2400,13 +2415,13 @@ public class ClientGUIView extends Application implements View{
                         chooseWeaponToWaste();
                     } else {
                         if (weaponG.getPrice().size() == 1) {
-                            controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                            controller.getClientNetwork().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
                         } else {
                             list = possibleCardPowerToPay(weaponG.getPrice().subList(1,weaponG.getPrice().size()));
                             if (list.size() != 0)
                                 choosePowerUpToPay(list);
                             else
-                                controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
+                                controller.getClientNetwork().sendMessage(new PickUpWeaponRequest(weaponG, null, null));
                         }
                     }
                     disableWeapon();
@@ -2415,7 +2430,7 @@ public class ClientGUIView extends Application implements View{
                 case CHOOSEWEAPONTOWASTE: {
                     weaponW = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
                     if (weaponG.getPrice().size() == 1) {
-                        controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, weaponW));
+                        controller.getClientNetwork().sendMessage(new PickUpWeaponRequest(weaponG, null, weaponW));
                     }else{
                         price = weaponG.getPrice().subList(1,weaponG.getPrice().size());
                         list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
@@ -2423,7 +2438,7 @@ public class ClientGUIView extends Application implements View{
                             choosePowerUpToPay(list);
                         }
                         else {
-                            controller.getClient().sendMessage(new PickUpWeaponRequest(weaponG, null, weaponW));
+                            controller.getClientNetwork().sendMessage(new PickUpWeaponRequest(weaponG, null, weaponW));
                         }
                     }
                     disableMyWeapon();
@@ -2431,7 +2446,7 @@ public class ClientGUIView extends Application implements View{
                 }
                 case CHOOSEWEAPONTOSHOOT: {
                     selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
-                    controller.getClient().sendMessage(new ChooseWeaponToShootResponse(selected));
+                    controller.getClientNetwork().sendMessage(new ChooseWeaponToShootResponse(selected));
                     disableMyWeapon();
                     break;
                 }
@@ -2480,7 +2495,7 @@ public class ClientGUIView extends Application implements View{
             id = 3;
         if(rb.getId().equals("4"))
             id = 4;
-        controller.getClient().sendMessage(new JoinWaitingRoomRequest(id, user));
+        controller.getClientNetwork().sendMessage(new JoinWaitingRoomRequest(id, user));
     }
 
     /**
@@ -2593,7 +2608,7 @@ public class ClientGUIView extends Application implements View{
      */
     private void handleRespawnSquare(MouseEvent e){
         CardPower p = ClientContext.get().getMyPlayer().getCardPower().stream().filter(l->l.getId() == Integer.parseInt(((ImageView)e.getSource()).getId())).findFirst().orElse(null);
-        controller.getClient().sendMessage(new RespawnResponse((p)));
+        controller.getClientNetwork().sendMessage(new RespawnResponse((p)));
         disablePowerUp();
     }
 
@@ -2604,11 +2619,11 @@ public class ClientGUIView extends Application implements View{
     private void handlePowerUpClick(MouseEvent e){
         CardPower p = ClientContext.get().getMyPlayer().getCardPower().stream().filter(l->l.getId() == Integer.parseInt(((ImageView)e.getSource()).getId())).findFirst().orElse(null);
         if(state.equals(ClientState.CHOOSECOUNTER)) {
-            controller.getClient().sendMessage(new CounterAttackResponse(p, shooter));
+            controller.getClientNetwork().sendMessage(new CounterAttackResponse(p, shooter));
             state = ClientState.WAITING_TURN;
         }
         if(state.equals(ClientState.CHOOSECARDPOWER))
-            controller.getClient().sendMessage(new ChoosePowerUpResponse(p));
+            controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse(p));
         if(state.equals(ClientState.CHOOSESCOPE)){
             scopeSelected = p;
             chooseTargetScopePayment();
@@ -2635,14 +2650,14 @@ public class ClientGUIView extends Application implements View{
     }
 
     /**
-     * Identify the ammo selected and check the Client state fot the response
+     * Identify the ammo selected and check the ClientNetwork state fot the response
      * @param e
      */
     private void handleAmmoClick(MouseEvent e ){
         System.out.println("ammo");
         if(state.equals(ClientState.CHOOSESCOPE)) {
             game.model.Color c = game.model.Color.valueOf(((Rectangle) e.getSource()).getId());
-            controller.getClient().sendMessage(new ChoosePowerUpResponse(scopeSelected, c, new ArrayList<>()));
+            controller.getClientNetwork().sendMessage(new ChoosePowerUpResponse(scopeSelected, c, new ArrayList<>()));
         }
         disableAmmo();
     }
@@ -2656,27 +2671,27 @@ public class ClientGUIView extends Application implements View{
         switch (chosenAction){
             case MOVEMENT:
                 if(state.equals(ClientState.CHOOSESTEP)) {
-                    controller.getClient().sendMessage(new MovementActionRequest());
+                    controller.getClientNetwork().sendMessage(new MovementActionRequest());
                 }
                 else {
-                    controller.getClient().sendMessage(new ChooseTurnActionResponse(Action.MOVEMENT));
+                    controller.getClientNetwork().sendMessage(new ChooseTurnActionResponse(Action.MOVEMENT));
                 }
                 break;
             case SHOOT:
                 if(state.equals(ClientState.CHOOSESTEP))
-                    controller.getClient().sendMessage(new ShootActionRequest());
+                    controller.getClientNetwork().sendMessage(new ShootActionRequest());
                 else
-                    controller.getClient().sendMessage(new ChooseTurnActionResponse(Action.SHOOT));
+                    controller.getClientNetwork().sendMessage(new ChooseTurnActionResponse(Action.SHOOT));
                 break;
             case GRAB:
                 if(state.equals(ClientState.CHOOSESTEP))
-                    controller.getClient().sendMessage(new GrabActionRequest());
+                    controller.getClientNetwork().sendMessage(new GrabActionRequest());
                 else
-                    controller.getClient().sendMessage(new ChooseTurnActionResponse(Action.GRAB));
+                    controller.getClientNetwork().sendMessage(new ChooseTurnActionResponse(Action.GRAB));
                 break;
             case EXIT:
                 if(controller.getState() == ClientState.HANDLING_MOVEMENT)
-                    controller.getClient().sendMessage(new EndTurnRequest());
+                    controller.getClientNetwork().sendMessage(new EndTurnRequest());
                 else
                     chooseStepActionPhase();
                 break;

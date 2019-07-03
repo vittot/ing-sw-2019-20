@@ -16,17 +16,33 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * It's the controller on the clientNetwork side,
+ * the link among the network layer, the gui and the ClientContext
+ */
 public class ClientController implements ServerGameMessageHandler {
-    private final Client client;
+    /** Reference to the network layer */
+    private final ClientNetwork clientNetwork;
+    /** Reference to the view */
     private View clientView;
+    /** List of action currently available for the player */
     private List<Action> availableActions;
+    /** Current state of the clientNetwork */
     private ClientState state;
+    /** True when the game is started*/
     private boolean gameStarted;
+    /** True when the game is terminated*/
     private boolean gameEnded;
+    /** True during the reconnection phase*/
     private boolean reconnecting;
 
-    public ClientController(Client client, View view) {
-        this.client = client;
+    /**
+     * Create the ClientController
+     * @param clientNetwork network layer
+     * @param view view layer
+     */
+    public ClientController(ClientNetwork clientNetwork, View view) {
+        this.clientNetwork = clientNetwork;
         this.gameStarted = false;
         this.clientView = view;
         this.clientView.setController(this);
@@ -35,19 +51,35 @@ public class ClientController implements ServerGameMessageHandler {
         this.reconnecting = false;
     }
 
-    public Client getClient() {
-        return client;
+    /**
+     * Return the corresponding network layer
+     * @return the ClientNetwork object
+     */
+    public ClientNetwork getClientNetwork() {
+        return clientNetwork;
     }
 
-    public ClientState getState() {
+    /**
+     * Return the ClientController state
+     * @return the actual ClientState
+     */
+    ClientState getState() {
         return state;
     }
 
-    public void setState(ClientState state) {
+    /**
+     * Set the ClientController state
+     * @param state The new ClientState
+     */
+    void setState(ClientState state) {
         this.state = state;
     }
 
-    public List<Action> getAvailableActions() {
+    /**
+     * Return a list of the available Actions in the current phase
+     * @return the list of the available actions
+     */
+    List<Action> getAvailableActions() {
         return availableActions;
     }
 
@@ -56,23 +88,23 @@ public class ClientController implements ServerGameMessageHandler {
      * Start the connection listening and the identification phase
      */
     public void run() {
-        client.startListening(this);
+        clientNetwork.startListening(this);
         clientView.setUserNamePhase();
     }
 
     /**
      * Send a series of messages to server
-     * @param messages
+     * @param messages list of messages to be sent
      */
-    public void sendMessages(List<ClientGameMessage> messages)
+    void sendMessages(List<ClientGameMessage> messages)
     {
         for(ClientGameMessage m : messages)
-            client.sendMessage(m);
+            clientNetwork.sendMessage(m);
     }
 
     /**
      * Update the ClientContext reloading the weapon and removing the power-up cards and ammo cards used by the player
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(CheckReloadResponse serverMsg) {
@@ -92,7 +124,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Ask the player which possible step, contained in the list of the possible move he can make, want to select
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(ChooseSingleActionRequest serverMsg) {
@@ -107,7 +139,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Ask the player what square want to select
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(ChooseSquareRequest serverMsg) {
@@ -116,7 +148,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Ask the player what target want to select to apply his action
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(ChooseTargetRequest serverMsg) {
@@ -126,18 +158,19 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Ask the player what action want to choose for this turn phase
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(ChooseTurnActionRequest serverMsg) {
 
         this.state = ClientState.WAITING_ACTION;
-        clientView.chooseTurnActionPhase();
+        ClientContext.get().setMovedAllowed(serverMsg.isMovAllowed());
+        clientView.chooseTurnActionPhase(serverMsg.isMovAllowed());
     }
 
     /**
      * Notify the player that the targets chosen are invalid
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(InvalidTargetResponse serverMsg) {
@@ -146,7 +179,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Notify the player the invalid weapon selection
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(InvalidWeaponResponse serverMsg) {
@@ -156,7 +189,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Notify the player the invalid action selection
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(InvalidActionResponse serverMsg) {
@@ -165,7 +198,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Notify the player that he doesn't have other new actions available
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(InsufficientNumberOfActionResponse serverMsg) {
@@ -174,7 +207,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Notify the player the invalid step selection
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(InvalidStepResponse serverMsg) {
@@ -183,13 +216,17 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Notify the player that he doesn't have enough space to grab new weapons
-     * @param serverMsg
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(MaxNumberOfWeaponsResponse serverMsg) {
         clientView.maxNumberOfWeaponNotification();
     }
 
+    /**
+     * Notify the player of a damage occurred in the game
+     * @param serverMsg message from the server
+     */
     @Override
     public void handle(NotifyDamageResponse serverMsg) {
         Player shooter = ClientContext.get().getMap().getPlayerById(serverMsg.getShooterId());
@@ -210,6 +247,10 @@ public class ClientController implements ServerGameMessageHandler {
         }
     }
 
+    /**
+     * Notify the clientNetwork about a death happened in the game
+     * @param serverMsg message from the server
+     */
     @Override
     public void handle(NotifyDeathResponse serverMsg) {
         clientView.notifyDeath(serverMsg.getIdKiller(),serverMsg.getIdVictim(),serverMsg.isRage());
@@ -218,13 +259,14 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     * Show the player the final results of the game
-     * @param serverMsg
+     * Show the final results of the game
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(NotifyEndGame serverMsg) {
         if(this.state != ClientState.GAME_END && this.state != ClientState.WAITING_START)
         {
+            this.gameEnded = true;
             this.state = ClientState.GAME_END;
             clientView.showRanking(serverMsg.getRanking());
         }
@@ -232,8 +274,8 @@ public class ClientController implements ServerGameMessageHandler {
 
 
     /**
-     *
-     * @param serverMsg
+     * Notify the clientNetwork about the grab of a weapon during the game
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(NotifyGrabWeapon serverMsg) {
@@ -243,15 +285,15 @@ public class ClientController implements ServerGameMessageHandler {
             if(serverMsg.getwWaste() != null)
                 instance.getMap().getSquare(serverMsg.getX(),serverMsg.getY()).getWeapons().add(serverMsg.getwWaste());
         } catch (MapOutOfLimitException e) {
-            //TODO shouldnt append
+            System.out.println("Someone grab an ammo outside of the map :/");
         }
         clientView.grabWeaponNotification(serverMsg.getP(),serverMsg.getCw().getName(),serverMsg.getX(),serverMsg.getY());
 
     }
 
     /**
-     *
-     * @param serverMsg
+     * Notify the clientNetwork about a movement happened during the game
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(NotifyMovement serverMsg) {
@@ -264,13 +306,13 @@ public class ClientController implements ServerGameMessageHandler {
             clientView.notifyMovement(toMove.getId(),toMove.getPosition().getX(),toMove.getPosition().getY());
         }
         catch(MapOutOfLimitException e){
-            // TODO shouldnt append
+            System.out.println("Someone moved out of the map :/");
         }
     }
 
     /**
-     *
-     * @param serverMsg
+     * Notify the clientNetwork about the use of a power up during the game
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(NotifyPowerUpUsage serverMsg) {
@@ -282,12 +324,12 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param serverMsg
+     * Receive the confirm of the grab of an ammo card, updating the ClientContext
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(PickUpAmmoResponse serverMsg) {
-        //notify set null the card-ammo on the square
+        //notify already sets null the card-ammo on the square
         for(Color c : serverMsg.getColors())
             ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).addAmmo(c);
         if(!serverMsg.getPowerups().isEmpty())
@@ -298,8 +340,8 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param serverMsg
+     * Receive the confirm of the grab of a weapon, updating the ClientContext
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(PickUpWeaponResponse serverMsg) {
@@ -314,26 +356,25 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param serverMsg
+     * Manage the respawn of the player
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(RespawnRequest serverMsg) {
-        //System.out.println("SONO NELL'HANDLE DEL RESPAWN");
-
         Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == ClientContext.get().getMyID()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()));
-        //System.out.println("HO PRESO IL MIO PLAYER");
+
         if(serverMsg.getcPU() != null)
             p.addCardPower(serverMsg.getcPU());
-        //System.out.println("GLI HO DATO LA POWER UP");
+
         clientView.choosePowerUpToRespawn(p.getCardPower());
+
         /*if(ClientContext.get().getMyPlayer().getNickName().equals("vitto"))
             this.manageConnectionError();*/
     }
 
     /**
-     *
-     * @param serverMsg
+     * Alert about the insufficient ammo of the player to complete the previously selected operation
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(InsufficientAmmoResponse serverMsg) {
@@ -341,8 +382,8 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param serverMsg
+     * Alert about the successful completion of a previously selected operation
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(OperationCompletedResponse serverMsg) {
@@ -351,19 +392,19 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param serverMsg
+     * Alert about an invalid selection of power up in the previously selected action
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(InvalidPowerUpResponse serverMsg) {
         clientView.notifyInvalidPowerUP();
         if(this.state == ClientState.WAITING_ACTION)
-            clientView.chooseTurnActionPhase();
+            clientView.chooseTurnActionPhase(ClientContext.get().isMovedAllowed());
     }
 
     /**
-     *
-     * @param serverMsg
+     * Alert about an invalid position indicated in a previously selected grab action
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(InvalidGrabPositionResponse serverMsg) {
@@ -371,8 +412,8 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param serverMsg
+     * Ask the player to use a power up after doing a damage (Targeting scope)
+     * @param serverMsg message from the server
      */
     @Override
     public void handle(AfterDamagePowerUpRequest serverMsg){
@@ -380,7 +421,7 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
+     * Notify about the start of the game, saving game datas in ClientContext
      * @param serverMsg
      */
     @Override
@@ -394,21 +435,20 @@ public class ClientController implements ServerGameMessageHandler {
             ClientContext.get().setMyID(serverMsg.getId());
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
         ClientContext.get().setKillboard(serverMsg.getKillBoard());
-        if(ClientContext.get().getMyPlayer().getCardPower() == null)
+        /*if(ClientContext.get().getMyPlayer().getCardPower() == null)
         {
             System.out.println("NON HO LE MIE CARD POWER =( !");
             for(Player p : serverMsg.getPlayers())
             {
                 System.out.println("Player " + p.getId() + " powercard= " + p.getCardPower());
             }
-        }
-        //System.out.println("GAME STARTED FINISHED");
+        }*/
         clientView.notifyStart();
     }
 
     /**
-     *
-     * @param waitingRoomsListResponse
+     * Start the waiting room selection phase
+     * @param waitingRoomsListResponse message from the server
      */
     @Override
     public void handle(WaitingRoomsListResponse waitingRoomsListResponse) {
@@ -416,8 +456,8 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param invalidMessageResponse
+     * Alert about the previous sending of an invalid message
+     * @param invalidMessageResponse message from the server
      */
     @Override
     public void handle(InvalidMessageResponse invalidMessageResponse) {
@@ -425,8 +465,8 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param notifyTurnChanged
+     *  Notify about the change of turn during the game
+     * @param notifyTurnChanged message from the server
      */
     @Override
     public void handle(NotifyTurnChanged notifyTurnChanged) {
@@ -438,8 +478,8 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param notifyMarks
+     * Notify about marks given during the game
+     * @param notifyMarks message from the server
      */
     @Override
     public void handle(NotifyMarks notifyMarks) {
@@ -449,8 +489,8 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param notifyGrabCardAmmo
+     * Notify about the grab of an ammo card during the game
+     * @param notifyGrabCardAmmo message from the server
      */
     @Override
     public void handle(NotifyGrabCardAmmo notifyGrabCardAmmo) {
@@ -468,8 +508,8 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     *
-     * @param notifyRespawn
+     * Notify about the spawn of a player
+     * @param notifyRespawn message from the server
      */
     @Override
     public void handle(NotifyRespawn notifyRespawn) {
@@ -489,11 +529,19 @@ public class ClientController implements ServerGameMessageHandler {
         clientView.notifyRespawn(notifyRespawn.getpId());
     }
 
+    /**
+     * Show the list of available game maps sent by the server
+     * @param availableMapsListResponse message from the server
+     */
     @Override
     public void handle(AvailableMapsListResponse availableMapsListResponse) {
         clientView.showMapsPhase(availableMapsListResponse.getAvaiableMaps());
     }
 
+    /**
+     * Receive the confirm of entering in a waiting room
+     * @param joinWaitingRoomResponse message from the server
+     */
     @Override
     public void handle(JoinWaitingRoomResponse joinWaitingRoomResponse) {
         ClientContext.get().setMyID(joinWaitingRoomResponse.getId());
@@ -501,6 +549,10 @@ public class ClientController implements ServerGameMessageHandler {
         clientView.notifyCompletedOperation("You correctly joined the waiting room! Wait for other players...");
     }
 
+    /**
+     * Receive the confirm of the creation of a waiting room
+     * @param createWaitingRoomResponse message from the server
+     */
     @Override
     public void handle(CreateWaitingRoomResponse createWaitingRoomResponse) {
         ClientContext.get().setMyID(createWaitingRoomResponse.getId());
@@ -509,17 +561,33 @@ public class ClientController implements ServerGameMessageHandler {
         clientView.waitStart();
     }
 
+    /**
+     * Receive the list of the weapons available to be grabbed
+     * @param chooseWeaponToGrabRequest message from the server
+     */
     @Override
     public void handle(ChooseWeaponToGrabRequest chooseWeaponToGrabRequest){
         state = ClientState.WAITING_GRAB_WEAPON;
         clientView.chooseWeaponToGrab(chooseWeaponToGrabRequest.getWeapons());
     }
 
+    /**
+     * Start the weapon realoding phase
+     * @param reloadWeaponAsk message from the server
+     */
     @Override
     public void handle(ReloadWeaponAsk reloadWeaponAsk) {
-        clientView.reloadWeaponPhase(reloadWeaponAsk.getWeaponsToReload());
+        this.state = ClientState.WAITING_FINAL_RELOAD;
+        if(!reloadWeaponAsk.getWeaponsToReload().isEmpty())
+            clientView.reloadWeaponPhase(reloadWeaponAsk.getWeaponsToReload());
+        else
+            clientView.showNoWeaponToReload();
     }
 
+    /**
+     * Notify the suspension of a player
+     * @param notifyPlayerSuspend message from the server
+     */
     @Override
     public void handle(NotifyPlayerSuspend notifyPlayerSuspend) {
         Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyPlayerSuspend.getpId()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(notifyPlayerSuspend.getpId()));
@@ -541,21 +609,33 @@ public class ClientController implements ServerGameMessageHandler {
 
     }
 
+    /**
+     * Alert about the presence of another player with the previously sent username, restarting the login phase
+     * @param userAlreadyLoggedResponse message from the server
+     */
     @Override
     public void handle(UserAlreadyLoggedResponse userAlreadyLoggedResponse) {
         clientView.alreadyLoggedPhase();
     }
 
+    /**
+     * Receive the login confirm
+     * @param userLoggedResponse message from the server
+     */
     @Override
     public void handle(UserLoggedResponse userLoggedResponse) {
         clientView.loginCompletedPhase();
     }
 
+    /**
+     * Receive the request to rejoin a game from which the user has been suspended
+     * @param rejoinGameRequest message from the server
+     */
     @Override
     public void handle(RejoinGameRequest rejoinGameRequest) {
         if(this.reconnecting)
         {
-            client.sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
+            clientNetwork.sendMessage(new RejoinGameResponse(true,ClientContext.get().getUser()));
             clientView.notifyReconnected();
             this.reconnecting = false;
         }
@@ -563,6 +643,10 @@ public class ClientController implements ServerGameMessageHandler {
             clientView.rejoinGamePhase(rejoinGameRequest.getOtherPlayerNames());
     }
 
+    /**
+     * Notify about the rejoin of a previously suspended player
+     * @param notifyPlayerRejoin message from the server
+     */
     @Override
     public void handle(NotifyPlayerRejoin notifyPlayerRejoin) {
         Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyPlayerRejoin.getPlayerId()).findFirst().orElse(ClientContext.get().getMap().getPlayerById(notifyPlayerRejoin.getPlayerId()));
@@ -574,6 +658,10 @@ public class ClientController implements ServerGameMessageHandler {
 
     }
 
+    /**
+     * Receive the confirm to be rejoined
+     * @param rejoinGameConfirm message from the server
+     */
     @Override
     public void handle(RejoinGameConfirm rejoinGameConfirm) {
         this.state = ClientState.WAITING_TURN;
@@ -592,32 +680,56 @@ public class ClientController implements ServerGameMessageHandler {
         clientView.rejoinGameConfirm();
     }
 
+    /**
+     * Receive the list of available weapons to be used in a shoot action
+     * @param chooseWeaponToShootRequest message from the server
+     */
     @Override
     public void handle(ChooseWeaponToShootRequest chooseWeaponToShootRequest) {
         state = ClientState.WAITING_SHOOT;
         clientView.chooseWeaponToShoot(chooseWeaponToShootRequest.getMyWeapons());
     }
 
+    /**
+     * Start of the selection of the first effect during the shoot action
+     * @param chooseFirstEffectRequest message from the server
+     */
     @Override
     public void handle(ChooseFirstEffectRequest chooseFirstEffectRequest) {
         clientView.chooseFirstEffect(chooseFirstEffectRequest.getBaseEff(),chooseFirstEffectRequest.getAltEff());
     }
 
+    /**
+     * Ask if the user want to use a plus effect which can be used before the base effect
+     * @param beforeBaseRequest message from the server
+     */
     @Override
     public void handle(BeforeBaseRequest beforeBaseRequest) {
         clientView.usePlusBeforeBase(beforeBaseRequest.getPlusEff());
     }
 
+    /**
+     * Ask about the use of plus effects
+     * @param usePlusEffectRequest message from the server
+     */
     @Override
     public void handle(UsePlusEffectRequest usePlusEffectRequest) {
         clientView.choosePlusEffect(usePlusEffectRequest.getPlusEffects());
     }
 
+    /**
+     * Ask about the use of plus effects, respecting their given order
+     * @param usePlusByOrderRequest message from the server
+     */
     @Override
     public void handle(UsePlusByOrderRequest usePlusByOrderRequest) {
         clientView.usePlusInOrder(usePlusByOrderRequest.getPlusEffects());
     }
 
+    /**
+     * Receive the confirm of a previously requested shoot action
+     * @param shootActionResponse message from the server
+     */
     @Override
     public void handle(ShootActionResponse shootActionResponse) {
         CardWeapon currWeapon = null;
@@ -631,13 +743,21 @@ public class ClientController implements ServerGameMessageHandler {
         }
     }
 
+    /**
+     * Receive the request to remove the power-up used to spawn
+     * @param removeSpawnPowerUp message from the server
+     */
     @Override
     public void handle(RemoveSpawnPowerUp removeSpawnPowerUp) {
         Player me = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
-        if(me.getCardPower().contains(removeSpawnPowerUp.getPowerup()))
+        //if(me.getCardPower().contains(removeSpawnPowerUp.getPowerup()))
             me.getCardPower().remove(removeSpawnPowerUp.getPowerup());
     }
 
+    /**
+     * Refill the gam map with a weapon
+     * @param notifyWeaponRefill message from the server
+     */
     @Override
     public void handle(NotifyWeaponRefill notifyWeaponRefill){
         CardWeapon cw = notifyWeaponRefill.getCw();
@@ -654,6 +774,10 @@ public class ClientController implements ServerGameMessageHandler {
 
     }
 
+    /**
+     * Refill the game map with a card ammo
+     * @param notifyAmmoRefill message from the server
+     */
     @Override
     public void handle(NotifyAmmoRefill notifyAmmoRefill){
         CardAmmo ca = notifyAmmoRefill.getCa();
@@ -667,6 +791,10 @@ public class ClientController implements ServerGameMessageHandler {
             }
     }
 
+    /**
+     * Update player marks
+     * @param updateMarks message from the server
+     */
     @Override
     public void handle(UpdateMarks updateMarks) {
         Player p = ClientContext.get().getMap().getPlayerById(updateMarks.getId());
@@ -674,11 +802,19 @@ public class ClientController implements ServerGameMessageHandler {
             p.updateMarks();
     }
 
+    /**
+     * Remove the indicated power-up, previously used
+     * @param choosePowerUpUsed message from the server
+     */
     @Override
     public void handle(ChoosePowerUpUsed choosePowerUpUsed) {
         ClientContext.get().getMyPlayer().removePowerUp(Collections.singletonList(choosePowerUpUsed.getCardPower()));
     }
 
+    /**
+     * Remove munitions and/or power-up cards used for a payment
+     * @param addPayment
+     */
     @Override
     public void handle(AddPayment addPayment) {
         Player me = ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID());
@@ -692,7 +828,7 @@ public class ClientController implements ServerGameMessageHandler {
 
     /**
      * Update player points
-     * @param notifyPoints
+     * @param notifyPoints message from the server
      */
     @Override
     public void handle(NotifyPoints notifyPoints) {
@@ -700,17 +836,35 @@ public class ClientController implements ServerGameMessageHandler {
         clientView.showPoints();
     }
 
+    /**
+     * Notify about a rage hit
+     * @param notifyRage message from the server
+     */
     @Override
     public void handle(NotifyRage notifyRage) {
         clientView.notifyRage(notifyRage.getKiller(), notifyRage.getVictim());
     }
 
     @Override
+    public void handle(NotifyFinalFrenzy notifyFinalFrenzy) {
+        ClientContext.get().setFinalFrenzy();
+        clientView.notifyFinalFrenzy();
+    }
+
+    /**
+     * Notify about the leaving of the waiting room by a player
+     * @param notifyPlayerExitedWaitingRoom message from the server
+     */
+    @Override
     public void handle(NotifyPlayerExitedWaitingRoom notifyPlayerExitedWaitingRoom) {
         ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyPlayerExitedWaitingRoom.getPlayerId()).findFirst().ifPresent(clientView::notifyPlayerLeavedWaitingRoom);
 
     }
 
+    /**
+     * Notify about the join of a player in the waiting room
+     * @param notifyPlayerJoinedWaitingRoom message from the server
+     */
     @Override
     public void handle(NotifyPlayerJoinedWaitingRoom notifyPlayerJoinedWaitingRoom) {
         Player p = notifyPlayerJoinedWaitingRoom.getPlayer();
@@ -718,50 +872,57 @@ public class ClientController implements ServerGameMessageHandler {
         clientView.notifyPlayerJoinedWaitingRoom(p);
     }
 
-    public void resumeState(){
+    /**
+     * //TODO
+     */
+    void resumeState(){
         switch(state){
             case WAITING_GRAB_WEAPON:
-                client.sendMessage(new GrabActionRequest());
+                clientNetwork.sendMessage(new GrabActionRequest());
         }
     }
 
-    public boolean isGameStarted() {
+    /**
+     * Return if the game is started
+     * @return true if it is started, false otherwise
+     */
+    boolean isGameStarted() {
         return gameStarted;
     }
 
     /**
      * Stop listening before closing the application
      */
-    public void stopListening() {
-        client.close();
+    void stopListening() {
+        clientNetwork.close();
     }
 
     /**
-     * Called by the newtork layer in case of connection error
+     * Called by the network layer in case of connection error
      */
-    public void manageConnectionError() {
-        client.stopWaitingPing();
+    void manageConnectionError() {
+        clientNetwork.stopWaitingPing();
         clientView.notifyConnectionError();
     }
 
     /**
      * Reconnect with the server after a connection error
      */
-    public void retryConnection() {
-        if(!client.init())
+    void retryConnection() {
+        if(!clientNetwork.init())
             clientView.notifyConnectionError();
         else{
-            client.startListening(this);
+            clientNetwork.startListening(this);
             this.reconnecting = true;
-            client.sendMessage(new LoginMessage(ClientContext.get().getMyPlayer().getNickName(),true));
+            clientNetwork.sendMessage(new LoginMessage(ClientContext.get().getMyPlayer().getNickName(),true));
         }
     }
 
     /**
      * Start a new game
      */
-    public void startNewGame() {
+    void startNewGame() {
         state  = ClientState.WAITING_START;
-        client.sendMessage(new GetAvailableMapsRequest());
+        clientNetwork.sendMessage(new GetAvailableMapsRequest());
     }
 }

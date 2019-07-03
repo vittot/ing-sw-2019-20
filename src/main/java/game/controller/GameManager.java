@@ -121,6 +121,7 @@ public class GameManager implements Serializable {
     /**
      * Add a new Game to t
      * @param mapId
+     * @param players
      * @return
      */
     public Game addGame(int mapId, List<Player> players){
