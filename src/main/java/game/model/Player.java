@@ -285,6 +285,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
     public void respawn(CardPower discard){
         this.damage.clear();
         this.adrenaline = AdrenalineLevel.NONE;
+        if(this.position != null)
+            this.position.removePlayer(this);
         this.position = game.getMap().respawnColor(discard.getMapColor());
         this.position.addPlayer(this);
         this.isDead = false;
@@ -572,13 +574,18 @@ public class Player implements Target, Serializable, Comparable<Player> {
 
     public boolean mustUsePowerUpsToPay(List<Color> price) {
         if (!price.isEmpty() && price != null) {
-            if (price.get(0) == Color.ANY)
-                return true;
-            if (ammo != null && !ammo.isEmpty())
-                for (int i = 0; i < ammo.size(); i++)
-                    price.remove(ammo.get(i));
-            if (price.isEmpty())
-                return false;
+            if (ammo != null && !ammo.isEmpty()) {
+                if (price.get(0) == Color.ANY)
+                    return false;
+                else {
+                    for (int i = 0; i < ammo.size(); i++)
+                        price.remove(ammo.get(i));
+                    if (price.isEmpty())
+                        return false;
+                    else
+                        return true;
+                }
+            }
             else
                 return true;
         }
@@ -614,6 +621,9 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 }
             }
         }
+        else if(!ammoToPay.isEmpty() && ammoToPay.get(0) == Color.ANY && powerUp != null && !powerUp.isEmpty())
+            cardPower.remove(powerUp.get(0));
+
     }
 
     public List<Color> controlGrabAmmo(List<Color> ammos){

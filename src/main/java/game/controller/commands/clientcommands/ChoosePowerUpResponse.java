@@ -7,10 +7,13 @@ import game.controller.commands.ServerGameMessage;
 import game.model.CardPower;
 import game.model.Color;
 
+import java.util.List;
+
 public class ChoosePowerUpResponse implements ClientGameMessage {
     private CardPower cardPower;
     private Color ammoToPay;
     private boolean confirm;
+    private List<CardPower> cpToPay;
 
     public ChoosePowerUpResponse(CardPower cardPower) {
         this.cardPower = cardPower;
@@ -18,9 +21,10 @@ public class ChoosePowerUpResponse implements ClientGameMessage {
         this.confirm = true;
     }
 
-    public ChoosePowerUpResponse(CardPower cardPower, Color ammoToPay) {
+    public ChoosePowerUpResponse(CardPower cardPower, Color ammoToPay, List<CardPower> cpToPay) {
         this.cardPower = cardPower;
         this.ammoToPay = ammoToPay;
+        this.cpToPay = cpToPay;
         this.confirm = true;
     }
 
@@ -34,6 +38,10 @@ public class ChoosePowerUpResponse implements ClientGameMessage {
 
     public Color getAmmoToPay() {
         return ammoToPay;
+    }
+
+    public List<CardPower> getCpToPay() {
+        return cpToPay;
     }
 
     public boolean isConfirm() {
