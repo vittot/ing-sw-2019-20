@@ -656,42 +656,25 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             if (count != clientMsg.getPowerups().size())
                 return new InvalidPowerUpResponse();
         }
+        List<CardWeapon> toReload = currPlayer.hasToReload();
         try{
             w.reloadWeapon(clientMsg.getPowerups());
             state = ServerState.WAITING_RELOAD;
             clientHandler.sendMessage(new CheckReloadResponse(clientMsg.getWeapon(), clientMsg.getPowerups()));
+            toReload.remove(w);
+            if(toReload != null && !toReload.isEmpty())
+                return new ReloadWeaponAsk(toReload);
             return checkTurnEnd();
         }catch(InsufficientAmmoException e)
         {
             clientHandler.sendMessage(new InsufficientAmmoResponse());
             state = ServerState.WAITING_RELOAD;
+            if(toReload != null && !toReload.isEmpty())
+                return new ReloadWeaponAsk(toReload);
             return checkTurnEnd();
         }
     }
 
-    /*
-    @Override
-    public ServerGameMessage handle(SpawnResponse clientMsg){
-         if(state == ServerState.WAITING_SPAWN){
-             if (currPlayer.getCardPower().contains(clientMsg.getPowerUp())) {
-                 currPlayer.respawn(clientMsg.getPowerUp());
-                 currPlayer.removePowerUp(Collections.singletonList(clientMsg.getPowerUp()));
-                 model.addPowerWaste(clientMsg.getPowerUp());
-                 if (model.getCurrentTurn().getCurrentPlayer().equals(currPlayer)) {
-                     state = ServerState.WAITING_ACTION;
-                     return new ChooseTurnActionRequest();
-                 } else {
-                     state = ServerState.WAITING_TURN;
-                     return new OperationCompletedResponse("Wait for your turn");
-                 }
-             } else
-                 return new InvalidPowerUpResponse();
-         }
-         else{
-             return new InvalidMessageResponse("You are not dead, you can't respawn!");
-         }
-         }
-    */
     @Override
     public ServerGameMessage handle(RespawnResponse clientMsg) {
         if(checkIfEnded())
@@ -933,8 +916,14 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             //baseDone = true; //TODO: check
             if(choosePowerUpResponse.getAmmoToPay() != Color.ANY) {
                 try {
-                    currPlayer.pay(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()),new ArrayList<>());
-                    clientHandler.sendMessage(new AddPayment(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()),new ArrayList<>()));
+                    if(choosePowerUpResponse.getAmmoToPay() != null) {
+                        currPlayer.pay(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()), new ArrayList<>());
+                        clientHandler.sendMessage(new AddPayment(Collections.singletonList(choosePowerUpResponse.getAmmoToPay()), new ArrayList<>()));
+                    }
+                    else{
+                        currPlayer.pay(Collections.singletonList(Color.ANY), Collections.singletonList(choosePowerUpResponse.getCpToPay().get(0)));
+                        clientHandler.sendMessage(new AddPayment(Collections.singletonList(Color.ANY), Collections.singletonList(choosePowerUpResponse.getCpToPay().get(0))));
+                    }
                 } catch (InsufficientAmmoException e) {
                     e.printStackTrace();
                 }

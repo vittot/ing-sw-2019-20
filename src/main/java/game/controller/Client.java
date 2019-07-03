@@ -11,7 +11,7 @@ public abstract class Client {
     protected ClientController controller;
     int nPingLost;
     ScheduledExecutorService disconnectionExecutor;
-    static final int WAIT_TIME_PING_MS = 40000;
+    static final int WAIT_TIME_PING_MS = 4000000;
     boolean stop;
 
     abstract void sendMessage(ClientMessage msg);
