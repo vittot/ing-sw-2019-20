@@ -5,7 +5,13 @@ import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.CardPower;
 
+/**
+ * Request of respawn, and give the new power up to the client
+ */
 public class RespawnRequest implements ServerGameMessage {
+    /**
+     * Card power given to the player
+     */
     private CardPower cPU;
 
     public RespawnRequest(CardPower cPU) {

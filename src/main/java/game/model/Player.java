@@ -43,7 +43,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
     private transient PlayerObserver playerObserver; /** reference to the object that is in charge of notify the game events */
     private boolean suspended; /** boolean value that specifies if the player has been suspended from the game cause of connection lost */
     private int killboardpoints;
-
+    private boolean beforeFrenzy = true; /** boolean that specifies if the player got some damages before final frenzy
     /**
      * construct a player object ready to start the game
      * @param id
@@ -1027,5 +1027,23 @@ public class Player implements Target, Serializable, Comparable<Player> {
         if(this.points == p2.getPoints())
             return p2.getKillboardpoints() - this.killboardpoints;
         return p2.getPoints() - this.points;
+    }
+
+    /**
+     * Gets beforeFrenzy.
+     *
+     * @return Value of beforeFrenzy.
+     */
+    public boolean isBeforeFrenzy() {
+        return beforeFrenzy;
+    }
+
+    /**
+     * Sets new beforeFrenzy.
+     *
+     * @param beforeFrenzy New value of beforeFrenzy.
+     */
+    public void setBeforeFrenzy(boolean beforeFrenzy) {
+        this.beforeFrenzy = beforeFrenzy;
     }
 }

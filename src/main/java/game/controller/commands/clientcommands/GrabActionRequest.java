@@ -5,13 +5,25 @@ import game.controller.commands.ClientGameMessageHandler;
 import game.controller.commands.ClientMessageHandler;
 import game.controller.commands.ServerGameMessage;
 
+/**
+ * requsto of grab action of the client
+ */
 public class GrabActionRequest implements ClientGameMessage {
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public ServerGameMessage handle(ClientGameMessageHandler handler) {
         return handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     */
     @Override
     public void handle(ClientMessageHandler handler) {
         handler.handle(this);
