@@ -1,5 +1,3 @@
-# ing-sw-2019-20
-
 Le funzionalità sviluppate sono
 Regole Complete + CLI + GUI + Socket + RMI + 1 FA (partite multiple)
 
