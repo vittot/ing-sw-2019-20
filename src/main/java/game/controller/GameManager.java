@@ -24,6 +24,9 @@ public class GameManager implements Serializable {
     private Map<String,Game> usersSuspended;
 
 
+    /**
+     * Default consructor
+     */
     private GameManager(){
         nextId = 1;
         games = new ArrayList<>();
@@ -33,6 +36,10 @@ public class GameManager implements Serializable {
         waitingRooms = new ArrayList<>();
     }
 
+    /**
+     * Get the singleton instance
+     * @return game manager instance
+     */
     public static synchronized GameManager get() {
         if (instance == null) {
             instance = new GameManager();
@@ -41,37 +48,36 @@ public class GameManager implements Serializable {
         return instance;
     }
 
-    /*private void writeObject(ObjectOutputStream oos)
-            throws IOException
-    {
-        oos.defaultWriteObject();
-        //oos.writeObject(instance);
-    }
-
-    private void readObject(ObjectInputStream ois)
-            throws ClassNotFoundException, IOException
-    {
-        ois.defaultReadObject();
-        //instance = (GameManager) ois.readObject();
-    }*/
-
+    /**
+     * Return the map with a given id
+     * @param mapId map id
+     * @return map
+     */
     public GameMap getMap(int mapId)
     {
         return availableMaps.stream().filter(m->m.getId() == mapId).findFirst().orElse(null);
     }
 
+    /**
+     * Return the list of available maps
+     * @return maps list
+     */
     public List<GameMap> getAvailableMaps() {
         return availableMaps;
     }
 
+    /**
+     * Add a new logged user
+     * @param user username
+     */
     public void addLoggedUser(String user)
     {
         usersLogged.add(user);
     }
 
     /**
-     * Suspend the player
-     * @param player
+     * Suspend a player
+     * @param player player to be suspended
      */
     public void suspendPlayer(Player player)
     {
@@ -84,7 +90,7 @@ public class GameManager implements Serializable {
 
     /**
      * Remove all users suspended from an ended game
-     * @param g
+     * @param g game
      */
     public void endGame(Game g)
     {
@@ -99,9 +105,9 @@ public class GameManager implements Serializable {
 
     /**
      * Rejoin a user previously suspended to its old game
-     * @param user
+     * @param user username
      */
-    public void rejoinUser(String user)
+    void rejoinUser(String user)
     {
         Game g = usersSuspended.remove(user);
         if(g == null)
@@ -110,21 +116,29 @@ public class GameManager implements Serializable {
         usersLogged.add(user);
     }
 
-    public List<String> getUsersLogged() {
+    /**
+     * Return logged users list
+     * @return usernames list
+     */
+    List<String> getUsersLogged() {
         return usersLogged;
     }
 
-    public Set<String> getUsersSuspended() {
+    /**
+     * Return suspend users list
+     * @return usernames list
+     */
+    Set<String> getUsersSuspended() {
         return usersSuspended.keySet();
     }
 
     /**
-     * Add a new Game to t
-     * @param mapId
-     * @param players
-     * @return
+     * Create a new Game
+     * @param mapId map id for the game
+     * @param players players for the game
+     * @return the new game
      */
-    public Game addGame(int mapId, List<Player> players){
+    Game addGame(int mapId, List<Player> players){
         Game g = new Game(nextId, mapId, 8,players);
         nextId++;
         games.add(g);
@@ -132,8 +146,8 @@ public class GameManager implements Serializable {
     }
 
     /**
-     * Return all avaiable waitingRooms
-     * @return
+     * Return all available waitingRooms
+     * @return waiting rooms list
      */
     public List<WaitingRoom> getWaitingRooms() {
         return waitingRooms;
@@ -141,15 +155,15 @@ public class GameManager implements Serializable {
 
     /**
      * Remove a waiting room
-     * @param waitingRoom
+     * @param waitingRoom waiting room to be removed
      */
-    public void removeWaitingRoom(WaitingRoom waitingRoom) {
+    void removeWaitingRoom(WaitingRoom waitingRoom) {
         this.waitingRooms.remove(waitingRoom);
     }
 
     /**
      * Get the waiting room with the indicated id
-     * @param roomId
+     * @param roomId id
      * @return the waiting room or null if it does not exist
      */
     public WaitingRoom getWaitingRoom(int roomId) {
@@ -158,27 +172,27 @@ public class GameManager implements Serializable {
 
     /**
      * Add a new WaitingRoom with the given mapId
-     * @param mapId
+     * @param mapId map id
      * @return the WaitingRoom created
      */
-    public WaitingRoom addWaitingRoom(int mapId) {
+    WaitingRoom addWaitingRoom(int mapId) {
         waitingRooms.add(new WaitingRoom(waitingRooms.size()+1,mapId));
         return waitingRooms.get(waitingRooms.size()-1);
     }
 
     /**
-     * Return the game in which was involveed a suspender user
-     * @param nickname
-     * @return
+     * Return the game in which was involved a suspender user
+     * @param nickname username
+     * @return the game (or null)
      */
-    public Game getGameOfSuspendedUser(String nickname) {
+    Game getGameOfSuspendedUser(String nickname) {
         return usersSuspended.get(nickname);
     }
 
     /**
      * Return the game in which is playing a certain user
-     * @param nickname
-     * @return
+     * @param nickname username
+     * @return game (or null)
      */
     Game getGameOfUser(String nickname)
     {

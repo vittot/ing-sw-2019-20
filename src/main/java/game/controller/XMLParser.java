@@ -15,7 +15,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Class with static methods to read XML files
+ */
 public class XMLParser {
 
     /**
@@ -62,8 +64,8 @@ public class XMLParser {
     }
 
     /**
-     *
-     * @return the available map
+     * Read maps
+     * @return the available maps list
      */
     public static List<GameMap> getAvailableMaps()
     {
@@ -178,8 +180,8 @@ public class XMLParser {
 
     /**
      * read from xml and call the methods to build a weapon deck
-     * @param fileName
-     * @return
+     * @param fileName filename
+     * @return false in case of error
      */
     public static boolean readDeck(String fileName, Game g){
         SAXBuilder builder = new SAXBuilder();
@@ -205,8 +207,8 @@ public class XMLParser {
 
     /**
      * read from xml and call the methods to build the ammo deck
-     * @param fileName
-     * @return
+     * @param fileName filename
+     * @return false in case of error
      */
     public static boolean readAmmoDeck(String fileName, Game g){
         SAXBuilder builder = new SAXBuilder();
@@ -229,8 +231,9 @@ public class XMLParser {
 
     /**
      * read from xml and call the methods to build the powerup deck
-     * @param fileName
-     * @return
+     * @param fileName fileName
+     * @param g game to which the power up are added
+     * @return false in case of error
      */
     public static boolean readPowerUpDeck(String fileName, Game g){
         SAXBuilder builder = new SAXBuilder();
@@ -246,19 +249,18 @@ public class XMLParser {
             }
         } catch (JDOMException e1) {
             e1.printStackTrace();
-            //TODO ecc
             return false;
         } catch (IOException el) {
             el.printStackTrace();
-            //TODO ecc
             return false;
         }
         return true;
     }
 
     /**
-     * Get a Element powerup and build it
+     * Get a Element ammo and build it
      * @param ammo
+     * @param g game to which the ammo card is added
      */
     private static void addAmmoCard(Element ammo, Game g){
 
@@ -277,6 +279,7 @@ public class XMLParser {
     /**
      * Get a Element powerup and build it
      * @param powerup
+     * @param g game to which the power up is added
      */
     private static void addPowerUp(Element powerup, Game g){
         String name = powerup.getChild("name").getText().trim();
@@ -303,6 +306,7 @@ public class XMLParser {
      * Get a Element weapon and build it
      * @param weapon
      * @param id
+     * @param g game to which the weapon is added
      */
     private static void addWeapon(Element weapon, int id, Game g){
         String name = weapon.getChild("name").getText().trim();
@@ -350,12 +354,12 @@ public class XMLParser {
     }
 
     /**
-     * Insert the description of the effetc
+     * Insert the description of the effect
      * @param ef base
      * @param aef alternative
      * @param oef optional
      * @param desc description
-     * @param name nanem
+     * @param name name
      */
     private static void insertDescription (FullEffect ef,FullEffect aef,List<FullEffect> oef, List<String> desc, List<String> name){
         ef.setName(name.get(0));
@@ -517,7 +521,7 @@ public class XMLParser {
     }
 
     /**
-     * Create all the optional effect of a weapon
+     * Create all the optional effects of a weapon
      * @param weapon
      * @return
      */
@@ -593,7 +597,7 @@ public class XMLParser {
     }
 
     /**
-     * Create all the base effect of a weapon
+     * Create all the base effects of a weapon
      * @param weapon
      * @return
      */

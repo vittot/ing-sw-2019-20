@@ -15,16 +15,23 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
-
+/**
+ * Network socket layer on server side
+ */
 public class SocketClientHandler extends ClientHandler implements Runnable, ClientMessageHandler {
 
+    /** Client socket */
     private Socket socket;
+    /** Client socket input stream*/
     private final ObjectInputStream inStream;
+    /** Client socket ouput stream */
     private final ObjectOutputStream outStream;
-    private ObjectInputStream inPingStream;
-    private ObjectOutputStream outPingStream;
-    private Socket pingSocket;
 
+    /**
+     * Default constructor
+     * @param s client socket
+     * @throws IOException  in case of communication error
+     */
     public SocketClientHandler(Socket s) throws IOException {
         super();
         this.socket = s;
@@ -37,7 +44,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
     /**
      * Send a message to the client
      * It must be synhcronized to avoid interferences between game messages and ping messages
-     * @param msg
+     * @param msg message
      */
     @Override
     public synchronized void sendMessage(ServerMessage msg) {
@@ -61,7 +68,8 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
             }
             catch(IOException e)
             {
-                e.printStackTrace();
+                clientDisconnected();
+                //e.printStackTrace();
             }
     }
 
@@ -86,42 +94,45 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
             clientDisconnected();
         }
         catch (Exception e) {
-            //TODO: handle exception
             e.printStackTrace();
         }
 
 
     }
 
-    public InetAddress getInetAddress()
-    {
-        return socket.getInetAddress();
-    }
-
+    /** Return the client username */
+    @Override
     public String getUsername() {
         return username;
     }
 
 
+    /**
+     * Handle an incoming message from the client
+     * @param inMsg message
+     */
     @Override
     public void handle(ClientGameMessage inMsg) {
-        //new Thread( () ->{
             ServerGameMessage outMsg = inMsg.handle(controller);
             sendMessage(outMsg);
-        //}).start();
 
-        /*if(controller.getCurrPlayer() != null)
-            controller.getCurrPlayer().setSerializeEverything(false); //it is not always necessary*/
     }
 
+    /**
+     * Handle a pong answer
+     * @param msg pong answer
+     */
     @Override
     public synchronized void handle(PongMessage msg) {
-        //pingTimer.cancel();
         pingTimer.shutdownNow();
         nPingLost = 0;
-        System.out.println(username + " PONG");
+        //System.out.println(username + " PONG");
     }
 
+    /**
+     * Handle a login message (save the username)
+     * @param inMsg message
+     */
     @Override
     public void handle(LoginMessage inMsg) {
         this.username = inMsg.getNickname();
@@ -131,12 +142,12 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
 
     /**
      * Send a ping message
-     * @param msg
+     * @param msg ping message
      */
     @Override
     public void sendPingMessage(PingMessage msg) {
 
-        System.out.println("PING " + username);
+        //System.out.println("PING " + username);
         sendMessage(msg);
     }
 

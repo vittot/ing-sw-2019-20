@@ -10,8 +10,12 @@ import java.util.SortedMap;
 
 import static com.sun.javafx.application.PlatformImpl.runLater;
 
+/**
+ * Wrapper class to call all gui methods with runLater
+ */
 public class ClientGuiWrapper implements View {
 
+    /** Reference to the GUI */
     private ClientGUIView gui;
 
     public ClientGuiWrapper() {

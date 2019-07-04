@@ -12,15 +12,44 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Class that identify the waiting room
+ */
 public class WaitingRoom implements Serializable {
+    /**
+     * Identifier of the waiting room
+     */
     private int id;
+    /**
+     * Map of the player and the his Server Controller reference
+     */
     private transient Map<ServerController,Player> players;
+    /**
+     * Number of player in the waiting room
+     */
     private int numWaitingPlayers;
+    /**
+     * Id of the map selected for the waiting room
+     */
     private int mapId;
+    /**
+     * Minimun player to start a game
+     */
     private final int N_MINIMUM_PLAYERS = 3;
+    /**
+     * Number of mac player
+     */
     private final int NUM_PLAYERS = 5;
+    /**
+     * Timer before the game start after reaching the minimun number of player
+     */
     private transient ScheduledExecutorService timer;
 
+    /**
+     * Constructor
+     * @param id id
+     * @param mapId map id
+     */
     public WaitingRoom(int id, int mapId)
     {
         this.mapId = mapId;
@@ -29,20 +58,35 @@ public class WaitingRoom implements Serializable {
         this.numWaitingPlayers = NUM_PLAYERS;
     }
 
+    /**
+     *
+     * @return the number of player in waiting
+     */
     int getNumWaitingPlayers() {
         return numWaitingPlayers;
     }
 
+    /**
+     *
+     * @return the player in waiting
+     */
     public Collection<Player> getPlayers()
     {
         return players.values();
     }
 
-
+    /**
+     *
+     * @return the waiting room id
+     */
     public int getId() {
         return this.id;
     }
 
+    /**
+     *
+     * @return the collection of all server controller from the other player
+     */
     public Collection<ServerController> getServerControllers()
     {
         return players.keySet();
@@ -136,8 +180,8 @@ public class WaitingRoom implements Serializable {
 
     /**
      * Serialize the object, excluding the player controllers
-     * @param oos
-     * @throws IOException
+     * @param oos outputs stream
+     * @throws IOException  in case of communication error
      */
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
@@ -152,8 +196,8 @@ public class WaitingRoom implements Serializable {
 
     /**
      * De-serialize the object. The players are associated to null controllers
-     * @param ois
-     * @throws IOException
+     * @param ois input stream
+     * @throws IOException  in case of communication error
      */
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
@@ -165,7 +209,7 @@ public class WaitingRoom implements Serializable {
 
     /**
      * Return a string representation of the waiting room
-     * @return
+     * @return string
      */
     @Override
     public String toString()
@@ -178,7 +222,7 @@ public class WaitingRoom implements Serializable {
 
     /**
      * Return true if the waiting room is empty, false otherwise
-     * @return
+     * @return boolean
      */
     public boolean isEmpty() {
         return players.isEmpty();

@@ -117,8 +117,8 @@ public interface GameListener {
     void onPlayerRaged(Kill lastKill);
 
     /**
-     *
-     * @return
+     * Return the username
+     * @return username
      */
     String getUsername();
 

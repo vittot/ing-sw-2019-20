@@ -13,10 +13,24 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * RMI Network layer on server side
+ */
 public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHandler, ClientMessageHandler {
+    /**
+     * Reference to the remote rmi client
+     */
     private RemoteClient client;
+    /**
+     * Thread pool to send messages
+     */
     private ExecutorService threadPool;
 
+    /**
+     * Default constructor
+     * @param gm GameManager (need to be passed because otherwise rmi breaks the singleton pattern)
+     * @throws RemoteException  in case of communication error
+     */
     RMIClientHandler(GameManager gm) throws RemoteException {
         super();
         threadPool = Executors.newSingleThreadScheduledExecutor();
@@ -25,6 +39,10 @@ public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHa
         UnicastRemoteObject.exportObject(this, 0);
     }
 
+    /**
+     * Send a message to the client
+     * @param msg message
+     */
     @Override
     public void sendMessage(ServerMessage msg) {
 
@@ -47,12 +65,22 @@ public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHa
 
     }
 
+    /**
+     * Receive a message from the client
+     * @param cmsg message
+     * @throws RemoteException  in case of communication error
+     */
     @Override
     public void receiveMessage(ClientMessage cmsg) throws RemoteException
     {
             cmsg.handle(this);
     }
 
+    /**
+     * Receive a pong answer from the client
+     * @param msg pong answer
+     * @throws RemoteException  in case of communication error
+     */
     public void receivePongMessage(PongMessage msg) throws RemoteException
     {
         try {
@@ -63,12 +91,20 @@ public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHa
         }
     }
 
+    /**
+     * Handle a clientGameMessage
+     * @param msg message
+     */
     @Override
     public void handle(ClientGameMessage msg) {
         ServerGameMessage answ = msg.handle(controller);
         sendMessage(answ);
     }
 
+    /**
+     * Handle a login message (just to save the username)
+     * @param login
+     */
     @Override
     public void handle(LoginMessage login) {
         this.username = login.getNickname();
@@ -76,6 +112,10 @@ public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHa
         sendMessage(answ);
     }
 
+    /**
+     * Handle a pong answer
+     * @param msg pong answer
+     */
     @Override
     public synchronized void handle(PongMessage msg) {
         pingTimer.shutdownNow();
@@ -84,6 +124,10 @@ public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHa
         nPingLost = 0;
     }
 
+    /**
+     * Send a ping message
+     * @param msg ping message
+     */
     @Override
     public void sendPingMessage(PingMessage msg) {
         try {
@@ -97,6 +141,11 @@ public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHa
         }
     }
 
+    /**
+     * Register the client and starts ping
+     * @param client rmi client
+     * @throws RemoteException  in case of communication error
+     */
     @Override
     public void register(RemoteClient client) throws RemoteException {
         this.client = client;

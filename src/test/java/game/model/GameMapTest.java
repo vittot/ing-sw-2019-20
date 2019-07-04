@@ -32,24 +32,70 @@ class GameMapTest {
         grid[2][0] = new Square(MapColor.RED, true, 0, 2, map, edges3);
         grid[0][1] = new Square(MapColor.BLUE, true, 1, 0, map, edges4);
         grid[1][1] = new Square(MapColor.YELLOW, true, 1, 1, map, edges5);
+        CardWeapon cw = new CardWeapon(new ArrayList<>());
+        List<CardWeapon> cards = new ArrayList<>();
+        cards.add(cw);
+        grid[2][0].addWeapon(cards);
+
+        map.setDescription("map desc");
 
 
         map.setGrid(grid);
     }
+    @Test
+    void getDirection(){
+        Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
+        Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
+        Square sq1 = new Square(MapColor.BLUE, false, 0, 0, map, edges1);
+        Square sq2 = new Square(MapColor.BLUE, false, 0, 1, map, edges2);
+        assertTrue(GameMap.getDirection(sq1,sq2) == Direction.DOWN);
 
+    }
+    /**
+     * Check description of the map
+     */
+    @Test
+    void getDescription(){
+        assertEquals(map.getDescription(),"map desc");
+    }
+
+    /**
+     * Check id of the map
+     */
+    @Test
+    void getId(){
+        assertEquals(map.getId(),1);
+    }
+    /**
+     * Check id of the map
+     */
+    @Test
+    void getDimX(){
+        assertEquals(map.getDimX(),2);
+    }
+    /**
+     * Check id of the map
+     */
+    @Test
+    void getDimY(){
+        assertEquals(map.getDimY(),3);
+    }
+    @Test
+    void getRoomByColor(){
+        Room r = new Room(MapColor.BLUE,map);
+        assertEquals(map.getRoomByColor(MapColor.BLUE), r);
+    }
     /**
      * Check getRoomSquares return exactly all the GameMap's Squares of a given MapColor
      */
     @Test
     void getRoom() {
-
         List<Square> blueRoom = new ArrayList<>();
         blueRoom.add(map.getGrid()[0][0]);
         blueRoom.add(map.getGrid()[1][0]);
         blueRoom.add(map.getGrid()[0][1]);
 
         List<Square> blueRoomMap = map.getRoomSquares(MapColor.BLUE);
-
         assertTrue(blueRoomMap.containsAll(blueRoom) && blueRoom.containsAll(blueRoomMap));
     }
 
@@ -227,5 +273,12 @@ class GameMapTest {
     void copyConstructor() {
         GameMap copy = new GameMap(map);
         assertEquals(copy,map);
+    }
+    @Test
+    void getWeaponOnMap(){
+        CardWeapon cw = new CardWeapon(new ArrayList<>());
+        List<CardWeapon> cards = new ArrayList<>();
+        cards.add(cw);
+        assertEquals(cards,map.getWeaponOnMap());
     }
 }
