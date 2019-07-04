@@ -682,6 +682,14 @@ public class ClientTextView implements  View {
     }
 
     /**
+     * GUI methods
+     */
+    @Override
+    public void completedShootAction() {
+
+    }
+
+    /**
      * Choose one of the proposed squares
      * @param possibleSquare
      */

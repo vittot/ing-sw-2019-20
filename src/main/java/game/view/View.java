@@ -57,6 +57,8 @@ public interface View {
 
     void choosePowerUpToUse(List<CardPower> cardPower);
 
+    void notifyGrabAmmo(List<javafx.scene.paint.Color> ammos, CardPower cp);
+
     void notifyInvalidMessage();
 
     void notifyTurnChanged(int pID);
@@ -128,4 +130,8 @@ public interface View {
     void showNoWeaponToReload();
 
     void notifyFinalFrenzy();
+
+    void completedShootAction();
+
+    void notifyGrabAmmo(List<Color> colors, List<CardPower> powerups);
 }

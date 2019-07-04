@@ -342,7 +342,7 @@ public class ClientController implements ServerGameMessageHandler {
         if(!serverMsg.getPowerups().isEmpty())
             for(CardPower cp : serverMsg.getPowerups())
                 ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).addCardPower(cp);
-        clientView.notifyCompletedOperation("");
+        clientView.notifyGrabAmmo(serverMsg.getColors(),serverMsg.getPowerups());
     }
 
     /**
@@ -748,6 +748,7 @@ public class ClientController implements ServerGameMessageHandler {
         if(currWeapon != null) {
             currWeapon.setLoaded(false);
         }
+        clientView.completedShootAction();
     }
 
     /**
