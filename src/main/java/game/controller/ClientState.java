@@ -1,5 +1,8 @@
 package game.controller;
 
+/**
+ * Used for client state during interation with player choice, used from client controller and gui
+ */
 public enum ClientState {                   //Used from GUI
     CHOOSEWEAPONTOWASTE,
     CHOOSEWEAPONTOGRAB,

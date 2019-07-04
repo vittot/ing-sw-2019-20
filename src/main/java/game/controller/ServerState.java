@@ -1,5 +1,8 @@
 package game.controller;
 
+/**
+ * Indicate the server state during comunication with client
+ */
 public enum ServerState {
     JUST_LOGGED,
     WAITING_FOR_PLAYERS,
