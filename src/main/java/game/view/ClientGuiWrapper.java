@@ -139,6 +139,11 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
+    public void notifyGrabAmmo(List<Color> ammos, List<CardPower> cp) {
+
+    }
+
+    @Override
     public void notifyInvalidMessage() {
         runLater(gui::notifyInvalidMessage);
     }
@@ -311,5 +316,10 @@ public class ClientGuiWrapper implements View {
     @Override
     public void notifyFinalFrenzy() {
         runLater(()->gui.notifyFinalFrenzy());
+    }
+
+    @Override
+    public void completedShootAction() {
+
     }
 }

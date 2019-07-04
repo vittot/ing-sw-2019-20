@@ -1078,7 +1078,7 @@ public class ClientGUIView extends Application implements View{
      * @param cp card power
      */
     @Override
-    public void notifyGrabAmmo(List<Color> ammos, CardPower cp ){
+    public void notifyGrabAmmo(List<game.model.Color> ammos, List<CardPower> cp ){
         refreshMyPlayerAmmo();
     }
     /**
