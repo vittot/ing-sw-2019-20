@@ -136,8 +136,8 @@ public class WaitingRoom implements Serializable {
 
     /**
      * Serialize the object, excluding the player controllers
-     * @param oos
-     * @throws IOException
+     * @param oos outputs stream
+     * @throws IOException  in case of communication error
      */
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
@@ -152,8 +152,8 @@ public class WaitingRoom implements Serializable {
 
     /**
      * De-serialize the object. The players are associated to null controllers
-     * @param ois
-     * @throws IOException
+     * @param ois input stream
+     * @throws IOException  in case of communication error
      */
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
@@ -165,7 +165,7 @@ public class WaitingRoom implements Serializable {
 
     /**
      * Return a string representation of the waiting room
-     * @return
+     * @return string
      */
     @Override
     public String toString()
@@ -178,7 +178,7 @@ public class WaitingRoom implements Serializable {
 
     /**
      * Return true if the waiting room is empty, false otherwise
-     * @return
+     * @return boolean
      */
     public boolean isEmpty() {
         return players.isEmpty();

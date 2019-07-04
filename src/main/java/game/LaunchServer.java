@@ -11,8 +11,17 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+/**
+ * Launch the server application
+ */
 public class LaunchServer {
 
+    /**
+     * Server main class
+     * load settings and open the listening connections
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
         loadConfigurationSettings();

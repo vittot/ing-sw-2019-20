@@ -9,6 +9,9 @@ import game.model.effects.SimpleEffect;
 import java.util.List;
 import java.util.SortedMap;
 
+/**
+ * User interface for client application
+ */
 public interface View {
 
     void notifyStart();

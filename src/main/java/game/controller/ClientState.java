@@ -1,9 +1,9 @@
 package game.controller;
 
 /**
- * Used for client state during interation with player choice, used from client controller and gui
+ * Used for client state during interaction with player choice, used from client controller and view
  */
-public enum ClientState {                   //Used from GUI
+public enum ClientState {
     CHOOSEWEAPONTOWASTE,
     CHOOSEWEAPONTOGRAB,
     CHOOSESTEP,
@@ -25,5 +25,9 @@ public enum ClientState {                   //Used from GUI
     WAITING_SPAWN,
     WAITING_START,
     TIMED_OUT,
-    HANDLING_MOVEMENT, RECONNECTING, WAITING_TURN, WAITING_FINAL_RELOAD, WAITING_COUNTERATTACK;
+    HANDLING_MOVEMENT,
+    RECONNECTING,
+    WAITING_TURN,
+    WAITING_FINAL_RELOAD,
+    WAITING_COUNTERATTACK;
 }

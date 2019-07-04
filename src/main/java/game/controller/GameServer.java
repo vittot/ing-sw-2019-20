@@ -33,7 +33,7 @@ public class GameServer {
 
     /**
      * Return the singleton instance of GameServer, creating it if it does not exist yet
-     * @return
+     * @return the GameServer instance
      */
     public static synchronized GameServer get() {
         if (instance == null) {
@@ -47,7 +47,7 @@ public class GameServer {
      * Start listening on the given port with socket
      * Bind on RMI registry
      * @param port - port number for socket connections
-     * @throws IOException
+     * @throws IOException in case of communication error
      */
     public void connect(int port) throws IOException
     {

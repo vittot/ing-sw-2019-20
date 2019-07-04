@@ -392,8 +392,8 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     /**
      * manage the target selection in case of movement effect to apply
      * progress requesting the client to select the destination of the movement choosing between a list of possibilities
-     * @param selectedTarget
-     * @return a list of possible square be the client has to choose from
+     * @param selectedTarget targets selected
+     * @return a list of possible square among which the user has to choose the movement position
      */
     private ServerGameMessage handleTargetSelectionMovement(List<Target> selectedTarget) {
         if(checkIfEnded())
@@ -575,7 +575,6 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     listCp = new ArrayList<>(currPlayer.pickUpAmmo());
                 }catch(NoCardAmmoAvailableException e)
                 {
-                    //TODO: send an error message?
                     return new InvalidGrabPositionResponse();
                 }
                 state = ServerState.HANDLING_GRAB;

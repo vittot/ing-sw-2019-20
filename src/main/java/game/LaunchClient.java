@@ -15,10 +15,19 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
+/**
+ * Launch the client application
+ */
 public class LaunchClient {
 
+    /** Client view */
     private static View clientView;
 
+    /**
+     * Launch the application with the interface selection from command line
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
         String interfaceChoice = interfaceSelection();
