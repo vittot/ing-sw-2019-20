@@ -434,7 +434,6 @@ public class ClientController implements ServerGameMessageHandler {
         this.gameStarted = true;
         this.state = ClientState.WAITING_SPAWN;
         ClientContext.get().setMap(serverMsg.getMap());
-
         if(serverMsg.getId() != 0)
             ClientContext.get().setMyID(serverMsg.getId());
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());

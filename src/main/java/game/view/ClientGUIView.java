@@ -601,13 +601,21 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void chooseTargetPhase(List<Target> possibleTargets) {
+        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.jpg"));
+        BackgroundImage bi = new BackgroundImage(background,
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
         int maxE = ClientContext.get().getCurrentEffect().getMaxEnemy();
         int minE = ClientContext.get().getCurrentEffect().getMinEnemy();
         List<Target> choosenTarget = new ArrayList<>();
         List<CheckBox> check = new ArrayList<>();
         StackPane sp = new StackPane();
+        sp.setBackground(new Background(bi));
         Scene temp = new Scene(sp);
         Label tex = new Label("Choose between " + minE + " and " + maxE + " targets to apply your attack:");
+        tex.setTextFill(Color.WHITE);
         StackPane.setAlignment(tex,Pos.TOP_CENTER);
         StackPane.setMargin(tex,new Insets(20,0,0,0));
         sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
@@ -615,6 +623,7 @@ public class ClientGUIView extends Application implements View{
         int j = 0;
         for(Target p : possibleTargets){
             CheckBox rb = new CheckBox(p.toString());
+            rb.setTextFill(Color.WHITE);
             rb.setId(""+j);
             check.add(rb);
             sp.getChildren().add(rb);
@@ -854,11 +863,12 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void choosePowerUpToRespawn(List<CardPower> cardPower) {
         textNotify.setText("Your turn: respawn\n" + textNotify.getText());
+        text.setText("Choose which power up to waste:");
         refreshMyPlayerCard();
-        if(cardPower.size() > 3){StackPane sp = new StackPane();
+        if(cardPower.size() > 3){
+            StackPane sp = new StackPane();
             Scene tempScene = new Scene(sp);
             ToggleGroup tg = new ToggleGroup();
-            CardPower choosenPW;
             Label tex = new Label("Choose which power up you wanna wast to respawn!");
             Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.jpg"));
             BackgroundImage bi = new BackgroundImage(background,
@@ -869,24 +879,32 @@ public class ClientGUIView extends Application implements View{
             sp.getChildren().add(tex);
             int j = 0;
             StackPane.setMargin(tex,new Insets(20, 0,0,0));
-            tex.setFont(Font.font(25));
+            tex.setFont(Font.font(15));
             tex.setTextFill(Color.WHITE);
             sp.setBackground(new Background(bi));
             StackPane.setAlignment(tex,Pos.TOP_CENTER);
             sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
-            /*for(CardPower cp : cardPower){
-                CheckBox cb = new CheckBox(cp.getName());
+            for(CardPower cp : cardPower){
+                RadioButton cb = new RadioButton(cp.getName() + "color :" +cp.getColor().toString());
+                cb.setToggleGroup(tg);
+                cb.setSelected(true);
                 StackPane.setAlignment(cb,Pos.TOP_LEFT);
                 StackPane.setMargin(cb,new Insets(100 + j , 0,0,40));
                 sp.getChildren().add(cb);
-                cb.setFont(Font.font(25));
+                cb.setFont(Font.font(15));
                 cb.setId(""+cp.getId());
-                powerUp.add(cb);
                 cb.setTextFill(Color.WHITE);
                 j = j + 35;
             }
-            */
             Button submit = new Button("Submit");
+            submit.setOnMouseClicked(mouseEvent -> {
+                CardPower cp = ClientContext.get().getMyPlayer().getCardPower().stream().filter(pw -> pw.getId() == Integer.parseInt(((RadioButton)tg.getSelectedToggle()).getId())).findFirst().orElse(null);
+                if(cp != null){
+                    controller.getClientNetwork().sendMessage(new RespawnResponse((cp)));
+                    sg.close();
+                }else
+                    tex.setText("Power up not selected!!!");
+            });
             sp.getChildren().add(submit);
             StackPane.setAlignment(submit, Pos.BOTTOM_RIGHT);
             sg.setScene(tempScene);
@@ -1012,7 +1030,7 @@ public class ClientGUIView extends Application implements View{
         sp.getChildren().add(tex);
         int j = 0;
         StackPane.setMargin(tex,new Insets(20, 0,0,0));
-        tex.setFont(Font.font(25));
+        tex.setFont(Font.font(15));
         tex.setTextFill(Color.WHITE);
         sp.setBackground(new Background(bi));
         StackPane.setAlignment(tex,Pos.TOP_CENTER);
@@ -1022,7 +1040,7 @@ public class ClientGUIView extends Application implements View{
             StackPane.setAlignment(cb,Pos.TOP_LEFT);
             StackPane.setMargin(cb,new Insets(100 + j , 0,0,40));
             sp.getChildren().add(cb);
-            cb.setFont(Font.font(25));
+            cb.setFont(Font.font(15));
             cb.setId(""+cp.getId());
             powerUp.add(cb);
             cb.setTextFill(Color.WHITE);
@@ -1492,9 +1510,18 @@ public class ClientGUIView extends Application implements View{
     @Override
     public synchronized void choosePlusEffect(List<FullEffect> plusEffects) {
         state = ClientState.CHOOSEPLUSEFFECT;
+        Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.jpg"));
+        BackgroundImage bi = new BackgroundImage(background,
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+
         StackPane sp = new StackPane();
         Scene tempScene = new Scene(sp);
         Label tex = new Label("Choose wich efferct you want to apply:");
+        sp.setBackground(new Background(bi));
+        tex.setTextFill(Color.WHITE);
         sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
         sp.getChildren().add(tex);
         StackPane.setAlignment(tex,Pos.TOP_CENTER);
@@ -1502,6 +1529,7 @@ public class ClientGUIView extends Application implements View{
         ToggleGroup tg = new ToggleGroup();
         RadioButton none = new RadioButton("None");
         none.setId("none");
+        none.setTextFill(Color.WHITE);
         none.setToggleGroup(tg);
         none.setSelected(true);
         sp.getChildren().add(none);
@@ -1511,6 +1539,7 @@ public class ClientGUIView extends Application implements View{
         j = j + 35;
         for(FullEffect f : plusEffects){
             RadioButton eff = new RadioButton("Effect: "+f.getName() + "description: " + f.getDescription());
+            eff.setTextFill(Color.WHITE);
             eff.setId(f.getName());
             eff.setToggleGroup(tg);
             sp.getChildren().add(eff);
@@ -1863,11 +1892,13 @@ public class ClientGUIView extends Application implements View{
      */
     private void createTextNotification(){
         text.setStyle("-fx-font: 20px Tahoma;");
+        text.setFont(Font.font(screenHeight * 1.851 / 100));
         text.setWrapText(true);
         text.setTextFill(Color.WHITE);
         text.setPrefWidth(screenWidth*52.5/100);
         text.setMaxHeight(screenHeight* 3 /100);
         textNotify.setStyle("-fx-font: 15px Tahoma;");
+        textNotify.setFont(Font.font(screenHeight * 1.388 / 100));
         textNotify.setTextFill(Color.WHITE);
         textNotify.setPrefWidth(screenWidth*52.5/100);
         textNotify.setMaxHeight(screenHeight * 12/100);
@@ -2095,7 +2126,7 @@ public class ClientGUIView extends Application implements View{
             Image kill = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+k.getKiller().getColor().toString()+"Tear.png"));
             ImageView kills = new ImageView(kill);
             if(k.isRage())
-                kills.setEffect(new DropShadow(15,Color.ORANGE));
+                kills.setEffect(new DropShadow(25,Color.ORANGE));
             kills.setFitHeight(screenHeight * 3 /100);
             kills.setPreserveRatio(true);
             deathsBoard.add(kills);
@@ -2232,7 +2263,8 @@ public class ClientGUIView extends Application implements View{
             if(p == null)
                 p = ClientContext.get().getPlayersInWaiting().stream().filter(play->play.getId() == Integer.parseInt(dash.getId())).findFirst().orElse(null);
             System.out.println(p.getNickName()+" Danno "+p.getDamage().size() +" color "+p.getMark().size());
-            for (PlayerColor  c :p.getDamage()) {
+            List<PlayerColor> damageP = new ArrayList<>(p.getDamage());
+            for (PlayerColor  c : damageP) {
                 Image damage = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
                 ImageView damages = new ImageView(damage);
                 infoD.add(damages);
@@ -2250,7 +2282,8 @@ public class ClientGUIView extends Application implements View{
                 j++;
             }
             spaceX = 0;
-            for (PlayerColor  c :p.getMark()) {
+            List<PlayerColor> marksP = new ArrayList<>(p.getMark());
+            for (PlayerColor  c : marksP) {
                 Image mark = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
                 ImageView marks = new ImageView(mark);
                 infoM.add(marks);
@@ -2262,7 +2295,8 @@ public class ClientGUIView extends Application implements View{
                 spaceX = spaceX + screenWidth * 1 / 100;
             }
 
-            for(PlayerColor c : p.getThisTurnMarks()){
+            List<PlayerColor> marksPT = new ArrayList<>(p.getThisTurnMarks());
+            for(PlayerColor c : marksPT){
                 Image mark = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c.toString()+"Tear.png"));
                 ImageView marks = new ImageView(mark);
                 infoM.add(marks);
@@ -2313,7 +2347,8 @@ public class ClientGUIView extends Application implements View{
         double spaceX = 0;
         int j = 0;
         deleteMyPlayerDamage();
-        for(PlayerColor p : ClientContext.get().getMyPlayer().getDamage()){
+        List<PlayerColor> damageP = new ArrayList<>(ClientContext.get().getMyPlayer().getDamage());
+        for(PlayerColor p : damageP){
             ImageView damages = createMyTear(p.toString());
             damages.setFitHeight(screenHeight * 3 /100);
             StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
@@ -2327,14 +2362,16 @@ public class ClientGUIView extends Application implements View{
             j++;
         }
         spaceX = 0;
-        for(PlayerColor p : ClientContext.get().getMyPlayer().getMark()){
+        List<PlayerColor> marksP = new ArrayList<>(ClientContext.get().getMyPlayer().getMark());
+        for(PlayerColor p : marksP){
             ImageView damages = createMyTear(p.toString());
             damages.setFitHeight(screenHeight * 2 /100);
             StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
             StackPane.setMargin(damages,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 17.6 / 100 + spaceX));
             spaceX = spaceX + screenWidth * 1 / 100;
         }
-        for(PlayerColor p : ClientContext.get().getMyPlayer().getThisTurnMarks()){
+        List<PlayerColor> marksPT = new ArrayList<>(ClientContext.get().getMyPlayer().getThisTurnMarks());
+        for(PlayerColor p : marksPT){
             ImageView damages = createMyTear(p.toString());
             damages.setFitHeight(screenHeight * 2 /100);
             StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
@@ -2395,6 +2432,10 @@ public class ClientGUIView extends Application implements View{
         }
         myAmmo.clear();
     }
+
+    /**
+     * Refresh all weapon in the map
+     */
     private synchronized void refreshWeaponCard(){
         for(Square q : ClientContext.get().getMap().getSpawnpoints()){
             if(q.getX() == 0 ){
@@ -2437,6 +2478,9 @@ public class ClientGUIView extends Application implements View{
         }
     }
 
+    /**
+     * Build all component for the map
+     */
     private void showMapGame(){
         primaryStage.setScene(scene);
         primaryStage.setFullScreen(true);
@@ -2488,16 +2532,27 @@ public class ClientGUIView extends Application implements View{
         int id = Integer.parseInt(((ImageView) e.getSource()).getId().substring(2));
         CardWeapon selected;
         if(e.getButton() == MouseButton.SECONDARY){
+            Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.jpg"));
+            BackgroundImage bi = new BackgroundImage(background,
+                    BackgroundRepeat.REPEAT,
+                    BackgroundRepeat.REPEAT,
+                    BackgroundPosition.DEFAULT,
+                    BackgroundSize.DEFAULT);
+
             System.out.println("Right Click");
             StackPane sp = new StackPane();
+            sp.setBackground(new Background(bi));
             selected = ClientContext.get().getMyPlayer().getWeapons().stream().filter(w -> w.getId() == id).findFirst().orElse(null);
             selected = ClientContext.get().getMap().getWeaponOnMap().stream().filter(w->w.getId() == id).findFirst().orElse(selected);
             if(selected != null) {
                 sp.setPrefSize(screenWidth * 30 / 100, screenHeight * 50 / 100);
                 VBox vbox = new VBox(15);
                 Label nameW = new Label("Weapon : " +selected.getName());
+                nameW.setTextFill(Color.WHITE);
                 Label name = new Label("Base Effect:");
+                name.setTextFill(Color.WHITE);
                 Label desc = new Label("Description " +selected.getBaseEffect().getDescription());
+                desc.setTextFill(Color.WHITE);
                 desc.setMaxWidth(screenWidth * 30 / 100);
                 desc.setWrapText(true);
                 vbox.getChildren().addAll(nameW, name, desc);
@@ -2507,7 +2562,9 @@ public class ClientGUIView extends Application implements View{
                 if(selected.getPlusEffects() != null)
                     for (FullEffect fe : selected.getPlusEffects()) {
                         name = new Label("Optional effect: "+fe.getName());
+                        name.setTextFill(Color.WHITE);
                         desc = new Label(fe.getDescription());
+                        desc.setTextFill(Color.WHITE);
                         desc.setWrapText(true);
                         vbox.getChildren().addAll(name, desc);
                         VBox.setMargin(name, new Insets(0,0,0,25));
