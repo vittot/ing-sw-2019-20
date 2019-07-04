@@ -1,5 +1,8 @@
-package game.controller;
+package game.controller.network;
 
+import game.controller.Configuration;
+import game.controller.GameManager;
+import game.controller.ServerController;
 import game.controller.commands.*;
 import game.controller.commands.clientcommands.LoginMessage;
 import game.controller.commands.clientcommands.PongMessage;

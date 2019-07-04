@@ -4,6 +4,7 @@ import game.controller.commands.ClientGameMessageHandler;
 import game.controller.commands.ServerGameMessage;
 import game.controller.commands.clientcommands.*;
 import game.controller.commands.servercommands.*;
+import game.controller.network.ClientHandler;
 import game.model.*;
 import game.model.effects.*;
 
@@ -1746,7 +1747,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     /**
      * Remove this user from his waiting room
      */
-    void leaveWaitingRoom() {
+    public void leaveWaitingRoom() {
         waitingRoom.removeWaitingPlayer(this);
         if(waitingRoom.isEmpty())
             GameManager.get().removeWaitingRoom(waitingRoom);

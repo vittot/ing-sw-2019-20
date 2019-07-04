@@ -1,10 +1,12 @@
-package game.controller;
+package game.controller.network;
 
+import game.controller.Configuration;
+import game.controller.ServerController;
 import game.controller.commands.*;
 import game.controller.commands.clientcommands.LoginMessage;
 import game.controller.commands.clientcommands.PongMessage;
 import game.controller.commands.servercommands.*;
-import game.model.*;
+import game.controller.network.ClientHandler;
 
 
 import java.io.*;
@@ -12,7 +14,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.Executors;
 
 
 public class SocketClientHandler extends ClientHandler implements Runnable, ClientMessageHandler {
@@ -24,7 +25,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable, Clie
     private ObjectOutputStream outPingStream;
     private Socket pingSocket;
 
-    SocketClientHandler(Socket s) throws IOException {
+    public SocketClientHandler(Socket s) throws IOException {
         super();
         this.socket = s;
         this.outStream = new ObjectOutputStream(s.getOutputStream());

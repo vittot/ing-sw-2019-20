@@ -29,7 +29,7 @@ public class GameManager implements Serializable {
         games = new ArrayList<>();
         usersLogged = new ArrayList<>();
         usersSuspended = new HashMap<>();
-        availableMaps = Game.getAvailableMaps();
+        availableMaps = XMLParser.getAvailableMaps();
         waitingRooms = new ArrayList<>();
     }
 
@@ -194,7 +194,7 @@ public class GameManager implements Serializable {
      * Remove a user previously logged
      * @param nickname username
      */
-    void removeLoggedUser(String nickname)
+    public void removeLoggedUser(String nickname)
     {
         this.usersLogged.remove(nickname);
     }
