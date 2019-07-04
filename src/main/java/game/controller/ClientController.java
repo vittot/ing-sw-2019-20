@@ -340,7 +340,6 @@ public class ClientController implements ServerGameMessageHandler {
         if(!serverMsg.getPowerups().isEmpty())
             for(CardPower cp : serverMsg.getPowerups())
                 ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).addCardPower(cp);
-        //TODO: show on the view
         clientView.notifyCompletedOperation("");
     }
 
