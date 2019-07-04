@@ -517,7 +517,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 return new InvalidActionResponse();
             }
         }
-        catch(NoResidualActionAvaiableException e){
+        catch(NoResidualActionAvailableException e){
             return new InsufficientNumberOfActionResponse();
         }
 

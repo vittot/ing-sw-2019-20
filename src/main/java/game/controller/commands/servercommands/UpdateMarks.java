@@ -33,7 +33,6 @@ public class UpdateMarks implements ServerGameMessage {
      * Handle the message
      * @param handler who handle the message
      */
-
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);

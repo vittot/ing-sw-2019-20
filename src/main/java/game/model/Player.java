@@ -531,7 +531,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
                 count++;
         }
 
-        return marks+count<MARKS_PER_ENEMY;
+        return marks+count<=MARKS_PER_ENEMY;
     }
 
     /**
