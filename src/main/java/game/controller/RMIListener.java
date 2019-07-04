@@ -1,15 +1,11 @@
 package game.controller;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.RMIClassLoader;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class RMIListener extends UnicastRemoteObject implements IRMIListener {
+public class RMIListener extends UnicastRemoteObject implements RemoteRMIListener {
 
     private List<RMIClientHandler> rmiHandlers;
 
@@ -21,7 +17,7 @@ public class RMIListener extends UnicastRemoteObject implements IRMIListener {
         gameManager = GameManager.get();
     }
 
-    public IRMIClientHandler getHandler() throws RemoteException {
+    public RemoteRMIClientHandler getHandler() throws RemoteException {
         RMIClientHandler h = new RMIClientHandler(gameManager);
         rmiHandlers.add(h);
         return h;

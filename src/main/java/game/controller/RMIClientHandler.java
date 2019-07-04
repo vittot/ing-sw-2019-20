@@ -7,11 +7,10 @@ import game.controller.commands.servercommands.PingMessage;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.rmi.server.Unreferenced;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RMIClientHandler extends ClientHandler implements IRMIClientHandler, ClientMessageHandler {
+public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHandler, ClientMessageHandler {
     private RemoteClient client;
     private ExecutorService threadPool;
 

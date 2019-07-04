@@ -242,8 +242,11 @@ public class ClientController implements ServerGameMessageHandler {
             for (CardPower cp : ClientContext.get().getMyPlayer().getCardPower())
                 if (!cp.getName().equalsIgnoreCase("Tagback Grenade"))
                     counterattack.remove(cp);
-            if (!counterattack.isEmpty())
+            if (!counterattack.isEmpty() && this.state != ClientState.WAITING_COUNTERATTACK && hitten.getDamage().size()<=10) //<=10
+            {
+                this.state = ClientState.WAITING_COUNTERATTACK;
                 clientView.chooseCounterAttack(counterattack, shooter);
+            }
         }
     }
 
@@ -253,9 +256,11 @@ public class ClientController implements ServerGameMessageHandler {
      */
     @Override
     public void handle(NotifyDeathResponse serverMsg) {
+        Player killer = ClientContext.get().getMap().getPlayerById(serverMsg.getIdKiller());
+        Player victim = ClientContext.get().getMap().getPlayerById(serverMsg.getIdVictim());
+        Kill k = new Kill(killer,victim,serverMsg.isRage());
+        ClientContext.get().getKillboard().add(k);
         clientView.notifyDeath(serverMsg.getIdKiller(),serverMsg.getIdVictim(),serverMsg.isRage());
-        return;
-
     }
 
     /**
@@ -335,7 +340,6 @@ public class ClientController implements ServerGameMessageHandler {
         if(!serverMsg.getPowerups().isEmpty())
             for(CardPower cp : serverMsg.getPowerups())
                 ClientContext.get().getMap().getPlayerById(ClientContext.get().getMyID()).addCardPower(cp);
-        //TODO: show on the view
         clientView.notifyCompletedOperation("");
     }
 
@@ -368,8 +372,6 @@ public class ClientController implements ServerGameMessageHandler {
 
         clientView.choosePowerUpToRespawn(p.getCardPower());
 
-        /*if(ClientContext.get().getMyPlayer().getNickName().equals("vitto"))
-            this.manageConnectionError();*/
     }
 
     /**
@@ -516,6 +518,9 @@ public class ClientController implements ServerGameMessageHandler {
         Player p = ClientContext.get().getPlayersInWaiting().stream().filter(pl -> pl.getId() == notifyRespawn.getpId()).findFirst().orElse(null);
         if(p == null){
             p = ClientContext.get().getMap().getPlayerById(notifyRespawn.getpId());
+        }
+        if(ClientContext.get().isFinalFrenzy()){
+            p.setBeforeFrenzy(false);
         }
         try {
             ClientContext.get().getMap().movePlayer(p,notifyRespawn.getX(),notifyRespawn.getY());
@@ -847,6 +852,12 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(NotifyFinalFrenzy notifyFinalFrenzy) {
+        for(Player p : ClientContext.get().getMap().getAllPlayers()){
+            if(!p.getDamage().isEmpty() || !p.getMark().isEmpty())
+                p.setBeforeFrenzy(true);
+            else
+                p.setBeforeFrenzy(false);
+        }
         ClientContext.get().setFinalFrenzy();
         clientView.notifyFinalFrenzy();
     }
@@ -873,9 +884,9 @@ public class ClientController implements ServerGameMessageHandler {
     }
 
     /**
-     * //TODO
+     * Return to grab weapon state, resending the grab request
      */
-    void resumeState(){
+    void resumeGrabState(){
         switch(state){
             case WAITING_GRAB_WEAPON:
                 clientNetwork.sendMessage(new GrabActionRequest());

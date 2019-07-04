@@ -43,7 +43,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
     private transient PlayerObserver playerObserver; /** reference to the object that is in charge of notify the game events */
     private boolean suspended; /** boolean value that specifies if the player has been suspended from the game cause of connection lost */
     private int killboardpoints; /** field that contains the points calculated at the end of the game */
-
+    private boolean beforeFrenzy = true; /** boolean that specifies if the player got some damages before final frenzy
     /**
      * construct a player object ready to start the game
      * @param id
@@ -463,11 +463,11 @@ public class Player implements Target, Serializable, Comparable<Player> {
             damage += marksToBeRemoved.size();
             marks.removeAll(marksToBeRemoved);
 
-            if (this.damage.size() < 11) {
+            if (this.damage.size() < 11) { //11
                 for (int i = 0; i < damage; i++)
                     this.damage.add(shooter.getColor());
                 num = this.damage.size();
-                if (num > 10) {
+                if (num > 10) { //10
                     this.deaths++;
                     this.isDead = true;
                     if (num > 11) {
@@ -481,7 +481,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
                     this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
                 else if (num > 2)
                     this.adrenaline = AdrenalineLevel.GRABLEVEL;
-            } else if (this.damage.size() == 11 && damage > 0) {
+            } else if (this.damage.size() == 11 && damage > 0) { //11
                 lastKill = game.getLastKill(this);
                 lastKill.setRage(true);
                 shooter.addThisTurnMarks(this, 1); //the shooter receive a mark in case of rage
@@ -1027,5 +1027,23 @@ public class Player implements Target, Serializable, Comparable<Player> {
         if(this.points == p2.getPoints())
             return p2.getKillboardpoints() - this.killboardpoints;
         return p2.getPoints() - this.points;
+    }
+
+    /**
+     * Gets beforeFrenzy.
+     *
+     * @return Value of beforeFrenzy.
+     */
+    public boolean isBeforeFrenzy() {
+        return beforeFrenzy;
+    }
+
+    /**
+     * Sets new beforeFrenzy.
+     *
+     * @param beforeFrenzy New value of beforeFrenzy.
+     */
+    public void setBeforeFrenzy(boolean beforeFrenzy) {
+        this.beforeFrenzy = beforeFrenzy;
     }
 }

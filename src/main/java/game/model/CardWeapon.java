@@ -10,26 +10,73 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
+/**
+ * weapon card
+ */
 public class CardWeapon implements Serializable {
+    /**
+     * Identifier of the card weapon
+     */
     private int id;
+    /**
+     * name of the weapon
+     */
     private String name;
+    /**
+     * Price of the weapon, list of color
+     */
     private List<Color> price;
-    //private List<List<Color>> pricePlus; //moved in FullEffect
-    //private List<Color> priceAlt;
+    /**
+     * Base effect of the card
+     */
     private FullEffect baseEffect;
+    /**
+     * alternative effect of the card
+     */
     private FullEffect altEffect;
+    /**
+     * optional effect of the crad
+     */
     private List<FullEffect> plusEffects;
-    //private List<String> effectDescriptions; //moved in FullEffect
-
+    /**
+     * flag to say if you can use a plus effect before the base effect
+     */
     private boolean plusBeforeBase;           //True if you can use a plus effect before the base effect
+    /**
+     * flag to say if the plus effect have to be done in order
+     */
     private boolean plusOrder;                //True if you have to respect the order of the list
+    /**
+     * List of previus target hitted
+     */
     private List<Player> previousTargets;
+    /**
+     * Last square hitted
+     */
     private Square lastTargetSquare;
+    /**
+     * last direction used
+     */
     private Direction lastDirection;
+    /**
+     * flag to say if the weapon is loaded
+     */
     private boolean loaded;
+    /**
+     * last shooter of the card
+     */
     private Player shooter;
 
+    /**
+     * Constructor
+     * @param name string
+     * @param price list
+     * @param baseEffect effect
+     * @param effectPlus effect
+     * @param altEffect effect
+     * @param plusBeforeBase  flag
+     * @param plusOrder flag
+     */
     public CardWeapon(String name, List<Color> price, FullEffect baseEffect, List<FullEffect> effectPlus, FullEffect altEffect, boolean plusBeforeBase, boolean plusOrder) {
         this.name = name;
         this.price = price;
@@ -42,115 +89,22 @@ public class CardWeapon implements Serializable {
         this.previousTargets = new ArrayList<>();
     }
 
+    /**
+     * Constructor
+     * @param lastDirection direction
+     * @param lastTargetSquare last target
+     */
     public CardWeapon(Direction lastDirection, Square lastTargetSquare){
         this.lastDirection = lastDirection;
         this.lastTargetSquare = lastTargetSquare;
     }
 
+    /**
+     * Contructor
+     * @param price price
+     */
     public CardWeapon(List<Color> price){
         this.price = price;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Color> getPrice() {
-        return price;
-    }
-
-    public void setPrice(List<Color> price) {
-        this.price = price;
-    }
-
-    public List<FullEffect> getPlusEffects() {
-        return plusEffects;
-    }
-
-    public void setPlusEffects(List<FullEffect> plusEffects) {
-        this.plusEffects = plusEffects;
-    }
-
-    public FullEffect getAltEffect() {
-        return altEffect;
-    }
-
-    public void setAltEffect(FullEffect altEffect) {
-        this.altEffect = altEffect;
-    }
-
-    public FullEffect getBaseEffect() {
-        return baseEffect;
-    }
-
-    public boolean isPlusBeforeBase() {
-        return plusBeforeBase;
-    }
-
-    public void setPlusBeforeBase(boolean plusBeforeBase) {
-        this.plusBeforeBase = plusBeforeBase;
-    }
-
-    public boolean isPlusOrder() {
-        return plusOrder;
-    }
-
-    public void setPlusOrder(boolean plusOrder) {
-        this.plusOrder = plusOrder;
-    }
-
-    public void setBaseEffect(FullEffect baseEffect) {
-        this.baseEffect = baseEffect;
-    }
-
-    public Player getShooter() {
-        return shooter;
-    }
-
-    public void setShooter(Player shooter) {
-        this.shooter = shooter;
-    }
-
-    public List<Player> getPreviousTargets() { return previousTargets; }
-
-    public void setPreviousTargets(List<Player> previousTargets) {
-        this.previousTargets = previousTargets;
-    }
-
-    public Square getLastTargetSquare() {
-        return lastTargetSquare;
-    }
-
-    public void setLastTargetSquare(Square lastTargetSquare) {
-        this.lastTargetSquare = lastTargetSquare;
-    }
-
-    public Direction getLastDirection() {
-        return lastDirection;
-    }
-
-    public void setLastDirection(Direction lastDirection) {
-        this.lastDirection = lastDirection;
-    }
-
-    public boolean isLoaded() {
-        return loaded;
-    }
-
-    public void setLoaded(boolean loaded) {
-        this.loaded = loaded;
     }
 
     /**
@@ -194,6 +148,9 @@ public class CardWeapon implements Serializable {
             throw new InsufficientAmmoException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -202,6 +159,9 @@ public class CardWeapon implements Serializable {
         return id == that.id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id, name);
@@ -224,5 +184,185 @@ public class CardWeapon implements Serializable {
             }
         }
         return false;
+    }
+
+    /**
+     * Gets Identifier of the card weapon.
+     *
+     * @return Value of Identifier of the card weapon.
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Sets new Identifier of the card weapon.
+     *
+     * @param id New value of Identifier of the card weapon.
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * Sets new name of the weapon.
+     *
+     * @param name New value of name of the weapon.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gets name of the weapon.
+     *
+     * @return Value of name of the weapon.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets Price of the weapon, list of color.
+     *
+     * @return Value of Price of the weapon, list of color.
+     */
+    public List<Color> getPrice() {
+        return price;
+    }
+
+    /**
+     * Sets new Price of the weapon, list of color.
+     *
+     * @param price New value of Price of the weapon, list of color.
+     */
+    public void setPrice(List<Color> price) {
+        this.price = price;
+    }
+
+    /**
+     * Gets optional effect of the crad.
+     *
+     * @return Value of optional effect of the crad.
+     */
+    public List<FullEffect> getPlusEffects() {
+        return plusEffects;
+    }
+
+    /**
+     * Gets alternative effect of the card.
+     *
+     * @return Value of alternative effect of the card.
+     */
+    public FullEffect getAltEffect() {
+        return altEffect;
+    }
+
+    /**
+     * Gets Base effect of the card.
+     *
+     * @return Value of Base effect of the card.
+     */
+    public FullEffect getBaseEffect() {
+        return baseEffect;
+    }
+
+    /**
+     * Gets flag to say if the plus effect have to be done in order.
+     *
+     * @return Value of flag to say if the plus effect have to be done in order.
+     */
+    public boolean isPlusOrder() {
+        return plusOrder;
+    }
+
+    /**
+     * Gets last shooter of the card.
+     *
+     * @return Value of last shooter of the card.
+     */
+    public Player getShooter() {
+        return shooter;
+    }
+
+    /**
+     * Gets List of previus target hitted.
+     *
+     * @return Value of List of previus target hitted.
+     */
+    public List<Player> getPreviousTargets() {
+        return previousTargets;
+    }
+
+    /**
+     * Sets new last shooter of the card.
+     *
+     * @param shooter New value of last shooter of the card.
+     */
+    public void setShooter(Player shooter) {
+        this.shooter = shooter;
+    }
+
+    /**
+     * Sets new flag to say if the weapon is loaded.
+     *
+     * @param loaded New value of flag to say if the weapon is loaded.
+     */
+    public void setLoaded(boolean loaded) {
+        this.loaded = loaded;
+    }
+
+    /**
+     * Gets flag to say if the weapon is loaded.
+     *
+     * @return Value of flag to say if the weapon is loaded.
+     */
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    /**
+     * Sets new last direction used.
+     *
+     * @param lastDirection New value of last direction used.
+     */
+    public void setLastDirection(Direction lastDirection) {
+        this.lastDirection = lastDirection;
+    }
+
+    /**
+     * Sets new List of previus target hitted.
+     *
+     * @param previousTargets New value of List of previus target hitted.
+     */
+    public void setPreviousTargets(List<Player> previousTargets) {
+        this.previousTargets = previousTargets;
+    }
+
+    /**
+     * Gets last direction used.
+     *
+     * @return Value of last direction used.
+     */
+    public Direction getLastDirection() {
+        return lastDirection;
+    }
+
+    /**
+     * Gets Last square hitted.
+     *
+     * @return Value of Last square hitted.
+     */
+    public Square getLastTargetSquare() {
+        return lastTargetSquare;
+    }
+
+    /**
+     * Sets new Last square hitted.
+     *
+     * @param lastTargetSquare New value of Last square hitted.
+     */
+    public void setLastTargetSquare(Square lastTargetSquare) {
+        this.lastTargetSquare = lastTargetSquare;
     }
 }

@@ -541,6 +541,13 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         if(model.getCurrentTurn().getCurrentPlayer() != currPlayer)
             return new OperationCompletedResponse("Not your turn!");
 
+        if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB)){
+            clientHandler.sendMessage(new InvalidStepResponse());
+            return checkTurnEnd();
+        }
+
+        availableActionSteps = model.getCurrentTurn().getActionList();
+
         List<CardWeapon> possibleToGrab = new ArrayList<>();
         if (currPlayer.getPosition().isRespawn()) {
             if (currPlayer.getPosition().getWeapons() != null) {
@@ -624,6 +631,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             clientHandler.sendMessage(new InvalidStepResponse());
             return checkTurnEnd();
         }
+
         try{
             currPlayer.pickUpAmmo();
             availableActionSteps = model.getCurrentTurn().getActionList();
@@ -669,10 +677,10 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 return new InvalidPowerUpResponse();
         }
         //This has to be the last check
-        if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB)){
+        /*if(!currPlayer.getGame().getCurrentTurn().applyStep(Action.GRAB)){
             clientHandler.sendMessage(new InvalidStepResponse());
             return checkTurnEnd();
-        }
+        }*/
         try {
             currPlayer.pickUpWeapon(clientMsg.getWeapon(), clientMsg.getWeaponToWaste(), clientMsg.getPowerup());
             playerWeapons = currPlayer.getWeapons();
@@ -798,9 +806,13 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             return new OperationCompletedResponse("Not your turn!");
 
         CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
+        List<CardWeapon> toReload = currPlayer.hasToReload();
+        if(toReload != null)
+            for(CardWeapon cw : currPlayer.getWeapons())
+                if(!currPlayer.canReloadWeapon(cw))
+                    toReload.remove(cw);
         int count = 0;
         List<CardPower> tmp;
-        List<CardWeapon> toReload = currPlayer.hasToReload();
         if(toReload != null)
             for(CardWeapon cw : currPlayer.getWeapons())
                 if(!currPlayer.canReloadWeapon(cw))
@@ -880,8 +892,9 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     if(model.getnPlayerToBeRespawned() == 0)
                         newTurn();
                     if(currPlayer.equals(model.getCurrentTurn().getCurrentPlayer())){
-                        state = ServerState.WAITING_ACTION;
-                        return new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed());
+                        /*state = ServerState.WAITING_ACTION;
+                        return new ChooseTurnActionRequest(model.getCurrentTurn().isMovAllowed());*/
+                        return new OperationCompletedResponse("");
                     }
                     else
                         return new OperationCompletedResponse("Wait for you turn..");
@@ -924,7 +937,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             model.getCurrentTurn().newTurn(true);
         }
         else{
-            if(currPlayer.getId() == 2 || model.getCurrentTurn().isFinalFrenzy())
+            /*if(currPlayer.getId() == 2 || model.getCurrentTurn().isFinalFrenzy())
             {
                 if(model.getCurrentTurn().getnPlayedFinalFrenzy() == model.getNumPlayersAlive())
                     model.endGame();
@@ -933,8 +946,8 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     model.getCurrentTurn().newTurn(true);
                 }
             }
-            else
-                model.getCurrentTurn().newTurn(false);
+            else*/
+            model.getCurrentTurn().newTurn(false);
         }
     }
 
@@ -964,6 +977,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
         //weapon selection request
         if(model.getCurrentTurn().applyStep(Action.SHOOT)) {
+            availableActionSteps = model.getCurrentTurn().getActionList();
             myWeapons = new ArrayList<>(currPlayer.getWeapons());
             tmp = new ArrayList<>();
             for(CardWeapon cw : myWeapons) {
