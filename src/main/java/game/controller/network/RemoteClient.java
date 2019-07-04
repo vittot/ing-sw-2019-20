@@ -1,4 +1,4 @@
-package game.controller;
+package game.controller.network;
 
 import game.controller.commands.ServerGameMessage;
 import game.controller.commands.ServerMessage;

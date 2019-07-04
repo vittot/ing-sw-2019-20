@@ -1,6 +1,12 @@
 package game;
 
 import game.controller.*;
+import game.controller.network.ClientNetwork;
+import game.controller.network.RMIClient;
+import game.controller.network.SocketClient;
+import game.view.ClientGuiWrapper;
+import game.view.ClientTextView;
+import game.view.View;
 
 import java.io.IOException;
 import java.net.DatagramSocket;

@@ -1,13 +1,13 @@
 package game.controller;
 
 import game.model.*;
+import game.view.ClientTextView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,7 +15,7 @@ class ClientTextViewTest {
     @BeforeEach
     public void before()
     {
-        GameMap mape= Game.readMap(1,"mapFile.xml");
+        GameMap mape= XMLParser.readMap(1,"mapFile.xml");
         Player p1= new Player(1,PlayerColor.GREY);
         Player p2= new Player(2,PlayerColor.PURPLE);
         List<Color> ammos = new ArrayList<>();
@@ -41,7 +41,7 @@ class ClientTextViewTest {
         //ammos.add(Color.BLUE);
         ammos.add(Color.YELLOW);
         ammos.add(Color.RED);
-        GameMap map= Game.readMap(2,"mapFile.xml");
+        GameMap map= XMLParser.readMap(2,"mapFile.xml");
         map.getGrid()[0][2].setCardAmmo(ca);
         map.getGrid()[0][2].addPlayer(p1);
         map.getGrid()[0][2].addPlayer(p2);

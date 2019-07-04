@@ -1,5 +1,6 @@
-package game.controller;
+package game.controller.network;
 
+import game.controller.ClientController;
 import game.controller.commands.ClientMessage;
 import game.controller.commands.ServerGameMessage;
 
@@ -32,7 +33,7 @@ public abstract class ClientNetwork {
      * Send a message to the server
      * @param msg message
      */
-    abstract void sendMessage(ClientMessage msg);
+    public abstract void sendMessage(ClientMessage msg);
 
 
     /**
@@ -44,7 +45,7 @@ public abstract class ClientNetwork {
     /**
      * Close the connection
      */
-    abstract void close();
+    public abstract void close();
 
     ClientNetwork() {
         this.nPingLost  = 0;
@@ -100,7 +101,7 @@ public abstract class ClientNetwork {
     /**
      * Interrupt the scheduled executor which is called in case of missing ping
      */
-    void stopWaitingPing()
+    public void stopWaitingPing()
     {   //stop = true;
         if(disconnectionExecutor != null)
             disconnectionExecutor.shutdownNow();

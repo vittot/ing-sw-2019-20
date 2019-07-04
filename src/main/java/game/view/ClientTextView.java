@@ -1,6 +1,10 @@
-package game.controller;
+package game.view;
 
 import game.LaunchClient;
+import game.controller.ClientContext;
+import game.controller.ClientController;
+import game.controller.ClientState;
+import game.controller.WaitingRoom;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
@@ -900,17 +904,17 @@ public class ClientTextView implements  View {
 
     /**
      * Notify the player from a power up usage
-     * @param id
+     * @param nick
      * @param name
      * @param desc
      */
     @Override
-    public void powerUpUsageNotification(int id, String name, String desc){
+    public void powerUpUsageNotification(String nick, String name, String desc){
         int num = 0;
-        if(ClientContext.get().getMyID() == id)
+        if(ClientContext.get().getMyPlayer().getNickName().equals(nick))
             writeText(name +" used correctly");
         else {
-            writeText("Player " + id + " used power up: " + name + " press 1 for more info, anything else to exit");
+            writeText("Player " + nick + " used power up: " + name + " press 1 for more info, anything else to exit");
             num = readInt();
         }
         if(num == 1){
@@ -1146,7 +1150,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify that a player grab a card ammo from the field
      * @param pID
      */
     @Override
@@ -1158,7 +1162,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * notify a player respawn
      * @param pID
      */
     @Override
@@ -1186,7 +1190,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     *
+     * method that graphically show the game map chosen when the waiting room has been created
      * @param map
      */
     public void showMap(GameMap map) {
@@ -1341,7 +1345,7 @@ public class ClientTextView implements  View {
 
 
     /**
-     *
+     * method that print on screen the informations about the player used by the client
      */
     private void showMyPlayerInformation() {
         String death = "\u2620";
@@ -1386,6 +1390,9 @@ public class ClientTextView implements  View {
         }
     }
 
+    /**
+     * method that show the informations about the other players
+     */
     private void showPlayerPosition() {
         for(Player p : ClientContext.get().getMap().getAllPlayers()) {
             if (p.getId() != ClientContext.get().getMyID()){
@@ -1413,11 +1420,24 @@ public class ClientTextView implements  View {
         }
     }
 
+    /**
+     * return the ansi code relative to the color of an ammo
+     * this method allow to show on screen the correct colors
+     * @param color
+     * @return a color codification
+     */
     private String checkAmmoColor(Color color){
         if(color.equals(Color.YELLOW))return ANSI_YELLOW;
         if(color.equals(Color.RED))return ANSI_RED;
         return ANSI_BLUE;
     }
+
+    /**
+     * return the ansi code relative to the color of a player
+     * this method allow to show on screen the correct colors
+     * @param color
+     * @return a color codification
+     */
     private String checkPlayerColor(PlayerColor color) {
         if(color.equals(PlayerColor.YELLOW))return ANSI_YELLOW;
         if(color.equals(PlayerColor.GREEN))return ANSI_GREEN;
@@ -1426,6 +1446,12 @@ public class ClientTextView implements  View {
         return ANSI_GREY;
     }
 
+    /**
+     * return the ansi code relative to the color of a square
+     * this method allow to show on screen the correct colors
+     * @param color
+     * @return a color codification
+     */
     private String checkColor(MapColor color){
         if(color.equals(MapColor.YELLOW))return ANSI_YELLOW;
         if(color.equals(MapColor.GREEN))return ANSI_GREEN;
@@ -1435,6 +1461,10 @@ public class ClientTextView implements  View {
         return ANSI_GREY;
     }
 
+    /**
+     * manage the selection of the weapon the player want to grab from the field and the possibility to pay the grab using also power-up cards
+     * @param weapons
+     */
     public void chooseWeaponToGrab(List<CardWeapon> weapons){
         int i=1;
         int choiceWG = 0;
@@ -1476,6 +1506,12 @@ public class ClientTextView implements  View {
         controller.getClientNetwork().sendMessage(new PickUpWeaponRequest(wG,toUse, wD));
     }
 
+    /**
+     * manage the selection of the power-up cards the player want to use to complete payment
+     * @param price
+     * @param useEffect
+     * @return a list of power-up cards
+     */
     private List<CardPower> powerUpSelection(List<Color> price, CardPower useEffect)
     {
         Player myP = ClientContext.get().getMyPlayer();
@@ -1515,7 +1551,7 @@ public class ClientTextView implements  View {
     }
 
     /**
-     * Print a weapon and its cost
+     * Print a weapon and its cost (grab cost or reload cost)
      * @param cw
      * @param p
      * @param showCost
@@ -1568,6 +1604,11 @@ public class ClientTextView implements  View {
 
     }
 
+    /**
+     * print a list of effects that the client is able to use and select
+     * @param effects
+     * @param numeric
+     */
     private void showEffects(List<FullEffect> effects, boolean numeric){
         FullEffect actual = null;
         if(numeric) {
@@ -1606,6 +1647,9 @@ public class ClientTextView implements  View {
         }
     }
 
+    /**
+     * notify errors cause of internet connection
+     */
     @Override
     public void notifyConnectionError() {
         char choice;

@@ -1,8 +1,11 @@
-package game.controller;
+package game.view;
 
 
 import game.LaunchClient;
-import game.controller.commands.ClientGameMessage;
+import game.controller.ClientContext;
+import game.controller.ClientController;
+import game.controller.ClientState;
+import game.controller.WaitingRoom;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
@@ -35,7 +38,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -831,18 +833,17 @@ public class ClientGUIView extends Application implements View{
 
     /**
      * power up notification
-     * @param id id of the player
+     * @param nick nickname of the player
      * @param name name of the power up used
      * @param description description of the power up
      */
     @Override
-    public void powerUpUsageNotification(int id, String name, String description) {
-        if(id == ClientContext.get().getMyID()){
+    public void powerUpUsageNotification(String nick, String name, String description) {
+        if(ClientContext.get().getMyPlayer().getNickName().equals(nick)){
             refreshMyPlayerCard();
             textNotify.setText("You used "+name + "\n" + textNotify.getText());
         }else{
-            String pName = ClientContext.get().getMap().getPlayerById(id).getNickName();
-            textNotify.setText("Player "+pName+ " used "+ name + "\n" + textNotify.getText());
+            textNotify.setText("Player "+nick+ " used "+ name + "\n" + textNotify.getText());
         }
     }
 

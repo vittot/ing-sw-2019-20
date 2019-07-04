@@ -8,12 +8,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
+/**
+ * class that permit to apply area damages to players one square away from the shooter
+ */
 public class AreaDamageEffect extends SimpleEffect {
-    private int damage;
-    private int marks;
-    private int maxEnemyPerSquare; //quando andrà controllato vedere Collectors.groupingBy
+    private int damage; /** attribute tat contains the damages to apply */
+    private int marks; /** attribute tat contains the marks to apply */
+    private int maxEnemyPerSquare; /** attribute tat contains the number of enemy toshoot per square */
 
+    /**
+     * construct an area damage effect with the correct parameter
+     * @param minEnemy
+     * @param maxEnemy
+     * @param minDist
+     * @param maxDist
+     * @param visibility
+     * @param damage
+     * @param marks
+     * @param maxEnemyPerSquare
+     */
     public AreaDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, int maxEnemyPerSquare) {
         super( minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.damage = damage;
@@ -21,22 +34,42 @@ public class AreaDamageEffect extends SimpleEffect {
         this.maxEnemyPerSquare = maxEnemyPerSquare;
     }
 
+    /**
+     * return maxEnemyPerSquare attribute
+     * @return maxEnemyPerSquare
+     */
     public int getMaxEnemyPerSquare() {
         return maxEnemyPerSquare;
     }
 
+    /**
+     * return damage attribute
+     * @return damage
+     */
     public int getDamage() {
         return damage;
     }
 
+    /**
+     * set damage attribute
+     * @param damage
+     */
     public void setDamage(int damage) {
         this.damage = damage;
     }
 
+    /**
+     * return marks attribute
+     * @return marks
+     */
     public int getMarks() {
         return marks;
     }
 
+    /**
+     * set marks attribute
+     * @param marks
+     */
     public void setMarks(int marks) {
         this.marks = marks;
     }
@@ -127,16 +160,33 @@ public class AreaDamageEffect extends SimpleEffect {
         return true;
     }
 
+    /**
+     * used in collaboration with server controller to proceed with the next step to manage the effect
+     * @param h
+     * @return server message
+     */
     @Override
     public ServerGameMessage handle(EffectHandler h) {
         return h.handle(this);
     }
 
+    /**
+     * used in collaboration with server controller to proceed with the next step to manage the target selection of the effect
+     * @param h
+     * @param targetList
+     * @param model
+     * @return server message
+     */
     @Override
     public ServerGameMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
         return h.handleTarget(this, targetList);
     }
 
+    /**
+     * control if two effects are equals
+     * @param o
+     * @return true/false
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -147,6 +197,10 @@ public class AreaDamageEffect extends SimpleEffect {
                 maxEnemyPerSquare == that.maxEnemyPerSquare;
     }
 
+    /**
+     * used by equals method
+     * @return
+     */
     @Override
     public int hashCode() {
         return Objects.hash(damage, marks, maxEnemyPerSquare);

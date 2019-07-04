@@ -1,9 +1,10 @@
 package game.controller;
 
-import game.controller.commands.clientcommands.LoginMessage;
+import game.controller.network.ClientHandler;
+import game.controller.network.RMIListener;
+import game.controller.network.SocketClientHandler;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.registry.LocateRegistry;
@@ -83,7 +84,7 @@ public class GameServer {
         rmiListener.removeRMIClientHandler(user,newHandler);
         SocketClientHandler toRemove = null;
         for(SocketClientHandler h : socketClientHandlers)
-            if(h.username.equals(user) && h!=newHandler)
+            if(h.getUsername().equals(user) && h!=newHandler)
             {
                 h.stopPing();
                 h.stop();

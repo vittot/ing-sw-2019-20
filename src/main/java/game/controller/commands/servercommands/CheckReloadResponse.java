@@ -8,29 +8,55 @@ import game.model.CardWeapon;
 
 import java.util.List;
 
+/**
+ * notify the correct reload of a weapon and the power-up cards used
+ */
 public class CheckReloadResponse implements ServerGameMessage {
-    private CardWeapon weapon;
-    private List<CardPower> powerUps;
+    private CardWeapon weapon; /** weapon that has been reloaded */
+    private List<CardPower> powerUps; /** power-up cards to discard */
 
+    /**
+     * construct the message
+     * @param weapon
+     * @param powerUps
+     */
     public CheckReloadResponse(CardWeapon weapon, List<CardPower> powerUps) {
         this.weapon = weapon;
         this.powerUps = powerUps;
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * return the weapon reference
+     * @return weapon
+     */
     public CardWeapon getWeapon() {
         return weapon;
     }
 
+    /**
+     * return the power-up cards list
+     * @return powerUps
+     */
     public List<CardPower> getPowerUps() {
         return powerUps;
     }

@@ -1,14 +1,15 @@
-package game.controller;
+package game.controller.network;
 
+import game.controller.ClientController;
 import game.controller.commands.*;
 import game.controller.commands.clientcommands.PongMessage;
 import game.controller.commands.servercommands.PingMessage;
+import game.controller.network.ClientNetwork;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.concurrent.*;
 
 /**
  * Socket network layer on client side

@@ -1,4 +1,4 @@
-package game.controller;
+package game.controller.network;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

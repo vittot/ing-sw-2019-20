@@ -7,23 +7,45 @@ import game.model.Action;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * request of single step action choice from the server to the client
+ */
 public class ChooseSingleActionRequest implements ServerGameMessage {
-    private List<Action> actions = new ArrayList<>();
 
+    private List<Action> actions; /** available actions to choose from */
+
+    /**
+     * construct the correct message
+     * @param actions
+     */
     public ChooseSingleActionRequest(List<Action> actions) {
         this.actions = new ArrayList<>(actions);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * return the available actions
+     * @return actions
+     */
     public List<Action> getActions() {
         return actions;
     }

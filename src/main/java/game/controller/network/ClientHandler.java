@@ -1,6 +1,10 @@
-package game.controller;
+package game.controller.network;
 
 
+import game.controller.Configuration;
+import game.controller.GameManager;
+import game.controller.ServerController;
+import game.controller.ServerState;
 import game.controller.commands.ServerMessage;
 import game.controller.commands.servercommands.*;
 import game.model.*;
@@ -59,7 +63,7 @@ public abstract class ClientHandler implements GameListener {
      * Start the ping-pong system
      * @param pingPeriod period between two ping requests, in ms
      */
-    void startPing(int pingPeriod)
+    public void startPing(int pingPeriod)
     {
         if(periodicPingTimer != null)
             periodicPingTimer.shutdownNow();
@@ -83,7 +87,7 @@ public abstract class ClientHandler implements GameListener {
     /**
      * Interrupt the ping mechanism
      */
-    void stopPing()
+    public void stopPing()
     {
         pingTimer.shutdownNow();
         periodicPingTimer.shutdownNow();
@@ -186,7 +190,7 @@ public abstract class ClientHandler implements GameListener {
 
     @Override
     public void onPowerUpUse(Player p, CardPower c) {
-        sendMessage(new NotifyPowerUpUsage(p.getId(),c));
+        sendMessage(new NotifyPowerUpUsage(p,c));
     }
 
     @Override

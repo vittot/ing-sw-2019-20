@@ -10,29 +10,55 @@ import game.model.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * message that contains the payment executed on the server (ammos and power-up cards to remove)
+ */
 public class AddPayment implements ServerGameMessage {
 
-    private List<Color> ammo;
-    private List <CardPower> powers;
+    private List<Color> ammo; /** ammo to pay */
+    private List <CardPower> powers; /** power-up cards to pay */
 
+    /**
+     * construct he correct message
+     * @param ammo
+     * @param powers
+     */
     public AddPayment(List<Color> ammo, List<CardPower> powers) {
         this.ammo = ammo;
         this.powers = powers;
     }
 
+    /**
+     * return ammo list
+     * @return ammo
+     */
     public List<Color> getAmmo() {
         return ammo;
     }
 
+    /**
+     * return power-up list
+     * @return powers
+     */
     public List<CardPower> getPowers() {
         return powers;
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);

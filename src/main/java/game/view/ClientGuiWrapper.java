@@ -1,5 +1,7 @@
-package game.controller;
+package game.view;
 
+import game.controller.ClientController;
+import game.controller.WaitingRoom;
 import game.model.*;
 import game.model.effects.FullEffect;
 

@@ -42,8 +42,8 @@ public class Player implements Target, Serializable, Comparable<Player> {
     private boolean serializeEverything; /** boolean value that permits to specify if the transient attribute have to been serialized in transmission */
     private transient PlayerObserver playerObserver; /** reference to the object that is in charge of notify the game events */
     private boolean suspended; /** boolean value that specifies if the player has been suspended from the game cause of connection lost */
-    private int killboardpoints;
-    private boolean beforeFrenzy = true; /** boolean that specifies if the player got some damages before final frenzy*/
+    private int killboardpoints; /** field that contains the points calculated at the end of the game */
+    private boolean beforeFrenzy = true; /** boolean that specifies if the player got some damages before final frenzy
     /**
      * construct a player object ready to start the game
      * @param id

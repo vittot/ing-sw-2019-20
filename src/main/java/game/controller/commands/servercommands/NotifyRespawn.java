@@ -59,7 +59,7 @@ public class NotifyRespawn implements ServerGameMessage {
 
     /**
      * Handle the message
-     * @param handler who handle the message
+     * @param handler who handle the messag
      */
     @Override
     public void handle(ServerGameMessageHandler handler) {
@@ -68,7 +68,7 @@ public class NotifyRespawn implements ServerGameMessage {
 
     /**
      * Handle the message
-     * @param handler who handle the message
+     * @param handler who handle the messag
      */
     @Override
     public void handle(ServerMessageHandler handler) {

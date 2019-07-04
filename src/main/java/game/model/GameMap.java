@@ -6,15 +6,18 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * class representing the complete field (map) of the game, where players can move and complete their actions
+ */
 public class GameMap implements Serializable {
-    private int id;
-    private Square[][] grid;  // grid[y][x] y -> 0 : 2 | x -> 0 : 3
-    private int dimX; //number of cols
-    private int dimY; //number of rows
-    public static final int MAX_DIST = 12;
-    public static final int WEAPON_PER_SQUARE = 3;
-    private List<Room> rooms;
-    private String description;
+    private int id; /** attribute that identifies the different kind of map */
+    private Square[][] grid;  /** grid grouping the squares that make part of the map */ // grid[y][x] y -> 0 : 2 | x -> 0 : 3
+    private int dimX; /** number of columns of the grid */
+    private int dimY; /** number of rows of the grid */
+    public static final int MAX_DIST = 12; /** max value of distance between two players */
+    public static final int WEAPON_PER_SQUARE = 3; /** max number of weapons available to grab in respawn points */
+    private List<Room> rooms; /** list containing all the map rooms */
+    private String description; /** map description */
 
     /**
      * Construct an empty GameMap with just the dimensions set
@@ -86,52 +89,97 @@ public class GameMap implements Serializable {
         return copy;
     }
 
+    /**
+     * return description attribute
+     * @return description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * return the player in the map with an specific id
+     * @param id
+     * @return a player reference
+     */
     public Player getPlayerById(int id){
         return this.getAllSquares().stream().flatMap(s -> s.getPlayers().stream()).filter(p -> p.getId()==id).findFirst().orElse(null);
     }
 
+    /**
+     * set the map description
+     * @param description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * return the map id
+     * @return id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * set the map id
+     * @param id
+     */
     public void setId(int id) {
         this.id = id;
     }
 
+    /**
+     * return the grid of squares
+     * @return grid
+     */
     public Square[][] getGrid() {
         return grid;
     }
 
+    /**
+     * set the grid that compose the map
+     * @param grid
+     */
     public void setGrid(Square[][] grid) {
         this.grid = grid;
     }
 
+    /**
+     * return the number of columns
+     * @return dimX
+     */
     public int getDimX() {
         return dimX;
     }
 
+    /**
+     * set the number of columns
+     * @param dimX
+     */
     public void setDimX(int dimX) {
         this.dimX = dimX;
     }
 
+    /**
+     * return the number of rows
+     * @return dimY
+     */
     public int getDimY() {
         return dimY;
     }
 
+    /**
+     * set the number of rows
+     * @param dimY
+     */
     public void setDimY(int dimY) {
         this.dimY = dimY;
     }
 
     /**
-     * Return all spawnpoints of the GameMap
+     * Return all spawn points of the GameMap
      * @return
      */
     public List<Square> getSpawnpoints()
@@ -259,6 +307,12 @@ public class GameMap implements Serializable {
         return Arrays.stream(dists).min().getAsInt();
     }
 
+    /**
+     * service method used in the calculation of distance between two different squares
+     * @param s1
+     * @param s2
+     * @return the distance between the squares analyzed
+     */
     private static int distBfs(Square s1, Square s2)
     {
         Set<Square> visited = new HashSet<>();
@@ -319,6 +373,13 @@ public class GameMap implements Serializable {
         return null;
     }
 
+    /**
+     * move a player in a specific square identified by x and y coordinate
+     * @param p
+     * @param x
+     * @param y
+     * @throws MapOutOfLimitException
+     */
     public void movePlayer(Player p, int x, int y) throws MapOutOfLimitException {
         if(p.getPosition() != null)
             p.getPosition().removePlayer(p);
@@ -327,6 +388,12 @@ public class GameMap implements Serializable {
         p.setPosition(s);
     }
 
+    /**
+     * calculate the direction from a starting square to a destination square
+     * @param start
+     * @param destination
+     * @return a direction enum value
+     */
     public static Direction getDirection(Square start, Square destination){
         if(start.getX() == destination.getX()){
             if(start.getY() > destination.getY())
@@ -343,6 +410,11 @@ public class GameMap implements Serializable {
         return Direction.ERROR;
     }
 
+    /**
+     * control if two maps are equals
+     * @param o
+     * @return true/false
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -356,6 +428,10 @@ public class GameMap implements Serializable {
                 Objects.equals(description, gameMap.description);
     }
 
+    /**
+     * used by equals method
+     * @return
+     */
     @Override
     public int hashCode() {
         int result = Objects.hash(id, dimX, dimY, rooms, description);
