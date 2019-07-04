@@ -373,8 +373,6 @@ public class ClientController implements ServerGameMessageHandler {
 
         clientView.choosePowerUpToRespawn(p.getCardPower());
 
-        /*if(ClientContext.get().getMyPlayer().getNickName().equals("vitto"))
-            this.manageConnectionError();*/
     }
 
     /**

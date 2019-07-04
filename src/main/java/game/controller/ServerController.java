@@ -814,7 +814,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 }
             }
             else*/
-                model.getCurrentTurn().newTurn(false);
+            model.getCurrentTurn().newTurn(false);
         }
     }
 

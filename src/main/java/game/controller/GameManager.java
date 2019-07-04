@@ -125,7 +125,7 @@ public class GameManager implements Serializable {
      * @return
      */
     public Game addGame(int mapId, List<Player> players){
-        Game g = new Game(nextId, mapId, 1,players);
+        Game g = new Game(nextId, mapId, 8,players);
         nextId++;
         games.add(g);
         return g;

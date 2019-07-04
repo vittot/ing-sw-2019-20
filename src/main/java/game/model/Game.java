@@ -76,7 +76,7 @@ public class Game {
     /**
      * Max number of kill
      */
-    private int killboardSize = 2;
+    private int killboardSize = 8;
     /**
      * List  of game listener
      */

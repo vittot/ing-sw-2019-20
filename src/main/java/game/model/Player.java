@@ -463,11 +463,11 @@ public class Player implements Target, Serializable, Comparable<Player> {
             damage += marksToBeRemoved.size();
             marks.removeAll(marksToBeRemoved);
 
-            if (this.damage.size() < 3) { //11
+            if (this.damage.size() < 11) { //11
                 for (int i = 0; i < damage; i++)
                     this.damage.add(shooter.getColor());
                 num = this.damage.size();
-                if (num > 2) { //10
+                if (num > 10) { //10
                     this.deaths++;
                     this.isDead = true;
                     if (num > 11) {
@@ -481,7 +481,7 @@ public class Player implements Target, Serializable, Comparable<Player> {
                     this.adrenaline = AdrenalineLevel.SHOOTLEVEL;
                 else if (num > 2)
                     this.adrenaline = AdrenalineLevel.GRABLEVEL;
-            } else if (this.damage.size() == 3 && damage > 0) { //11
+            } else if (this.damage.size() == 11 && damage > 0) { //11
                 lastKill = game.getLastKill(this);
                 lastKill.setRage(true);
                 shooter.addThisTurnMarks(this, 1); //the shooter receive a mark in case of rage
