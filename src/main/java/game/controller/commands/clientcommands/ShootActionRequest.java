@@ -10,46 +10,25 @@ import game.model.effects.FullEffect;
 
 import java.util.List;
 
+/**
+ * Request of shoot action, the server will responde with the possible weapon to use
+ */
 public class ShootActionRequest implements ClientGameMessage {
-    private CardWeapon weapon;
-    private List<FullEffect> plusEffects;
-    private FullEffect baseEffect;
-    private FullEffect altEffect;
-    private List<CardPower> paymentWithPowerUp;
-    /**
-     * If this is true the weapon has to have one (and only one) plus effect which must be executed before the base effect and this has to be the first in the plusEffectsList
-     */
-    private boolean plusBeforeBase;
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     */
      @Override
     public void handle(ClientMessageHandler handler) {
         handler.handle(this);
     }
 
-    public CardWeapon getWeapon() {
-        return weapon;
-    }
-
-    public List<FullEffect> getPlusEffects() {
-        return plusEffects;
-    }
-
-    public FullEffect getBaseEffect() {
-        return baseEffect;
-    }
-
-    public FullEffect getAltEffect() {
-        return altEffect;
-    }
-
-    public List<CardPower> getPaymentWithPowerUp() {
-        return paymentWithPowerUp;
-    }
-
-    public boolean isPlusBeforeBase() {
-        return plusBeforeBase;
-    }
-
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public ServerGameMessage handle(ClientGameMessageHandler handler) {
         return handler.handle(this);

@@ -35,6 +35,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -99,6 +100,10 @@ public class ClientGUIView extends Application implements View{
      * ImageView  List of player DashBoard
      */
     private List<ImageView> playerDashBoard = new ArrayList<>();
+    /**
+     * ImageView of my player dashboard
+     */
+    private ImageView myPlayerDash;
     /**
      * ImageView list for My player power up
      */
@@ -424,6 +429,8 @@ public class ClientGUIView extends Application implements View{
             if(counterattack.size() > 1 ){
                 activateCardPower(counterattack);
             }else {
+                text.setText("");
+                controller.getClientNetwork().sendMessage(new CounterAttackResponse(counterattack.get(0), shooter));
                 controller.getClientNetwork().sendMessage(new CounterAttackResponse(counterattack.get(0), shooter));
                 state = ClientState.WAITING_TURN;
             }
@@ -540,16 +547,17 @@ public class ClientGUIView extends Application implements View{
     public void chooseStepActionPhase() {
         text.setText("Choose your single step");
         state = ClientState.CHOOSESTEP;
-        power.setVisible(true);
-        power.setDisable(false);
-        exit.setVisible(true);
-        exit.setDisable(false);
-        if(this.controller.getAvailableActions().size() == 1){
+        if(this.controller.getState().equals(ClientState.HANDLING_MOVEMENT)) {
+            exit.setVisible(true);
+            exit.setDisable(false);
+        }
+        System.out.println(""+this.controller.getAvailableActions().size());
+        if(this.controller.getAvailableActions().size() == 1 && this.controller.getAvailableActions().get(0)!= Action.MOVEMENT){
             textNotify.setText("Auto action complete : "+this.controller.getAvailableActions().get(0) + "\n" + textNotify.getText());
             if(this.controller.getAvailableActions().get(0).equals(Action.GRAB))
-                controller.getClient().sendMessage(new GrabActionRequest());
+                controller.getClientNetwork().sendMessage(new GrabActionRequest());
             if(this.controller.getAvailableActions().get(0).equals(Action.SHOOT))
-                controller.getClient().sendMessage(new ShootActionRequest());
+                controller.getClientNetwork().sendMessage(new ShootActionRequest());
             disableButton();
         }
         else {
@@ -642,7 +650,6 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void chooseTurnActionPhase(boolean isMovementAllowed) {
-        //TODO handle parameter
         System.out.println("Turn action Phase");
         refreshMyPlayerCard();
         refreshMyPlayerAmmo();
@@ -654,8 +661,10 @@ public class ClientGUIView extends Application implements View{
         else{
             text.setText("Choose your Action ");
             state = ClientState.CHOOSEACTIOIN;
-            move.setVisible(true);
-            move.setDisable(false);
+            if(!ClientContext.get().isFinalFrenzy()){
+                move.setVisible(true);
+                move.setDisable(false);
+            }
             shoot.setVisible(true);
             shoot.setDisable(false);
             grab.setVisible(true);
@@ -786,9 +795,13 @@ public class ClientGUIView extends Application implements View{
         textNotify.setText("Player "+killer.getNickName()+" has raged "+victim.getNickName() + "\n" + textNotify.getText());
     }
 
+    /**
+     * Can't reload any weapon
+     */
+
     @Override
     public void showNoWeaponToReload() {
-        //TODO
+        textNotify.setText("No weapon to reload\n" + textNotify.getText());
     }
 
     /**
@@ -1072,13 +1085,15 @@ public class ClientGUIView extends Application implements View{
         */
         String hitted = ClientContext.get().getMap().getPlayerById(idHitten).getNickName();
         String shooter = ClientContext.get().getMap().getPlayerById(idShooter).getNickName();
+        if(idShooter == ClientContext.get().getMyID())
+            refreshMyPlayerCard();
         if(idHitten == ClientContext.get().getMyID()) {
             refreshMyPlayerDamage();
-            textNotify.setText("You got hitted by "+ shooter +"\n" + textNotify.getText());
+            textNotify.setText("You got some marks from "+ shooter +"\n" + textNotify.getText());
         }
         else {
             refreshPlayerDamage();
-            textNotify.setText(hitted+" got hitted by "+ shooter + "\n" + textNotify.getText());
+            textNotify.setText(hitted+" got some marks from "+ shooter + "\n" + textNotify.getText());
         }
     }
 
@@ -1106,12 +1121,19 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void notifyRespawn(int pID) {
+        System.out.println(ClientContext.get().isFinalFrenzy());
         String url = getClass().getResource("/graphics/sound/respawn.wav").toExternalForm();
         AudioClip audio = new AudioClip(url);
         audio.play();
         System.out.println("notifyrespawn");
-        if(pID == ClientContext.get().getMyID())
+        if(pID == ClientContext.get().getMyID()) {
             refreshMyPlayerCard();
+            if(ClientContext.get().isFinalFrenzy())
+                refreshMyPlayerDash(ClientContext.get().getMyPlayer().getColor().toString());
+        }else{
+            if(ClientContext.get().isFinalFrenzy())
+                refreshPlayerDash(pID,ClientContext.get().getMap().getPlayerById(pID).getColor().toString());
+        }
         refreshPlayerPosition();
     }
 
@@ -1280,6 +1302,7 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void showReloadMessage(CardWeapon cW) {
+        refreshMyPlayerCard();
         textNotify.setText("You correctly reload " + cW.getName() + "\n" + textNotify.getText());
     }
 
@@ -1643,7 +1666,29 @@ public class ClientGUIView extends Application implements View{
 
     @Override
     public void notifyFinalFrenzy() {
-        //TODO
+        String url = getClass().getResource("/graphics/sound/final.wav").toExternalForm();
+        AudioClip audio = new AudioClip(url);
+        audio.play();
+        textNotify.setText("FINAL FREZY is started\n" + textNotify.getText());
+        for(Player p : ClientContext.get().getMap().getAllPlayers()){
+            if(p.getDamage().isEmpty() && p.getMark().isEmpty()){
+                if(p.getId() == ClientContext.get().getMyID())
+                    refreshMyPlayerDash(p.getColor().toString());
+                else
+                    refreshPlayerDash(p.getId(),p.getColor().toString());
+            }
+        }
+    }
+    private void refreshMyPlayerDash(String c){
+        myPlayerDash.setImage(new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c+"Dash2.png")));
+    }
+    private void refreshPlayerDash(int id,String s){
+        for(ImageView dash : playerDashBoard ){
+            if(Integer.parseInt(dash.getId()) == id){
+                dash.setImage(new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+s+"Dash2.png")));
+                System.out.println(dash.getImage().toString());
+            }
+        }
     }
 
     /**
@@ -1855,7 +1900,7 @@ public class ClientGUIView extends Application implements View{
                 BackgroundSize.DEFAULT);
         map.setBackground(new Background(bi));
 
-        map.getChildren().addAll(move,grab,shoot,exit);
+        map.getChildren().addAll(move,grab,shoot,exit,power);
         StackPane.setMargin(move,new Insets(0,screenWidth * 2 / 100,screenHeight * 23 / 100,0));
         StackPane.setAlignment(move,Pos.BOTTOM_RIGHT);
         StackPane.setMargin(grab,new Insets(0,screenWidth * 10 / 100,screenHeight * 23 / 100,0));
@@ -2009,9 +2054,14 @@ public class ClientGUIView extends Application implements View{
                 cardW = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/cards/W_back.png"));
                 weapons.get(i).setId("0_0");
             }
+
             else {
                 cardW = createWeaponCard(myP.getWeapons().get(i).getId());
                 weapons.get(i).setId("0_" + myP.getWeapons().get(i).getId());
+                if(!myP.getWeapons().get(i).isLoaded())
+                    weapons.get(i).setOpacity(0.5);
+                else
+                    weapons.get(i).setOpacity(1);
             }
             powerUp.get(i).setImage(cardP);
             weapons.get(i).setImage(cardW);
@@ -2078,13 +2128,13 @@ public class ClientGUIView extends Application implements View{
             imw.setPreserveRatio(true);
             if(p.equals(ClientContext.get().getMyPlayer())){
                 myPoint = point;
+                myPlayerDash = imw;
                 map.getChildren().add(point);
                 StackPane.setAlignment(imw,Pos.BOTTOM_LEFT);
                 StackPane.setAlignment(name,Pos.BOTTOM_LEFT);
                 StackPane.setMargin(name,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 6 / 100));
                 StackPane.setAlignment(point,Pos.BOTTOM_LEFT);
                 StackPane.setMargin(point,new Insets(0,0,screenHeight * 13.5 / 100,screenWidth * 4/ 100 ));
-
             }else {
                 playerDashBoard.add(imw);
                 System.out.println("Plater :" +p.getNickName());
@@ -2120,7 +2170,10 @@ public class ClientGUIView extends Application implements View{
                 damages.setPreserveRatio(true);
                 map.getChildren().add(damages);
                 StackPane.setAlignment(damages, Pos.TOP_RIGHT);
-                StackPane.setMargin(damages, new Insets(screenHeight * 6.5 / 100 + spaceY, screenWidth * 32.1 / 100 - spaceX, 0, 0));
+                if(!p.isBeforeFrenzy())
+                    StackPane.setMargin(damages, new Insets(screenHeight * 6.5 / 100 + spaceY, screenWidth * 31.5 / 100 - spaceX, 0, 0));
+                else
+                    StackPane.setMargin(damages, new Insets(screenHeight * 6.5 / 100 + spaceY, screenWidth * 32.1 / 100 - spaceX, 0, 0));
                 spaceX = spaceX + screenWidth * 2.25 / 100;
                 if (j > 1 && j != 4)
                     spaceX = spaceX - screenWidth * 0.25 / 100;
@@ -2194,7 +2247,10 @@ public class ClientGUIView extends Application implements View{
             ImageView damages = createMyTear(p.toString());
             damages.setFitHeight(screenHeight * 3 /100);
             StackPane.setAlignment(damages,Pos.BOTTOM_LEFT);
-            StackPane.setMargin(damages,new Insets(0,0,screenHeight * 6.25 / 100,screenWidth * 3.44 / 100 + spaceX));
+            if(!ClientContext.get().getMyPlayer().isBeforeFrenzy())
+                StackPane.setMargin(damages,new Insets(0,0,screenHeight * 6.25 / 100,screenWidth * 4.2 / 100 + spaceX));
+            else
+                StackPane.setMargin(damages,new Insets(0,0,screenHeight * 6.25 / 100,screenWidth * 3.44 / 100 + spaceX));
             spaceX = spaceX + screenWidth * 2.25 / 100;
             if(j > 1 && j != 4)
                 spaceX = spaceX - screenWidth * 0.25 / 100;
@@ -2458,10 +2514,10 @@ public class ClientGUIView extends Application implements View{
                         weaponToReload = selected;
                         price = selected.getPrice();
                         list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
-                        if(list.size() == 0)
+                        if(list.size() != 0)
                             choosePowerUpToPay(list);
                         else
-                            controller.getClient().sendMessage(new ReloadWeaponRequest(weaponToReload,null));
+                            controller.getClientNetwork().sendMessage(new ReloadWeaponRequest(weaponToReload,null));
                     }
                     break;
                 }
@@ -2667,10 +2723,12 @@ public class ClientGUIView extends Application implements View{
      * @param e
      */
     private void handleStepAction(MouseEvent e){
+        disableButton();
         Action chosenAction = Action.valueOf(((Button)e.getSource()).getId().toUpperCase());
         switch (chosenAction){
             case MOVEMENT:
                 if(state.equals(ClientState.CHOOSESTEP)) {
+                    controller.setState(ClientState.HANDLING_MOVEMENT);
                     controller.getClientNetwork().sendMessage(new MovementActionRequest());
                 }
                 else {
@@ -2702,11 +2760,12 @@ public class ClientGUIView extends Application implements View{
                     textNotify.setText("There are no power-up cards available for use in this moment!\n" + textNotify.getText());
                     chooseStepActionPhase();
                 }
-                else
+                else {
+                    text.setText("Choose a card power:");
                     activateCardPower(powerList);
+                }
                 break;
         }
-        disableButton();
     }
 
     /**

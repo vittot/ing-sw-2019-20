@@ -517,6 +517,9 @@ public class ClientController implements ServerGameMessageHandler {
         if(p == null){
             p = ClientContext.get().getMap().getPlayerById(notifyRespawn.getpId());
         }
+        if(ClientContext.get().isFinalFrenzy()){
+            p.setBeforeFrenzy(false);
+        }
         try {
             ClientContext.get().getMap().movePlayer(p,notifyRespawn.getX(),notifyRespawn.getY());
         } catch (MapOutOfLimitException e) {
@@ -847,6 +850,10 @@ public class ClientController implements ServerGameMessageHandler {
 
     @Override
     public void handle(NotifyFinalFrenzy notifyFinalFrenzy) {
+        for(Player p : ClientContext.get().getMap().getAllPlayers()){
+            if(!p.getDamage().isEmpty() || !p.getMark().isEmpty())
+                p.setBeforeFrenzy(true);
+        }
         ClientContext.get().setFinalFrenzy();
         clientView.notifyFinalFrenzy();
     }

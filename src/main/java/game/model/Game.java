@@ -311,7 +311,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    private boolean readDeck(String fileName){
+    public boolean readDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         int id=1;
@@ -340,7 +340,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    private boolean readAmmoDeck(String fileName){
+    public boolean readAmmoDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         try
@@ -366,7 +366,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    private boolean readPowerUpDeck(String fileName){
+    public boolean readPowerUpDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         int id = 1;
