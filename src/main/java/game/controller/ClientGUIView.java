@@ -390,7 +390,7 @@ public class ClientGUIView extends Application implements View{
         StackPane.setMargin(text, new Insets(100,0,0,0));
         StackPane.setMargin(bt1, new Insets(0,0,0,100));
         StackPane.setMargin(btn, new Insets(0,100,0,0));
-        bt1.setOnAction(actionEvent -> this.setUserNamePhase());
+        bt1.setOnAction(actionEvent -> controller.retryConnection());
         bt1.setOnAction(actionEvent -> primaryStage.close());
         primaryStage.setScene(scene);
         primaryStage.setHeight(300);

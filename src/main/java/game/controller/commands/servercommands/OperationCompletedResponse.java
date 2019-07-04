@@ -4,24 +4,49 @@ import game.controller.commands.ServerGameMessage;
 import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 
+/**
+ * Send the operation complete message to the client
+ */
 public class OperationCompletedResponse implements ServerGameMessage {
+    /**
+     * Message to visualized in the client
+     */
     private String message;
 
+    /**
+     * Constructor
+     */
     public OperationCompletedResponse() { }
 
+    /**
+     * Constructor
+     * @param message message to the client
+     */
     public OperationCompletedResponse(String message) {
         this.message = message;
     }
 
+    /**
+     *
+     * @return the message
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     */
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     */
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
