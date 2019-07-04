@@ -2,6 +2,9 @@ package game.controller.commands;
 
 import game.controller.commands.clientcommands.*;
 
+/**
+ * interface that describe the different kind of client game messages and the behavior to manage them
+ */
 public interface ClientGameMessageHandler {
     ServerGameMessage handle (ChooseSquareResponse clientMsg);
 

@@ -4,6 +4,9 @@ import game.controller.commands.servercommands.*;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 
+/**
+ * interface that describe the different kind of server game messages and the behavior to manage them
+ */
 public interface ServerGameMessageHandler {
 
     void handle (CheckReloadResponse serverMsg);

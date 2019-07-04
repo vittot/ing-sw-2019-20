@@ -16,11 +16,21 @@ public class NotifyPlayerExitedWaitingRoom implements ServerGameMessage {
         return playerId;
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the messag
+     * @param handler
+     */
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the messag
+     * @param handler
+     */
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

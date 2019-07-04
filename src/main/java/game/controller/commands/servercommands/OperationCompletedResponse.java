@@ -17,11 +17,21 @@ public class OperationCompletedResponse implements ServerGameMessage {
         return message;
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the messag
+     * @param handler
+     */
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the messag
+     * @param handler
+     */
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

@@ -8,23 +8,44 @@ import game.model.GameMap;
 
 import java.util.List;
 
+/**
+ * message containing the available maps to choose from to start a new game
+ */
 public class AvailableMapsListResponse implements ServerGameMessage {
 
-    private List<GameMap> avaiableMaps;
+    private List<GameMap> avaiableMaps; /** list of available maps */
 
+    /**
+     * construct the message
+     * @param avaiableMaps
+     */
     public AvailableMapsListResponse(List<GameMap> avaiableMaps) {
         this.avaiableMaps = avaiableMaps;
     }
 
+    /**
+     * return the list of maps
+     * @return availableMaps
+     */
     public List<GameMap> getAvaiableMaps() {
         return avaiableMaps;
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the message
+     * @return the message from the handler
+     */
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);

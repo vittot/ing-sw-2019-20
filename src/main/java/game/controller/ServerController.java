@@ -17,36 +17,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * class that allow the management of the request messages from the client and the interaction with the game model
+ * and other clients connected to the same match
+ */
 public class ServerController implements ClientGameMessageHandler, PlayerObserver, EffectHandler {
 
-    private ClientHandler clientHandler;
+    private ClientHandler clientHandler; /** reference to the corresponding ClientHandler object */
 
-    private final GameManager gameManager;
+    private final GameManager gameManager; /** reference to the class that manage the creation of all the waiting rooms and all the game */
 
-    private Game model;
-    private Player currPlayer;
-    private List<CardWeapon> playerWeapons;
-    private CardWeapon selectedWeapon;
-    private List<FullEffect> remainingPlusEffects;
-    private FullEffect plusBeforeBase;
-    private boolean isOrdered;
-    private List<Color> ammoToPay;
-    private List<CardPower> powerUpToPay;
-    private FullEffect currFullEffect;
-    private SimpleEffect currSimpleEffect;
-    private Player toBeMoved;
-    private boolean baseDone;
-    private int nSimpleEffect; //the number of the current simpleEffect of the current FullEffect
-    private List<Target> selectableTarget;
-    private List<Square> selectableSquares;
-    private ServerState state;
-    private List<Action> availableActionSteps;
-    private int numberOfTurnActionMade;
-    private boolean damageEffect;
-    private WaitingRoom waitingRoom;
-    private String nickname;
+    private Game model; /** reference to the model that contains game information */
+    private Player currPlayer; /** reference to the player in the model associated with this server controller */
+    private List<CardWeapon> playerWeapons; /** list of player's weapons */
+    private CardWeapon selectedWeapon; /** referenc to the weapon selected to shoot */
+    private List<FullEffect> remainingPlusEffects; /** list of remaining plus to use for the player */
+    private FullEffect plusBeforeBase; /** set not null if the selected weapon expect that a plus effect can be used before the base */
+    private boolean isOrdered; /** boolean that identifies if the plus effects of a weapon should be applied in order */
+    private List<Color> ammoToPay; /** list that accumulates all the ammos the player have to pay at the end of shoot */
+    private List<CardPower> powerUpToPay; /** list that accumulates all the power-up cards the player have to pay at the end of shoot */
+    private FullEffect currFullEffect; /** reference to the current full effect to apply */
+    private SimpleEffect currSimpleEffect;/** reference to the current simple effect to apply */
+    private Player toBeMoved; /** boolean used to identify the player that has to be moved */
+    private boolean baseDone; /** boolean used to indicate if the player has completed the first effect (base or alternative) */
+    private int nSimpleEffect; /** the number of the current simpleEffect of the current FullEffect */
+    private List<Target> selectableTarget; /** list containing all the possible target to be selected to apply an effect */
+    private List<Square> selectableSquares; /** list containing all the possible squares where apply an effect */
+    private ServerState state; /** field that specifies the state of the server controller */
+    private List<Action> availableActionSteps; /** list of all the available step for the current action */
+    private int numberOfTurnActionMade; /** field that counts the number of action made during the current turn */
+    private boolean damageEffect; /** boolean that confirm if an effect cause delt of damage */
+    private WaitingRoom waitingRoom; /** reference to the waiting room */
+    private String nickname; /** field that represents the nickname of the player */
 
 
+    /**
+     * construct an initial server controller based on a ClientHandler object
+     * @param clientHandler
+     */
     public ServerController(ClientHandler clientHandler) {
 
         this.clientHandler = clientHandler;
@@ -54,6 +62,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         this.gameManager = GameManager.get();
     }
 
+    /**
+     * construct an initial server controller for the player
+     * @param clientHandler
+     * @param gameManager
+     */
     public ServerController(ClientHandler clientHandler, GameManager gameManager)
     {
         this.clientHandler = clientHandler;
@@ -61,26 +74,49 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         this.gameManager = gameManager;
     }
 
+    /**
+     * construct a simply server controller
+     */
     public ServerController(){
         this.gameManager = GameManager.get();
     }
 
+    /**
+     * return clientHandler reference
+     * @return clientHandler
+     */
     public ClientHandler getClientHandler() {
         return clientHandler;
     }
 
+    /**
+     * return state attribute
+     * @return state
+     */
     public ServerState getState() {
         return state;
     }
 
+    /**
+     * set state attribute
+     * @param state
+     */
     public void setState(ServerState state) {
         this.state = state;
     }
 
+    /**
+     * return waitingRoom reference
+     * @return waitingRoom
+     */
     public WaitingRoom getWaitingRoom() {
         return waitingRoom;
     }
 
+    /**
+     * set waitingRoom reference
+     * @param waitingRoom
+     */
     public void setWaitingRoom(WaitingRoom waitingRoom) {
         this.waitingRoom = waitingRoom;
         this.state = ServerState.WAITING_FOR_PLAYERS;
@@ -105,10 +141,19 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         this.currPlayer.addAmmo(Color.RED);
     }
 
+    /**
+     * return game model reference
+     * @return model
+     */
     public Game getModel() {
         return model;
     }
 
+    /**
+     * manage the process of adding a weapon into the list of player's weapons
+     * @param clientMsg
+     * @return an operation completed response
+     */
     public ServerGameMessage handle(CheckValidWeaponRequest clientMsg){
         if(checkIfEnded())
             return new NotifyEndGame(model.getRanking());
@@ -123,6 +168,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return new OperationCompletedResponse("");
     }
 
+    /**
+     * manage the selection of the square the player want to shoot and control that the effect will correctly progress
+     * @param chooseSquareToShootResponse
+     * @return the correct next server response
+     */
     @Override
     public ServerGameMessage handle(ChooseSquareToShootResponse chooseSquareToShootResponse) {
         if(checkIfEnded())
@@ -146,6 +196,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return currSimpleEffect.handleTargetSelection(this, toApplyEffect, model);
     }
 
+    /**
+     * handle the volition of the player to counter-attack the player that dealt damage to him
+     * @param counterAttackResponse
+     * @return server answer
+     */
     @Override
     public ServerGameMessage handle(CounterAttackResponse counterAttackResponse) {
         if(counterAttackResponse.isConfirm()){
@@ -159,21 +214,38 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return new OperationCompletedResponse("");
     }
 
+    /**
+     * handle the logout request made by the client and complete the procedure
+     * @param logoutRequest
+     * @return an operation completed message
+     */
     @Override
     public ServerGameMessage handle(LogoutRequest logoutRequest) {
         GameManager.get().removeLoggedUser(logoutRequest.getUsername());
         return new OperationCompletedResponse("Logged out successfully!");
     }
 
-
+    /**
+     * return currPlayer reference
+     * @return currPlayer
+     */
     public Player getCurrPlayer() {
         return currPlayer;
     }
 
+    /**
+     * return nickName attribute
+     * @return nickName
+     */
     public String getNickname() {
         return nickname;
     }
 
+    /**
+     * handle the selection of a square that will be destination of a movement
+     * @param clientMsg
+     * @return server answer
+     */
     @Override
     public ServerGameMessage handle(ChooseSquareResponse clientMsg) {
         if(checkIfEnded())
@@ -231,6 +303,10 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
     }
 
+    /**
+     * manage the end of the turn and prepare the game model for the next turn updating the map and the players information
+     * manage the respawn of dead players, too
+     */
     void endTurnManagement()
     {
         //state
@@ -247,7 +323,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     /**
      * Validate the selected target for an effect and apply it, or ask for the movement position if it's a MovementEffect
      * @param clientMsg
-     * @return
+     * @return server answer
      */
     @Override
     public ServerGameMessage handle(ChooseTargetResponse clientMsg)
@@ -310,6 +386,12 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return true;
     }
 
+    /**
+     * manage the target selection in case of movement effect to apply
+     * progress requesting the client to select the destination of the movement choosing between a list of possibilities
+     * @param selectedTarget
+     * @return a list of possible square be the client has to choose from
+     */
     private ServerGameMessage handleTargetSelectionMovement(List<Target> selectedTarget) {
         if(checkIfEnded())
             return new NotifyEndGame(model.getRanking());
@@ -399,6 +481,12 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return checkTurnEnd();
     }
 
+    /**
+     * control which action has been selected from the client to play his turn and create a list of possible steps
+     * expected from his choice
+     * @param clientMsg
+     * @return a request of step selection to choose from the proposals
+     */
     @Override
     public ServerGameMessage handle(ChooseTurnActionResponse clientMsg) {
         if(checkIfEnded())
@@ -440,6 +528,12 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return (this.state == ServerState.GAME_ENDED);
     }
 
+    /**
+     * manage the grab action request from the client allowing him to grab a weapon if he is positioned in a respawn square
+     * otherwise he will grab a card ammo
+     * @param clientMsg
+     * @return
+     */
     @Override
     public ServerGameMessage handle(GrabActionRequest clientMsg) {
         if(checkIfEnded())
@@ -489,6 +583,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return checkTurnEnd();
     }
 
+    /**
+     * manage a movement action request from client allowing him to select a possible square square that will be destination of the movement
+     * @param clientMsg
+     * @return a square selection request to complete the movement
+     */
     @Override
     public ServerGameMessage handle(MovementActionRequest clientMsg) {
         if(checkIfEnded())
@@ -509,6 +608,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         }
     }
 
+    /**
+     * manage the grab request of a card ammo from the field
+     * @param clientMsg
+     * @return
+     */
     @Override
     public ServerGameMessage handle(PickUpAmmoRequest clientMsg) {
         if(checkIfEnded())
@@ -530,9 +634,10 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     }
 
     /**
-     *
+     * manage the request of pick up a weapon
+     * control the weapon selected is valid and then confirm that the operation has been completed
      * @param clientMsg
-     * @return
+     * @return a notification of grab completed
      */
     @Override
     public ServerGameMessage handle(PickUpWeaponRequest clientMsg) {
@@ -586,6 +691,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         }
     }
 
+    /**
+     * this is the method that controls if the turn is ended or the current player can make others actions
+     * if the player ended his turn, the server will ask him if he wants to reload his unloaded weapons otherwise the turn will directly change
+     * @return a new turn or server proposals for other operations
+     */
     private ServerGameMessage checkTurnEnd()
     {
         List<CardWeapon> weaponsToReload;
@@ -619,11 +729,21 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         }
     }
 
+    /**
+     * manage the end turn request sent by the client
+     * @param endTurnRequest
+     * @return a new turn or ask the client if he want to reload
+     */
     @Override
     public ServerGameMessage handle(EndTurnRequest endTurnRequest) {
         return checkTurnEnd();
     }
 
+    /**
+     * during the final frenzy phase of the game, manage a reload request action before making other actions
+     * @param reloadWeaponAction
+     * @return a list of weapon that client can reload
+     */
     @Override
     public ServerGameMessage handle(ReloadWeaponAction reloadWeaponAction) {
         if(checkIfEnded())
@@ -680,6 +800,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         CardWeapon w = currPlayer.getWeapons().stream().filter(wp -> wp.getId() == clientMsg.getWeapon().getId()).findFirst().orElse(null);
         int count = 0;
         List<CardPower> tmp;
+        List<CardWeapon> toReload = currPlayer.hasToReload();
+        if(toReload != null)
+            for(CardWeapon cw : currPlayer.getWeapons())
+                if(!currPlayer.canReloadWeapon(cw))
+                    toReload.remove(cw);
         if( w == null)
             return new InvalidWeaponResponse();
         if( w.isLoaded())
@@ -692,10 +817,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                         tmp.remove(i);
                         count++;
                     }
-            if (count != clientMsg.getPowerups().size())
-                return new InvalidPowerUpResponse();
+            if (count != clientMsg.getPowerups().size()) {
+                clientHandler.sendMessage(new InvalidPowerUpResponse());
+                return new ReloadWeaponAsk(toReload);
+            }
         }
-        List<CardWeapon> toReload = currPlayer.hasToReload();
         try{
             w.reloadWeapon(clientMsg.getPowerups());
             state = ServerState.WAITING_RELOAD;
@@ -719,6 +845,14 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         }
     }
 
+    /**
+     * manage the player respawn and control what will have to be the next role of the player once he will respawn
+     * he could be the next turn player or he should only wait his turn
+     * @param clientMsg
+     * @return ChooseTurnActionRequest if the player has spawn for the first time
+     *         OperationCompletedResponse if he has to wait his turn
+     *         newTurn() if he was dead and then respawn
+     */
     @Override
     public ServerGameMessage handle(RespawnResponse clientMsg) {
         if(checkIfEnded())
@@ -766,7 +900,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
     }
 
     /**
-     * Start the new turn, eventualy with final frenzy
+     * Start the new turn, eventually with final frenzy
      * When the last turn is terminated it ends the game
      */
     private void newTurn() {
@@ -854,6 +988,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         }
     }
 
+    /**
+     * control if a weapon can be use to shoot simulating the research of the target for the first effect the weapon make available
+     * @param cw
+     * @return true if the weapon has at least one possible target to shoot for one of his first effect, false otherwise
+     */
     private boolean simulateApplication(CardWeapon cw) {
         if(!cw.getBaseEffect().getSimpleEffects().get(0).searchTarget(currPlayer).isEmpty())
             return true;
@@ -940,6 +1079,12 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
     }
 
+    /**
+     * manage the request for create a new waiting room after the login phase
+     * create it and notify the client
+     * @param createWaitingRoomRequest
+     * @return CreateWaitingRoomResponse
+     */
     @Override
     public ServerGameMessage handle(CreateWaitingRoomRequest createWaitingRoomRequest) {
         WaitingRoom w = gameManager.addWaitingRoom(createWaitingRoomRequest.getMapId());
@@ -947,6 +1092,12 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return new CreateWaitingRoomResponse(n);
     }
 
+    /**
+     * control if the player has correctly terminate his action or he has to complete it
+     * @param endActionRequest
+     * @return checkTurnEnd if the action has been completed
+     *         ChooseSingleActionRequest if the action has to be completed
+     */
     @Override
     public ServerGameMessage handle(EndActionRequest endActionRequest) {
         if(checkIfEnded())
@@ -964,11 +1115,23 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return new ChooseSingleActionRequest(availableActionSteps);
     }
 
+    /**
+     * return the available map to choose from to create a new game
+     * @param getAvailableMapsRequest
+     * @return AvailableMapsListResponse
+     */
     @Override
     public ServerGameMessage handle(GetAvailableMapsRequest getAvailableMapsRequest) {
         return new AvailableMapsListResponse(GameManager.get().getAvailableMaps());
     }
 
+    /**
+     * permit to use the effect of a power-up card with the same procedure of weapons effects
+     * control that the client correctly pay to do this operation
+     * @param choosePowerUpResponse
+     * @return effect handle if the power-up card has been correctly selected
+     *         InvalidPowerUpResponse otherwise
+     */
     @Override
     public ServerGameMessage handle(ChoosePowerUpResponse choosePowerUpResponse) {
         if(checkIfEnded())
@@ -1018,6 +1181,12 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return terminateFullEffect();
     }
 
+    /**
+     * receive a login message and verify if the client has been suspended before (reconnection) or this is his first login message
+     * the client will complete his connection to the server and he will be able to play
+     * @param loginMessage
+     * @return
+     */
     @Override
     public ServerGameMessage handle(LoginMessage loginMessage) {
         if(!loginMessage.isReconnecting() && gameManager.getUsersLogged().contains(loginMessage.getNickname()))
@@ -1130,6 +1299,12 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return firstEffect();
     }
 
+    /**
+     * manage the choice of the first effect to apply with the weapon selected to shoot
+     * the client could probably choose between a base effect and an alternative effect
+     * @return handle base effect if there is't an available alternative effect for this weapon
+     *         ChooseFirstEffect if the client has to make a choice between the two possible effect
+     */
     private ServerGameMessage firstEffect(){
         FullEffect baseEff = selectedWeapon.getBaseEffect();
         FullEffect altEff = null;
@@ -1147,6 +1322,14 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         //return managePlusEffectChoice();
     }
 
+    /**
+     * manage the selection of the plus effects to use
+     * they could be proposed in order or not
+     * in case there aren't possible plus effects to choose the shoot action terminate
+     * @return  UsePlusByOrderRequest if the plus effects must be proposed in order
+     *          UsePlusEffectRequest if they can be proposed by a simply list
+     *          checkShootActionEnd if there aren't possible plus effects to use
+     */
     private ServerGameMessage managePlusEffectChoice() {
         List<FullEffect> tmp = new ArrayList<>(remainingPlusEffects);
         if (selectedWeapon.getPlusEffects() != null){
@@ -1172,6 +1355,12 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             return terminateFullEffect();
     }
 
+    /**
+     * set the first effect to use during the shoot action and start his handle
+     * if the effect to apply is an alternative effect it will be even managed its payment
+     * @param chooseFirstEffectResponse
+     * @return the handle of the selected first effect
+     */
     @Override
     public ServerGameMessage handle(ChooseFirstEffectResponse chooseFirstEffectResponse) {
         if(checkIfEnded())
@@ -1196,6 +1385,13 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return currSimpleEffect.handle(this);
     }
 
+    /**
+     * receive the client decision about using the plus effect before the base effect
+     * in case of positive reply it will be managed the payment of the effect using ammos and/or power-up cards
+     * @param usePlusBeforeResponse
+     * @return handle of the plus effect if the client decided to use it
+     *         firstEffect choice if the client don't want to use it
+     */
     @Override
     public ServerGameMessage handle(UsePlusBeforeResponse usePlusBeforeResponse) {
         if(checkIfEnded())
@@ -1221,6 +1417,14 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return firstEffect();
     }
 
+    /**
+     * add the ammos and the power-up cards used to pay in the corresponding list of the server controller
+     * they will be definitely paid at the end of the shoot action
+     * @param price
+     * @param toUse
+     * @throws InsufficientAmmoException
+     * if the ammos and the power-up cards selected from the client aren't enough to pay the effect
+     */
     private void addFinalPayment(List<Color> price, List<CardPower> toUse) throws InsufficientAmmoException {
         if(price != null) {
             if (ammoToPay == null)
@@ -1242,6 +1446,13 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                     currPlayer.pay(currFullEffect.getPrice(),toUse);
     }
 
+    /**
+     * receive the response about using the next plus effect expect by the established order
+     * if the response is positive the effect will be applied and remove from the list of remaining plus effects
+     * @param useOrderPlusResponse
+     * @return effect handle if the client decided to use the plus effect
+     *         terminate shoot action otherwise
+     */
     @Override
     public ServerGameMessage handle(UseOrderPlusResponse useOrderPlusResponse){
         if(checkIfEnded())
@@ -1274,6 +1485,13 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
 
     }
 
+    /**
+     * manage an entire full effect and the interconnection between the simple effects that composed it
+     * control when the effect is finished and if the shoot action has to be terminated
+     * if the effect used dealt damages and the player has at least a Targeting scope power-up card he will be asked about using one of them to apply an additional damage to one of the previous targets
+     * @return AfterDamagePowerUpRequest if the client can use a power-up card to apply an additional damage
+     *         checkShootActionEnd if the effect is terminated and it is necessary control if the shoot action has to be terminated
+     */
     private ServerGameMessage terminateFullEffect() {
         if(currFullEffect != null && nSimpleEffect < currFullEffect.getSimpleEffects().size())
             return currFullEffect.getSimpleEffects().get(nSimpleEffect).handle(this);
@@ -1299,6 +1517,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return checkShootActionEnd();
     }
 
+    /**
+     * manage the client decision about using a plus effect
+     * @param usePlusEffectResponse
+     * @return handle effect selected from the client
+     */
     @Override
     public ServerGameMessage handle(UsePlusEffectResponse usePlusEffectResponse) {
         if(checkIfEnded())
@@ -1319,6 +1542,11 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         return currSimpleEffect.handle(this);
     }
 
+    /**
+     * terminate the shoot action
+     * @param terminateShootAction
+     * @return
+     */
     @Override
     public ServerGameMessage handle(TerminateShootAction terminateShootAction) {
         if(checkIfEnded())
@@ -1445,6 +1673,9 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         clientHandler.sendMessage(new RespawnRequest(cp));
     }
 
+    /**
+     * When a new turn start, ask a player to spawn if necessary or to choose the action he want to make in this turn
+     */
     @Override
     public void onTurnStart() {
         if(state != ServerState.WAITING_SPAWN)
@@ -1489,6 +1720,10 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         clientHandler.sendMessage(new NotifyPoints(this.currPlayer.getPoints()));
     }
 
+    /**
+     * Send a message that notify the player that another client quit the waiting room
+     * @param pId
+     */
     void notifyPlayerExitedFromWaitingRoom(int pId){
         clientHandler.sendMessage(new NotifyPlayerExitedWaitingRoom(pId));
     }
@@ -1502,57 +1737,115 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             GameManager.get().removeWaitingRoom(waitingRoom);
     }
 
+    /**
+     * Notify the player that another client joined the waiting room
+     * @param p
+     */
     void notifyPlayerJoinedWaitingRoom(Player p)
     {
         clientHandler.sendMessage(new NotifyPlayerJoinedWaitingRoom(p));
     }
 
-
+    /**
+     * handle movement effect
+     * @param e
+     * @return
+     */
     @Override
     public ServerGameMessage handle(MovementEffect e) {
         return handleMovementEffect(e);
     }
 
+    /**
+     * handle plain damage effect
+     * @param e
+     * @return
+     */
     @Override
     public ServerGameMessage handle(PlainDamageEffect e) {
         return handleOtherEffect(e);
     }
 
+    /**
+     * handle square damage effect
+     * @param e
+     * @return
+     */
     @Override
     public ServerGameMessage handle(SquareDamageEffect e) {
         return handleOtherEffect(e);
     }
 
+    /**
+     * handle room damage effect
+     * @param e
+     * @return
+     */
     @Override
     public ServerGameMessage handle(RoomDamageEffect e) {
         return handleOtherEffect(e);
     }
 
+    /**
+     * handle area damage effect
+     * @param e
+     * @return
+     */
     @Override
     public ServerGameMessage handle(AreaDamageEffect e) {
         return handleOtherEffect(e);
     }
 
+    /**
+     * handle target selection for movement effect
+     * @param movementEffect
+     * @param targetList
+     * @return
+     */
     @Override
     public ServerGameMessage handleTarget(MovementEffect movementEffect, List<Target> targetList) {
         return handleTargetSelectionMovement(targetList);
     }
 
+    /**
+     * handle target selection for plain damage effect
+     * @param plainDamageEffect
+     * @param targetList
+     * @return
+     */
     @Override
     public ServerGameMessage handleTarget(PlainDamageEffect plainDamageEffect, List<Target> targetList) {
         return handleTargetSelection(targetList);
     }
 
+    /**
+     * handle target selection for area damage effect
+     * @param areaDamageEffect
+     * @param targetList
+     * @return
+     */
     @Override
     public ServerGameMessage handleTarget(AreaDamageEffect areaDamageEffect, List<Target> targetList) {
         return handleTargetSelection(targetList);
     }
 
+    /**
+     * handle target selection for square damage effect
+     * @param squareDamageEffect
+     * @param targetList
+     * @return
+     */
     @Override
     public ServerGameMessage handleTarget(SquareDamageEffect squareDamageEffect, List<Target> targetList) {
         return handleTargetSelection(targetList);
     }
 
+    /**
+     * handle target selection for room damage effect
+     * @param roomDamageEffect
+     * @param targetList
+     * @return
+     */
     @Override
     public ServerGameMessage handleTarget(RoomDamageEffect roomDamageEffect, List<Target> targetList) {
         return handleTargetSelection(targetList);

@@ -9,16 +9,31 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-
+/**
+ * class that represents a simple effect that plain damage to an established number of targets
+ */
 public class PlainDamageEffect extends SimpleEffect {
-    private int damage;
-    private int marks;
-    private boolean lastTarget; //if the target has to be among the previous targets hit by the weapon
-    private DifferentTarget differentTarget; //the target could be different from the last one or from all the previous
-    private boolean chainTarget; //if the target should be found from the target of the last effects (eg: T.H.O.R.)
-    private boolean sameDirection; //if the target has to be on the same last direction of the last one
+    private int damage; /** attribute that contains the damages to apply to the targets */
+    private int marks; /** attribute that contains the marks to apply to the targets */
+    private boolean lastTarget; /** if the target has to be among the previous targets hit by the weapon */
+    private DifferentTarget differentTarget; /** the target could be different from the last one or from all the previous */
+    private boolean chainTarget; /** if the target should be found from the target of the last effects (eg: T.H.O.R.) */
+    private boolean sameDirection; /** if the target has to be on the same last direction of the last one */
 
-
+    /**
+     * construct a complete plain damage effect object with the correct parameters
+     * @param minEnemy
+     * @param maxEnemy
+     * @param minDist
+     * @param maxDist
+     * @param visibility
+     * @param damage
+     * @param marks
+     * @param lastTarget
+     * @param differentTarget
+     * @param chainTarget
+     * @param sameDirection
+     */
     public PlainDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, boolean lastTarget, DifferentTarget differentTarget, boolean chainTarget, boolean sameDirection) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.damage = damage;
@@ -29,48 +44,96 @@ public class PlainDamageEffect extends SimpleEffect {
         this.sameDirection = sameDirection;
     }
 
+    /**
+     * return damage attribute
+     * @return damage
+     */
     public int getDamage() {return damage; }
 
+    /**
+     * set damage attribute value
+     * @param damage
+     */
     public void setDamage(int damage) {
         this.damage = damage;
     }
 
+    /**
+     * return marks attribute value
+     * @return marks
+     */
     public int getMarks() {
         return marks;
     }
 
+    /**
+     * set marks attribute value
+     * @param marks
+     */
     public void setMarks(int marks) {
         this.marks = marks;
     }
 
+    /**
+     * return lastTarget attribute
+     * @return lastTarget
+     */
     public boolean isLastTarget() {
         return lastTarget;
     }
 
+    /**
+     * set lastTarget attribute
+     * @param lastTarget
+     */
     public void setLastTarget(boolean lastTarget) {
         this.lastTarget = lastTarget;
     }
 
+    /**
+     * return differentTarget attribute
+     * @return differentTarget
+     */
     public DifferentTarget getDifferentTarget() {
         return differentTarget;
     }
 
+    /**
+     * set differentTarget attribute
+     * @param differentTarget
+     */
     public void setDifferentTarget(DifferentTarget differentTarget) {
         this.differentTarget = differentTarget;
     }
 
+    /**
+     * return chainTarget attribute
+     * @return chainTarget
+     */
     public boolean isChainTarget() {
         return chainTarget;
     }
 
+    /**
+     * set chainTarget attribute
+     * @param chainTarget
+     */
     public void setChainTarget(boolean chainTarget) {
         this.chainTarget = chainTarget;
     }
 
+    /**
+     * return sameDirection attribute
+     * @return sameDirection
+     */
     public boolean isSameDirection() {
         return sameDirection;
     }
 
+    /**
+     * set sameDirection attribute
+     * @param sameDirection
+     */
     public void setSameDirection(boolean sameDirection) {
         this.sameDirection = sameDirection;
     }
@@ -167,11 +230,22 @@ public class PlainDamageEffect extends SimpleEffect {
         shooter.getActualWeapon().setLastDirection(GameMap.getDirection(shooter.getPosition(),shooter.getActualWeapon().getLastTarget().getPosition()));
     }
 
+    /**
+     * answer that this isn't a movement effect
+     * @param effect
+     * @param p
+     * @return
+     */
     @Override
     public boolean checkEffect(MovementEffect effect, Player p) {
         return false;
     }
 
+    /**
+     * verify if two effects are equals
+     * @param o
+     * @return true/false
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -185,11 +259,21 @@ public class PlainDamageEffect extends SimpleEffect {
                 differentTarget == that.differentTarget;
     }
 
+    /**
+     * used by the equals method
+     * @return
+     */
     @Override
     public int hashCode() {
         return Objects.hash(damage, marks, lastTarget, differentTarget, chainTarget, sameDirection);
     }
 
+    /**
+     * check if the effect can be used
+     * @param effect
+     * @param p
+     * @return
+     */
     @Override
     public boolean checkEffect(SimpleEffect effect, Player p) {
         if(searchTarget(p) == null)
@@ -197,11 +281,23 @@ public class PlainDamageEffect extends SimpleEffect {
         return true;
     }
 
+    /**
+     * handle plain damange effect
+     * @param h
+     * @return
+     */
     @Override
     public ServerGameMessage handle(EffectHandler h) {
         return h.handle(this);
     }
 
+    /**
+     * handle plain damage effect after target selection
+     * @param h
+     * @param targetList
+     * @param model
+     * @return
+     */
     @Override
     public ServerGameMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
         List<Target> toApplyEffect = new ArrayList<>();

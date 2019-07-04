@@ -1,5 +1,8 @@
 package game.model;
 
+/**
+ * enum class representing the different map color identifying the different rooms
+ */
 public enum MapColor {
     RED,
     BLUE,
@@ -8,6 +11,10 @@ public enum MapColor {
     GREY,
     GREEN;
 
+    /**
+     * convert the enum values in the corresponding string identification
+     * @return
+     */
     @Override
     public String toString() {
         switch(this) {

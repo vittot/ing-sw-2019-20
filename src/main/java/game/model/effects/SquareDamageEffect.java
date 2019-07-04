@@ -9,12 +9,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * class that represents a simple effect that plain damage to aall the players in a specific square of a map
+ */
 public class SquareDamageEffect extends SimpleEffect {
-    private int damage;
-    private int marks;
-    private boolean lastTargetSquare; //if true indicate to search target from the last target position
-    private boolean sameDirection;
+    private int damage; /** attribute that contains the damages to apply to the targets */
+    private int marks; /** attribute that contains the marks to apply to the targets */
+    private boolean lastTargetSquare; /** if true indicate to search target from the last target position */
+    private boolean sameDirection; /** true if the next target has to be select in the same direction of the previous */
 
+    /**
+     * construct a complete square damage effect with correct parameters
+     * @param minEnemy
+     * @param maxEnemy
+     * @param minDist
+     * @param maxDist
+     * @param visibility
+     * @param damage
+     * @param marks
+     * @param lastTargetSquare
+     * @param sameDirection
+     */
     public SquareDamageEffect(int minEnemy, int maxEnemy, int minDist, int maxDist, TargetVisibility visibility, int damage, int marks, boolean lastTargetSquare, boolean sameDirection) {
         super(minEnemy, maxEnemy, minDist, maxDist, visibility);
         this.damage = damage;
@@ -23,34 +38,66 @@ public class SquareDamageEffect extends SimpleEffect {
         this.sameDirection = sameDirection;
     }
 
+    /**
+     * return damage attribute
+     * @return damage
+     */
     public int getDamage() {
         return damage;
     }
 
+    /**
+     * set damage attribute value
+     * @param damage
+     */
     public void setDamage(int damage) {
         this.damage = damage;
     }
 
+    /**
+     * return marks attribute
+     * @return marks
+     */
     public int getMarks() {
         return marks;
     }
 
+    /**
+     * set marks attribute value
+     * @param marks
+     */
     public void setMarks(int marks) {
         this.marks = marks;
     }
 
+    /**
+     * return lastTargetSquare attribute
+     * @return lastTargetSquare
+     */
     public boolean isLastTargetSquare() {
         return lastTargetSquare;
     }
 
+    /**
+     * set lastTargetSquare attribute
+     * @param lastTargetSquare
+     */
     public void setLastTargetSquare(boolean lastTargetSquare) {
         this.lastTargetSquare = lastTargetSquare;
     }
 
+    /**
+     * return sameDirection attribute
+     * @return sameDirection
+     */
     public boolean isSameDirection() {
         return sameDirection;
     }
 
+    /**
+     * set sameDirection attribute
+     * @param sameDirection
+     */
     public void setSameDirection(boolean sameDirection) {
         this.sameDirection = sameDirection;
     }
@@ -137,21 +184,45 @@ public class SquareDamageEffect extends SimpleEffect {
         }
     }
 
+    /**
+     *
+     * @param effect
+     * @param p
+     * @return
+     */
     @Override
     public boolean checkEffect(MovementEffect effect, Player p) {
         return false;
     }
 
+    /**
+     * control if the effect can be apply, if it has possible target to shoot
+     * @param effect
+     * @param p
+     * @return
+     */
     @Override
     public boolean checkEffect(SimpleEffect effect, Player p) {
         return searchTarget(p)==null;
     }
 
+    /**
+     * handle square damage effect execution in collaboration with the server controller
+     * @param h
+     * @return
+     */
     @Override
     public ServerGameMessage handle(EffectHandler h) {
         return h.handle(this);
     }
 
+    /**
+     * handle square damage effect execution after the target selection in collaboration with the server controller
+     * @param h
+     * @param targetList
+     * @param model
+     * @return
+     */
     @Override
     public ServerGameMessage handleTargetSelection(EffectHandler h, List<Target> targetList, Game model) {
         List<Target> toApplyEffect = new ArrayList<>();
@@ -162,6 +233,11 @@ public class SquareDamageEffect extends SimpleEffect {
         return h.handleTarget(this, toApplyEffect);
     }
 
+    /**
+     * verify if two effects are equals
+     * @param o
+     * @return true/false
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -173,6 +249,10 @@ public class SquareDamageEffect extends SimpleEffect {
                 sameDirection == that.sameDirection;
     }
 
+    /**
+     * used by equals method
+     * @return
+     */
     @Override
     public int hashCode() {
         return Objects.hash(damage, marks, lastTargetSquare, sameDirection);

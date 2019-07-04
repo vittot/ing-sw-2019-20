@@ -7,24 +7,45 @@ import game.model.Player;
 
 import java.util.SortedMap;
 
+/**
+ * notify the end of the game
+ */
 public class NotifyEndGame implements ServerGameMessage {
-    private SortedMap<Player,Integer> ranking;
 
+    private SortedMap<Player,Integer> ranking; /** sorted map containing the players in order of occurred points */
+
+    /**
+     * construct correct message
+     * @param gameRanking
+     */
     public NotifyEndGame(SortedMap<Player,Integer> gameRanking) {
         this.ranking = gameRanking;
     }
 
-
+    /**
+     * Handle the message
+     * @param handler who handle the messag
+     * @param handler
+     */
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * Handle the message
+     * @param handler who handle the messag
+     * @param handler
+     */
     @Override
     public void handle(ServerMessageHandler handler) {
         handler.handle(this);
     }
 
+    /**
+     * return final game ranking
+     * @return ranking
+     */
     public SortedMap<Player,Integer> getRanking() {
         return ranking;
     }

@@ -20,9 +20,9 @@ public class Turn {
     private Game game; /** field that reference the game */
     private Timer timer; /** field that reference the timer object that allow the disconnection of the current player cause of a long time inactivity */
     private boolean afterFirstPlayer = false; /** field that recognize if the current player is playing after or before the player that starts the game */
-    private List <Player> lastTurnPlayed;
-    private int nPlayedFinalFrenzy;
-    private boolean finalFrenzy;
+    private List <Player> lastTurnPlayed; /** list of reference to player that played the last turns */
+    private int nPlayedFinalFrenzy; /** count of many players played their final frenzy turn */
+    private boolean finalFrenzy; /** field that specifies if it is a final frenzy turn */
 
     /**
      * construct a turn of a specific game
@@ -108,10 +108,18 @@ public class Turn {
         this.numOfActions = numOfActions;
     }
 
+    /**
+     * set numOfMovs attribute
+     * @param numOfMovs
+     */
     public void setNumOfMovs(int numOfMovs) {
         this.numOfMovs = numOfMovs;
     }
 
+    /**
+     * set currentAction attribute
+     * @param currentAction
+     */
     public void setCurrentAction(Action currentAction) {
         this.currentAction = currentAction;
     }
