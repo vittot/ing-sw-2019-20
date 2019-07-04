@@ -253,6 +253,9 @@ public class ClientController implements ServerGameMessageHandler {
      */
     @Override
     public void handle(NotifyDeathResponse serverMsg) {
+        Player killer = ClientContext.get().getMap().getPlayerById(serverMsg.getIdKiller());
+        Player victim = ClientContext.get().getMap().getPlayerById(serverMsg.getIdVictim());
+        ClientContext.get().getKillboard().add(new Kill(killer,victim,serverMsg.isRage()));
         clientView.notifyDeath(serverMsg.getIdKiller(),serverMsg.getIdVictim(),serverMsg.isRage());
         return;
 
@@ -426,15 +429,17 @@ public class ClientController implements ServerGameMessageHandler {
      */
     @Override
     public void handle(NotifyGameStarted serverMsg) {
-
+        Kill kill = new Kill(ClientContext.get().getPlayersInWaiting().get(0),ClientContext.get().getPlayersInWaiting().get(1),false);
         this.gameStarted = true;
         this.state = ClientState.WAITING_SPAWN;
         ClientContext.get().setMap(serverMsg.getMap());
 
-        if(serverMsg.getId() != 0)
+        if(serverMsg.getId() != 0) {
             ClientContext.get().setMyID(serverMsg.getId());
+        }
         ClientContext.get().setPlayersInWaiting(serverMsg.getPlayers());
         ClientContext.get().setKillboard(serverMsg.getKillBoard());
+        ClientContext.get().getKillboard().add(kill);
         /*if(ClientContext.get().getMyPlayer().getCardPower() == null)
         {
             System.out.println("NON HO LE MIE CARD POWER =( !");
@@ -853,6 +858,8 @@ public class ClientController implements ServerGameMessageHandler {
         for(Player p : ClientContext.get().getMap().getAllPlayers()){
             if(!p.getDamage().isEmpty() || !p.getMark().isEmpty())
                 p.setBeforeFrenzy(true);
+            else
+                p.setBeforeFrenzy(false);
         }
         ClientContext.get().setFinalFrenzy();
         clientView.notifyFinalFrenzy();

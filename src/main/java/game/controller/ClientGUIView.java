@@ -467,6 +467,7 @@ public class ClientGUIView extends Application implements View{
     public void notifyStart() {
         loginBack.setVolume(0.2);
         showMapGame();
+        refreshDeaths();
     }
 
     /**
@@ -846,18 +847,50 @@ public class ClientGUIView extends Application implements View{
     }
 
     /**
-     * Ask the plywer with wich power up he want to respawn
+     * Ask the player with which power up he want to respawn
      * @param cardPower list of possible power up to waste
      */
     @Override
     public void choosePowerUpToRespawn(List<CardPower> cardPower) {
         textNotify.setText("Your turn: respawn\n" + textNotify.getText());
         refreshMyPlayerCard();
-        if(cardPower.size() > 3){
-            StackPane sp = new StackPane();
-            Scene tempS = new Scene(sp);
-            sg.setAlwaysOnTop(true);
+        if(cardPower.size() > 3){StackPane sp = new StackPane();
+            Scene tempScene = new Scene(sp);
+            ToggleGroup tg = new ToggleGroup();
+            CardPower choosenPW;
+            Label tex = new Label("Choose which power up you wanna wast to respawn!");
+            Image background = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/background.jpg"));
+            BackgroundImage bi = new BackgroundImage(background,
+                    BackgroundRepeat.REPEAT,
+                    BackgroundRepeat.REPEAT,
+                    BackgroundPosition.DEFAULT,
+                    BackgroundSize.DEFAULT);
+            sp.getChildren().add(tex);
+            int j = 0;
+            StackPane.setMargin(tex,new Insets(20, 0,0,0));
+            tex.setFont(Font.font(25));
+            tex.setTextFill(Color.WHITE);
+            sp.setBackground(new Background(bi));
+            StackPane.setAlignment(tex,Pos.TOP_CENTER);
+            sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
+            /*for(CardPower cp : cardPower){
+                CheckBox cb = new CheckBox(cp.getName());
+                StackPane.setAlignment(cb,Pos.TOP_LEFT);
+                StackPane.setMargin(cb,new Insets(100 + j , 0,0,40));
+                sp.getChildren().add(cb);
+                cb.setFont(Font.font(25));
+                cb.setId(""+cp.getId());
+                powerUp.add(cb);
+                cb.setTextFill(Color.WHITE);
+                j = j + 35;
+            }
+            */
+            Button submit = new Button("Submit");
+            sp.getChildren().add(submit);
+            StackPane.setAlignment(submit, Pos.BOTTOM_RIGHT);
+            sg.setScene(tempScene);
             primaryStage.setAlwaysOnTop(false);
+            sg.setAlwaysOnTop(true);
             sg.show();
         }
         else{
@@ -1217,8 +1250,14 @@ public class ClientGUIView extends Application implements View{
             Label text = new Label("No waiting room available");
             text.setTextFill(Color.WHITE);
             Button bt1 = new Button("Create new Waiting room");
-            chooseRoom.getChildren().addAll(text, bt1);
+            Button bt2 = new Button("Refresh!");
+            chooseRoom.getChildren().addAll(text, bt1, bt2);
             bt1.setOnAction(this::handleNewRoom);
+            bt2.setOnMouseClicked(mouseEvent -> controller.getClientNetwork().sendMessage(new GetWaitingRoomsRequest()));
+
+            StackPane.setAlignment(bt1, Pos.BOTTOM_RIGHT);
+
+            StackPane.setAlignment(bt2, Pos.BOTTOM_LEFT);
         } else {
             VBox infoRoom = new VBox();
             ToggleGroup tg = new ToggleGroup();
@@ -2011,6 +2050,11 @@ public class ClientGUIView extends Application implements View{
             spaceR = spaceR - screenHeight*22.4/100;
             //weapon.setEffect(new DropShadow(20,Color.GREEN));
         }
+        Button zoom = new Button("Full screen");
+        zoom.setOnMouseClicked(mouseEvent -> primaryStage.setFullScreen(true));
+        map.getChildren().add(zoom);
+        StackPane.setAlignment(zoom,Pos.TOP_CENTER);
+        StackPane.setMargin(zoom, new Insets(0,0,0,screenWidth * 12 / 100));
     }
 
     /**
@@ -2026,6 +2070,8 @@ public class ClientGUIView extends Application implements View{
         for(Kill k : ClientContext.get().getKillboard()){
             Image kill = new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+k.getKiller().getColor().toString()+"Tear.png"));
             ImageView kills = new ImageView(kill);
+            if(k.isRage())
+                kills.setEffect(new DropShadow(15,Color.ORANGE));
             kills.setFitHeight(screenHeight * 3 /100);
             kills.setPreserveRatio(true);
             deathsBoard.add(kills);
