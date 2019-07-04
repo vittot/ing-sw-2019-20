@@ -57,7 +57,7 @@ public interface View {
 
     void choosePowerUpToUse(List<CardPower> cardPower);
 
-    void notifyGrabAmmo(List<javafx.scene.paint.Color> ammos, CardPower cp);
+    void notifyGrabAmmo(List<Color> ammos, List <CardPower> cp);
 
     void notifyInvalidMessage();
 
@@ -133,5 +133,4 @@ public interface View {
 
     void completedShootAction();
 
-    void notifyGrabAmmo(List<Color> colors, List<CardPower> powerups);
 }
