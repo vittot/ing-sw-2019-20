@@ -811,24 +811,25 @@ public class Player implements Target, Serializable, Comparable<Player> {
         for(Color c: ammos)
         {
             if(c == Color.BLUE) {
-                if(nBlue > 3)
+                if(nBlue >= 3)
                     toRemove.add(c);
                 nBlue++;
             }
             else if(c == Color.RED)
             {
-                if(nRed > 3)
+                if(nRed >= 3)
                     toRemove.add(c);
                 nRed++;
             }
             else if(c == Color.YELLOW)
             {
-                if(nYellow > 3)
+                if(nYellow >= 3)
                     toRemove.add(c);
                 nYellow++;
             }
         }
-        ammos.removeAll(toRemove);
+        for(Color c : toRemove)
+            ammos.remove(c);
         return ammos;
     }
 
