@@ -7,10 +7,12 @@ import game.controller.commands.clientcommands.GrabActionRequest;
 import game.controller.commands.clientcommands.LoginMessage;
 import game.controller.commands.clientcommands.RejoinGameResponse;
 import game.controller.commands.servercommands.*;
+import game.controller.network.ClientNetwork;
 import game.model.*;
 import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 import game.model.exceptions.NoCardWeaponSpaceException;
+import game.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,7 +65,7 @@ public class ClientController implements ServerGameMessageHandler {
      * Return the ClientController state
      * @return the actual ClientState
      */
-    ClientState getState() {
+    public ClientState getState() {
         return state;
     }
 
@@ -71,7 +73,7 @@ public class ClientController implements ServerGameMessageHandler {
      * Set the ClientController state
      * @param state The new ClientState
      */
-    void setState(ClientState state) {
+    public void setState(ClientState state) {
         this.state = state;
     }
 
@@ -79,7 +81,7 @@ public class ClientController implements ServerGameMessageHandler {
      * Return a list of the available Actions in the current phase
      * @return the list of the available actions
      */
-    List<Action> getAvailableActions() {
+    public List<Action> getAvailableActions() {
         return availableActions;
     }
 
@@ -886,7 +888,7 @@ public class ClientController implements ServerGameMessageHandler {
     /**
      * Return to grab weapon state, resending the grab request
      */
-    void resumeGrabState(){
+    public void resumeGrabState(){
         switch(state){
             case WAITING_GRAB_WEAPON:
                 clientNetwork.sendMessage(new GrabActionRequest());
@@ -897,21 +899,21 @@ public class ClientController implements ServerGameMessageHandler {
      * Return if the game is started
      * @return true if it is started, false otherwise
      */
-    boolean isGameStarted() {
+    public boolean isGameStarted() {
         return gameStarted;
     }
 
     /**
      * Stop listening before closing the application
      */
-    void stopListening() {
+    public void stopListening() {
         clientNetwork.close();
     }
 
     /**
      * Called by the network layer in case of connection error
      */
-    void manageConnectionError() {
+    public void manageConnectionError() {
         clientNetwork.stopWaitingPing();
         clientView.notifyConnectionError();
     }
@@ -919,7 +921,7 @@ public class ClientController implements ServerGameMessageHandler {
     /**
      * Reconnect with the server after a connection error
      */
-    void retryConnection() {
+    public void retryConnection() {
         if(!clientNetwork.init())
             clientView.notifyConnectionError();
         else{
@@ -932,7 +934,7 @@ public class ClientController implements ServerGameMessageHandler {
     /**
      * Start a new game
      */
-    void startNewGame() {
+    public void startNewGame() {
         state  = ClientState.WAITING_START;
         clientNetwork.sendMessage(new GetAvailableMapsRequest());
     }

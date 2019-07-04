@@ -1,6 +1,10 @@
-package game.controller;
+package game.view;
 
 import game.LaunchClient;
+import game.controller.ClientContext;
+import game.controller.ClientController;
+import game.controller.ClientState;
+import game.controller.WaitingRoom;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;

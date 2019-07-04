@@ -1,8 +1,11 @@
-package game.controller;
+package game.view;
 
 
 import game.LaunchClient;
-import game.controller.commands.ClientGameMessage;
+import game.controller.ClientContext;
+import game.controller.ClientController;
+import game.controller.ClientState;
+import game.controller.WaitingRoom;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
@@ -35,7 +38,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executors;

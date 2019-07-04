@@ -1,6 +1,7 @@
 package game.model;
 
 import game.controller.PlayerObserver;
+import game.controller.XMLParser;
 import game.model.effects.*;
 import game.model.exceptions.MapOutOfLimitException;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,7 +142,7 @@ class GameTest {
 
     @Test
     void checkMap() throws MapOutOfLimitException{
-        g.setMap(g.readMap(99, "mapFile.xml"));
+        g.setMap(XMLParser.readMap(99, "mapFile.xml"));
         GameMap map = new GameMap(99,4,3);
         Edge [] ed = new Edge[4];
         ed[0] = Edge.WALL;
@@ -155,7 +156,7 @@ class GameTest {
 
     @Test
     void readDeck() {
-        g.readDeck("effectFile.xml");
+        XMLParser.readDeck("effectFile.xml",this.g);
     }
 
     @Test
@@ -165,7 +166,7 @@ class GameTest {
         ammo.add(Color.RED);
         ammo.add(Color.BLUE);
         CardAmmo c = new CardAmmo(ammo,1);
-        g.readAmmoDeck("ammoFile.xml");
+        XMLParser.readAmmoDeck("ammoFile.xml",this.g);
         assertTrue(g.getDeckAmmo().size() == 36 && g.getDeckAmmo().get(35).equals(c));
     }
 
@@ -177,7 +178,7 @@ class GameTest {
         FullEffect eff = new FullEffect(Collections.singletonList(ef1),"Teleporter","Play this card in any moment of your turn, move your figure and set it down on any square.",price,false);
 
         CardPower cp = new CardPower(24,"name","desc",Color.YELLOW,false,false,eff);
-        g.readPowerUpDeck("powerupFile.xml");
+        XMLParser.readPowerUpDeck("powerupFile.xml",this.g);
 
         assertTrue(g.getDeckPower().size() == 24 && g.getDeckPower().get(23).equals(cp));
 

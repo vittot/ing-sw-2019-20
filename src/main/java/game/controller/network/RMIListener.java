@@ -1,4 +1,6 @@
-package game.controller;
+package game.controller.network;
+
+import game.controller.GameManager;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -11,7 +13,7 @@ public class RMIListener extends UnicastRemoteObject implements RemoteRMIListene
 
     private final transient GameManager gameManager;
 
-    RMIListener() throws RemoteException {
+    public RMIListener() throws RemoteException {
         super();
         rmiHandlers = new ArrayList<>();
         gameManager = GameManager.get();

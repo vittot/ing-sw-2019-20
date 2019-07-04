@@ -1,19 +1,16 @@
 package game.model;
 
 
-import game.controller.ClientTextView;
-import game.controller.GameManager;
+import game.controller.XMLParser;
 import game.model.exceptions.MapOutOfLimitException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 
 class GameMapTest {
@@ -188,7 +185,7 @@ class GameMapTest {
 
     @Test
     public void distanceBtwSquaresTest() throws MapOutOfLimitException {
-        this.map = Game.readMap(1,"mapFile.xml");
+        this.map = XMLParser.readMap(1,"mapFile.xml");
         //ClientTextView cv = new ClientTextView();
         //cv.showMap(map);
         //lo spawnpoint yellow è in posizione x=3, y=2 (contando da zero le coordinate)
