@@ -681,6 +681,17 @@ public class ClientTextView implements  View {
         writeText("The FINAL FRENZY is started!");
     }
 
+    @Override
+    public void notifyGrabAmmo(List<Color> colors, List<CardPower> powerups) {
+        System.out.println(">> Ammo grabbed: ");
+        for(Color c : colors){
+            System.out.println("  >> "+c.toString());
+        }
+        if(powerups != null && !powerups.isEmpty()){
+            System.out.println(">> You grab a "+ powerups.get(0).getName());
+        }
+    }
+
     /**
      * Choose one of the proposed squares
      * @param possibleSquare

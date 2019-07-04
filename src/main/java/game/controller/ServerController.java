@@ -295,8 +295,10 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
         else {
             CardWeapon cw = currPlayer.getActualWeapon();
             List<Player> prev = cw.getPreviousTargets();
-            prev.remove(toBeMoved);
-            prev.add(toBeMoved);
+            if(!toBeMoved.equals((currPlayer))) {
+                prev.remove(toBeMoved);
+                prev.add(toBeMoved);
+            }
             Square dest = toBeMoved.getPosition();
             currPlayer.getActualWeapon().setLastDirection(GameMap.getDirection(start,dest));
             return terminateFullEffect();
@@ -1670,8 +1672,10 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
             return terminateFullEffect();
         }
         List<Player> prevTargets = currPlayer.getActualWeapon().getPreviousTargets();
-        prevTargets.remove(toBeMoved);
-        prevTargets.add(toBeMoved);
+        if(!toBeMoved.equals(currPlayer)) {
+            prevTargets.remove(toBeMoved);
+            prevTargets.add(toBeMoved);
+        }
         Square dest = toBeMoved.getPosition();
         currPlayer.getActualWeapon().setLastDirection(GameMap.getDirection(start,dest));
         return terminateFullEffect();

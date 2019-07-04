@@ -128,4 +128,6 @@ public interface View {
     void showNoWeaponToReload();
 
     void notifyFinalFrenzy();
+
+    void notifyGrabAmmo(List<Color> colors, List<CardPower> powerups);
 }
