@@ -4,14 +4,25 @@ import game.controller.commands.ServerGameMessage;
 import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 
+/**
+ * notify update of points
+ */
 public class NotifyPoints implements ServerGameMessage {
 
-    private int points;
+    private int points; /** player total points */
 
+    /**
+     * construct correct message
+     * @param points
+     */
     public NotifyPoints(int points) {
         this.points = points;
     }
 
+    /**
+     * return points value
+     * @return points
+     */
     public int getPoints() {
         return points;
     }

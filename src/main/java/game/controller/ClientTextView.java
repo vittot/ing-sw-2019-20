@@ -900,17 +900,17 @@ public class ClientTextView implements  View {
 
     /**
      * Notify the player from a power up usage
-     * @param id
+     * @param nick
      * @param name
      * @param desc
      */
     @Override
-    public void powerUpUsageNotification(int id, String name, String desc){
+    public void powerUpUsageNotification(String nick, String name, String desc){
         int num = 0;
-        if(ClientContext.get().getMyID() == id)
+        if(ClientContext.get().getMyPlayer().getNickName().equals(nick))
             writeText(name +" used correctly");
         else {
-            writeText("Player " + id + " used power up: " + name + " press 1 for more info, anything else to exit");
+            writeText("Player " + nick + " used power up: " + name + " press 1 for more info, anything else to exit");
             num = readInt();
         }
         if(num == 1){

@@ -4,20 +4,37 @@ import game.controller.commands.ServerGameMessage;
 import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.CardPower;
+import game.model.Player;
 
+/**
+ * notify the correct usage of power-up card
+ */
 public class NotifyPowerUpUsage implements ServerGameMessage {
-    private int id;
-    private CardPower cp;
+    private Player p; /** reference to the player that used the power-up card effect */
+    private CardPower cp; /** power-up card used */
 
-    public NotifyPowerUpUsage(int id, CardPower cp) {
-        this.id = id;
+    /**
+     * construct the message
+     * @param p
+     * @param cp
+     */
+    public NotifyPowerUpUsage(Player p, CardPower cp) {
+        this.p = p;
         this.cp = cp;
     }
 
-    public int getId() {
-        return id;
+    /**
+     * return the player
+     * @return p
+     */
+    public Player getP() {
+        return p;
     }
 
+    /**
+     * return the power-up card
+     * @return cp
+     */
     public CardPower getCp() {
         return cp;
     }

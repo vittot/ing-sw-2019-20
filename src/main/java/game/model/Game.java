@@ -1202,7 +1202,7 @@ public class Game {
      * @param p
      * @param c
      */
-    void notifyPowerUpUse(Player p, CardPower c)
+    public void notifyPowerUpUse(Player p, CardPower c)
     {
         gameObservers.forEach(o -> o.onPowerUpUse(p,c));
     }

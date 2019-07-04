@@ -186,7 +186,7 @@ public abstract class ClientHandler implements GameListener {
 
     @Override
     public void onPowerUpUse(Player p, CardPower c) {
-        sendMessage(new NotifyPowerUpUsage(p.getId(),c));
+        sendMessage(new NotifyPowerUpUsage(p,c));
     }
 
     @Override

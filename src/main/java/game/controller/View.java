@@ -37,11 +37,11 @@ public interface View {
 
     void damageNotification(int shooterId, int damage, int hit);
 
+    void powerUpUsageNotification(String nick, String name, String desc);
+
     void notifyMovement(int pId, int newX, int newY);
 
     void grabWeaponNotification(int pID, String name, int x, int y);
-
-    void powerUpUsageNotification(int id, String name, String description);
 
     void choosePowerUpToRespawn(List<CardPower> cardPower);
 

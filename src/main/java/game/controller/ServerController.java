@@ -1189,6 +1189,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
                 }
             }
             clientHandler.sendMessage(new ChoosePowerUpUsed(cp));
+            model.notifyPowerUpUse(currPlayer, cp);
             avPowerUp.remove(cp);
             return currSimpleEffect.handle(this);
         }

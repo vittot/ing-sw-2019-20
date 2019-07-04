@@ -322,10 +322,10 @@ public class ClientController implements ServerGameMessageHandler {
     @Override
     public void handle(NotifyPowerUpUsage serverMsg) {
         ClientContext instance = ClientContext.get();
-        if(instance.getMyID() == serverMsg.getId()){
-            instance.getMap().getPlayerById(serverMsg.getId()).getCardPower().remove(serverMsg.getCp());
+        if(instance.getMyID() == serverMsg.getP().getId()){
+            instance.getMap().getPlayerById(serverMsg.getP().getId()).getCardPower().remove(serverMsg.getCp());
         }
-        clientView.powerUpUsageNotification(serverMsg.getId(),serverMsg.getCp().getEffect().getName(),serverMsg.getCp().getEffect().getDescription());
+        clientView.powerUpUsageNotification(serverMsg.getP().getNickName(),serverMsg.getCp().getEffect().getName(),serverMsg.getCp().getEffect().getDescription());
     }
 
     /**
