@@ -104,8 +104,8 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
-    public void powerUpUsageNotification(int id, String name, String description) {
-        runLater(()->gui.powerUpUsageNotification(id,name,description));
+    public void powerUpUsageNotification(String nick, String name, String description) {
+        runLater(()->gui.powerUpUsageNotification(nick,name,description));
     }
 
     @Override

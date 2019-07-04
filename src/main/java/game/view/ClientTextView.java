@@ -910,15 +910,10 @@ public class ClientTextView implements  View {
      */
     @Override
     public void powerUpUsageNotification(String nick, String name, String desc){
-        int num = 0;
         if(ClientContext.get().getMyPlayer().getNickName().equals(nick))
             writeText(name +" used correctly");
         else {
-            writeText("Player " + nick + " used power up: " + name + " press 1 for more info, anything else to exit");
-            num = readInt();
-        }
-        if(num == 1){
-            writeText("Power up: "+name+", "+desc);
+            writeText("Player " + nick + " used power up: " + name);
         }
     }
 
