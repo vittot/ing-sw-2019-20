@@ -202,7 +202,10 @@ public class Turn {
             this.numOfMovs++;
         if(this.actionList.contains(ac)){
             i = actionList.indexOf(ac);
-            setActionList(actionList.subList(i+1,actionList.size()));
+            if(i == actionList.size()-1)
+                actionList.clear();
+            else
+                setActionList(actionList.subList(i+1,actionList.size()));
             //startTimer();
             return true;
         }

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ClientTextViewTest {
     @BeforeEach
@@ -44,5 +46,21 @@ class ClientTextViewTest {
         map.getGrid()[0][2].addPlayer(p1);
         map.getGrid()[0][2].addPlayer(p2);
         //cli.showMap(map);
+    }
+
+    @Test
+    void killboardTest()
+    {
+        Player p1 = mock(Player.class);
+        when(p1.getColor()).thenReturn(PlayerColor.GREEN);
+        Player p2 = mock(Player.class);
+        when(p2.getColor()).thenReturn(PlayerColor.GREEN);
+        ClientContext.get().getKillboard().add(new Kill(p1,p2,true));
+        ClientContext.get().getKillboard().add(new Kill(p1,p2,false));
+        ClientContext.get().getKillboard().add(new Kill(p2,p1,true));
+        ClientContext.get().getKillboard().add(new Kill(p1,p2,false));
+        ClientTextView view = new ClientTextView();
+        view.showKillBoard();
+
     }
 }

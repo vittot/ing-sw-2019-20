@@ -1,7 +1,6 @@
 package game.controller;
 
 import game.LaunchClient;
-import game.controller.commands.ClientGameMessage;
 import game.controller.commands.clientcommands.*;
 import game.model.*;
 import game.model.effects.FullEffect;
@@ -361,6 +360,7 @@ public class ClientTextView implements  View {
         }
         else
             controller.getClientNetwork().sendMessage(new CounterAttackResponse());
+        controller.setState(ClientState.WAITING_TURN);
 
     }
 
@@ -765,6 +765,7 @@ public class ClientTextView implements  View {
             try {
                 if(action.equals("INFO")){
                     showMap(ClientContext.get().getMap());
+                    showKillBoard();
                     showMyPlayerInformation();
                     showPlayerPosition();
                     choosenAction = null;
@@ -831,12 +832,12 @@ public class ClientTextView implements  View {
     }
 
     /**
-     * Notify impossibility that the player doesn't have enough ammo
+     * Notify impossibility because the player doesn't have enough ammo
      */
     @Override
     public void insufficientAmmoNotification() {
         writeText("Not enough ammo");
-        controller.resumeState();
+        controller.resumeGrabState();
 
     }
 
@@ -1313,6 +1314,29 @@ public class ClientTextView implements  View {
             }
         //showMyPlayerInformation();
         //showPlayerPosition();
+    }
+
+    /**
+     * Show the killboard
+     */
+    public void showKillBoard()
+    {
+        System.out.println("Killboard: ");
+        for(Kill k : ClientContext.get().getKillboard())
+        {
+            if(k.isRage())
+                System.out.print(checkPlayerColor(k.getKiller().getColor()) + "® " + ANSI_RESET);
+            else
+                System.out.print(checkPlayerColor(k.getKiller().getColor()) + "■ " + ANSI_RESET);
+        }
+        System.out.println("");
+        /*for(Kill k : ClientContext.get().getKillboard())
+        {
+            if(k.isRage())
+                System.out.print(checkPlayerColor(k.getKiller().getColor()) + "® " + ANSI_RESET);
+            else
+                System.out.print(checkPlayerColor(k.getKiller().getColor()) + "  " + ANSI_RESET);
+        }*/
     }
 
 

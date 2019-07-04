@@ -10,22 +10,33 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.concurrent.*;
 
+/**
+ * RMI network layer on client side
+ */
 public class RMIClient extends ClientNetwork implements RemoteClient,ServerMessageHandler {
 
-    private transient IRMIClientHandler rmiClientHandler;
+    /** Reference to the Remote Client Handler*/
+    private RemoteRMIClientHandler rmiClientHandler;
+    /** IP Address of the server*/
     private String serverIP;
 
-    private Thread processer;
 
-
+    /**
+     * Build the RMI Client network with the given server IP
+     * @param serverIP server IP
+     * @throws RemoteException in case of error
+     */
     public RMIClient(String serverIP) throws RemoteException{
         super();
         this.serverIP = serverIP;
 
     }
 
+    /**
+     * Send a message to the server
+     * @param msg message
+     */
     @Override
     public void sendMessage(ClientMessage msg) {
         if(stop)
@@ -35,20 +46,31 @@ public class RMIClient extends ClientNetwork implements RemoteClient,ServerMessa
         }
         catch(RemoteException e)
         {
-            System.out.println("ECCEZIONE IN SEND MESSAGE"); //TODO: call retry connection method
-            e.printStackTrace();
+            /*System.out.println("ECCEZIONE IN SEND MESSAGE");
+            e.printStackTrace();*/
+            controller.manageConnectionError();
         }
     }
 
 
+    /**
+     * Receive a message from the server
+     * @param msg received message
+     * @throws RemoteException in case of error
+     */
     @Override
     public void receiveMessage(ServerMessage msg) throws RemoteException {
             msg.handle(this);
     }
 
+    /**
+     * Receive a ping message and send the pong answer
+     * @param msg ping message
+     * @throws RemoteException in case of error
+     */
     @Override
     public void receivePingMessage(PingMessage msg) throws RemoteException {
-        //System.out.println("PING FROM SERVER");
+
         try{
             nPingLost = 0;
             if(disconnectionExecutor != null)
@@ -57,11 +79,15 @@ public class RMIClient extends ClientNetwork implements RemoteClient,ServerMessa
             rmiClientHandler.receivePongMessage(new PongMessage());
         }catch(Exception e)
         {
-            e.printStackTrace();
+            controller.manageConnectionError();
         }
 
     }
 
+    /**
+     * Put the received message in the gameMessages queue
+     * @param msg received message
+     */
     @Override
     public synchronized void handle(ServerGameMessage msg) {
         //msg.handle(controller);
@@ -72,18 +98,26 @@ public class RMIClient extends ClientNetwork implements RemoteClient,ServerMessa
         }
     }
 
+    /**
+     * Send the pong answer
+     * @param msg ping message
+     */
     @Override
     public void handle(PingMessage msg) {
         sendMessage(new PongMessage());
     }
 
+    /**
+     * Establish the remote connection, obtaining the RemoteClientHandler
+     * @return true in case of success, false in case of error
+     */
     @Override
     public boolean init() {
         if(!stop)
             close();
         try{
             Registry registry = LocateRegistry.getRegistry(serverIP);
-            IRMIListener remoteListener = (IRMIListener) registry.lookup("rmiListener");
+            RemoteRMIListener remoteListener = (RemoteRMIListener) registry.lookup("rmiListener");
             UnicastRemoteObject.exportObject(this,0);
             this.rmiClientHandler = remoteListener.getHandler();
             this.rmiClientHandler.register(this);
@@ -97,6 +131,9 @@ public class RMIClient extends ClientNetwork implements RemoteClient,ServerMessa
 
     }
 
+    /**
+     * Close the connection
+     */
     @Override
     public void close() {
         stopWaitingPing();

@@ -547,9 +547,9 @@ public class ClientGUIView extends Application implements View{
         if(this.controller.getAvailableActions().size() == 1){
             textNotify.setText("Auto action complete : "+this.controller.getAvailableActions().get(0) + "\n" + textNotify.getText());
             if(this.controller.getAvailableActions().get(0).equals(Action.GRAB))
-                controller.getClient().sendMessage(new GrabActionRequest());
+                controller.getClientNetwork().sendMessage(new GrabActionRequest());
             if(this.controller.getAvailableActions().get(0).equals(Action.SHOOT))
-                controller.getClient().sendMessage(new ShootActionRequest());
+                controller.getClientNetwork().sendMessage(new ShootActionRequest());
             disableButton();
         }
         else {
@@ -2458,10 +2458,10 @@ public class ClientGUIView extends Application implements View{
                         weaponToReload = selected;
                         price = selected.getPrice();
                         list = new ArrayList<>(ClientContext.get().getMyPlayer().getCardPower().stream().filter(n -> price.contains(n.getColor())).collect(Collectors.toList()));
-                        if(list.size() == 0)
+                        if(list.size() != 0)
                             choosePowerUpToPay(list);
                         else
-                            controller.getClient().sendMessage(new ReloadWeaponRequest(weaponToReload,null));
+                            controller.getClientNetwork().sendMessage(new ReloadWeaponRequest(weaponToReload,null));
                     }
                     break;
                 }

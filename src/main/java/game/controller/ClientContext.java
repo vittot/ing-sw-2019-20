@@ -1,6 +1,8 @@
 package game.controller;
 
 import game.model.Kill;
+
+import java.util.ArrayList;
 import java.util.List;
 import game.model.GameMap;
 import game.model.Player;
@@ -40,6 +42,7 @@ public class ClientContext {
     private ClientContext() {
         finalFrenzy = false;
         movedAllowed = true;
+        killboard = new ArrayList<>();
     }
 
     /**

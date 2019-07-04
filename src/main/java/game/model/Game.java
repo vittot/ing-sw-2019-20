@@ -76,7 +76,7 @@ public class Game {
     /**
      * Max number of kill
      */
-    private int killboardSize = 8;
+    private int killboardSize = 2;
     /**
      * List  of game listener
      */
@@ -311,7 +311,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    private boolean readDeck(String fileName){
+    public boolean readDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         int id=1;
@@ -340,7 +340,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    private boolean readAmmoDeck(String fileName){
+    public boolean readAmmoDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         try
@@ -366,7 +366,7 @@ public class Game {
      * @param fileName
      * @return
      */
-    private boolean readPowerUpDeck(String fileName){
+    public boolean readPowerUpDeck(String fileName){
         SAXBuilder builder = new SAXBuilder();
         Document document = null;
         int id = 1;
@@ -912,6 +912,7 @@ public class Game {
             for (int j = 0; j < players.size(); j++) {
                 if (colors[i] == players.get(j).getColor()) {
                     if (countDeaths >= 5) countDeaths = 5;
+                    if (countDeaths == 0) countDeaths = 1;
                     if (firstBlood == colors[i] && countFirstBlood) {
                         players.get(j).addPoints(POINTSCOUNT.get(countDeaths-1) + 1);
                     } else
@@ -1418,7 +1419,7 @@ public class Game {
      * @return true if killboard is full
      */
     public boolean isKillBoardFull() {
-        return this.killBoard.size() == this.killboardSize;
+        return this.killBoard.size() >= this.killboardSize;
     }
 
     /**

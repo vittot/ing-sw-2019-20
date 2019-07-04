@@ -9,7 +9,7 @@ import game.controller.commands.clientcommands.PongMessage;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IRMIClientHandler extends Remote {
+public interface RemoteRMIClientHandler extends Remote {
 
     void sendMessage(ServerMessage msg) throws RemoteException;
 
