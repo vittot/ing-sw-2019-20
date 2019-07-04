@@ -942,12 +942,13 @@ public class ClientGUIView extends Application implements View{
         yes.setVisible(true);
         no.setVisible(true);
         yes.setOnMouseClicked(mouseEvent -> {
+            text.setText("Choose the ammo you wan to use");
             activateAmmo();
             no.setVisible(false);
             yes.setVisible(false);
         });
         no.setOnMouseClicked(mouseEvent -> {
-            List <CardPower> list = ClientContext.get().getMyPlayer().getCardPower().stream().filter(x -> x.getId() == scopeSelected.getId()).collect(Collectors.toList());
+            List <CardPower> list = ClientContext.get().getMyPlayer().getCardPower().stream().filter(x -> x.getId() != scopeSelected.getId()).collect(Collectors.toList());
             choosePowerUpToPay(list);
             no.setVisible(false);
             yes.setVisible(false);
@@ -1318,6 +1319,7 @@ public class ClientGUIView extends Application implements View{
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
         refreshAmmoCard();
+        refreshMyPlayerCard();
         if(weaponsToReload.size() == 0){
             textNotify.setText("Invalid weapons selection \n" + textNotify.getText());
         }else {
@@ -1570,8 +1572,9 @@ public class ClientGUIView extends Application implements View{
         StackPane.setMargin(tex,new Insets(20, 0,0,0));
         StackPane.setAlignment(tex,Pos.TOP_CENTER);
         int j = 1;
+        ArrayList<Integer> points = new ArrayList<>(ranking.values());
         for(Player p : ranking.keySet()){
-            Label pos = new Label(p.getNickName() + " got " +j+ "° place with "+ ranking.get(p) + " points");
+            Label pos = new Label(p.getNickName() + " got " +j+ "° place with "+ points.get(j-1) + " points");
             sp.getChildren().add(pos);
             StackPane.setAlignment(pos,Pos.TOP_CENTER);
             StackPane.setMargin(pos,new Insets(20 + j * 30, 0,0,0));
