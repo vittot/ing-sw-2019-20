@@ -748,6 +748,7 @@ public class ClientController implements ServerGameMessageHandler {
         if(currWeapon != null) {
             currWeapon.setLoaded(false);
         }
+        clientView.completedShootAction();
     }
 
     /**

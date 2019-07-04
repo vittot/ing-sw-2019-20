@@ -1073,6 +1073,15 @@ public class ClientGUIView extends Application implements View{
     }
 
     /**
+     * notify that my player grab a card ammo
+     * @param ammos ammo
+     * @param cp card power
+     */
+    @Override
+    public void notifyGrabAmmo(List<Color> ammos, CardPower cp ){
+        refreshMyPlayerAmmo();
+    }
+    /**
      * notification of invalid message
      */
     @Override
@@ -1115,7 +1124,6 @@ public class ClientGUIView extends Application implements View{
        /* String url = getClass().getResource("/graphics/sound/shoot.wav").toExternalForm();
         AudioClip audio = new AudioClip(url);
         audio.play();
-
         */
         String hitted = ClientContext.get().getMap().getPlayerById(idHitten).getNickName();
         String shooter = ClientContext.get().getMap().getPlayerById(idShooter).getNickName();
@@ -1169,6 +1177,8 @@ public class ClientGUIView extends Application implements View{
                 refreshPlayerDash(pID,ClientContext.get().getMap().getPlayerById(pID).getColor().toString());
         }
         refreshPlayerPosition();
+        refreshMyPlayerDamage();
+        refreshPlayerDamage();
     }
 
     /**
@@ -1307,6 +1317,7 @@ public class ClientGUIView extends Application implements View{
      */
     @Override
     public void reloadWeaponPhase(List<CardWeapon> weaponsToReload) {
+        refreshAmmoCard();
         if(weaponsToReload.size() == 0){
             textNotify.setText("Invalid weapons selection \n" + textNotify.getText());
         }else {
@@ -1497,7 +1508,7 @@ public class ClientGUIView extends Application implements View{
         StackPane.setMargin(none,new Insets(100 + j , 0,0,40));
         j = j + 35;
         for(FullEffect f : plusEffects){
-            RadioButton eff = new RadioButton("Effect: "+f.getName());
+            RadioButton eff = new RadioButton("Effect: "+f.getName() + "description: " + f.getDescription());
             eff.setId(f.getName());
             eff.setToggleGroup(tg);
             sp.getChildren().add(eff);
@@ -1719,6 +1730,15 @@ public class ClientGUIView extends Application implements View{
             }
         }
     }
+
+    /**
+     * Confirm of complete shoot action
+     */
+    @Override
+    public void completedShootAction() {
+        refreshMyPlayerCard();
+    }
+
     private void refreshMyPlayerDash(String c){
         myPlayerDash.setImage(new Image(ClassLoader.getSystemClassLoader().getResourceAsStream("graphics/map/"+c+"Dash2.png")));
     }
@@ -2055,7 +2075,7 @@ public class ClientGUIView extends Application implements View{
         zoom.setOnMouseClicked(mouseEvent -> primaryStage.setFullScreen(true));
         map.getChildren().add(zoom);
         StackPane.setAlignment(zoom,Pos.TOP_CENTER);
-        StackPane.setMargin(zoom, new Insets(0,0,0,screenWidth * 12 / 100));
+        StackPane.setMargin(zoom, new Insets(0,0,0,screenWidth * 18 / 100));
     }
 
     /**

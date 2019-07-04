@@ -57,6 +57,8 @@ public interface View {
 
     void choosePowerUpToUse(List<CardPower> cardPower);
 
+    void notifyGrabAmmo(List<Color> ammos, List <CardPower> cp);
+
     void notifyInvalidMessage();
 
     void notifyTurnChanged(int pID);
@@ -129,5 +131,6 @@ public interface View {
 
     void notifyFinalFrenzy();
 
-    void notifyGrabAmmo(List<Color> colors, List<CardPower> powerups);
+    void completedShootAction();
+
 }
