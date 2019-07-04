@@ -1,21 +1,30 @@
 package game.model;
 
 import game.model.effects.*;
+import game.model.exceptions.InsufficientAmmoException;
 import org.junit.jupiter.api.Test;
 
 //import javax.xml.bind.JAXBContext;
 //import javax.xml.bind.Marshaller;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class CardWeaponTest {
+
+    /**
+     * instance all the different kind of game weapon
+     * @throws Exception
+     */
     @Test
     void instanceWeapons ()throws Exception
     {
-
-
-
-
 //        //Distruttore (lock rifle)
 //        SimpleEffect distr01 = new SimpleEffect (2,1,1,1,false,false,0,0,1,2,0,12,false, false,false,0,false,false, Target.PLAYER);
 //        SimpleEffect distr21 = new SimpleEffect (0,1,1,1,false,false,0,0,1,2,0, 12,false,false,false,2,false,false, Target.PLAYER);
@@ -230,5 +239,65 @@ class CardWeaponTest {
         marshallerObj.marshal(cwLR, fo);
         //marshallerObj.marshal(distr21, fo);*/
 
+    }
+
+    /**
+     * Reload an unloaded weapon without cardPower usage
+     */
+    @Test
+    void reloadWeaponTest(){
+        Player p = new Player(1, PlayerColor.GREEN);
+        p.addAmmo(Color.BLUE);
+        p.addAmmo(Color.BLUE);
+        List<Color> priceLRB = new ArrayList<>();
+        priceLRB.add(Color.BLUE);
+        priceLRB.add(Color.BLUE);
+        CardWeapon cwLR = new CardWeapon("Lock rifle",priceLRB,null,null,null,false,false);
+        cwLR.setShooter(p);
+        p.addWeapon(cwLR);
+        cwLR.setLoaded(false);
+        try {
+            cwLR.reloadWeapon(new ArrayList<>());
+        } catch (InsufficientAmmoException e) {
+            e.printStackTrace();
+        }
+        assertTrue(cwLR.isLoaded());
+    }
+
+    /**
+     * Reload an unloaded weapon with cardPower usage
+     */
+    @Test
+    void reloadWeaponTest2(){
+        Player p = new Player(1, PlayerColor.GREEN);
+        p.addAmmo(Color.BLUE);
+        List<Color> priceLRB = new ArrayList<>();
+        priceLRB.add(Color.BLUE);
+        priceLRB.add(Color.BLUE);
+        CardWeapon cwLR = new CardWeapon("Lock rifle",priceLRB,null,null,null,false,false);
+        cwLR.setShooter(p);
+        p.addWeapon(cwLR);
+        cwLR.setLoaded(false);
+        try {
+            cwLR.reloadWeapon(Collections.singletonList(new CardPower(1, "Targeting scope"," ", Color.BLUE, false,true, null)));
+        } catch (InsufficientAmmoException e) {
+            e.printStackTrace();
+        }
+        assertTrue(cwLR.isLoaded());
+    }
+
+    /**
+     * Return if two weapons are equals
+     */
+    @Test
+    void equalsTest(){
+        List<Color> priceLRB = new ArrayList<>();
+        priceLRB.add(Color.BLUE);
+        priceLRB.add(Color.BLUE);
+        CardWeapon cwLR = new CardWeapon("Lock rifle",priceLRB,null,null,null,false,false);
+        cwLR.setId(1);
+        CardWeapon cwLA = new CardWeapon("ZX-2",priceLRB,null,null,null,false,false);
+        cwLA.setId(2);
+        assertTrue(!cwLR.equals(cwLA));
     }
 }
