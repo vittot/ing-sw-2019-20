@@ -18,7 +18,7 @@ class GameMapTest {
     private GameMap map;
 
     @BeforeEach
-    public void before()  {
+    void before(){
         map = new GameMap(1,2,3);
         Square[][] grid = new Square[3][2];
         Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};

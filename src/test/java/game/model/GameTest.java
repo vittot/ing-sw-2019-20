@@ -291,11 +291,26 @@ class GameTest {
     void isFinal(){
         assertFalse(g.isFinalFreazy());
     }
+
+    /**
+     * Check if the last kill of the turn
+     */
     @Test
     void getLastKill(){
         Player p1  = g.getPlayer(1);
         Player p2 = g.getPlayer(2);
         g.addThisTurnKill(p1,p2,false);
         assertEquals(g.getLastKill(p2).getKiller(),p1);
+    }
+
+    /**
+     * Check if this turn kill is filled correctly
+     */
+    @Test
+    void getThisTurnKill(){
+        Player p1  = g.getPlayer(1);
+        Player p2 = g.getPlayer(2);
+        g.addThisTurnKill(p1,p2,false);
+        assertEquals(g.getThisTurnKill().size(),1);
     }
 }
