@@ -912,6 +912,7 @@ public class ClientGUIView extends Application implements View{
             sg.setScene(tempScene);
             primaryStage.setAlwaysOnTop(false);
             sg.setAlwaysOnTop(true);
+            sg.toFront();
             sg.show();
         }
         else{
@@ -1038,7 +1039,7 @@ public class ClientGUIView extends Application implements View{
         StackPane.setAlignment(tex,Pos.TOP_CENTER);
         sp.setPrefSize(screenWidth * 30 / 100,screenHeight * 50/ 100);
         for(CardPower cp : cardPower){
-            CheckBox cb = new CheckBox(cp.getName());
+            CheckBox cb = new CheckBox(cp.getName() + "color " + cp.getColor());
             StackPane.setAlignment(cb,Pos.TOP_LEFT);
             StackPane.setMargin(cb,new Insets(100 + j , 0,0,40));
             sp.getChildren().add(cb);
@@ -2574,7 +2575,9 @@ public class ClientGUIView extends Application implements View{
                     }
                 if (selected.getAltEffect() != null) {
                     name = new Label("Alternative effect: "+ selected.getAltEffect().getName());
+                    name.setTextFill(Color.WHITE);
                     desc = new Label(selected.getAltEffect().getDescription());
+                    desc.setTextFill(Color.WHITE);
                     desc.setWrapText(true);
                     vbox.getChildren().addAll(name, desc);
                     VBox.setMargin(name, new Insets(0 ,0,0,25));

@@ -128,6 +128,9 @@ class PlainDamageEffectTest {
         assertEquals(expTargets,targets);
     }
 
+    /**
+     * Test for the application of the effect
+     */
     @Test
     void applyEffect() {
         effect = new PlainDamageEffect(1,1, 0, GameMap.MAX_DIST, TargetVisibility.VISIBLE, 2, 1, false, DifferentTarget.ANYONE, false,false);

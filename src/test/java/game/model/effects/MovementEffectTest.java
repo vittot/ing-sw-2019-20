@@ -64,6 +64,9 @@ class MovementEffectTest {
         game.getPlayers().get(2).setGame(game);
     }
 
+    /**
+     * Test for the targets research
+     */
     @Test
     void selectMoved() {
         effect = new MovementEffect(1,1,1,3,1,3,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,false,false,DifferentTarget.ANYONE);
