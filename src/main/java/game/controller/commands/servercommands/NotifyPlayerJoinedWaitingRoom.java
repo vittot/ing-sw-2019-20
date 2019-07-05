@@ -10,7 +10,10 @@ import game.model.Player;
  */
 public class NotifyPlayerJoinedWaitingRoom implements ServerGameMessage {
 
-    private Player player; /** reference to the player */
+    /**
+     * reference to the player
+     */
+    private Player player;
 
     /**
      * construct correct message

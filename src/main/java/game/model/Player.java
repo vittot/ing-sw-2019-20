@@ -21,29 +21,52 @@ import java.util.stream.Collectors;
  * class that represents a single player in game
  */
 public class Player implements Target, Serializable, Comparable<Player> {
-    private PlayerColor color; /** field that specifies the player color */
-    private List<PlayerColor> marks; /** list of all the marks received by the player during the game */
-    private List<PlayerColor> thisTurnMarks; /** list of all the marks received during the current turn by the player */
-    private int id; /** field that contains the id of the player in game */
-    private String nickName; /** nickName chosen by the user to play the game */
-    private List<PlayerColor> damage; /** list of all the damages received by the player during the game */
-    private AdrenalineLevel adrenaline; /** field that indicates the player adrenaline state */
-    private transient List<CardWeapon> weapons; /** list of weapons grabbed by the player */
-    private CardWeapon actualWeapon; /** field representing the weapon actually used by the player */
-    private CardPower actualCardPower; /** reference to the power-up card actually use by the player */
-    private List<Color> ammo; /** list of ammos grabbed by the player */
-    private List<CardPower> cardPower; /** list of power-up cards grabbed by the player */
-    private int deaths; /** field that counts the player deaths */
-    private transient int points; /** field that counts the player points */
-    private Square position; /** reference to the square where the player is positioned */
-    private transient Game game; /** reference to the game */
-    private boolean isDead; /** field that indicates if the player is dead or alive */
-    private static final int MARKS_PER_ENEMY=3; /** constant value that specify the max number of marks that every player can give to each of the others */
-    private boolean serializeEverything; /** boolean value that permits to specify if the transient attribute have to been serialized in transmission */
-    private transient PlayerObserver playerObserver; /** reference to the object that is in charge of notify the game events */
-    private boolean suspended; /** boolean value that specifies if the player has been suspended from the game cause of connection lost */
-    private int killboardpoints; /** field that contains the points calculated at the end of the game */
-    private boolean beforeFrenzy = true; /** boolean that specifies if the player got some damages before final frenzy
+    /** field that specifies the player color */
+    private PlayerColor color;
+    /** list of all the marks received by the player during the game */
+    private List<PlayerColor> marks;
+    /** list of all the marks received during the current turn by the player */
+    private List<PlayerColor> thisTurnMarks;
+    /** field that contains the id of the player in game */
+    private int id;
+    /** nickName chosen by the user to play the game */
+    private String nickName;
+    /** list of all the damages received by the player during the game */
+    private List<PlayerColor> damage;
+    /** field that indicates the player adrenaline state */
+    private AdrenalineLevel adrenaline;
+    /** list of weapons grabbed by the player */
+    private transient List<CardWeapon> weapons;
+    /** field representing the weapon actually used by the player */
+    private CardWeapon actualWeapon;
+    /** reference to the power-up card actually use by the player */
+    private CardPower actualCardPower;
+    /** list of ammos grabbed by the player */
+    private List<Color> ammo;
+    /** list of power-up cards grabbed by the player */
+    private List<CardPower> cardPower;
+    /** field that counts the player deaths */
+    private int deaths;
+    /** field that counts the player points */
+    private transient int points;
+    /** reference to the square where the player is positioned */
+    private Square position;
+    /** reference to the game */
+    private transient Game game;
+    /** field that indicates if the player is dead or alive */
+    private boolean isDead;
+    /** constant value that specify the max number of marks that every player can give to each of the others */
+    private static final int MARKS_PER_ENEMY=3;
+    /** boolean value that permits to specify if the transient attribute have to been serialized in transmission */
+    private boolean serializeEverything;
+    /** reference to the object that is in charge of notify the game events */
+    private transient PlayerObserver playerObserver;
+    /** boolean value that specifies if the player has been suspended from the game cause of connection lost */
+    private boolean suspended;
+    /** field that contains the points calculated at the end of the game */
+    private int killboardpoints;
+    /** boolean that specifies if the player got some damages before final frenzy */
+    private boolean beforeFrenzy = true;
     /**
      * construct a player object ready to start the game
      * @param id

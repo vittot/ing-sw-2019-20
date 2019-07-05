@@ -21,10 +21,14 @@ public class ClientTextView implements  View {
     private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_GREY = "\u001b[37m";
-    private ClientController controller; /** reference to che client controller */
-    private Scanner fromKeyBoard; /** standard input reference */
-    private List<GameMap> availableMaps; /** list of available maps */
-    private Thread waitingThread; /** thread to wait the game start */
+    /** reference to che client controller */
+    private ClientController controller;
+    /** standard input reference */
+    private Scanner fromKeyBoard;
+    /** list of available maps */
+    private List<GameMap> availableMaps;
+    /** thread to wait the game start */
+    private Thread waitingThread;
 
 
     /**

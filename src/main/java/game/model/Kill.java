@@ -6,9 +6,12 @@ import java.io.Serializable;
  * class representing every player death, indicate the killer and if the victim was raged too
  */
 public class Kill implements Serializable {
-    private Player killer; /** reference to the killer player */
-    private Player victim; /** reference to the victim (player dead) */
-    private boolean isRage; /** boolean that specifies if the victim was raged too */
+    /** reference to the killer player */
+    private Player killer;
+    /** reference to the victim (player dead) */
+    private Player victim;
+    /** boolean that specifies if the victim was raged too */
+    private boolean isRage;
 
     /**
      * construct a Kill object

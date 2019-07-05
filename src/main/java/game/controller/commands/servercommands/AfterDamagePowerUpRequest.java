@@ -13,8 +13,14 @@ import java.util.List;
  * message to ask the client if he want to use a targeting scope card to apply an additional damage
  */
 public class AfterDamagePowerUpRequest implements ServerGameMessage {
-    private List<CardPower> list; /** list of targeting scope card to choose from */
-    private List<Target> targets; /** list of possible target to dealt a damage */
+    /**
+     * list of targeting scope card to choose from
+     */
+    private List<CardPower> list;
+    /**
+     * list of possible target to dealt a damage
+     */
+    private List<Target> targets;
 
     /**
      * construct a message with correct parameters

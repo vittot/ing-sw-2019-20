@@ -12,8 +12,15 @@ import java.util.List;
  * notify the correct reload of a weapon and the power-up cards used
  */
 public class CheckReloadResponse implements ServerGameMessage {
-    private CardWeapon weapon; /** weapon that has been reloaded */
-    private List<CardPower> powerUps; /** power-up cards to discard */
+    /**
+     * weapon that has been reloaded
+     */
+    private CardWeapon weapon;
+
+    /**
+     * power-up cards to discard
+     */
+    private List<CardPower> powerUps;
 
     /**
      * construct the message

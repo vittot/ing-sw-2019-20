@@ -12,7 +12,10 @@ import java.util.List;
  */
 public class ChooseSquareRequest implements ServerGameMessage {
 
-    private List<Square> possiblePositions; /** possible square to choose from */
+    /**
+     * possible square to choose from
+     */
+    private List<Square> possiblePositions;
 
     /**
      * construct the correct message

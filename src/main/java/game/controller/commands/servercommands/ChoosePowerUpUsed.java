@@ -10,7 +10,10 @@ import game.model.CardPower;
  */
 public class ChoosePowerUpUsed implements ServerGameMessage {
 
-    private CardPower cardPower; /** power-up used by the client and to remove */
+    /**
+     * power-up used by the client and to remove
+     */
+    private CardPower cardPower;
 
     /**
      * construct the message

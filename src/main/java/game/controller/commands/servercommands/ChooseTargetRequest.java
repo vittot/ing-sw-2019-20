@@ -12,8 +12,15 @@ import java.util.List;
  * message to allow the choice of possible targets to choose from to apply the effect selected
  */
 public class ChooseTargetRequest implements ServerGameMessage {
-    private List<Target> possibleTargets; /** list of possible targets to choose from */
-    private SimpleEffect currSimpleEffect; /** effect selected */
+
+    /**
+     * list of possible targets to choose from
+     */
+    private List<Target> possibleTargets;
+    /**
+     * effect selected
+     */
+    private SimpleEffect currSimpleEffect;
 
     /**
      * construct the correct message

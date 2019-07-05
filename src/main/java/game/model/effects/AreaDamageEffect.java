@@ -12,9 +12,12 @@ import java.util.Objects;
  * class that permit to apply area damages to players one square away from the shooter
  */
 public class AreaDamageEffect extends SimpleEffect {
-    private int damage; /** attribute tat contains the damages to apply */
-    private int marks; /** attribute tat contains the marks to apply */
-    private int maxEnemyPerSquare; /** attribute tat contains the number of enemy toshoot per square */
+    /** attribute tat contains the damages to apply */
+    private int damage;
+    /** attribute tat contains the marks to apply */
+    private int marks;
+    /** attribute tat contains the number of enemy toshoot per square */
+    private int maxEnemyPerSquare;
 
     /**
      * construct an area damage effect with the correct parameter

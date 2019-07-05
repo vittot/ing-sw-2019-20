@@ -24,9 +24,11 @@ import java.util.stream.Collectors;
  */
 public class ServerController implements ClientGameMessageHandler, PlayerObserver, EffectHandler {
 
-    private ClientHandler clientHandler; /** reference to the corresponding ClientHandler object */
+    /** reference to the corresponding ClientHandler object */
+    private ClientHandler clientHandler;
 
-    private final GameManager gameManager; /** reference to the class that manage the creation of all the waiting rooms and all the game */
+    /** reference to the class that manage the creation of all the waiting rooms and all the game */
+    private final GameManager gameManager;
 
     private Game model; /** reference to the model that contains game information */
     private Player currPlayer; /** reference to the player in the model associated with this server controller */

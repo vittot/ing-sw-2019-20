@@ -11,8 +11,10 @@ import java.util.Objects;
  */
 public class Room implements Target, Serializable {
 
-    private MapColor color; /** field that identifies the color of the room */
-    private GameMap map; /** reference to the game map */
+    /** field that identifies the color of the room */
+    private MapColor color;
+    /** reference to the game map */
+    private GameMap map;
 
     /**
      * construct a room specifying the color and the map that contains it

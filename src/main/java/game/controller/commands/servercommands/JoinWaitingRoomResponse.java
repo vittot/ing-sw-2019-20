@@ -10,8 +10,15 @@ import game.controller.commands.ServerMessageHandler;
  */
 public class JoinWaitingRoomResponse implements ServerGameMessage {
 
-    private int id; /** id of the player in the waiting room joined */
-    private WaitingRoom waitingRoom; /** waiting room joined */
+    /**
+     * id of the player in the waiting room joined
+     */
+    private int id;
+
+    /**
+     * waiting room joined
+     */
+    private WaitingRoom waitingRoom;
 
     /**
      * construct correct message

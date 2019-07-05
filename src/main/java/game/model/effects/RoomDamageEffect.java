@@ -12,8 +12,10 @@ import java.util.Objects;
  * class that represents a simple effect that plain damage to all the players that are positioned in a specific room of the map
  */
 public class RoomDamageEffect extends SimpleEffect {
-    private int damage; /** attribute representing the damages to apply */
-    private int marks; /** attribute representing the marks to apply */
+    /** attribute representing the damages to apply */
+    private int damage;
+    /** attribute representing the marks to apply */
+    private int marks;
 
     /**
      * construct a room damage effect object with correct parameters

@@ -9,7 +9,10 @@ import game.controller.commands.ServerMessageHandler;
  */
 public class InvalidMessageResponse implements ServerGameMessage {
 
-    private String message; /** message to show to the client */
+    /**
+     * message to show to the client
+     */
+    private String message;
 
     /**
      * construct correct message

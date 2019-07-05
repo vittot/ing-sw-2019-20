@@ -13,11 +13,16 @@ import java.util.List;
  * abstract class that describe the common behavior of a single step effect that composes a weapon full effect
  */
 public abstract class SimpleEffect implements Serializable {
-    protected int minEnemy; /** minimum number of enemy to select */
-    protected int maxEnemy; /** maximum number of enemy to select */
-    protected int minDist; /** minimum distance from the shooter to select the enemy */
-    protected int maxDist; /** maximum distance from the shooter to select the enemy */
-    protected TargetVisibility visibility; /** attribute that indicate where to research in the map the enemy to select */
+    /** minimum number of enemy to select */
+    protected int minEnemy;
+    /** maximum number of enemy to select */
+    protected int maxEnemy;
+    /** minimum distance from the shooter to select the enemy */
+    protected int minDist;
+    /** maximum distance from the shooter to select the enemy */
+    protected int maxDist;
+    /** attribute that indicate where to research in the map the enemy to select */
+    protected TargetVisibility visibility;
 
     /**
      * construct a complete simple effect object with correct parameters

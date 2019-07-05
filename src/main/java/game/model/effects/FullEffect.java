@@ -11,11 +11,16 @@ import java.util.Objects;
  * class representing a whole weapon effect, it is composed by a list of simple effect that realize all the step necessary to complete it
  */
 public class FullEffect implements Serializable {
-    private List<SimpleEffect> simpleEffects; /** list of simple effects each of which composes the full effect */
-    private String name; /** name of the effect */
-    private String description; /** description of the effect */
-    private List<Color> price; /** list of color representing the price to pay to use the effect */
-    private boolean beforeBase; /** boolean value that indicate if the effect can be used before than a base effect */
+    /** list of simple effects each of which composes the full effect */
+    private List<SimpleEffect> simpleEffects;
+    /** name of the effect */
+    private String name;
+    /** description of the effect */
+    private String description;
+    /** list of color representing the price to pay to use the effect */
+    private List<Color> price;
+    /** boolean value that indicate if the effect can be used before than a base effect */
+    private boolean beforeBase;
 
     /**
      * construct a full effect with the correct parameters

@@ -13,16 +13,25 @@ import java.util.stream.Collectors;
  * class that represents a single tile in the map
  */
 public class Square implements Target, Serializable {
-    private MapColor color; /** field that contains the square room color */
-    private Edge[] edges; /** array that specify the 4 edges of the square between {WALL, DOOR, OPEN} (up-right-down-left from 0 to 3) */
-    private boolean respawn; /** field that specify if the square is a respawn square in the map */
-    private List<Player> players; /** reference to all the players that are positioned in this square */
-    private List<CardWeapon> weapons; /** list of weapons available in this tile (only in case of respawn tile) */
-    private CardAmmo cardAmmo; /** card ammo available to grab in this tile (only if this is not a respawn tile) */
+    /** field that contains the square room color */
+    private MapColor color;
+    /** array that specify the 4 edges of the square between {WALL, DOOR, OPEN} (up-right-down-left from 0 to 3) */
+    private Edge[] edges;
+    /** field that specify if the square is a respawn square in the map */
+    private boolean respawn;
+    /** reference to all the players that are positioned in this square */
+    private List<Player> players;
+    /** list of weapons available in this tile (only in case of respawn tile) */
+    private List<CardWeapon> weapons;
+    /** card ammo available to grab in this tile (only if this is not a respawn tile) */
+    private CardAmmo cardAmmo;
     //Convention: the map starts with (0,0) the left upper corner and ends with (map.dimY-1,map.dimX-1) at the lower right corner
-    private int x; /** this is the numb of the column (from 0), the 2nd index in the grid matrix (x coordinate) */
-    private int y; /** this is the numb of the row (from 0), the 1st idex in the grid matrix (y coordinate) */
-    private GameMap map; /** reference to the game */
+    /** this is the numb of the column (from 0), the 2nd index in the grid matrix (x coordinate) */
+    private int x;
+    /** this is the numb of the row (from 0), the 1st idex in the grid matrix (y coordinate) */
+    private int y;
+    /** reference to the game */
+    private GameMap map;
 
     /**
      * Construct an empty square

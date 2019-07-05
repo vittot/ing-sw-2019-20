@@ -10,8 +10,14 @@ import game.model.effects.FullEffect;
  */
 public class ChooseFirstEffectRequest implements ServerGameMessage {
 
-    private FullEffect baseEff; /** weapon base effect */
-    private FullEffect altEff; /** weapon alternative effect */
+    /**
+     * weapon base effect
+     */
+    private FullEffect baseEff;
+    /**
+     * weapon alternative effect
+     */
+    private FullEffect altEff;
 
     /**
      * construct the correct message

@@ -49,7 +49,9 @@ import static com.sun.javafx.application.PlatformImpl.runLater;
 
 
 public class ClientGUIView extends Application implements View{
+    /** GUI view reference */
     private static ClientGUIView GUI;
+    /** Reference to the client controller */
     private ClientController controller;
     /**
      * User name choosed
