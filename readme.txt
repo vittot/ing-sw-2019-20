@@ -9,6 +9,8 @@ java -jar AdrenalinaServer.jar
 
 Il client richiederà come prima cosa se procedere in CLI o avviare la GUI
 
+Il jar del client potrebbe non avviare correttamente la gui su tutte le piattaforme delle diverse libreria di javafx nei diversi sistemi operativi. Su git sono caricati 3 jar generati su windows, mac e linux, in caso di problemi è consigliabile generare il jar sul sistema operativo su cui dovrà essere avviato.
+
 Per il corretto funzionamento di RMI occorre che il codice rilevi correttamente l'indirizzo IP locale della macchina (sia su client che su server) e questo non avviene su mac, ove il programma richiede all'utente di inserirlo manualmente
 
 In HKCU\Console occorre create una DWORD di nome VirtualTerminalLevel con valore 1 (e riavviare cmd.exe).
