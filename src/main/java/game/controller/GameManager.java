@@ -1,3 +1,4 @@
+
 package game.controller;
 
 import game.model.Game;
@@ -15,12 +16,33 @@ import java.util.*;
  * It's a singleton
  */
 public class GameManager implements Serializable {
+    /**
+     * Instance of the singleton
+     */
     private static GameManager instance;
+    /**
+     * Id for the next game
+     */
     private int nextId;
+    /**
+     * List of currently created games
+     */
     private List<Game> games;
+    /**
+     * List of existing waiting rooms
+     */
     private List<WaitingRoom> waitingRooms;
+    /**
+     * List of available maps
+     */
     private List<GameMap> availableMaps;
+    /**
+     * List of users logged
+     */
     private List<String> usersLogged;
+    /**
+     * Users suspended associated to their game
+     */
     private Map<String,Game> usersSuspended;
 
 

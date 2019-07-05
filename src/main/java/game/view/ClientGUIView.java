@@ -1891,13 +1891,13 @@ public class ClientGUIView extends Application implements View{
      * create a text view in the map
      */
     private void createTextNotification(){
-        text.setStyle("-fx-font: 20px Tahoma;");
+        //text.setStyle("-fx-font: 20px Tahoma;");
         text.setFont(Font.font(screenHeight * 1.851 / 100));
         text.setWrapText(true);
         text.setTextFill(Color.WHITE);
         text.setPrefWidth(screenWidth*52.5/100);
         text.setMaxHeight(screenHeight* 3 /100);
-        textNotify.setStyle("-fx-font: 15px Tahoma;");
+        //textNotify.setStyle("-fx-font: 15px Tahoma;");
         textNotify.setFont(Font.font(screenHeight * 1.388 / 100));
         textNotify.setTextFill(Color.WHITE);
         textNotify.setPrefWidth(screenWidth*52.5/100);

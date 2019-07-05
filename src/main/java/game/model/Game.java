@@ -614,6 +614,10 @@ public class Game {
         }
     }
 
+    /**
+     * Notify about the rejoin of a player
+     * @param player player rejoin
+     */
     public void notifyPlayerRejoined(Player player) {
         gameObservers.forEach(o -> o.onPlayerRejoined(player));
     }
@@ -628,13 +632,17 @@ public class Game {
         gameObservers.forEach(o -> o.onGameEnd(getRanking()));
     }
 
+    /**
+     * Check if the game is ended
+     * @return true if it is ended
+     */
     public boolean isEnded() {
         return ended;
     }
 
     /**
      * Return the list of players ordered by points
-     * @return
+     * @return ranking map
      */
     public SortedMap<Player,Integer> getRanking()
     {

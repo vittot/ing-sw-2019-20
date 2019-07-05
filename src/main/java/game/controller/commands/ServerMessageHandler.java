@@ -8,13 +8,13 @@ import game.controller.commands.servercommands.PingMessage;
 public interface ServerMessageHandler {
     /**
      * manage the reception of server game messages
-     * @param msg
+     * @param msg message
      */
     void handle(ServerGameMessage msg);
 
     /**
      * manage the reception of server ping messages
-     * @param msg
+     * @param msg message
      */
     void handle(PingMessage msg);
 }

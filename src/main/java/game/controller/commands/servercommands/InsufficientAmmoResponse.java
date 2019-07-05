@@ -12,7 +12,6 @@ public class InsufficientAmmoResponse implements ServerGameMessage {
     /**
      * Handle the message
      * @param handler who handle the message
-     * @return the message from the handler
      */
     @Override
     public void handle(ServerGameMessageHandler handler) {
@@ -22,7 +21,6 @@ public class InsufficientAmmoResponse implements ServerGameMessage {
     /**
      * Handle the message
      * @param handler who handle the message
-     * @return the message from the handler
      */
     @Override
     public void handle(ServerMessageHandler handler) {

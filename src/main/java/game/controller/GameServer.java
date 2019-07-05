@@ -15,16 +15,37 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Manage incoming connections from clients
+ * Manage incoming connections from clients. It's a singleton
  */
 public class GameServer {
+    /**
+     * Server socket
+     */
     private ServerSocket serverSocket;
+    /**
+     * Object exposed on RMI registri
+     */
     private RMIListener rmiListener;
+    /**
+     * ThreadPool to handle socket connections
+     */
     private ExecutorService pool;
+    /**
+     * Flag to close the connection
+     */
     private boolean close;
+    /**
+     * List of socket connection handlers
+     */
     private List<SocketClientHandler> socketClientHandlers;
+    /**
+     * Singleton instance
+     */
     private static GameServer instance;
 
+    /**
+     * Default constructor
+     */
     private GameServer() {
         socketClientHandlers = new ArrayList<>();
         pool = Executors.newCachedThreadPool();
@@ -101,7 +122,6 @@ public class GameServer {
         close = true;
         serverSocket.close();
         pool.shutdown();
-        //TODO unbind from registry for RMI
 
     }
 }

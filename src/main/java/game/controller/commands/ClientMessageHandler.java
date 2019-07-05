@@ -10,19 +10,19 @@ public interface ClientMessageHandler {
 
     /**
      * manage the reception of client game messages
-     * @param msg
+     * @param msg message
      */
     void handle(ClientGameMessage msg);
 
     /**
      * manage the reception of client pong messages (response to ping messages from the server)
-     * @param msg
+     * @param msg message
      */
     void handle(PongMessage msg);
 
     /**
      * manage the reception of client login requests
-     * @param login
+     * @param login message
      */
     void handle(LoginMessage login);
 }

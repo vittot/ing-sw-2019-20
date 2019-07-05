@@ -5,7 +5,7 @@ import game.model.exceptions.InsufficientAmmoException;
 import game.model.exceptions.MapOutOfLimitException;
 
 /**
- * interface that describe the different kind of server game messages and the behavior to manage them
+ * Interface which is implemented by the controller which is able to handle all server game messages
  */
 public interface ServerGameMessageHandler {
 
