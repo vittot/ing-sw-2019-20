@@ -30,11 +30,11 @@ public class PickUpAmmoResponse implements ServerGameMessage {
         this.colors = colors;
         this.powerups = powerups;
     }
+
     /**
      * Handle the message
      * @param handler who handle the message
      */
-
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);

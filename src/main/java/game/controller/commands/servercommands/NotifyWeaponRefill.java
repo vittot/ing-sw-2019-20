@@ -57,11 +57,11 @@ public class NotifyWeaponRefill implements ServerGameMessage {
     public int getY() {
         return y;
     }
+
     /**
      * Handle the message
      * @param handler who handle the message
      */
-
     @Override
     public void handle(ServerGameMessageHandler handler) {
         handler.handle(this);

@@ -1,7 +1,7 @@
 package game.model;
 
 import game.controller.Configuration;
-import game.model.exceptions.NoResidualActionAvaiableException;
+import game.model.exceptions.NoResidualActionAvailableException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -226,12 +226,12 @@ public class Turn {
      * @param action
      * @param adrenaline
      */
-    public List<Action> newAction(Action action, AdrenalineLevel adrenaline) throws NoResidualActionAvaiableException {
+    public List<Action> newAction(Action action, AdrenalineLevel adrenaline) throws NoResidualActionAvailableException {
         actionList.clear();
         currentAction = action;
 
         if (numOfActions == 0){
-            throw new NoResidualActionAvaiableException();
+            throw new NoResidualActionAvailableException();
         }
         numOfActions = numOfActions - 1;
         if(finalFrenzy) {

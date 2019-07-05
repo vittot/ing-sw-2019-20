@@ -412,7 +412,8 @@ public class Square implements Target, Serializable {
      */
     @Override
     public void move(int numSquare, Direction dir) throws MapOutOfLimitException{
-        for (Player p : players) {
+        List<Player> py = new ArrayList<>(players);
+        for (Player p : py) {
             p.move(numSquare, dir);
         }
     }

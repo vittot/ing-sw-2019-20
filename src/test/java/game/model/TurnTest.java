@@ -1,8 +1,7 @@
 package game.model;
 
 
-import game.model.exceptions.NoResidualActionAvaiableException;
-import org.junit.jupiter.api.BeforeAll;
+import game.model.exceptions.NoResidualActionAvailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,7 @@ class TurnTest {
      * Check the Movement list return
      */
     @Test
-    void newAction() throws NoResidualActionAvaiableException {
+    void newAction() throws NoResidualActionAvailableException {
         turn.setNumOfActions(2);
         turn.newAction(action,al);
         assertEquals(actionList,turn.getActionList());
