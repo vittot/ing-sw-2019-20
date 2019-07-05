@@ -15,3 +15,5 @@ Per il corretto funzionamento di RMI occorre che il codice rilevi correttamente 
 
 In HKCU\Console occorre create una DWORD di nome VirtualTerminalLevel con valore 1 (e riavviare cmd.exe).
 Nella root di github è caricato un file bat che provvede all'aggiunta di questa chiave.
+
+I jar sono caricati qui https://drive.google.com/open?id=1zo3iv4ln4xMX42SphkUkHwFY7z2VNvzL perchè git impedisce di caricare file così grandi
