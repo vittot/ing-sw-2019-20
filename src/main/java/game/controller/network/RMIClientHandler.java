@@ -120,7 +120,7 @@ public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHa
     public synchronized void handle(PongMessage msg) {
         pingTimer.shutdownNow();
         pingTimer = Executors.newScheduledThreadPool(1);
-        System.out.println(username + " PONG");
+        //System.out.println(username + " PONG");
         nPingLost = 0;
     }
 
@@ -133,7 +133,7 @@ public class RMIClientHandler extends ClientHandler implements RemoteRMIClientHa
         try {
             if(!stop)
             {
-                System.out.println("PING " + username);
+                //System.out.println("PING " + username);
                 client.receivePingMessage(msg);
             }
         } catch (RemoteException e) {

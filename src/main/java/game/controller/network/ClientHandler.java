@@ -171,7 +171,7 @@ public abstract class ClientHandler implements GameListener {
      * @param ranking - players ordered by points
      */
     @Override
-    public void onGameEnd(SortedMap<Player,Integer> ranking) {
+    public void onGameEnd(Ranking ranking) {
 
         this.controller.setState(ServerState.GAME_ENDED);
         sendMessage(new NotifyEndGame(ranking));

@@ -4,6 +4,7 @@ import game.controller.commands.ServerGameMessage;
 import game.controller.commands.ServerGameMessageHandler;
 import game.controller.commands.ServerMessageHandler;
 import game.model.Player;
+import game.model.Ranking;
 
 import java.util.SortedMap;
 
@@ -12,22 +13,21 @@ import java.util.SortedMap;
  */
 public class NotifyEndGame implements ServerGameMessage {
     /**
-     * sorted map containing the players in order of occurred points
+     * final game ranking
      */
-    private SortedMap<Player,Integer> ranking;
+    private Ranking ranking;
 
     /**
      * construct correct message
-     * @param gameRanking
+     * @param gameRanking ranking
      */
-    public NotifyEndGame(SortedMap<Player,Integer> gameRanking) {
+    public NotifyEndGame(Ranking gameRanking) {
         this.ranking = gameRanking;
     }
 
     /**
      * Handle the message
-     * @param handler who handle the messag
-     * @param handler
+     * @param handler handler
      */
     @Override
     public void handle(ServerGameMessageHandler handler) {
@@ -36,8 +36,7 @@ public class NotifyEndGame implements ServerGameMessage {
 
     /**
      * Handle the message
-     * @param handler who handle the messag
-     * @param handler
+     * @param handler handler
      */
     @Override
     public void handle(ServerMessageHandler handler) {
@@ -48,7 +47,7 @@ public class NotifyEndGame implements ServerGameMessage {
      * return final game ranking
      * @return ranking
      */
-    public SortedMap<Player,Integer> getRanking() {
+    public Ranking getRanking() {
         return ranking;
     }
 }

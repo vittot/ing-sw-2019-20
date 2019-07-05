@@ -15,7 +15,7 @@ public class ChooseWeaponToGrabRequest implements ServerGameMessage {
     /**
      * list of weapons available to grab
      */
-    List<CardWeapon> weapons;
+    private List<CardWeapon> weapons;
 
     /**
      * construct correct message

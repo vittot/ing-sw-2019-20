@@ -18,7 +18,7 @@ public interface GameListener {
      * notify game has ended
      * @param gameRanking
      */
-    void onGameEnd(SortedMap<Player,Integer> gameRanking);
+    void onGameEnd(Ranking gameRanking);
 
     /**
      * notify damages that a player dealt to another one

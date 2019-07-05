@@ -118,7 +118,7 @@ public class ClientGuiWrapper implements View {
     }
 
     @Override
-    public void showRanking(SortedMap<Player, Integer> ranking) {
+    public void showRanking(Ranking ranking) {
         runLater(()->gui.showRanking(ranking));
     }
 

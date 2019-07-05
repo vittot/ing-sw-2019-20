@@ -1593,7 +1593,7 @@ public class ClientGUIView extends Application implements View{
      * @param ranking sorted map with points and player
      */
     @Override
-    public void showRanking(SortedMap<Player, Integer> ranking) {
+    public void showRanking(Ranking ranking) {
         System.out.println("RANK");
         StackPane sp = new StackPane();
         Scene tempScene = new Scene(sp);
@@ -1603,9 +1603,9 @@ public class ClientGUIView extends Application implements View{
         StackPane.setMargin(tex,new Insets(20, 0,0,0));
         StackPane.setAlignment(tex,Pos.TOP_CENTER);
         int j = 1;
-        ArrayList<Integer> points = new ArrayList<>(ranking.values());
-        for(Player p : ranking.keySet()){
-            Label pos = new Label(p.getNickName() + " got " +j+ "° place with "+ points.get(j-1) + " points");
+        List<Integer> points = ranking.getOrderedPoints();
+        for(String p : ranking.getOrderedNicknames()){
+            Label pos = new Label(p + " got " +j+ "° place with "+ points.get(j-1) + " points");
             sp.getChildren().add(pos);
             StackPane.setAlignment(pos,Pos.TOP_CENTER);
             StackPane.setMargin(pos,new Insets(20 + j * 30, 0,0,0));
