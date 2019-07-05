@@ -58,10 +58,38 @@ class TurnTest {
     }
 
     /**
-     * Return the action list
+     * Manage the new turn creation
      */
     @Test
     void manageCurrPlayerTest(){
+        Player p1 = new Player(1, PlayerColor.GREEN);
+        Player p2 = new Player(2, PlayerColor.PURPLE);
+        turn.setCurrentPlayer(p1);
+        turn.setNumOfActions(0);
+        turn.newTurn(p2,false);
+        assertTrue(turn.getCurrentPlayer().equals(p2) && turn.getNumOfActions() == 2);
+    }
 
+    /**
+     * Return the action list
+     */
+    @Test
+    void createNewActionListTest() throws NoResidualActionAvailableException {
+        Player p1 = new Player(1, PlayerColor.GREEN);
+        turn.setCurrentPlayer(p1);
+        List<Action> act = turn.newAction(Action.MOVEMENT,AdrenalineLevel.NONE);
+        if(turn.getNumOfActions()>0)
+            act = turn.newAction(Action.GRAB, AdrenalineLevel.GRABLEVEL);
+        assertTrue(act.equals(actionList));
+    }
+
+    /**
+     * Return the action list
+     */
+    @Test
+    void contIfFrenzyTest() throws NoResidualActionAvailableException {
+        Player p1 = new Player(1, PlayerColor.GREEN);
+        turn.setCurrentPlayer(p1);
+        assertFalse(turn.isFinalFrenzy());
     }
 }

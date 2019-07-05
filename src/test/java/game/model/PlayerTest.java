@@ -37,6 +37,7 @@ class PlayerTest {
         price.add(Color.YELLOW);
 
         w = new CardWeapon(price);
+        w1 = new CardWeapon(price);
         p.setWeapons(new ArrayList<CardWeapon>());
 
         List<CardPower> powerups = new ArrayList<>();
@@ -148,5 +149,63 @@ class PlayerTest {
             
         }
         assertTrue(p.getWeapons().contains(w));
+    }
+
+    /**
+     * Test the adding of new weapons, ammos and power-ups
+     */
+    @Test
+    void addingItemTest(){
+        int numW = p.getWeapons().size();
+        p.addWeapon(w);
+        int numA = p.getAmmo().size();
+        p.addAmmo(Color.BLUE);
+        int numCp = p.getCardPower().size();
+        p.addCardPower(new CardPower(3,"name","descr",Color.BLUE,true,false,null));
+        assertTrue(p.getWeapons().size() == numW+1 && p.getAmmo().size() == numA+1 && p.getCardPower().size() == numCp+1);
+    }
+
+    /**
+     * Test the player respawn
+     */
+    @Test
+    void respawnTest(){
+        p.respawn(new CardPower(3,"name","descr",Color.BLUE,true,false,null));
+        assertTrue(game.getMap().getSpawnpoints().contains(p.getPosition()));
+    }
+
+    /**
+     * Test the player points comparing
+     */
+    @Test
+    void pointComparingTest(){
+        Player p2 = new Player(2, PlayerColor.GREY);
+        p.setPoints(5);
+        p2.setPoints(4);
+        assertTrue(p.compareTo(p2) < 0);
+    }
+
+    /**
+     * Test the control on unloaded weapons
+     */
+    @Test
+    void hasToReloadTest() throws InsufficientAmmoException {
+        p.addWeapon(w);
+        p.addWeapon(w1);
+        p.pay(Collections.singletonList(Color.BLUE),new ArrayList());
+        w1.setLoaded(true);
+        List<CardWeapon> list = p.hasToReload();
+        assertTrue(!list.isEmpty() && p.canReloadWeapon(list.get(0)));
+    }
+
+    /**
+     * Test dealt of damage and marks
+     */
+    @Test
+    void addDamageTest(){
+        Player p2 = new Player(2, PlayerColor.GREY);
+        p.addDamage(p2,3);
+        p.addThisTurnMarks(p2,1);
+        assertTrue(p.getDamage().size() == 3 && p.getThisTurnMarks().size() == 1);
     }
 }
