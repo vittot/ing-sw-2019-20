@@ -644,14 +644,18 @@ public class Game {
      * Return the list of players ordered by points
      * @return ranking map
      */
-    public SortedMap<Player,Integer> getRanking()
+    public Ranking getRanking()
     {
-        SortedMap<Player,Integer> ranking = new TreeMap<>();
         ArrayList<Player> orderedPlayers = new ArrayList<>(players);
+        ArrayList<String> orderedNicknames = new ArrayList<>();
+        ArrayList<Integer> orderedPoints = new ArrayList<>();
         Collections.sort(orderedPlayers);
         for(Player p : orderedPlayers)
-            ranking.put(p,p.getPoints());
-        return ranking;
+        {
+            orderedNicknames.add(p.getNickName());
+            orderedPoints.add(p.getPoints());
+        }
+        return new Ranking(orderedNicknames,orderedPoints);
     }
 
     public long getNumPlayersAlive() {

@@ -1000,11 +1000,12 @@ public class ClientTextView implements  View {
      * @param ranking
      */
     @Override
-    public void showRanking(SortedMap<Player, Integer> ranking){
+    public void showRanking(Ranking ranking){
         int i=1;
         System.out.println("The game is over! \nLet's see the final results:");
-        ArrayList<Integer> points = new ArrayList<>(ranking.values());
-        for(Player p : ranking.keySet()) {
+        List<Integer> points = ranking.getOrderedPoints();
+        List<String> users = ranking.getOrderedNicknames();
+        for(String u : users) {
             switch (i) {
                 case 1:
                     System.out.print(">>> First place : ");
@@ -1022,7 +1023,7 @@ public class ClientTextView implements  View {
                     System.out.print(">>> Fifth place : ");
                     break;
             }
-            System.out.println("ID: "+p.getId() + ", nickname: "+p.getNickName()+", total points "+points.get(i-1) +".");
+            System.out.println("Nickname: "+u+", total points "+points.get(i-1) +".");
             i++;
         }
         restartGamePhase();

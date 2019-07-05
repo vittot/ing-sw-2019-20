@@ -10,3 +10,6 @@ java -jar AdrenalinaServer.jar
 Il client richiederà come prima cosa se procedere in CLI o avviare la GUI
 
 Per il corretto funzionamento di RMI occorre che il codice rilevi correttamente l'indirizzo IP locale della macchina (sia su client che su server) e questo non avviene su mac, ove il programma richiede all'utente di inserirlo manualmente
+
+In HKCU\Console occorre create una DWORD di nome VirtualTerminalLevel con valore 1 (e riavviare cmd.exe).
+Nella root di github è caricato un file bat che provvede all'aggiunta di questa chiave.

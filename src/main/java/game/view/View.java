@@ -50,7 +50,7 @@ public interface View {
 
     void choosePowerUpToRespawn(List<CardPower> cardPower);
 
-    void showRanking(SortedMap<Player,Integer> ranking);
+    void showRanking(Ranking ranking);
 
     void notifyCompletedOperation(String message);
 

@@ -184,21 +184,24 @@ class GameTest {
 
     }
 
+    /**
+     * Ranking generation test
+     */
     @Test
     void getRankingTest()
     {
         g.getPlayer(2).setPoints(3);
-        SortedMap<Player,Integer> ranking = g.getRanking();
+        Ranking ranking = g.getRanking();
         int p = Integer.MAX_VALUE, id=-1;
         boolean correct = true;
-        for(Map.Entry<Player,Integer> e : ranking.entrySet())
+        for(Integer i : ranking.getOrderedPoints())
         {
-            if(e.getValue() > p)
+            if(i > p)
                 correct = false;
-            if(e.getValue() == p && e.getKey().getId() < id)
-                correct = false;
-            p = e.getValue();
-            id = e.getKey().getId();
+            /*if(e.getValue() == p && e.getKey().getId() < id)
+                correct = false;*/
+            p = i;
+            //id = e.getKey().getId();
 
         }
         assertTrue(correct);
