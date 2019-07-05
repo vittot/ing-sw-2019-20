@@ -1560,7 +1560,8 @@ public class ClientGUIView extends Application implements View{
             else{
                 int i = 0;
                 FullEffect fe = null;
-                for(FullEffect e : plusEffects){
+                List<FullEffect> fulle = new ArrayList<>(plusEffects);
+                for(FullEffect e : fulle){
                     if(e.getName().equals(((RadioButton)tg.getSelectedToggle()).getId())){
                         fe = e;
                         plusEffects.remove(i);
