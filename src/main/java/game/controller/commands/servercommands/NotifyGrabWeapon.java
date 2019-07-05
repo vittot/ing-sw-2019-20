@@ -10,7 +10,7 @@ import game.model.CardWeapon;
  */
 public class NotifyGrabWeapon implements ServerGameMessage {
     /**
-     id of the player that grab the weapon
+     * id of the player that grab the weapon
      */
     private int p;
     /**

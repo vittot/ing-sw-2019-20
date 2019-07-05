@@ -12,11 +12,11 @@ public class NotifyMovement implements ServerGameMessage {
     private int id;
     /**
      * x coordinate of the movement destination
-     * */
+     */
     private int x;
     /**
      * y coordinate of the movement destination
-     * */
+     */
     private int y;
 
     /**

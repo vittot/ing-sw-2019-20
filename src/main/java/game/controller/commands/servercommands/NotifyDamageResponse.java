@@ -10,15 +10,15 @@ import game.controller.commands.ServerMessageHandler;
 public class NotifyDamageResponse implements ServerGameMessage {
 
     /**
-     * shooter's id that dealt damage
+     * shooter id that dealt damage
      */
     private int shooterId;
     /**
-     victim's id that dealt damage
+     victim id that dealt damage
      */
     private int hitId;
     /**
-     * damages dealt *
+     * damages dealt
      */
     private int damage;
     /**

@@ -687,9 +687,11 @@ public class ClientTextView implements  View {
 
     @Override
     public void notifyGrabAmmo(List<Color> colors, List<CardPower> powerups) {
-        System.out.println(">> Ammo grabbed: ");
-        for(Color c : colors){
-            System.out.println("  >> "+c.toString());
+        if(colors != null && !colors.isEmpty()) {
+            System.out.println(">> Ammo grabbed: ");
+            for (Color c : colors) {
+                System.out.println("  >> " + c.toString());
+            }
         }
         if(powerups != null && !powerups.isEmpty()){
             System.out.println(">> You grab a "+ powerups.get(0).getName());

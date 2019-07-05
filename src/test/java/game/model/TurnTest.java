@@ -43,8 +43,25 @@ class TurnTest {
         turn.setNumOfActions(2);
         turn.newAction(action,al);
         assertEquals(actionList,turn.getActionList());
-
     }
 
+    /**
+     * Apply a single step action if it's possible
+     */
+    @Test
+    void applyStepTest() throws NoResidualActionAvailableException {
+        turn.setNumOfActions(2);
+        turn.newAction(action,al);
+        turn.applyStep(Action.MOVEMENT);
+        turn.applyStep(Action.MOVEMENT);
+        assertTrue(turn.applyStep(Action.GRAB) && !turn.applyStep(Action.MOVEMENT));
+    }
 
+    /**
+     * Return the action list
+     */
+    @Test
+    void manageCurrPlayerTest(){
+
+    }
 }
