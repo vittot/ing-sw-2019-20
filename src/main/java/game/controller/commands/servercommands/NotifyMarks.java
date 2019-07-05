@@ -9,9 +9,18 @@ import game.controller.commands.ServerMessageHandler;
  */
 public class NotifyMarks implements ServerGameMessage {
 
-    private int shooterId; /** shooter id */
-    private int hitId; /** victim id */
-    private int marks; /** number of marks given/received */
+    /**
+     * shooter id
+     */
+    private int shooterId;
+    /**
+     * victim id
+     */
+    private int hitId;
+    /**
+     * number of marks given/received
+     */
+    private int marks;
 
     /**
      * construct correct message

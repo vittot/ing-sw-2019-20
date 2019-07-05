@@ -11,8 +11,10 @@ import java.util.SortedMap;
  * notify the end of the game
  */
 public class NotifyEndGame implements ServerGameMessage {
-
-    private SortedMap<Player,Integer> ranking; /** sorted map containing the players in order of occurred points */
+    /**
+     * sorted map containing the players in order of occurred points
+     */
+    private SortedMap<Player,Integer> ranking;
 
     /**
      * construct correct message

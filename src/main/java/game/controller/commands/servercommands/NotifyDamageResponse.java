@@ -9,10 +9,22 @@ import game.controller.commands.ServerMessageHandler;
  */
 public class NotifyDamageResponse implements ServerGameMessage {
 
-    private int shooterId; /** shooter's id that dealt damage */
-    private int hitId; /** victim's id that dealt damage */
-    private int damage; /** damages dealt */
-    private int marksToRemove; /** marks to remove for the victim */
+    /**
+     * shooter's id that dealt damage
+     */
+    private int shooterId;
+    /**
+     victim's id that dealt damage
+     */
+    private int hitId;
+    /**
+     * damages dealt *
+     */
+    private int damage;
+    /**
+     * marks to remove for the victim
+     */
+    private int marksToRemove;
 
     /**
      * construct correct message

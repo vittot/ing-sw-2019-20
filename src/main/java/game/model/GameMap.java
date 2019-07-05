@@ -10,14 +10,22 @@ import java.util.stream.Collectors;
  * class representing the complete field (map) of the game, where players can move and complete their actions
  */
 public class GameMap implements Serializable {
-    private int id; /** attribute that identifies the different kind of map */
-    private Square[][] grid;  /** grid grouping the squares that make part of the map */ // grid[y][x] y -> 0 : 2 | x -> 0 : 3
-    private int dimX; /** number of columns of the grid */
-    private int dimY; /** number of rows of the grid */
-    public static final int MAX_DIST = 12; /** max value of distance between two players */
-    public static final int WEAPON_PER_SQUARE = 3; /** max number of weapons available to grab in respawn points */
-    private List<Room> rooms; /** list containing all the map rooms */
-    private String description; /** map description */
+    /** attribute that identifies the different kind of map */
+    private int id;
+    /** grid grouping the squares that make part of the map */
+    private Square[][] grid;  // grid[y][x] y -> 0 : 2 | x -> 0 : 3
+    /** number of columns of the grid */
+    private int dimX;
+    /** number of rows of the grid */
+    private int dimY;
+    /** max value of distance between two players */
+    public static final int MAX_DIST = 12;
+    /** max number of weapons available to grab in respawn points */
+    public static final int WEAPON_PER_SQUARE = 3;
+    /** list containing all the map rooms */
+    private List<Room> rooms;
+    /** map description */
+    private String description;
 
     /**
      * Construct an empty GameMap with just the dimensions set

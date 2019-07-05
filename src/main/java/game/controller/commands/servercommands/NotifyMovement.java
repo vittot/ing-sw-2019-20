@@ -8,9 +8,16 @@ import game.controller.commands.ServerMessageHandler;
  * notify a completed movement action
  */
 public class NotifyMovement implements ServerGameMessage {
-    private int id; /** id of the player that complete the movement **/
-    private int x; /** x coordinate of the movement destination */
-    private int y; /** y coordinate of the movement destination */
+    /** id of the player that complete the movement **/
+    private int id;
+    /**
+     * x coordinate of the movement destination
+     * */
+    private int x;
+    /**
+     * y coordinate of the movement destination
+     * */
+    private int y;
 
     /**
      * construct correct message

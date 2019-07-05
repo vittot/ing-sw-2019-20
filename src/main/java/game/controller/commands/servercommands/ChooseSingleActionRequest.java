@@ -12,7 +12,10 @@ import java.util.List;
  */
 public class ChooseSingleActionRequest implements ServerGameMessage {
 
-    private List<Action> actions; /** available actions to choose from */
+    /**
+     * available actions to choose from
+     */
+    private List<Action> actions;
 
     /**
      * construct the correct message

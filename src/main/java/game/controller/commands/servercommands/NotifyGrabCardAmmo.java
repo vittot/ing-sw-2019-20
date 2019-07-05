@@ -12,10 +12,22 @@ import java.util.List;
  */
 public class NotifyGrabCardAmmo implements ServerGameMessage {
 
-    private int pId; /** id of the player that complete the grab action */
-    private int x; /** x coordinate of the square where the player grab ammos */
-    private int y; /** y coordinate of the square where the player grab ammos */
-    private List<Color> ammos; /** list of ammos grabbed by the player */
+    /**
+     * id of the player that complete the grab action
+     */
+    private int pId;
+    /**
+     * x coordinate of the square where the player grab ammos
+     */
+    private int x;
+    /**
+     * y coordinate of the square where the player grab ammos
+     */
+    private int y;
+    /**
+     * list of ammos grabbed by the player
+     */
+    private List<Color> ammos;
     //private List<CardPower> powerUps;
 
     /**

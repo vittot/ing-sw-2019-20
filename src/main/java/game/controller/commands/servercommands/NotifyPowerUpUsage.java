@@ -10,8 +10,14 @@ import game.model.Player;
  * notify the correct usage of power-up card
  */
 public class NotifyPowerUpUsage implements ServerGameMessage {
-    private Player p; /** reference to the player that used the power-up card effect */
-    private CardPower cp; /** power-up card used */
+    /**
+     * reference to the player that used the power-up card effect
+     */
+    private Player p;
+    /**
+     * power-up card used
+     */
+    private CardPower cp;
 
     /**
      * construct the message

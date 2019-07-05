@@ -12,17 +12,28 @@ import java.util.TimerTask;
  * class that represent the state of the current turn of the game
  */
 public class Turn {
-    private Player currentPlayer; /** field that reference the player who is actually play the turn */
-    private int numOfActions; /** field that permit to count the remaining turn action */
-    private int numOfMovs;  /** field that which contains the number of movement made during the current turn  */
-    private Action currentAction;   /** field that reference the current action chosen from the player */
-    private List <Action> actionList; /** field that contains all the possible steps the player can make cause of the chosen action */
-    private Game game; /** field that reference the game */
-    private Timer timer; /** field that reference the timer object that allow the disconnection of the current player cause of a long time inactivity */
-    private boolean afterFirstPlayer = false; /** field that recognize if the current player is playing after or before the player that starts the game */
-    private List <Player> lastTurnPlayed; /** list of reference to player that played the last turns */
-    private int nPlayedFinalFrenzy; /** count of many players played their final frenzy turn */
-    private boolean finalFrenzy; /** field that specifies if it is a final frenzy turn */
+    /** field that reference the player who is actually play the turn */
+    private Player currentPlayer;
+    /** field that permit to count the remaining turn action */
+    private int numOfActions;
+    /** field that which contains the number of movement made during the current turn  */
+    private int numOfMovs;
+    /** field that reference the current action chosen from the player */
+    private Action currentAction;
+    /** field that contains all the possible steps the player can make cause of the chosen action */
+    private List <Action> actionList;
+    /** field that reference the game */
+    private Game game;
+    /** field that reference the timer object that allow the disconnection of the current player cause of a long time inactivity */
+    private Timer timer;
+    /** field that recognize if the current player is playing after or before the player that starts the game */
+    private boolean afterFirstPlayer = false;
+    /** list of reference to player that played the last turns */
+    private List <Player> lastTurnPlayed;
+    /** count of many players played their final frenzy turn */
+    private int nPlayedFinalFrenzy;
+    /** field that specifies if it is a final frenzy turn */
+    private boolean finalFrenzy;
 
     /**
      * construct a turn of a specific game

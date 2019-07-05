@@ -13,7 +13,10 @@ import java.util.List;
  */
 public class AvailableMapsListResponse implements ServerGameMessage {
 
-    private List<GameMap> avaiableMaps; /** list of available maps */
+    /**
+     * list of available maps
+     */
+    private List<GameMap> avaiableMaps;
 
     /**
      * construct the message

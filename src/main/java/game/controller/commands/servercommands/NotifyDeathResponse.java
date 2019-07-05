@@ -9,9 +9,18 @@ import game.model.Kill;
  * notify player death
  */
 public class NotifyDeathResponse implements ServerGameMessage {
-    private int idKiller; /** killer player id */
-    private int idVictim; /** victim player id */
-    private boolean isRage; /** boolean value that specifies if the victim was raged */
+    /**
+     * killer player id
+     */
+    private int idKiller;
+    /**
+     * victim player id
+     */
+    private int idVictim;
+    /**
+     * boolean value that specifies if the victim was raged
+     */
+    private boolean isRage;
 
     /**
      * construct correct message

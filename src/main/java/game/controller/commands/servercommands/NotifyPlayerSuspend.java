@@ -9,7 +9,10 @@ import game.controller.commands.ServerMessageHandler;
  */
 public class NotifyPlayerSuspend implements ServerGameMessage {
 
-    private int pId; /** player id */
+    /**
+     * suspended player id
+     */
+    private int pId;
 
     /**
      * construct correct message

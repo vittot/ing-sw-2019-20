@@ -11,9 +11,19 @@ import game.model.Square;
  */
 public class NotifyAmmoRefill implements ServerGameMessage {
 
-    private CardAmmo ca; /** card ammo added during the refill */
-    private int x; /** x coordinate of the considered square */
-    private int y; /** y coordinate of the considered square */
+    /**
+     * card ammo added during the refill
+     */
+    private CardAmmo ca;
+    /**
+     * x coordinate of the considered square
+     */
+    private int x;
+
+    /**
+     * y coordinate of the considered square
+     */
+    private int y;
 
     /**
      * construct correct message

@@ -13,10 +13,14 @@ import java.util.stream.Collectors;
  * class that represents a simple effect that plain damage to aall the players in a specific square of a map
  */
 public class SquareDamageEffect extends SimpleEffect {
-    private int damage; /** attribute that contains the damages to apply to the targets */
-    private int marks; /** attribute that contains the marks to apply to the targets */
-    private boolean lastTargetSquare; /** if true indicate to search target from the last target position */
-    private boolean sameDirection; /** true if the next target has to be select in the same direction of the previous */
+    /** attribute that contains the damages to apply to the targets */
+    private int damage;
+    /** attribute that contains the marks to apply to the targets */
+    private int marks;
+    /** if true indicate to search target from the last target position */
+    private boolean lastTargetSquare;
+    /** true if the next target has to be select in the same direction of the previous */
+    private boolean sameDirection;
 
     /**
      * construct a complete square damage effect with correct parameters

@@ -9,7 +9,10 @@ import game.controller.commands.ServerMessageHandler;
  */
 public class NotifyPlayerRejoin implements ServerGameMessage {
 
-    private int playerId; /** player id */
+    /**
+     * player id
+     */
+    private int playerId;
 
     /**
      * construct correct message

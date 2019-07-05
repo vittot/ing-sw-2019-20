@@ -12,7 +12,10 @@ import java.util.List;
  */
 public class ChooseWeaponToShootRequest implements ServerGameMessage {
 
-    private List<CardWeapon> myWeapons; /** weapons available to shoot */
+    /**
+     * weapons available to shoot
+     */
+    private List<CardWeapon> myWeapons;
 
     /**
      * construct correct message

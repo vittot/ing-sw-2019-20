@@ -13,12 +13,18 @@ import java.util.stream.Collectors;
  * class that represents a simple effect that plain damage to an established number of targets
  */
 public class PlainDamageEffect extends SimpleEffect {
-    private int damage; /** attribute that contains the damages to apply to the targets */
-    private int marks; /** attribute that contains the marks to apply to the targets */
-    private boolean lastTarget; /** if the target has to be among the previous targets hit by the weapon */
-    private DifferentTarget differentTarget; /** the target could be different from the last one or from all the previous */
-    private boolean chainTarget; /** if the target should be found from the target of the last effects (eg: T.H.O.R.) */
-    private boolean sameDirection; /** if the target has to be on the same last direction of the last one */
+    /** attribute that contains the damages to apply to the targets */
+    private int damage;
+    /** attribute that contains the marks to apply to the targets */
+    private int marks;
+    /** if the target has to be among the previous targets hit by the weapon */
+    private boolean lastTarget;
+    /** the target could be different from the last one or from all the previous */
+    private DifferentTarget differentTarget;
+    /** if the target should be found from the target of the last effects (eg: T.H.O.R.) */
+    private boolean chainTarget;
+    /** if the target has to be on the same last direction of the last one */
+    private boolean sameDirection;
 
     /**
      * construct a complete plain damage effect object with the correct parameters

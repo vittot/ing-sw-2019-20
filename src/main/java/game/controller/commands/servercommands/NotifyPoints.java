@@ -9,7 +9,10 @@ import game.controller.commands.ServerMessageHandler;
  */
 public class NotifyPoints implements ServerGameMessage {
 
-    private int points; /** player total points */
+    /**
+     * player total points
+     */
+    private int points;
 
     /**
      * construct correct message

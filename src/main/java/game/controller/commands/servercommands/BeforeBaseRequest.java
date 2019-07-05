@@ -9,8 +9,10 @@ import game.model.effects.FullEffect;
  * message that ask the client if he wants to apply a plus effect before base
  */
 public class BeforeBaseRequest implements ServerGameMessage {
-
-    private FullEffect plusEff; /** plus effect proposed */
+    /**
+     * plus effect proposed
+     */
+    private FullEffect plusEff;
 
     /**
      * construct the message

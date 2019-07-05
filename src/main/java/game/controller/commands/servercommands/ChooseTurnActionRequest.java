@@ -9,7 +9,10 @@ import game.controller.commands.ServerMessageHandler;
  */
 public class ChooseTurnActionRequest implements ServerGameMessage {
 
-    private boolean movAllowed; /** indicate if the movement is allowed for this turn */
+    /**
+     * indicate if the movement is allowed for this turn
+     */
+    private boolean movAllowed;
 
     /**
      * construct the correct message

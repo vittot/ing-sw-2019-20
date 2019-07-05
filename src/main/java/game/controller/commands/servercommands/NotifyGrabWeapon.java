@@ -9,12 +9,26 @@ import game.model.CardWeapon;
  * notify the occurred grab of a new weapon and if necessary the weapon to waste to complete the grab
  */
 public class NotifyGrabWeapon implements ServerGameMessage {
-
-    private int p; /** id of the player that grab the weapon */
-    private CardWeapon cw; /** weapon grabbed */
-    private int x; /** x coordinate of the square where the player grab the weapon */
-    private int y; /** y coordinate of the square where the player grab ammos */
-    private CardWeapon wWaste; /** if necessary, reference to the weapon to waste */
+    /**
+     id of the player that grab the weapon
+     */
+    private int p;
+    /**
+     * weapon grabbed
+     */
+    private CardWeapon cw;
+    /**
+     * x coordinate of the square where the player grab the weapon
+     */
+    private int x;
+    /**
+     * y coordinate of the square where the player grab ammos
+     */
+    private int y;
+    /**
+     * if necessary, reference to the weapon to waste
+     */
+    private CardWeapon wWaste;
 
     /**
      * construct correct message

@@ -14,15 +14,24 @@ import java.util.stream.Collectors;
  * simple effect that manage the possibility of apply movements of players
  */
 public class MovementEffect extends SimpleEffect {
-    private boolean moveShooter; /** true if the shooter has to be moved, false if the enemy has to be moved */
-    private TargetVisibility visibilityAfter; /** attribute that indicate if the victim of the movement has to be visible from the shooter after the application of the effect */
-    private boolean myPos; /** true if the target has to be moved into the position of the shooter */
-    private boolean chainMove; /** if the target has to be moved in the position of the last target (eg. Vortex Cannon) */
-    private boolean lastTarget; /** true if has to be selected a target from the last shot, false otherwise */
-    private boolean sameDirection; /** true if the next target has to be select in the same direction of the previous */
-    private DifferentTarget differentTarget; /** attribute that indicate if the shooter can't select on of the last targets shot before */
-    private int minMove; /** minimum distance of the movement to apply */
-    private int maxMove; /** maximum distance of the movement to apply */
+    /** true if the shooter has to be moved, false if the enemy has to be moved */
+    private boolean moveShooter;
+    /** attribute that indicate if the victim of the movement has to be visible from the shooter after the application of the effect */
+    private TargetVisibility visibilityAfter;
+    /** true if the target has to be moved into the position of the shooter */
+    private boolean myPos;
+    /** if the target has to be moved in the position of the last target (eg. Vortex Cannon) */
+    private boolean chainMove;
+    /** true if has to be selected a target from the last shot, false otherwise */
+    private boolean lastTarget;
+    /** true if the next target has to be select in the same direction of the previous */
+    private boolean sameDirection;
+    /** attribute that indicate if the shooter can't select on of the last targets shot before */
+    private DifferentTarget differentTarget;
+    /** minimum distance of the movement to apply */
+    private int minMove;
+    /** maximum distance of the movement to apply */
+    private int maxMove;
     //private List<Direction> choosenMovement;
 
     /**

@@ -12,11 +12,22 @@ import java.util.List;
  * notify the game has started
  */
 public class NotifyGameStarted implements ServerGameMessage {
-
-    private GameMap map; /** map of the game */
-    private List<Player> players; /** players that joined the waiting room */
-    private int id = 0; /** attribute that specifies the game id */
-    private List<Kill> killBoard; /** killBoard that will be updated whenever a player will die */
+    /**
+     * map of the game
+     */
+    private GameMap map;
+    /**
+     * players that joined the waiting room
+     */
+    private List<Player> players;
+    /**
+     * attribute that specifies the game id
+     */
+    private int id = 0;
+    /**
+     * killBoard that will be updated whenever a player will die
+     */
+    private List<Kill> killBoard;
 
     /**
      * construct correct message

@@ -14,9 +14,15 @@ import java.util.List;
  * message that contains the payment executed on the server (ammos and power-up cards to remove)
  */
 public class AddPayment implements ServerGameMessage {
+    /**
+     * ammo to pay
+     */
+    private List<Color> ammo;
 
-    private List<Color> ammo; /** ammo to pay */
-    private List <CardPower> powers; /** power-up cards to pay */
+    /**
+     * power-up cards to pay
+     */
+    private List <CardPower> powers;
 
     /**
      * construct he correct message
