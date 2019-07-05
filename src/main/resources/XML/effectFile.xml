@@ -1051,7 +1051,7 @@
         SimpleEffect gran01 =  new PlainDamageEffect(1,1,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
         SimpleEffect gran02 = new MovementEffect(0,1,0,GameMap.MAX_DIST,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false,false, DifferentTarget.ANYONE);
         SimpleEffect gran21 = new SquareDamageEffect(0,Game.MAXPLAYERS,0,GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,false);
-        //TODO Effetto plus su puo fare rima del effetto base
+        //Effetto plus su puo fare rima del effetto base
         -->
         <baseEffect>
             <beforeBase>false</beforeBase>

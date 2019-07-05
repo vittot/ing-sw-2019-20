@@ -141,7 +141,7 @@ class CardWeaponTest {
         SimpleEffect gran01 =  new PlainDamageEffect(1,1,0, GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,DifferentTarget.ANYONE,false,false);
         SimpleEffect gran02 = new MovementEffect(0,1,0, GameMap.MAX_DIST,0,1,TargetVisibility.VISIBLE,false,TargetVisibility.EVERYWHERE,false,false,true,false, DifferentTarget.ANYONE);
         SimpleEffect gran21 = new SquareDamageEffect(0,Game.MAXPLAYERS,0, GameMap.MAX_DIST,TargetVisibility.VISIBLE,1,0,false,false);
-        //TODO gran21 deve poter essere fatto prima dell'effetto base
+        //gran21 deve poter essere fatto prima dell'effetto base
 //
 //        //Rocket launcher
 //        SimpleEffect lcrz01 = new SimpleEffect (2,0,1,1,true,false,0,1,1,2,1,12,false,false,false,0,false,false,Target.PLAYER);
@@ -201,7 +201,7 @@ class CardWeaponTest {
 
 
 //
-//          Onda d'urto (shockwave) //TODO: verificare
+//          Onda d'urto (shockwave) //verificare
 //        SimpleEffect ond01 = new SimpleEffect (1,0,1,3,false,false,0,0,1,2,1,1,false,false,false,0,false,false,Target.PLAYER);
         SimpleEffect ond01 = new AreaDamageEffect(1,3,1,1,TargetVisibility.VISIBLE,1,0,1);
 

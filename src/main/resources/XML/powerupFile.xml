@@ -542,7 +542,6 @@
         </name>
         <description>
             Give 1 mark to a enemy that deal you damage and you can see.
-            <!--TODO gestire quando ti fanno danno-->
         </description>
         <color>
             blue
@@ -574,7 +573,6 @@
         </name>
         <description>
             Give 1 mark to a enemy that deal you damage and you can see.
-            <!--TODO gestire quando ti fanno danno-->
         </description>
         <color>
             red
@@ -606,7 +604,6 @@
         </name>
         <description>
             Give 1 mark to a enemy that deal you damage and you can see.
-            <!--TODO gestire quando ti fanno danno-->
         </description>
         <color>
             red
@@ -638,7 +635,6 @@
         </name>
         <description>
             Give 1 mark to a enemy that deal you damage and you can see.
-            <!--TODO gestire quando ti fanno danno-->
         </description>
         <color>
             blue
@@ -670,7 +666,6 @@
         </name>
         <description>
             Give 1 mark to a enemy that deal you damage and you can see.
-            <!--TODO gestire quando ti fanno danno-->
         </description>
         <color>
             yellow
@@ -702,7 +697,6 @@
         </name>
         <description>
             Give 1 mark to a enemy that deal you damage and you can see.
-            <!--TODO gestire quando ti fanno danno-->
         </description>
         <color>
             yellow

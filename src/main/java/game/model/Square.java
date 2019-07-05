@@ -385,7 +385,6 @@ public class Square implements Target, Serializable {
      */
     @Override
     public String returnName() {
-        //TODO string that identify suares
         return null;
     }
 

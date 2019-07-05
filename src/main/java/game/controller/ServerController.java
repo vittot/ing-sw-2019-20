@@ -1643,7 +1643,7 @@ public class ServerController implements ClientGameMessageHandler, PlayerObserve
      * If no choice is needed it passes to the next SingleEffect
      * When simpleEffects are terminated it passes to the next FullEffect
      * When fullEffects are terminated it return a confirm message
-     * @oaram e effect
+     * @param e effect
      * @return server answer
      */
     private ServerGameMessage handleMovementEffect(MovementEffect e)

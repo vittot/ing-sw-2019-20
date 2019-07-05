@@ -78,7 +78,7 @@ public class ClientContext {
      * @return the player object
      */
     public Player getMyPlayer(){
-        if(map.getPlayerById(myID) != null)                                                                             //TODO a volte da nullPointer
+        if(map.getPlayerById(myID) != null)
             return map.getPlayerById(myID);
         return playersInWaiting.stream().filter(player -> player.getId() == myID).findFirst().orElse(null);
     }

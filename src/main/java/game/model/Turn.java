@@ -137,7 +137,8 @@ public class Turn {
 
     /**
      * provide the creation and good starting of a new turn
-     * @param player , finalFrezy
+     * @param player player of the new turn
+     * @param finalFrezy true if it is a final frenzy turn
      */
     public void newTurn(Player player, boolean finalFrezy){
 

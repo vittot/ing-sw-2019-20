@@ -10,7 +10,6 @@ public class ReloadWeaponAction implements ClientGameMessage {
     /**
      * Handle the message
      * @param handler who handle the message
-     * @return the message from the handler
      */
     @Override
     public void handle(ClientMessageHandler handler) {

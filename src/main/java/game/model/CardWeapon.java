@@ -167,7 +167,7 @@ public class CardWeapon implements Serializable {
         return Objects.hash(id, name);
     }
 
-    //TODO it doesnt check player dist 2 not visible
+    //it doesnt check player dist 2 not visible
     public boolean checkweapon(Player p){
         List<Square> squaretmp = new ArrayList<>();
         if (this.plusBeforeBase)

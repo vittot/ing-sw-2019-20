@@ -91,4 +91,10 @@ class ServerControllerTest {
         assertFalse(GameManager.get().getUsersLogged().contains("user"));
     }
 
+    @Test
+    void endTurnManagement()
+    {
+
+    }
+
 }

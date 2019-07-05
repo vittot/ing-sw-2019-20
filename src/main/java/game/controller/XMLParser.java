@@ -296,7 +296,6 @@ public class XMLParser {
 
         int id = g.getDeckPower().size() + 1;
 
-        //TODO: read (and add on power up xml) the useWhenAttacking flag
         CardPower cardPower = new CardPower(id,name,desc,c,flag,false,effect);
         g.getDeckPower().add(cardPower);
         //Collections.shuffle(this.deckPower);

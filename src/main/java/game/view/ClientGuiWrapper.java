@@ -284,7 +284,7 @@ public class ClientGuiWrapper implements View {
 
     @Override
     public void notifyConnectionError() {
-        //TODO
+        runLater(()->gui.notifyConnectionError());
     }
 
     @Override
