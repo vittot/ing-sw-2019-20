@@ -51,6 +51,51 @@ class GameMapTest {
         assertTrue(GameMap.getDirection(sq1,sq2) == Direction.DOWN);
 
     }
+    @Test
+    void getGrid(){
+        Square[][] grid = new Square[3][2];
+        Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
+        Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
+        Edge[] edges3 = new Edge[]{Edge.DOOR,Edge.WALL,Edge.WALL,Edge.WALL};
+        Edge[] edges4 = new Edge[]{Edge.OPEN,Edge.OPEN,Edge.DOOR,Edge.OPEN};
+        Edge[] edges5 = new Edge[]{Edge.DOOR,Edge.OPEN,Edge.OPEN,Edge.WALL};
+
+        grid[0][0] = new Square(MapColor.BLUE, false, 0, 0, map, edges1);
+        grid[1][0] = new Square(MapColor.BLUE, false, 0, 1, map, edges2);
+        grid[2][0] = new Square(MapColor.RED, true, 0, 2, map, edges3);
+        grid[0][1] = new Square(MapColor.BLUE, true, 1, 0, map, edges4);
+        grid[1][1] = new Square(MapColor.YELLOW, true, 1, 1, map, edges5);
+        assertEquals(grid[0][0], map.getGrid()[0][0]);
+    }
+    @Test
+    void getAllSquare(){
+        List<Square> sq = new ArrayList<>();
+        Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
+        Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
+        Edge[] edges3 = new Edge[]{Edge.DOOR,Edge.WALL,Edge.WALL,Edge.WALL};
+        Edge[] edges4 = new Edge[]{Edge.OPEN,Edge.OPEN,Edge.DOOR,Edge.OPEN};
+        Edge[] edges5 = new Edge[]{Edge.DOOR,Edge.OPEN,Edge.OPEN,Edge.WALL};
+
+        sq.add(new Square(MapColor.BLUE, false, 0, 0, map, edges1));
+        sq.add(new Square(MapColor.BLUE, true, 1, 0, map, edges4));
+        sq.add(new Square(MapColor.BLUE, false, 0, 1, map, edges2));
+        sq.add(new Square(MapColor.YELLOW, true, 1, 1, map, edges5));
+        sq.add(new Square(MapColor.RED, true, 0, 2, map, edges3));
+        assertEquals(sq,map.getAllSquares());
+    }
+    /**
+     * Gte notmal squares
+     */
+    @Test
+    void getNormalSquare(){
+        List<Square> sq = new ArrayList<>();
+        Edge[] edges1 = new Edge[]{Edge.WALL,Edge.OPEN,Edge.OPEN,Edge.WALL};
+        Edge[] edges2 = new Edge[]{Edge.OPEN,Edge.WALL,Edge.DOOR,Edge.WALL};
+
+        sq.add(new Square(MapColor.BLUE, false, 0, 0, map, edges1));
+        sq.add(new Square(MapColor.BLUE, false, 0, 1, map, edges2));
+        assertEquals(sq, map.getNormalSquares());
+    }
     /**
      * Check description of the map
      */

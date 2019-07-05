@@ -15,6 +15,7 @@ import static org.mockito.Mockito.*;
 class GameTest {
 
     private Game g;
+    private List<Player> players = new ArrayList<>();
 
     @BeforeEach
     void before()  {
@@ -35,7 +36,6 @@ class GameTest {
         m.setGrid(grid);
 
 
-        List<Player> players = new ArrayList<>();
         PlayerObserver po = mock(PlayerObserver.class);
         doNothing().when(po).notifyPoints();
         for(i=0;i<3;i++) {
@@ -46,6 +46,13 @@ class GameTest {
         g = new Game(players,m,3);
     }
 
+    /**
+     * Check id game
+     */
+    @Test
+    void getId(){
+        assertEquals(g.getId(),0);
+    }
     /**
      * Test for normal turn change
      */
@@ -58,7 +65,25 @@ class GameTest {
         Player third  = g.getPlayers().get(2);
         assertEquals(pTurn,third);
     }
-
+    @Test
+    void getCurrentTurn(){
+        Player pTurn = g.getCurrentTurn().getCurrentPlayer();
+        assertEquals(pTurn,g.getCurrentTurn().getCurrentPlayer());
+    }
+    /**
+    *Check the number of player to be respawned
+    */
+    @Test
+    void getPLayerRespawned(){
+        assertEquals(g.getnPlayerToBeRespawned(),0);
+    }
+    /**
+     * Check get player
+     */
+    @Test
+    void getPlayer(){
+        assertEquals(players.get(0),g.getPlayer(1));
+}
     /**
      * Test for turn change after the last player
      */
@@ -140,6 +165,10 @@ class GameTest {
         assertTrue(hasAmmo && weaponOnMap == 2);
     }
 
+    /**
+     * check map
+     * @throws MapOutOfLimitException
+     */
     @Test
     void checkMap() throws MapOutOfLimitException{
         g.setMap(XMLParser.readMap(99, "mapFile.xml"));
@@ -154,11 +183,17 @@ class GameTest {
 
     }
 
+    /**
+     * Check read deck
+     */
     @Test
     void readDeck() {
         XMLParser.readDeck("effectFile.xml",this.g);
     }
 
+    /**
+     * Check ammo deck
+     */
     @Test
     void readAmmoDeck()
     {
@@ -170,6 +205,9 @@ class GameTest {
         assertTrue(g.getDeckAmmo().size() == 36 && g.getDeckAmmo().get(35).equals(c));
     }
 
+    /**
+     * read power up deck
+     */
     @Test
     void readPowerUpDeck()
     {
@@ -209,7 +247,7 @@ class GameTest {
     }
 
     /**
-     *
+     * check the point
      */
     @Test
     void updatePoints() {
@@ -244,5 +282,20 @@ class GameTest {
         g.countKillBoardPoints();
         assertTrue(p1.getKillboardpoints() == 8 && p2.getKillboardpoints() == 6 && p3.getKillboardpoints() == 0);
 
+    }
+
+    /**
+     * Check if the game is in final frenzy
+     */
+    @Test
+    void isFinal(){
+        assertFalse(g.isFinalFreazy());
+    }
+    @Test
+    void getLastKill(){
+        Player p1  = g.getPlayer(1);
+        Player p2 = g.getPlayer(2);
+        g.addThisTurnKill(p1,p2,false);
+        assertEquals(g.getLastKill(p2).getKiller(),p1);
     }
 }
