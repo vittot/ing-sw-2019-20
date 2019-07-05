@@ -11,7 +11,9 @@ java -jar AdrenalinaServer.jar
 
 Il client richiederà come prima cosa se procedere in CLI o avviare la GUI
 
-Per il corretto funzionamento di RMI occorre che il codice rilevi correttamente l'indirizzo IP locale della macchina (sia su client che su server) e questo non avviene su mac, ove il programma richiede all'utente di inserirlo manualmente
+Il jar del client potrebbe non avviare correttamente la gui su tutte le piattaforme delle diverse libreria di javafx nei diversi sistemi operativi. Su git sono caricati 3 jar generati su windows, mac e linux, in caso di problemi è consigliabile generare il jar sul sistema operativo su cui dovrà essere avviato.
+
+Per il corretto funzionamento di RMI occorre che il codice rilevi correttamente l'indirizzo IP locale della macchina (sia su client che su server) e questo non avviene su mac, ove il programma richiede all'utente di inserirlo manualmente. 
 
 Per visualizzare correttamente la CLI su windows occorre che sia possibile vedere i caratteri speciali ANSII, su Windows 10 è possibile farlo con una modifica al registro:
 
